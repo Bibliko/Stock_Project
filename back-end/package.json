@@ -9,7 +9,7 @@
     "prisma-up": "prisma migrate up --experimental",
     "prisma-studio": "prisma studio --experimental",
     "update-db": "npx prisma generate && npm run prisma-save && npm run prisma-up",
-    "docker-stop-containers": "docker container stop $(docker container ls -aq)",
+    "docker-stop-containers": "docker stop $(docker ps -a -q)",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "reset-db": "npm run docker-stop-containers && rm -rf ./db && rm -rf ./prisma/migrations",
     "dev": "nodemon index.js"
