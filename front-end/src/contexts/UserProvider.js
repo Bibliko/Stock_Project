@@ -61,70 +61,28 @@ class UserProvider extends React.Component {
                 window.location = `/api/auth/${typeLogin}`;
                 resolve("Successful");
             }
-            // else {//typeLogin==='local'
-            //     axios.post('/api/auth/login', credentials)
-            //     .then(res => {
-            //         this.componentDidUpdate();
-            //         resolve("Successful");
-            //     })
-            //     .catch(e => {
-            //         reject(e.response.data.message);
-            //     })
-            // }
+            else {  //typeLogin==='local'
+                axios.post('/api/auth/login', credentials)
+                .then(res => {
+                    resolve("Successful");
+                })
+                .catch(e => {
+                    reject(e.response.data.message);
+                })
+            }
         });
     }
 
     signupUser = (credentials) => {
-        // return new Promise((resolve, reject) => {
-        //     axios.post('/api/auth/signup', credentials)
-        //     .then(res => {
-        //         resolve("Successful");
-        //     })
-        //     .catch(e => {
-        //         reject(e.response.data.message);
-        //     })
-        // });
-    }
-
-    //Forgot password process
-    sendPasswordVerificationCode = (email) => {
-        // axios.get('/api/passwordVerification', {
-        //     params: {
-        //         email,
-        //     }
-        // })
-        // .catch(err => {
-        //     console.log(err);
-        // })
-    }
-    checkVerificationCode = (code) => {
-        // return new Promise((resolve, reject) => {
-        //     axios.get('/api/checkVerificationCode', {
-        //         params: {
-        //             code,
-        //         }
-        //     })
-        //     .then(res => {
-        //         resolve("Successful");
-        //     })
-        //     .catch(err => {
-        //         reject(err.response.data);
-        //     })
-        // });
-    }
-    changePassword = (password, email) => {
-        // return new Promise((resolve, reject) => {
-        //     axios.put('/api/changePassword', {
-        //         password,
-        //         email
-        //     })
-        //     .then(res => {
-        //         resolve(res);
-        //     })
-        //     .catch(err => {
-        //         reject(err);
-        //     })
-        // }); 
+        return new Promise((resolve, reject) => {
+            axios.post('/api/auth/signup', credentials)
+            .then(res => {
+                resolve("Successful");
+            })
+            .catch(e => {
+                reject(e.response.data.message);
+            })
+        });
     }
 
     forceReloadPage = () => {
@@ -140,11 +98,7 @@ class UserProvider extends React.Component {
                     getUser: this.getUser,
                     logoutUser: this.logoutUser,
                     loginUser: this.loginUser,
-                    // signupUser: this.signupUser,
-                    // sendPasswordVerificationCode: this.sendPasswordVerificationCode,
-                    // checkVerificationCode: this.checkVerificationCode,
-                    // changePassword: this.changePassword,
-                    // forceReloadPage: this.forceReloadPage,
+                    signupUser: this.signupUser,
                 }} 
             >
                 {this.props.children}

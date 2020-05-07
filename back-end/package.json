@@ -10,8 +10,8 @@
     "prisma-studio": "prisma studio --experimental",
     "update-db": "npx prisma generate && npm run prisma-save && npm run prisma-up",
     "docker-stop-containers": "docker container stop $(docker container ls -aq)",
-    "run-db": "npm run docker-stop-containers && docker-compose up", 
-    "reset-db": "npm run docker-stop-containers && rm -rf ./db && rm -rf ./prisma/migrations", 
+    "run-db": "npm run docker-stop-containers && docker-compose up",
+    "reset-db": "npm run docker-stop-containers && rm -rf ./db && rm -rf ./prisma/migrations",
     "dev": "nodemon index.js"
   },
   "keywords": [],
@@ -26,8 +26,11 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "lodash": "^4.17.15",
     "nodemon": "^2.0.3",
     "passport": "^0.4.1",
-    "passport-facebook": "^3.0.0"
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0"
   }
 }

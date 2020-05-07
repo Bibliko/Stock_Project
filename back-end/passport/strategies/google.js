@@ -1,21 +1,23 @@
-const { PrismaClient } = require('@prisma/client');
-const FacebookStrategy = require('passport-facebook').Strategy;
-const prisma = new PrismaClient();
-const {
-    HOST,
-    FACEBOOK_APP_ID, 
-    FACEBOOK_APP_SECRET,
-} = process.env;
+
+const { PrismaClient } = require('@prisma/client')
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 //const { indices } = require('../../algolia');
 
-const facebookStrategy = new FacebookStrategy({
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: `${HOST}/auth/facebook/callback`,
-    profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified']
+const prisma = new PrismaClient();
+
+const {
+    HOST,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET
+} = process.env;
+
+const googleStrategy = new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: `${HOST}/auth/google/callback`
   },
-  function(accessToken, refreshToken, profile, done) {
-    const { id, email, first_name, last_name } = profile._json;
+  function(token, tokenSecret, profile, done) {
+    const { name, picture, email } = profile._json;
     prisma.user.findOne({
         where: {
             email
@@ -29,10 +31,10 @@ const facebookStrategy = new FacebookStrategy({
         else {
             return prisma.user.create({
                 data: {
-                    name: `${first_name} ${last_name}`,
+                    name,
                     email,
                     password: "",
-                    avatarUrl: `http://graph.facebook.com/${id}/picture?type=large`
+                    avatarUrl: picture
                 }
             })
         }
@@ -54,7 +56,6 @@ const facebookStrategy = new FacebookStrategy({
     .catch(err => {
         return done(err);
     })
-  }
-);
+});
 
-module.exports = facebookStrategy;
+module.exports = googleStrategy;
