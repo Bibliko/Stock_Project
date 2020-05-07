@@ -56,7 +56,8 @@ class Layout extends React.Component {
     this.setState({ open: true });
   };
   handleDrawerClose = () => {
-    this.setState({ open: false });
+    if(this.state.open) 
+      this.setState({ open: false });
   };
 
   componentCheck = () => {
@@ -98,6 +99,7 @@ class Layout extends React.Component {
           className={clsx(classes.content, {
             [classes.contentShift]: open,
           })}
+          onClick={this.handleDrawerClose}
         >
           <div className={classes.contentHeader} />
           {this.props.children}
