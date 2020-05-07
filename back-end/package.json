@@ -8,19 +8,12 @@
     "prisma-save": "prisma migrate save --experimental",
     "prisma-up": "prisma migrate up --experimental",
     "prisma-studio": "prisma studio --experimental",
-
     "update-db": "npx prisma generate && npm run prisma-save && npm run prisma-up",
-    "update-db-ps": "npx prisma generate; npm run prisma-save; npm run prisma-up",
-
+    "update-db-ps": "npx prisma generate && npm run prisma-save && npm run prisma-up",
     "docker-stop-containers": "docker stop $(docker ps -a -q)",
-    "docker-stop-containers-ps": "docker ps -q | % { docker stop $_ }",
-
+    "docker-stop-containers-ps": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./powershell-scripts/docker-stop-containers.ps1",
     "run-db": "npm run docker-stop-containers && docker-compose up",
-    "run-db-ps": "npm run docker-stop-containers-ps; docker-compose up",
-    
-    "reset-db": "npm run docker-stop-containers && rm -rf ./db && rm -rf ./prisma/migrations",
-    "reset-db-ps": "npm run docker-stop-containers-ps; Remove-Item ./db/* -Recurse -Force; Remove-Item ./prisma/migrations/* -Recurse -Force",
-
+    "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
     "dev": "nodemon index.js"
   },
   "keywords": [],
