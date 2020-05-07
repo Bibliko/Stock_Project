@@ -1,0 +1,24 @@
+{
+  "name": "stock_project",
+  "version": "1.0.0",
+  "description": "Stock Market Game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node front-end/src/index.js && node back-end/index.js"
+  },
+  "engines": {
+    "node": "13.1.0",
+    "npm": "6.13.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doanhtu07/Stock_Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doanhtu07/Stock_Project/issues"
+  },
+  "homepage": "https://github.com/doanhtu07/Stock_Project#readme"
+}
