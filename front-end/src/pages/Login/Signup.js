@@ -77,9 +77,13 @@ class Signup extends React.Component {
 
     changeUsername = (event) => {
         this.username=event.target.value;
+        if(!_.isEmpty(this.state.error))
+            this.setState({ error: "" });
     }
     changePassword = (event) => {
         this.password=event.target.value;
+        if(!_.isEmpty(this.state.error))
+            this.setState({ error: "" });
     }
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
@@ -122,6 +126,11 @@ class Signup extends React.Component {
     redirect = (link) => {
         const { history } = this.props;
         history.push(link);
+    }
+
+    handleKeyDown = (event) => {
+        if(event.key==="Enter") 
+            this.submit();
     }
     
     componentCheck = () => {
@@ -169,6 +178,7 @@ class Signup extends React.Component {
                                     id="Username"
                                     label="Username"
                                     onChange={this.changeUsername}
+                                    onKeyDown={this.handleKeyDown}
                                 />
                             </Grid>
                             <Grid item xs className={classes.center}>
@@ -177,6 +187,7 @@ class Signup extends React.Component {
                                     label="Password"
                                     type="password"
                                     onChange={this.changePassword}
+                                    onKeyDown={this.handleKeyDown}
                                 />
                             </Grid>
                             <Grid item xs className={classes.center}>
@@ -185,6 +196,7 @@ class Signup extends React.Component {
                                     label="Confirm Password"
                                     type="password"
                                     onChange={this.changeConfirmPassword}
+                                    onKeyDown={this.handleKeyDown}
                                 />
                             </Grid>
                             {

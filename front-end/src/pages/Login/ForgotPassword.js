@@ -9,7 +9,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -24,7 +23,7 @@ const styles = theme => ({
         width: 450,
         left: 'calc((100% - 450px) / 2)',
         top: 'calc((100% - 500px) / 2)',
-        padding: theme.spacing(1),
+        padding: theme.spacing(3),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -52,25 +51,6 @@ const styles = theme => ({
         fontWeight: 'bold',
         fontSize: 'small'
     },
-    image: {
-        borderRadius: '50%',
-        height: "50px",
-        width: "50px" 
-    },
-    alternativeLoginButton: {
-        maxHeight: 'fit-content',
-        maxWidth: 'fit-content',
-        padding: 0,
-        minWidth: 0,
-        marginLeft: 10,
-        marginRight: 10,
-        borderRadius: '50%'
-    },
-    orLogInWith: {
-        color: theme.palette.subText.main,
-        fontSize: 'small',
-        marginTop: theme.spacing(1)
-    },
     error: {
         marginTop: 5,
         display: 'flex',
@@ -81,32 +61,42 @@ const styles = theme => ({
     },
 });
 
-class Login extends React.Component {
+class ForgotPassword extends React.Component {
     state = {
-        error: "",
+        error: ""
     }
 
     errorTypes = [
+        "Confirm Password does not match Password.",
         "Missing some fields"
     ]
 
     username=""
     password=""
+    confirmPassword=""
 
     changeUsername = (event) => {
-        this.username = event.target.value;
+        this.username=event.target.value;
         if(!_.isEmpty(this.state.error))
             this.setState({ error: "" });
     }
     changePassword = (event) => {
-        this.password = event.target.value;
+        this.password=event.target.value;
         if(!_.isEmpty(this.state.error))
             this.setState({ error: "" });
     }
+    changeConfirmPassword = (event) => {
+        this.confirmPassword=event.target.value;
 
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
+        if(!_.isEqual(this.password, this.confirmPassword)) {
+
+            if(!_.isEqual(this.state.error, this.errorTypes[0]))
+                this.setState({ error: this.errorTypes[0] });
+
+        }
+        else
+            this.setState({ error: "" });
+        
     }
 
     submit = () => {
@@ -114,12 +104,13 @@ class Login extends React.Component {
 
         if(
             _.isEmpty(this.username) ||
-            _.isEmpty(this.password)
+            _.isEmpty(this.password) ||
+            _.isEmpty(this.confirmPassword)
         )
-            this.setState({ error: this.errorTypes[0] });
+            this.setState({ error: this.errorTypes[1] }); 
         else {
             if(_.isEmpty(this.state.error)) 
-                this.context.loginUser('local', {
+                this.context.signupUser({
                     username: this.username,
                     password: this.password
                 })
@@ -130,6 +121,11 @@ class Login extends React.Component {
                     this.setState({ error: err });
                 })
         }
+    }
+
+    redirect = (link) => {
+        const { history } = this.props;
+        history.push(link);
     }
 
     handleKeyDown = (event) => {
@@ -157,7 +153,6 @@ class Login extends React.Component {
 
     render() {
         const { classes } = this.props;
-        const { loginUser } = this.context;
 
         return (
             <div className={classes.root}>
@@ -171,7 +166,7 @@ class Login extends React.Component {
                     >
                         <Grid item xs className={classes.center}>
                             <Typography className={classes.title}>
-                                Log In
+                                Sign Up
                             </Typography>
                         </Grid>
                         <Grid 
@@ -195,6 +190,15 @@ class Login extends React.Component {
                                     onKeyDown={this.handleKeyDown}
                                 />
                             </Grid>
+                            <Grid item xs className={classes.center}>
+                                <TextField 
+                                    id="Confirm Password"
+                                    label="Confirm Password"
+                                    type="password"
+                                    onChange={this.changeConfirmPassword}
+                                    onKeyDown={this.handleKeyDown}
+                                />
+                            </Grid>
                             {
                                 !_.isEmpty(this.state.error) &&
                                 <Grid item xs className={classes.error}>
@@ -214,59 +218,11 @@ class Login extends React.Component {
                             </Grid>
                         </Grid>
                         <Grid item xs className={classes.center}>
-                            <Button 
-                                color="primary" 
-                                onClick={() => {this.redirect("/signup")}}
+                            <Button color="primary" onClick={() => {this.redirect("/login")}}
                                 className={classes.link}
                             >
-                                Create an account
+                                Log In
                             </Button>
-                            <Divider orientation="vertical" flexItem/>
-                            <Button 
-                                color="primary" 
-                                onClick={() => {this.redirect("/forgotpassword")}}
-                                className={classes.link}
-                            >
-                                Forgot password
-                            </Button>
-                        </Grid>
-                        <Grid 
-                            container spacing={1} direction="column"
-                            item xs className={classes.center}
-                        >
-                            <Grid item xs className={classes.center}>
-                                <Typography className={classes.orLogInWith}>
-                                    Or Log In with:
-                                </Typography>
-                            </Grid>
-                            <Grid item xs
-                                className={classes.center}
-                            >
-                                <Button 
-                                    onClick={() => {loginUser("facebook")}}
-                                    classes={{
-                                        root: classes.alternativeLoginButton
-                                    }}
-                                >
-                                    <img 
-                                        src="/facebook.png"
-                                        alt="facebook"
-                                        className={classes.image}
-                                    />
-                                </Button>
-                                <Button 
-                                    onClick={() => {loginUser("google")}}
-                                    classes={{
-                                        root: classes.alternativeLoginButton
-                                    }}
-                                >
-                                    <img 
-                                        src="/google.jpg"
-                                        alt="google"
-                                        className={classes.image}
-                                    />
-                                </Button>
-                            </Grid>
                         </Grid>
                     </Grid>
                 </Paper>
@@ -275,6 +231,6 @@ class Login extends React.Component {
     }
 }
 
-Login.contextType = UserProvider.context;
+ForgotPassword.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(Login));
+export default withStyles(styles)(withRouter(ForgotPassword));
