@@ -58,6 +58,60 @@ app.get('/auth/facebook/callback',
     })
 );
 
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google/callback',
+    passport.authenticate('google', {
+        successRedirect: '/',
+        failureRedirect: '/login'
+    })
+);
+
+app.post('/auth/signup', (req, res, next) => {
+    passport.authenticate('local-signup', (err, user, info) => {
+        if (err) 
+            return res.sendStatus(500); 
+
+        if(user)
+            return res.status(401).send(info);
+
+        prisma.user.create({
+            data: {
+                username: info.username,
+                password: info.password,
+                name: info.username,
+            }
+        })
+        .then(user => {
+            req.logIn(user, (err) => {
+                if(err) {
+                    return err;
+                }
+                return res.sendStatus(200);
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.sendStatus(500);
+        })
+        
+    })(req, res, next);
+});
+
+app.post('/auth/login', (req, res, next) => {
+    passport.authenticate('local-login', (err, user, info) => {
+        if (err) { 
+            return res.sendStatus(500); 
+        }
+        if (!user) { 
+            return res.status(401).send(info);
+        }
+        req.logIn(user, err => {
+            if (err) { return res.sendStatus(500); }
+            return res.sendStatus(200);
+        });
+    })(req, res, next);
+})
+
 app.use('/user', (req, res) => {
     res.send(req.user);
 });

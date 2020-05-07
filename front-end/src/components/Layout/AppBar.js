@@ -9,8 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 
-import MenuIcon from '@material-ui/icons/Menu';
-
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -72,7 +70,7 @@ class PersistentAppBar extends React.Component {
                         edge="end"
                         className={clsx(classes.menuButton, open && classes.hide)}
                     >
-                        <Avatar>
+                        <Avatar src={user.avatarUrl}>
                             {user.name? user.name.charAt(0).toUpperCase():""}
                         </Avatar>
                     </IconButton>
