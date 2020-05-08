@@ -138,15 +138,4 @@ app.get('/logout', (req, res) => {
 const port = NODE_ENV === "production" ? (parseInt(PORT,10) + 1) : 4000;
 app.listen(port, () => {
     console.log(`app is listening on port ${port}`);
-    const { exec } = require('child_process');
-    exec('export BACKEND_DONE=\"true\"', (err, stdout, stderr) => {
-        if (err) {
-            //some err occurred
-            console.error(err)
-        } else {
-            // the *entire* stdout and stderr (buffered)
-            console.log(`stdout: ${stdout}`);
-            console.log(`stderr: ${stderr}`);
-        }
-    });
 });

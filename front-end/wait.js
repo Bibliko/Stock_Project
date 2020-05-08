@@ -1,1 +1,0 @@
-while(!process.env.BACKEND_DONE){}

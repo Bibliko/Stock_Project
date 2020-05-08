@@ -9,7 +9,7 @@
     "build-frontend": "cd front-end && npm install && npm run build",
     "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
     "start-backend": "cd back-end && npm run start",
-    "start-frontend": "cd front-end && node wait.js && npm run start",
+    "start-frontend": "cd front-end && wait-on tcp:$(($PORT + 1)) && npm run start",
     "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
   },
   "engines": {
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/doanhtu07/Stock_Project#readme",
   "dependencies": {
-    "concurrently": "^5.2.0"
+    "concurrently": "^5.2.0",
+    "wait-on": "^5.0.0"
   }
 }
