@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-backend": "cd back-end && npm install && npx prisma generate",
     "build-frontend": "cd front-end && npm install",
-    "build": "npm install && concurrently \"npm run build-backend\" \"npm run build-frontend\"",
+    "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
     "start-backend": "cd back-end && npm run dev",
     "start-frontend": "cd front-end && npm run dev",
     "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/doanhtu07/Stock_Project/issues"
   },
-  "homepage": "https://github.com/doanhtu07/Stock_Project#readme"
+  "homepage": "https://github.com/doanhtu07/Stock_Project#readme",
+  "dependencies": {
+    "concurrently": "^5.2.0"
+  }
 }
