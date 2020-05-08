@@ -1,13 +1,13 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const { PORT } = process.env;
-const port = PORT || 4000;
+const { PORT, NODE_ENV } = process.env;
+
 module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-        target: `http://localhost:${port}`,
+        target: `http://localhost:${NODE_ENV === "production" ? (PORT+1) : 4000}`,
         changeOrigin: true,
-        //pathRewrite: { [`^/api/`]: '/' },
+        pathRewrite: { [`^/api/`]: '/' },
     })
   );
 };

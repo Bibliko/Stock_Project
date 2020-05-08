@@ -5,7 +5,7 @@ try {
 }
 
 const { 
-    PORT: port,
+    PORT,
     NODE_ENV
 } = process.env;
 const express = require('express');
@@ -13,7 +13,7 @@ const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const path = require('path');
+// const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
@@ -52,28 +52,28 @@ app.use((req, res, next) => {
     
 });
 
-if (NODE_ENV === "production") {
-    // Serve static files from the React frontend app
-    app.use(express.static(path.join(__dirname, '../front-end/build')));
-}
+// if (NODE_ENV === "production") {
+//     // Serve static files from the React frontend app
+//     app.use(express.static(path.join(__dirname, '../front-end/build')));
+// }
 
-app.get('/api/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
-app.get('/api/auth/facebook/callback', 
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
+app.get('/auth/facebook/callback', 
     passport.authenticate('facebook', { 
         successRedirect: '/',
         failureRedirect: '/login' 
     })
 );
 
-app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/api/auth/google/callback',
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google/callback',
     passport.authenticate('google', {
         successRedirect: '/',
         failureRedirect: '/login'
     })
 );
 
-app.post('/api/auth/signup', (req, res, next) => {
+app.post('/auth/signup', (req, res, next) => {
     passport.authenticate('local-signup', (err, user, info) => {
         if (err) 
             return res.sendStatus(500); 
@@ -104,7 +104,7 @@ app.post('/api/auth/signup', (req, res, next) => {
     })(req, res, next);
 });
 
-app.post('/api/auth/login', (req, res, next) => {
+app.post('/auth/login', (req, res, next) => {
     passport.authenticate('local-login', (err, user, info) => {
         if (err) { 
             return res.sendStatus(500); 
@@ -119,22 +119,23 @@ app.post('/api/auth/login', (req, res, next) => {
     })(req, res, next);
 })
 
-app.use('/api/user', (req, res) => {
+app.use('/user', (req, res) => {
     res.send(req.user);
 });
 
-app.get('/api/logout', (req, res) => {
+app.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
 });
 
-if (NODE_ENV === "production") {
-    // AFTER defining routes: Anything that doesn't match what's above, send back index.html; (the beginning slash ('/') in the string is important!)
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname + '/../front-end/build/index.html'))
-    })
-}
+// if (NODE_ENV === "production") {
+//     // AFTER defining routes: Anything that doesn't match what's above, send back index.html; (the beginning slash ('/') in the string is important!)
+//     app.get('*', (req, res) => {
+//         res.sendFile(path.join(__dirname + '/../front-end/build/index.html'))
+//     })
+// }
 
+const port = NODE_ENV === "production" ? (PORT + 1) : 4000;
 app.listen(port, () => {
     console.log(`app is listening on port ${port}`);
 });
