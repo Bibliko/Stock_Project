@@ -9,7 +9,7 @@
     "build-frontend": "cd front-end && npm install && npm run build",
     "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
     "start-backend": "cd back-end && npm run start",
-    "start-frontend": "cd front-end && wait-on tcp:$(($PORT + 1)) && npm run start",
+    "start-frontend": "cd front-end && wait-on tcp:$(($PORT + 1)) && npm run dev",
     "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
   },
   "engines": {
