@@ -21,6 +21,7 @@
   },
   "scripts": {
     "dev": "react-scripts start",
+    "dev2": "PORT=$PORT react-scripts start",
     "start": "serve -s build -l $PORT",
     "build": "react-scripts build",
     "test": "react-scripts test",
