@@ -135,7 +135,7 @@ app.get('/logout', (req, res) => {
 //     })
 // }
 
-const port = NODE_ENV === "production" ? (PORT + 1) : 4000;
+const port = NODE_ENV === "production" ? (parseInt(PORT,10) + 1) : 4000;
 app.listen(port, () => {
     console.log(`app is listening on port ${port}`);
 });
