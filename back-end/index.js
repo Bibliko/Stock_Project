@@ -6,7 +6,7 @@ try {
 
 const { 
     PORT,
-    NODE_ENV
+    NODE_ENVIRONMENT
 } = process.env;
 const express = require('express');
 const app = express();
@@ -135,7 +135,7 @@ app.get('/logout', (req, res) => {
 //     })
 // }
 
-const port = NODE_ENV === "production" ? (parseInt(PORT,10) + 1) : 4000;
+const port = NODE_ENVIRONMENT === "production" ? (parseInt(PORT,10) + 1) : 4000;
 app.listen(port, () => {
     console.log(`app is listening on port ${port}`);
 });
