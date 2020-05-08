@@ -4,13 +4,15 @@ try {
     console.log("No config found. Using default ENV.");
     const { 
         PORT: port,
+        NODE_ENV
     } = process.env;
     console.log(port);
     const express = require('express');
     const app = express();
-    const { PrismaClient } = require('@prisma/client')
+    const { PrismaClient } = require('@prisma/client');
     const prisma = new PrismaClient();
-    
+
+    const path = require('path');
     const bodyParser = require('body-parser');
     const cors = require('cors');
     const passport = require('passport');
@@ -49,6 +51,11 @@ try {
         
     });
     
+    if (NODE_ENV === "production") {
+        // Serve static files from the React frontend app
+        app.use(express.static(path.join(__dirname, '../frontend/build')));
+    }
+
     app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
     app.get('/auth/facebook/callback', 
         passport.authenticate('facebook', { 
@@ -119,6 +126,13 @@ try {
         req.logout();
         res.redirect('/');
     });
+
+    if (NODE_ENV === "production") {
+        // AFTER defining routes: Anything that doesn't match what's above, send back index.html; (the beginning slash ('/') in the string is important!)
+        app.get('*', (req, res) => {
+            res.sendFile(path.join(__dirname + '/../frontend/build/index.html'))
+        })
+    }
     
     app.listen(port, () => {
         console.log(`app is listening on port ${port}`);

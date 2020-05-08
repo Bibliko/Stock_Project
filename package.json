@@ -8,9 +8,9 @@
     "build-backend": "cd back-end && npm install && npx prisma generate",
     "build-frontend": "cd front-end && npm install",
     "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
-    "start-backend": "cd back-end && npm run dev",
-    "start-frontend": "cd front-end && npm run dev",
-    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+    "start-backend": "cd back-end && npm run start",
+    "start-frontend": "cd front-end && npm run start",
+    "start": "npm run start-backend"
   },
   "engines": {
     "node": "13.1.0",
