@@ -5,6 +5,7 @@ try {
     const { 
         PORT: port,
     } = process.env;
+    console.log(port);
     const express = require('express');
     const app = express();
     const { PrismaClient } = require('@prisma/client')
