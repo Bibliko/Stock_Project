@@ -57,23 +57,23 @@ if (NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, '../front-end/build')));
 }
 
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
-app.get('/auth/facebook/callback', 
+app.get('/api/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
+app.get('/api/auth/facebook/callback', 
     passport.authenticate('facebook', { 
         successRedirect: '/',
         failureRedirect: '/login' 
     })
 );
 
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback',
+app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/api/auth/google/callback',
     passport.authenticate('google', {
         successRedirect: '/',
         failureRedirect: '/login'
     })
 );
 
-app.post('/auth/signup', (req, res, next) => {
+app.post('/api/auth/signup', (req, res, next) => {
     passport.authenticate('local-signup', (err, user, info) => {
         if (err) 
             return res.sendStatus(500); 
@@ -104,7 +104,7 @@ app.post('/auth/signup', (req, res, next) => {
     })(req, res, next);
 });
 
-app.post('/auth/login', (req, res, next) => {
+app.post('/api/auth/login', (req, res, next) => {
     passport.authenticate('local-login', (err, user, info) => {
         if (err) { 
             return res.sendStatus(500); 
@@ -119,11 +119,11 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 })
 
-app.use('/user', (req, res) => {
+app.use('/api/user', (req, res) => {
     res.send(req.user);
 });
 
-app.get('/logout', (req, res) => {
+app.get('/api/logout', (req, res) => {
     req.logout();
     res.redirect('/');
 });

@@ -7,7 +7,7 @@ module.exports = function(app) {
     createProxyMiddleware({
         target: `http://localhost:${port}`,
         changeOrigin: true,
-        pathRewrite: { [`^/api/`]: '/' },
+        //pathRewrite: { [`^/api/`]: '/' },
     })
   );
 };
