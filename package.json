@@ -9,8 +9,8 @@
     "build-frontend": "cd front-end && npm install && npm run build",
     "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
     "start-backend": "cd back-end && npm run start",
-    "start-frontend": "cd front-end && npm run start",
-    "start": "npm run start-backend && cd .. && npm run start-frontend"
+    "start-frontend": "cd front-end && node wait.js && npm run start",
+    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
   },
   "engines": {
     "node": "13.1.0",
