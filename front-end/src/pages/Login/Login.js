@@ -16,14 +16,15 @@ const styles = theme => ({
     root: {
         position: 'absolute',
         height: '-webkit-fill-available',
-        width: '-webkit-fill-available'
+        width: '-webkit-fill-available',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     paper: {
         position: 'absolute',
         height: 500,
         width: 450,
-        left: 'calc((100% - 450px) / 2)',
-        top: 'calc((100% - 500px) / 2)',
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
