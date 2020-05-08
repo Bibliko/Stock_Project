@@ -2,6 +2,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const { PORT, NODE_ENV } = process.env;
 
 module.exports = function(app) {
+  console.log(process.env);
   app.use(
     '/api',
     createProxyMiddleware({
