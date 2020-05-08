@@ -6,7 +6,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-        target: `http://localhost:${NODE_ENVIRONMENT === "production" ? (parseInt(PORT,10)+1) : 4000}`,
+        target: `http://127.0.0.1:${NODE_ENVIRONMENT === "production" ? (parseInt(PORT,10)+1) : 4000}`,
         changeOrigin: true,
         pathRewrite: { [`^/api/`]: '/' },
     })
