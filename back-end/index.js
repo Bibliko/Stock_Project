@@ -120,7 +120,11 @@ app.post('/auth/login', (req, res, next) => {
 })
 
 app.use('/user', (req, res) => {
-    res.send(req.user);
+    res.send({
+        id: 'abcde',
+        email: 'dot',
+        name: 'test',
+    });
 });
 
 app.get('/logout', (req, res) => {
