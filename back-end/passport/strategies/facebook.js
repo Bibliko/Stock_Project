@@ -10,7 +10,7 @@ const {
 const facebookStrategy = new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: `/auth/facebook/callback`,
+    callbackURL: `https://api.minecommand.us/auth/facebook/callback`,
     profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified']
   },
   function(accessToken, refreshToken, profile, done) {
