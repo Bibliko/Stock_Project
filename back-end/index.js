@@ -31,6 +31,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
+        path: "/user",
         domain: 'api.minecommand.us',
         secure: true
     }
