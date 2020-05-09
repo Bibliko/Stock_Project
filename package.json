@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-backend": "cd back-end && npm install && echo \"init\" | npm run update-db",
     "build-frontend": "cd front-end && npm install",
-    "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
+    "build": "bash build.sh",
     "start-backend": "cd back-end && npm run start",
     "start-frontend": "cd front-end && wait-on $REACT_APP_BACKEND_HOST && npm run start",
     "start": "bash start.sh"
