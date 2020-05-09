@@ -6,7 +6,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const prisma = new PrismaClient();
 
 const {
-    HOST,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET
 } = process.env;
@@ -14,7 +13,7 @@ const {
 const googleStrategy = new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: `${HOST}/auth/google/callback`
+    callbackURL: `/auth/google/callback`
   },
   function(token, tokenSecret, profile, done) {
     const { name, picture, email } = profile._json;

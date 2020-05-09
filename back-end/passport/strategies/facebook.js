@@ -2,7 +2,6 @@ const { PrismaClient } = require('@prisma/client');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const prisma = new PrismaClient();
 const {
-    HOST,
     FACEBOOK_APP_ID, 
     FACEBOOK_APP_SECRET,
 } = process.env;
@@ -11,7 +10,7 @@ const {
 const facebookStrategy = new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: `${HOST}/auth/facebook/callback`,
+    callbackURL: `/auth/facebook/callback`,
     profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified']
   },
   function(accessToken, refreshToken, profile, done) {
@@ -22,6 +21,7 @@ const facebookStrategy = new FacebookStrategy({
         }
     })
     .then(user => {
+        console.log("hellofacebook");
         if (user) {
             done(null, user);
             return null;

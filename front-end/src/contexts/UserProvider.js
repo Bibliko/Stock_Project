@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 
 const context = createContext(null);
+const { REACT_APP_BACKEND_HOST : BACKEND_HOST } = process.env;
 
 class UserProvider extends React.Component {
     state = {
@@ -16,7 +17,7 @@ class UserProvider extends React.Component {
 
     getUser = () => {
         return new Promise((resolve, reject) => {
-            axios.get('/api/user')
+            axios.get(`${BACKEND_HOST}/user`)
             .then(res => {
                 resolve(res);
             })
@@ -52,17 +53,17 @@ class UserProvider extends React.Component {
         this.setState({
             logIn: false
         });
-        axios.get('/api/logout');
+        axios.get(`${BACKEND_HOST}/logout`);
     }
 
     loginUser = (typeLogin, credentials) => {
         return new Promise((resolve, reject) => {
             if(this.typeLogin.indexOf(typeLogin)>=0) {
-                window.location = `/api/auth/${typeLogin}`;
+                window.location = `${BACKEND_HOST}/auth/${typeLogin}`;
                 resolve("Successful");
             }
             else {  //typeLogin==='local'
-                axios.post('/api/auth/login', credentials)
+                axios.post(`${BACKEND_HOST}/auth/login`, credentials)
                 .then(res => {
                     resolve("Successful");
                 })
@@ -75,7 +76,7 @@ class UserProvider extends React.Component {
 
     signupUser = (credentials) => {
         return new Promise((resolve, reject) => {
-            axios.post('/api/auth/signup', credentials)
+            axios.post(`${BACKEND_HOST}/auth/signup`, credentials)
             .then(res => {
                 resolve("Successful");
             })

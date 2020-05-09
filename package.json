@@ -6,11 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-backend": "cd back-end && npm install && echo \"init\" | npm run update-db",
-    "build-frontend": "cd front-end && npm install && npm run build",
+    "build-frontend": "cd front-end && npm install",
     "build": "concurrently \"npm run build-backend\" \"npm run build-frontend\"",
     "start-backend": "cd back-end && npm run start",
-    "start-frontend": "cd front-end && wait-on tcp:$(($PORT + 1)) && npm run dev2",
-    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+    "start-frontend": "cd front-end && wait-on $REACT_APP_BACKEND_HOST && npm run start",
+    "start": "bash start.sh"
   },
   "engines": {
     "node": "13.1.0",

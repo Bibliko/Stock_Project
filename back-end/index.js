@@ -5,8 +5,8 @@ try {
 }
 
 const { 
-    PORT,
-    NODE_ENVIRONMENT
+    PORT:port,
+    FRONTEND_HOST
 } = process.env;
 const express = require('express');
 const app = express();
@@ -60,16 +60,16 @@ app.use((req, res, next) => {
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
 app.get('/auth/facebook/callback', 
     passport.authenticate('facebook', { 
-        successRedirect: '/',
-        failureRedirect: '/login' 
+        successRedirect: `${FRONTEND_HOST}/`,
+        failureRedirect: `${FRONTEND_HOST}/login` 
     })
 );
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 app.get('/auth/google/callback',
     passport.authenticate('google', {
-        successRedirect: '/',
-        failureRedirect: '/login'
+        successRedirect: `${FRONTEND_HOST}/`,
+        failureRedirect: `${FRONTEND_HOST}/login` 
     })
 );
 
@@ -125,7 +125,7 @@ app.use('/user', (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect('/');
+    res.redirect(`${FRONTEND_HOST}/`);
 });
 
 // if (NODE_ENV === "production") {
@@ -135,7 +135,6 @@ app.get('/logout', (req, res) => {
 //     })
 // }
 
-const port = NODE_ENVIRONMENT === "production" ? (parseInt(PORT,10) + 1) : 4000;
 app.listen(port, () => {
     console.log(`app is listening on port ${port}`);
 });

@@ -10,6 +10,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
     "http-proxy-middleware": "^1.0.3",
     "lodash": "^4.17.15",
     "react": "^16.13.1",
@@ -21,8 +22,7 @@
   },
   "scripts": {
     "dev": "react-scripts start",
-    "dev2": "PORT=$PORT react-scripts start",
-    "start": "serve -s build -l $PORT",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
