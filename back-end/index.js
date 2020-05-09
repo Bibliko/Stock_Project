@@ -19,15 +19,12 @@ const cors = require('cors');
 const passport = require('passport');
 const { setupPassport } = require('./passport');
 const session = require("express-session");
-const cookieParser = require('cookie-parser');
-const cookieSession = require('cookie-session')
 
 const corsOptions = {
     origin: [process.env.FRONTEND_HOST],
     credentials: true
 };
 app.use(cors(corsOptions));
-app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
