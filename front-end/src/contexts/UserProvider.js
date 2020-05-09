@@ -9,9 +9,7 @@ const context = createContext(null);
 const { REACT_APP_BACKEND_HOST : BACKEND_HOST } = process.env;
 
 class UserProvider extends React.Component {
-    state = {
-        logIn: false,
-    }
+    logIn = false;
 
     typeLogin = ['facebook', 'google'];
 
@@ -32,9 +30,7 @@ class UserProvider extends React.Component {
         this.getUser()
         .then(user => {
             if(!_.isEmpty(user.data))
-                this.setState({
-                    logIn: true
-                })
+                this.logIn = true;
         })
         .catch(err => {
             console.log(err);
@@ -45,14 +41,8 @@ class UserProvider extends React.Component {
         this.componentCheck();
     }
 
-    componentDidUpdate() {
-        this.componentCheck();
-    }
-
     logoutUser = () => {
-        this.setState({
-            logIn: false
-        });
+        this.logIn = false;
         axios.get(`${BACKEND_HOST}/logout`, {withCredentials: true});
     }
 
