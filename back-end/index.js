@@ -29,7 +29,10 @@ app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        secure: true
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
