@@ -6,7 +6,8 @@ try {
 
 const { 
     PORT:port,
-    FRONTEND_HOST
+    FRONTEND_HOST,
+    COOKIE_ALLOWED_DOMAIN
 } = process.env;
 const express = require('express');
 const app = express();
@@ -28,7 +29,10 @@ app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        domain: `${COOKIE_ALLOWED_DOMAIN}`
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
