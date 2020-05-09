@@ -125,6 +125,8 @@ app.post('/auth/login', (req, res, next) => {
 
 app.use('/user', (req, res) => {
     console.log(req.user);
+    console.log(req.cookies);
+    console.log(req.session);
     res.send(req.user);
 });
 
