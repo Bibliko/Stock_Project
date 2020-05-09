@@ -17,7 +17,7 @@ class UserProvider extends React.Component {
 
     getUser = () => {
         return new Promise((resolve, reject) => {
-            axios.get(`${BACKEND_HOST}/user`)
+            axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
             .then(res => {
                 resolve(res);
             })
@@ -53,7 +53,7 @@ class UserProvider extends React.Component {
         this.setState({
             logIn: false
         });
-        axios.get(`${BACKEND_HOST}/logout`);
+        axios.get(`${BACKEND_HOST}/logout`, {withCredentials: true});
     }
 
     loginUser = (typeLogin, credentials) => {
@@ -63,7 +63,11 @@ class UserProvider extends React.Component {
                 resolve("Successful");
             }
             else {  //typeLogin==='local'
-                axios.post(`${BACKEND_HOST}/auth/login`, credentials)
+                axios(`${BACKEND_HOST}/auth/login`, {
+                    method: 'post',
+                    data: credentials,
+                    withCredentials: true
+                })
                 .then(res => {
                     resolve("Successful");
                 })
@@ -76,7 +80,11 @@ class UserProvider extends React.Component {
 
     signupUser = (credentials) => {
         return new Promise((resolve, reject) => {
-            axios.post(`${BACKEND_HOST}/auth/signup`, credentials)
+            axios(`${BACKEND_HOST}/auth/signup`, {
+                method: 'post',
+                data: credentials,
+                withCredentials: true
+            })
             .then(res => {
                 resolve("Successful");
             })
