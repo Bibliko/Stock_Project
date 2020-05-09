@@ -6,8 +6,7 @@ try {
 
 const { 
     PORT:port,
-    FRONTEND_HOST,
-    COOKIE_ALLOWED_DOMAIN
+    FRONTEND_HOST
 } = process.env;
 const express = require('express');
 const app = express();
@@ -21,7 +20,7 @@ const { setupPassport } = require('./passport');
 const session = require("express-session");
 
 const corsOptions = {
-    origin: [process.env.FRONTEND_HOST],
+    origin: [FRONTEND_HOST],
     credentials: true
 };
 app.use(cors(corsOptions));
@@ -29,10 +28,7 @@ app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
-    saveUninitialized: false,
-    cookie: {
-        domain: `${COOKIE_ALLOWED_DOMAIN}`
-    }
+    saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -42,7 +38,7 @@ setupPassport(passport);
 app.use((req, res, next) => {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', `${process.env.FRONTEND_HOST}`, "https://www.facebook.com");
+    res.setHeader('Access-Control-Allow-Origin', `${FRONTEND_HOST}`, "https://www.facebook.com");
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
