@@ -31,8 +31,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        path: "/user",
-        domain: 'api.minecommand.us'
+        domain: 'minecommand.us'
     }
 }));
 app.use(passport.initialize());
