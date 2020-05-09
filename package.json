@@ -9,7 +9,7 @@
     "build-frontend": "cd front-end && npm install",
     "build": "bash build.sh",
     "start-backend": "cd back-end && npm run start",
-    "start-frontend": "cd front-end && wait-on $REACT_APP_BACKEND_HOST && npm run start",
+    "start-frontend": "cd front-end && npm run start",
     "start": "bash start.sh"
   },
   "engines": {
