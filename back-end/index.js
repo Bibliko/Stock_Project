@@ -22,14 +22,17 @@ const session = require("express-session");
 const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session')
 
-app.use(cors());
+const corsOptions = {
+    origin: [process.env.FRONTEND_HOST],
+    credentials: true
+};
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(cookieSession({ 
+app.use(session({ 
     secret: "stock-project",
-    cookie: {maxAge: 60 * 60}
-    // resave: false,
-    // saveUninitialized: false
+    resave: false,
+    saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
