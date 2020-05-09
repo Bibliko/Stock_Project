@@ -32,7 +32,7 @@ const facebookStrategy = new FacebookStrategy({
                     name: `${first_name} ${last_name}`,
                     email,
                     password: "",
-                    avatarUrl: `http://graph.facebook.com/${id}/picture?type=large`
+                    avatarUrl: `https://graph.facebook.com/${id}/picture?type=large`
                 }
             })
         }
