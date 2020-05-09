@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { withRouter } from 'react-router';
 
 import UserProvider from '../../contexts/UserProvider';
 
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
@@ -37,10 +38,22 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function PersistentDrawer(props) {
+function PersistentDrawer(props) {
     const { logoutUser } = useContext(UserProvider.context);
     const classes = useStyles();
     const theme = useTheme();
+
+    const logout = () => {
+        const { history } = props;
+
+        logoutUser()
+        .then(() => {
+            history.push('/login');
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
 
     return (
         <Drawer
@@ -77,7 +90,7 @@ export default function PersistentDrawer(props) {
             </List>
             <Divider/>
             <List>
-                <ListItem button onClick={logoutUser}>
+                <ListItem button onClick={logout}>
                     <ListItemIcon>
                         <MeetingRoomRoundedIcon/>
                     </ListItemIcon>
@@ -87,3 +100,5 @@ export default function PersistentDrawer(props) {
         </Drawer>
     );
 }
+
+export default withRouter(PersistentDrawer);

@@ -12,8 +12,6 @@ import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 
-const { REACT_APP_BACKEND_HOST: backend } = process.env;
-
 const styles = theme => ({
     root: {
         position: 'absolute',
@@ -174,7 +172,7 @@ class Login extends React.Component {
                     >
                         <Grid item xs className={classes.center}>
                             <Typography className={classes.title}>
-                                Log In {backend}
+                                Log In
                             </Typography>
                         </Grid>
                         <Grid 
