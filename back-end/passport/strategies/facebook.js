@@ -4,13 +4,14 @@ const prisma = new PrismaClient();
 const {
     FACEBOOK_APP_ID, 
     FACEBOOK_APP_SECRET,
+    PASSPORT_CALLBACK_HOST
 } = process.env;
 //const { indices } = require('../../algolia');
 
 const facebookStrategy = new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: `https://api.minecommand.us/auth/facebook/callback`,
+    callbackURL: `${PASSPORT_CALLBACK_HOST}/auth/facebook/callback`,
     profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified']
   },
   function(accessToken, refreshToken, profile, done) {
@@ -21,7 +22,6 @@ const facebookStrategy = new FacebookStrategy({
         }
     })
     .then(user => {
-        console.log("hellofacebook");
         if (user) {
             done(null, user);
             return null;

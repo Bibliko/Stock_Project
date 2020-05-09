@@ -13,7 +13,6 @@ const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
@@ -29,10 +28,7 @@ app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
-    saveUninitialized: false,
-    cookie: {
-        domain: 'minecommand.us',
-    }
+    saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
