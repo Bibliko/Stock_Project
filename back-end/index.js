@@ -19,12 +19,14 @@ const cors = require('cors');
 const passport = require('passport');
 const { setupPassport } = require('./passport');
 const session = require("express-session");
+const cookieParser = require('cookie-parser');
 
 app.use(cors());
+app.use(cookieParser());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { secure: false }
 }));
 app.use(bodyParser.json());
