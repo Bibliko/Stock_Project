@@ -20,16 +20,17 @@ const passport = require('passport');
 const { setupPassport } = require('./passport');
 const session = require("express-session");
 const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session')
 
 app.use(cors());
 app.use(cookieParser());
-app.use(session({ 
-    secret: "stock-project",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-}));
 app.use(bodyParser.json());
+app.use(cookieSession({ 
+    secret: "stock-project",
+    cookie: {maxAge: 60 * 60}
+    // resave: false,
+    // saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
