@@ -24,7 +24,8 @@ app.use(cors());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { secure: false }
 }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
@@ -120,11 +121,7 @@ app.post('/auth/login', (req, res, next) => {
 })
 
 app.use('/user', (req, res) => {
-    res.send({
-        id: 'abcde',
-        email: 'dot',
-        name: 'test',
-    });
+    res.send(req.user);
 });
 
 app.get('/logout', (req, res) => {
