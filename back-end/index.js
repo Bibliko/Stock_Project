@@ -20,7 +20,7 @@ const { setupPassport } = require('./passport');
 const session = require("express-session");
 
 const corsOptions = {
-    origin: [FRONTEND_HOST],
+    origin: FRONTEND_HOST,
     credentials: true
 };
 app.use(cors(corsOptions));
@@ -38,7 +38,7 @@ setupPassport(passport);
 app.use((req, res, next) => {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', `${FRONTEND_HOST}`/*, "https://www.facebook.com"*/);
+    res.setHeader('Access-Control-Allow-Origin', `${FRONTEND_HOST}`);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
