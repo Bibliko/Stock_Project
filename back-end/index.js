@@ -19,11 +19,23 @@ const passport = require('passport');
 const { setupPassport } = require('./passport');
 const session = require("express-session");
 
+/* cors: for example, if front-end sends request to back-end, 
+ * then front-end is cors (cross-origin requests),
+ * and back-end is a cors receiver.
+ * A cors reciever can choose to respond to specific cors,
+ * and leave out the rest.
+ * However, if the back-end initiate a request to another server,
+ * e.g. Facebook server, then the back-end is a cors,
+ * and Facebook is a cors receiver.
+ * If Facebook respond anything back to back-end, then this
+ * response is NOT a cors, and back-end accepts this response
+ * without being regulated by this corsOptions.
+ */
 const corsOptions = {
     origin: FRONTEND_HOST,
     credentials: true
 };
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions)); 
 app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
