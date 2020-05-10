@@ -1,7 +1,8 @@
-// Create firebase
-// File node: take firebase schema, compare schema firebase with schema in folder Git
-// - Different: take migrations firebase, run prisma generate back-end heroku -> send firebase newest migration and schema 
-// - Same: skip generate, go straight npm build
+/* Create firebase
+ * File node: take firebase schema, compare schema firebase with schema in folder Git
+ * - Different: take migrations firebase, run prisma generate back-end heroku -> send firebase newest migration and schema 
+ * - Same: skip generate, go straight npm build
+ */
 if (process.env.NODE_ENV !== "production") {
     console.log("Not in production ==> Will not update DB.");
     process.exit();
