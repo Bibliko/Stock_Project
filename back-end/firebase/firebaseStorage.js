@@ -1,4 +1,9 @@
-require("../config/config");
+try {
+    require("../config/config");
+} catch(error) {
+    console.log("No config found. Using default ENV.");
+}
+
 global.XMLHttpRequest = require("xhr2");
 var firebase = require("firebase");
 
@@ -21,6 +26,7 @@ var firebaseConfig = {
     databaseURL,
     storageBucket
 };
+
 firebase.initializeApp(firebaseConfig);
 
 var storage = firebase.storage();
