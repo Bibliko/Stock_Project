@@ -16,8 +16,10 @@ const facebookStrategy = new FacebookStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     const { id, email, first_name, last_name } = profile._json;
-    console.log(profile._json);
-    console.log(email);
+
+    if(!email) 
+        return done(err);
+        
     prisma.user.findOne({
         where: {
             email
