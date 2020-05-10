@@ -20,3 +20,7 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
 }
+
+model Dummy {
+  id          String    @default(cuid()) @id
+}
