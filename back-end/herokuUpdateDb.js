@@ -191,6 +191,9 @@ const main = () => {
                     })
                 })
             })
+        } else {
+            // Firebase does not stop automatically
+            process.exit();
         }
     })
 }
