@@ -23,7 +23,7 @@ const corsOptions = {
     origin: FRONTEND_HOST,
     credentials: true
 };
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
