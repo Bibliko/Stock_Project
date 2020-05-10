@@ -143,7 +143,7 @@ app.use('/user', (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect(`${FRONTEND_HOST}/`);
+    res.send("Successful");
 });
 
 // if (NODE_ENV === "production") {

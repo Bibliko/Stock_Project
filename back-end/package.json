@@ -27,11 +27,13 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "firebase": "^7.14.3",
     "lodash": "^4.17.15",
     "nodemon": "^2.0.3",
     "passport": "^0.4.1",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "xhr2": "^0.2.0"
   }
 }
