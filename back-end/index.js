@@ -38,7 +38,7 @@ setupPassport(passport);
 app.use((req, res, next) => {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', `${FRONTEND_HOST}`, "https://www.facebook.com");
+    res.setHeader('Access-Control-Allow-Origin', `${FRONTEND_HOST}`/*, "https://www.facebook.com"*/);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
