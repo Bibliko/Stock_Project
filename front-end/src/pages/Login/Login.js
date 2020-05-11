@@ -33,7 +33,9 @@ const styles = theme => ({
     center: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        margin: 'auto',
+        flexBasis: 0
     },
     title: {
         fontSize: 'x-large',
