@@ -18,8 +18,7 @@ const googleStrategy = new GoogleStrategy({
   },
   function(token, tokenSecret, profile, done) {
     const { name, picture, email } = profile._json;
-    console.log(GOOGLE_CLIENT_ID);
-    console.log(GOOGLE_CLIENT_SECRET);
+
     prisma.user.findOne({
         where: {
             email
