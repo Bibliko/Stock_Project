@@ -34,7 +34,7 @@ const styles = theme => ({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
-        flexBasis: 0
+        flexBasis: 'unset'
     },
     title: {
         fontSize: 'x-large',
