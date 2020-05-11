@@ -10,38 +10,21 @@ const prisma = new PrismaClient();
 
 const setupPassport = (passport) => {
     passport.serializeUser(function(user, done) {
-        if(!_.isEmpty(user.email)) {
-            done(null, [user.email, "email"]);
-        }
-        else //user.username
-            done(null, [user.username, "username"]);
+        done(null, user.email);
     });
       
-    passport.deserializeUser(function([userKey, type], done) {
-        if(type==="email")
-            prisma.user.findOne({
-                where: {
-                    email: userKey
-                },
-            })
-            .then(user => {
-                done(null, user);
-            })
-            .catch(err => {
-                done(err, null);
-            });
-        else //type==="username"
-            prisma.user.findOne({
-                where: {
-                    username: userKey
-                },
-            })
-            .then(user => {
-                done(null, user);
-            })
-            .catch(err => {
-                done(err, null);
-            });
+    passport.deserializeUser((email, done) => {
+        prisma.user.findOne({
+            where: {
+                email
+            },
+        })
+        .then(user => {
+            done(null, user);
+        })
+        .catch(err => {
+            done(err, null);
+        });
     });
 
     passport.use('local-login', loginStrategy);

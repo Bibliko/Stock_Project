@@ -94,12 +94,66 @@ class UserProvider extends React.Component {
                 withCredentials: true
             })
             .then(res => {
-                resolve("Successful");
+                resolve(res.data.message);
             })
             .catch(e => {
                 reject(e.response.data.message);
             })
         });
+    }
+
+    //Forgot password process includes 3 functions below:
+    sendPasswordVerificationCode = (email) => {
+        return new Promise((resolve, reject) => {
+            axios(`${BACKEND_HOST}/passwordVerification`, {
+                method: 'get',
+                params: {
+                    email,  
+                },
+                withCredentials: true
+            })
+            .then(res => {
+                resolve(res.data.message);
+            })
+            .catch(err => {
+                reject(err.response.data);
+            })
+        })
+    }
+    checkVerificationCode = (code) => {
+        return new Promise((resolve, reject) => {
+            axios(`${BACKEND_HOST}/checkVerificationCode`, {
+                method: 'get',
+                params: {
+                    code,  
+                },
+                withCredentials: true
+            })
+            .then(() => {
+                resolve("Successful");
+            })
+            .catch(err => {
+                reject(err.response.data);
+            })
+        });
+    }
+    changePassword = (password, email) => {
+        return new Promise((resolve, reject) => {
+            axios(`${BACKEND_HOST}/userData/changeData`, {
+                method: 'put',
+                data: {
+                    password,
+                    email,  
+                },
+                withCredentials: true
+            })
+            .then(() => {
+                resolve("Successfully change password");
+            })
+            .catch(err => {
+                reject(err.response.data);
+            })
+        }); 
     }
 
     forceReloadPage = () => {
@@ -116,6 +170,9 @@ class UserProvider extends React.Component {
                     logoutUser: this.logoutUser,
                     loginUser: this.loginUser,
                     signupUser: this.signupUser,
+                    sendPasswordVerificationCode: this.sendPasswordVerificationCode,
+                    checkVerificationCode: this.checkVerificationCode,
+                    changePassword: this.changePassword
                 }} 
             >
                 {this.props.children}

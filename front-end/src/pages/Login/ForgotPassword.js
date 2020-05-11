@@ -54,19 +54,23 @@ const styles = theme => ({
         fontWeight: 'bold',
         fontSize: 'small'
     },
-    error: {
+    announcement: {
         marginTop: 5,
         display: 'flex',
         justifyContent: 'center',
     },
-    errorText: {
+    announcementText: {
         fontSize: 'small'
     },
 });
 
 class ForgotPassword extends React.Component {
     state = {
-        error: ""
+        error: "",
+        success: "",
+        allowButtonSendCode: true,
+        allowCode: false,
+        allowPassword: false
     }
 
     errorTypes = [
@@ -74,55 +78,110 @@ class ForgotPassword extends React.Component {
         "Missing some fields"
     ]
 
-    username=""
+    email=""
+    code=""
     password=""
     confirmPassword=""
 
-    changeUsername = (event) => {
-        this.username=event.target.value;
-        if(!_.isEmpty(this.state.error))
+    changeEmail = (event) => {
+        this.email = event.target.value;
+        if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
+        }
+    }
+    changeCode = (event) => {
+        this.code = event.target.value;
+        if(!_.isEmpty(this.state.error)) {
+            this.setState({ error: "" });
+        }
     }
     changePassword = (event) => {
         this.password=event.target.value;
-        if(!_.isEmpty(this.state.error))
+        if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
+        }
     }
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
 
         if(!_.isEqual(this.password, this.confirmPassword)) {
 
-            if(!_.isEqual(this.state.error, this.errorTypes[0]))
+            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
                 this.setState({ error: this.errorTypes[0] });
+            }
 
         }
-        else
+        else {
             this.setState({ error: "" });
-        
+        }
+    }
+
+    sendCode = () => {
+        this.context.sendPasswordVerificationCode(this.email)
+        .then(res => {
+            this.setState({ 
+                success: res,
+                error: "",
+                allowCode: true
+            });
+        })  
+        .catch(err => {
+            this.setState({ error: err });
+        })
+    }
+
+    verifyCode = () => {
+        this.setState({ success: "" });
+        this.context.checkVerificationCode(this.code)
+        .then(() => {
+            this.setState({ 
+                allowButtonSendCode: false,
+                allowCode: false,
+                allowPassword: true
+            });
+        })
+        .catch(err => {
+            this.setState({
+                error: err,
+            });
+        })
     }
 
     submit = () => {
-        const { history } = this.props;
-
         if(
-            _.isEmpty(this.username) ||
             _.isEmpty(this.password) ||
             _.isEmpty(this.confirmPassword)
-        )
+        ) {
             this.setState({ error: this.errorTypes[1] }); 
+        }
         else {
-            if(_.isEmpty(this.state.error)) 
-                this.context.signupUser({
-                    username: this.username,
-                    password: this.password
-                })
-                .then(() => {
-                    history.push('/');
+            if(_.isEmpty(this.state.error)) {
+                this.context.changePassword(this.password, this.email)
+                .then(res => {
+                    this.setState({ success: res });
                 })
                 .catch(err => {
                     this.setState({ error: err });
                 })
+            }
+        }
+    }
+
+    enterEmail = (event) => {
+        if(event.key==="Enter") {
+            this.sendCode();
+        }
+    }
+
+    enterCode = (event) => {
+        if(event.key==="Enter") {
+            this.verifyCode();
+        }
+    }
+
+    enterPassword = (event) => {
+        if(event.key==="Enter") {
+            this.submit();
         }
     }
 
@@ -130,29 +189,23 @@ class ForgotPassword extends React.Component {
         const { history } = this.props;
         history.push(link);
     }
-
-    handleKeyDown = (event) => {
-        if(event.key==="Enter") 
-            this.submit();
-    }
     
     componentCheck = () => {
-        const { history } = this.props;
-    
         this.context.getUser()
         .then(user => {
-          if(!_.isEmpty(user.data))
-            history.push('/');
+          if(!_.isEmpty(user.data)) {
+            this.redirect('/');
+          }
         })
       }
     
-      componentDidMount() {
+    componentDidMount() {
         this.componentCheck();
-      }
-    
-      componentDidUpdate() {
+    }
+
+    componentDidUpdate() {
         this.componentCheck();
-      }
+    }
 
     render() {
         const { classes } = this.props;
@@ -169,7 +222,7 @@ class ForgotPassword extends React.Component {
                     >
                         <Grid item xs className={classes.center}>
                             <Typography className={classes.title}>
-                                Sign Up
+                                Change Password
                             </Typography>
                         </Grid>
                         <Grid 
@@ -178,47 +231,93 @@ class ForgotPassword extends React.Component {
                         >
                             <Grid item xs className={classes.center}>
                                 <TextField 
-                                    id="Username"
-                                    label="Username"
-                                    onChange={this.changeUsername}
-                                    onKeyDown={this.handleKeyDown}
-                                />
-                            </Grid>
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Password"
-                                    label="Password"
-                                    type="password"
-                                    onChange={this.changePassword}
-                                    onKeyDown={this.handleKeyDown}
-                                />
-                            </Grid>
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Confirm Password"
-                                    label="Confirm Password"
-                                    type="password"
-                                    onChange={this.changeConfirmPassword}
-                                    onKeyDown={this.handleKeyDown}
+                                    id="Email"
+                                    label="Email"
+                                    onChange={this.changeEmail}
+                                    onKeyDown={this.enterEmail}
                                 />
                             </Grid>
                             {
+                                this.state.allowButtonSendCode &&
+                                <Grid item xs className={classes.center}>
+                                    <Button color="primary" variant="outlined"
+                                        onClick={this.sendCode}
+                                    >
+                                        Send Code
+                                    </Button>
+                                </Grid>
+                            }
+                            {
+                                this.state.allowCode &&
+                                <Grid item xs className={classes.center}>
+                                    <TextField 
+                                        id="Code"
+                                        label="Code"
+                                        onChange={this.changeCode}
+                                        onKeyDown={this.enterCode}
+                                    />
+                                </Grid>
+                            }
+                            {
+                                this.state.allowCode &&
+                                <Grid item xs className={classes.center}>
+                                    <Button color="primary" variant="outlined"
+                                        onClick={this.verifyCode}
+                                    >
+                                        Next
+                                    </Button>
+                                </Grid>
+                            }
+                            {   
+                                this.state.allowPassword &&
+                                <div>
+                                    <Grid item xs className={classes.center}>
+                                        <TextField 
+                                            id="Password"
+                                            label="Password"
+                                            type="password"
+                                            onChange={this.changePassword}
+                                            onKeyDown={this.enterPassword}
+                                        />
+                                    </Grid>
+                                    <Grid item xs className={classes.center}>
+                                        <TextField 
+                                            id="Confirm Password"
+                                            label="Confirm Password"
+                                            type="password"
+                                            onChange={this.changeConfirmPassword}
+                                            onKeyDown={this.enterPassword}
+                                        />
+                                    </Grid>
+                                    <Grid item xs className={classes.center}>
+                                        <Button className={classes.submit}
+                                            onClick={this.submit}
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Grid>
+                                </div>
+                            }
+                            {
                                 !_.isEmpty(this.state.error) &&
-                                <Grid item xs className={classes.error}>
+                                <Grid item xs className={classes.announcement}>
                                     <Typography color="error" align="center"
-                                        className={classes.errorText}
+                                        className={classes.announcementText}
                                     >
                                         Error: {this.state.error}
                                     </Typography>
                                 </Grid>
                             }
-                            <Grid item xs className={classes.center}>
-                                <Button className={classes.submit}
-                                    onClick={this.submit}
-                                >
-                                    Submit
-                                </Button>
-                            </Grid>
+                            {
+                                !_.isEmpty(this.state.success) &&
+                                <Grid item xs className={classes.announcement}>
+                                    <Typography color="primary" align="center"
+                                        className={classes.announcementText}
+                                    >
+                                        Success: {this.state.success}
+                                    </Typography>
+                                </Grid>
+                            }
                         </Grid>
                         <Grid item xs className={classes.center}>
                             <Button color="primary" onClick={() => {this.redirect("/login")}}

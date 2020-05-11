@@ -93,18 +93,20 @@ class Login extends React.Component {
         "Missing some fields"
     ]
 
-    username=""
+    email=""
     password=""
 
-    changeUsername = (event) => {
-        this.username = event.target.value;
-        if(!_.isEmpty(this.state.error))
+    changeEmail = (event) => {
+        this.email = event.target.value;
+        if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
+        }
     }
     changePassword = (event) => {
         this.password = event.target.value;
-        if(!_.isEmpty(this.state.error))
+        if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
+        }
     }
 
     redirect = (link) => {
@@ -116,14 +118,15 @@ class Login extends React.Component {
         const { history } = this.props;
 
         if(
-            _.isEmpty(this.username) ||
+            _.isEmpty(this.email) ||
             _.isEmpty(this.password)
-        )
+        ) {
             this.setState({ error: this.errorTypes[0] });
+        }
         else {
-            if(_.isEmpty(this.state.error)) 
+            if(_.isEmpty(this.state.error)) {
                 this.context.loginUser('local', {
-                    username: this.username,
+                    email: this.email,
                     password: this.password
                 })
                 .then(() => {
@@ -132,12 +135,14 @@ class Login extends React.Component {
                 .catch(err => {
                     this.setState({ error: err });
                 })
+            }
         }
     }
 
     handleKeyDown = (event) => {
-        if(event.key==="Enter") 
+        if(event.key==="Enter") {
             this.submit();
+        }
     }
     
     componentCheck = () => {
@@ -145,8 +150,9 @@ class Login extends React.Component {
     
         this.context.getUser()
         .then(user => {
-          if(!_.isEmpty(user.data))
+          if(!_.isEmpty(user.data)) {
             history.push('/');
+          }
         })
       }
     
@@ -183,9 +189,9 @@ class Login extends React.Component {
                         >
                             <Grid item xs className={classes.center}>
                                 <TextField 
-                                    id="Username"
-                                    label="Username"
-                                    onChange={this.changeUsername}
+                                    id="Email"
+                                    label="Email"
+                                    onChange={this.changeEmail}
                                     onKeyDown={this.handleKeyDown}
                                 />
                             </Grid>

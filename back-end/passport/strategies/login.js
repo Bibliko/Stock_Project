@@ -2,11 +2,13 @@ const { PrismaClient } = require('@prisma/client');
 const LocalStrategy = require('passport-local').Strategy;
 const prisma = new PrismaClient();
 
-const loginStrategy = new LocalStrategy(
-    (username, password, done) => {
+const loginStrategy = new LocalStrategy({
+        usernameField: 'email',
+    },
+    (email, password, done) => {
         prisma.user.findOne({
             where: {
-                username
+                email
             }
         })
         .then(user => {

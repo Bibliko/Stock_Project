@@ -1,0 +1,88 @@
+<html>
+    <!-- <script>
+
+        document.getElementById('form_id').action = "script.php";
+    </script> -->
+    <head>
+        <style>
+            #body {
+                text-align:center;
+                position: relative;
+                height: 100%;
+                width: 100%;
+            }
+
+            .project {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .item {
+                position: absolute;               
+                top: 50%;
+                left: 50%;              
+                transform: translate(-50%, -50%);
+            }
+
+            .button {
+                display: inline-block;
+                border-radius: 4px;
+                background-color: #03b6fc;
+                border: none;
+                color: #FFFFFF;
+                text-align: center;
+                font-size: 28px;
+                padding: 20px;
+                width: 200px;
+                transition: all 0.5s;
+                cursor: pointer;
+                margin: 5px;
+            }
+
+            .button span {
+                cursor: pointer;
+                display: inline-block;
+                position: relative;
+                transition: 0.5s;
+            }
+
+            .button span:after {
+                content: '\00bb';
+                position: absolute;
+                opacity: 0;
+                top: 0;
+                right: -20px;
+                transition: 0.5s;
+            }
+
+            .button:hover span {
+                padding-right: 25px;
+            }
+
+            .button:hover span:after {
+                opacity: 1;
+                right: 0;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div id='body'>
+            <div class="item">
+                <h1 class="stockproject">Stock Project</h1>
+
+                <p>
+                    Please verify your email by clicking the button below:
+                </p>
+
+                <form id="verify" action="{{ formAction }}">
+                    <button class="button" style="vertical-align:middle">
+                        <span>
+                            Verify!
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </body>
+</html>
