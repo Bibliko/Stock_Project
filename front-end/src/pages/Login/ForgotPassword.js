@@ -220,15 +220,15 @@ class ForgotPassword extends React.Component {
                     <Grid container spacing={2} direction="column"
                         className={classes.center}
                     >
-                        <Grid item xs className={classes.center}>
-                            <Typography className={classes.title}>
-                                Change Password
-                            </Typography>
-                        </Grid>
                         <Grid 
                             container spacing={1} direction="column"
                             item xs className={classes.center}
                         >
+                            <Grid item xs className={classes.center}>
+                                <Typography className={classes.title}>
+                                    Change Password
+                                </Typography>
+                            </Grid>
                             <Grid item xs className={classes.center}>
                                 <TextField 
                                     id="Email"
