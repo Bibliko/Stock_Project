@@ -24,7 +24,7 @@ const styles = theme => ({
         position: 'absolute',
         height: 500,
         width: 450,
-        padding: theme.spacing(3),
+        padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
