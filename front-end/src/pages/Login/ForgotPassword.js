@@ -38,7 +38,10 @@ const styles = theme => ({
     },
     title: {
         fontSize: 'x-large',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     submit: {
         marginTop: '16px',
@@ -224,11 +227,9 @@ class ForgotPassword extends React.Component {
                             container spacing={1} direction="column"
                             item xs className={classes.center}
                         >
-                            <Grid item xs className={classes.center}>
-                                <Typography className={classes.title}>
-                                    Change Password
-                                </Typography>
-                            </Grid>
+                            <Typography className={classes.title}>
+                                Change Password
+                            </Typography>
                             <Grid item xs className={classes.center}>
                                 <TextField 
                                     id="Email"
