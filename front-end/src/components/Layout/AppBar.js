@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
@@ -8,6 +9,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
+
+import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
 
 const drawerWidth = 240;
 
@@ -31,6 +34,9 @@ const styles = theme => ({
         maxWidth: 'fit-content',
         padding: 0,
         marginRight: -5
+    },
+    avatarIcon: {
+        fontSize: '-webkit-xxx-large',
     },
     hide: {
         display: 'none',
@@ -70,9 +76,11 @@ class PersistentAppBar extends React.Component {
                         edge="end"
                         className={clsx(classes.menuButton, open && classes.hide)}
                     >
-                        <Avatar src={user.avatarUrl}>
-                            {user.name? user.name.charAt(0).toUpperCase():""}
-                        </Avatar>
+                        {
+                            _.isEmpty(user.avatarUrl)?
+                            <AccountCircleRoundedIcon className={classes.avatarIcon}/>:
+                            <Avatar src={user.avatarUrl}/>
+                        }
                     </IconButton>
                 </Toolbar>
             </AppBar>
