@@ -1,0 +1,33 @@
+{
+  "name": "stock_project",
+  "version": "1.0.0",
+  "description": "Stock Market Game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-backend": "cd back-end && npm install && node herokuUpdateDb.js",
+    "build-frontend": "cd front-end && npm install && npm run build",
+    "build": "bash build.sh",
+    "start-backend": "cd back-end && npm run start",
+    "start-frontend": "cd front-end && npm run start",
+    "start": "bash start.sh"
+  },
+  "engines": {
+    "node": "13.1.0",
+    "npm": "6.13.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doanhtu07/Stock_Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doanhtu07/Stock_Project/issues"
+  },
+  "homepage": "https://github.com/doanhtu07/Stock_Project#readme",
+  "dependencies": {
+    "concurrently": "^5.2.0",
+    "wait-on": "^5.0.0"
+  }
+}

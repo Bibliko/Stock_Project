@@ -9,6 +9,8 @@ import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
 import ForgotPassword from './pages/Login/ForgotPassword';
+import Succeed from './pages/Login/Verification/Succeed';
+import Fail from './pages/Login/Verification/Fail';
 import UserProvider from './contexts/UserProvider';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
@@ -42,7 +44,9 @@ class App extends React.Component {
   specialLinks = [
     '/login', 
     '/signup', 
-    '/forgotpassword'
+    '/forgotpassword',
+    '/verificationSucceed',
+    '/verificationFail'
   ]
 
   state = {
@@ -157,6 +161,14 @@ class App extends React.Component {
           {
             this.state.path==="/forgotpassword" &&
             <ForgotPassword/>
+          }
+          {
+            this.state.path==="/verificationSucceed" &&
+            <Succeed/>
+          }
+          {
+            this.state.path==="/verificationFail" &&
+            <Fail/>
           }
           {
             !this.specialLinks.includes(this.state.path) &&

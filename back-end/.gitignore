@@ -7,6 +7,7 @@
 
 # secrets
 /config/*
+/prisma/.env
 
 # misc
 .DS_Store

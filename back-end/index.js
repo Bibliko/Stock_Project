@@ -5,12 +5,20 @@ try {
 }
 
 const { 
-    PORT: port,
+    PORT:port,
+    FRONTEND_HOST
 } = process.env;
 const express = require('express');
 const app = express();
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const fs = require('fs-extra');
+const randomKey = require('random-key');
+let passwordVerificationCode = "";
+
 
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -18,51 +26,83 @@ const passport = require('passport');
 const { setupPassport } = require('./passport');
 const session = require("express-session");
 
-app.use(cors());
+/* cors: for example, if front-end sends request to back-end, 
+ * then front-end is cors (cross-origin requests),
+ * and back-end is a cors receiver.
+ * A cors reciever can choose to respond to specific cors,
+ * and leave out the rest.
+ * However, if the back-end initiate a request to another server,
+ * e.g. Facebook server, then the back-end is a cors,
+ * and Facebook is a cors receiver.
+ * If Facebook respond anything back to back-end, then this
+ * response is NOT a cors, and back-end accepts this response
+ * without being regulated by this corsOptions.
+ */
+const corsOptions = {
+    origin: FRONTEND_HOST,
+    credentials: true
+};
+app.use(cors(corsOptions)); 
+app.use(bodyParser.json());
 app.use(session({ 
     secret: "stock-project",
     resave: false,
     saveUninitialized: false
 }));
-app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
 setupPassport(passport);
 
-app.use((req, res, next) => {
+var timerForDeleteVerification;
+var timerForSendCodeVerifyingPassword;
 
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'/*, 'https://obscure-badlands-88487.herokuapp.com/'*/);
+const deleteExpiredVerification = () => {
+    let date = new Date();
+    date = (date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear(); 
+    prisma.userVerification.deleteMany({
+        where: {
+            expiredAt: date
+        }
+    })
+    .then(res => {
+        console.log('Deleted', res, 'email verifications');
+    })
+    .catch(err => {
+        console.log(err);
+    })
+}
 
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+function setDaysTimeout(callback, days) {
+    // 86400 seconds in a day
+    var msInDay = 86400*1000; 
 
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    var dayCount = 0;
+    timerForDeleteVerification = setInterval(function() {
+        dayCount++;  // a day has passed
 
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
+        if(dayCount == days) {
+           clearInterval(timerForDeleteVerification);
+           callback.apply(this, []);
+        }
+    }, msInDay);
+}
 
-    // Pass to next layer of middleware
-    next();
-    
-});
+setDaysTimeout(deleteExpiredVerification, 1); 
 
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
 app.get('/auth/facebook/callback', 
     passport.authenticate('facebook', { 
-        successRedirect: '/',
-        failureRedirect: '/login' 
+        successRedirect: `${FRONTEND_HOST}/`,
+        failureRedirect: `${FRONTEND_HOST}/login` 
     })
 );
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 app.get('/auth/google/callback',
     passport.authenticate('google', {
-        successRedirect: '/',
-        failureRedirect: '/login'
+        successRedirect: `${FRONTEND_HOST}/`,
+        failureRedirect: `${FRONTEND_HOST}/login` 
     })
 );
 
@@ -74,25 +114,7 @@ app.post('/auth/signup', (req, res, next) => {
         if(user)
             return res.status(401).send(info);
 
-        prisma.user.create({
-            data: {
-                username: info.username,
-                password: info.password,
-                name: info.username,
-            }
-        })
-        .then(user => {
-            req.logIn(user, (err) => {
-                if(err) {
-                    return err;
-                }
-                return res.sendStatus(200);
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            res.sendStatus(500);
-        })
+        return res.status(202).send(info);
         
     })(req, res, next);
 });
@@ -118,8 +140,110 @@ app.use('/user', (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect('/');
+    res.send("Successful");
 });
+
+//verification APIs are listed below:
+
+app.get('/passwordVerification', (req, res) => {
+    if(
+        timerForSendCodeVerifyingPassword &&
+        timerForSendCodeVerifyingPassword._idleTimeout > -1
+    ) {
+        console.log(timerForSendCodeVerifyingPassword);
+        return res.status(429).send(`Wait ${timerForSendCodeVerifyingPassword._idleTimeout/1000} seconds to send code again.`);
+    }
+
+    passwordVerificationCode = randomKey.generate(6);
+    fs.readFile('./verificationHTML/verifyPassword.html', 'utf8') 
+    .then(data => {
+        const htmlFile = data.replace("{{ verificationKey }}", passwordVerificationCode);
+        const msg = {
+            to: req.query.email,
+            from: 'customerservice@minecommand.us',
+            subject: 'Verification Code For Password Recovery',
+            html: htmlFile,
+        };
+        return sgMail.send(msg);
+    })
+    .then(() => {
+        console.log("Code for password recovery has been sent.");
+
+        timerForSendCodeVerifyingPassword = setTimeout(() => {
+            clearInterval(timerForSendCodeVerifyingPassword);
+        }, 15000);
+
+        res.status(200).send("Code for password recovery has been sent.");
+    })
+    .catch(err => {
+        console.log(err);
+    })
+})
+
+app.get('/checkVerificationCode', (req, res) => {
+    const { code } = req.query;
+    if(code!==passwordVerificationCode) {
+        res.status(404).send("Your verification code does not match.");
+    }
+    else {
+        res.sendStatus(200);
+    }
+})
+
+app.use('/verification/:tokenId', (req, res) => {
+    const tokenId = req.params.tokenId;
+    prisma.userVerification.findOne({
+        where: {
+            id: tokenId
+        }
+    })
+    .then(token => {
+        if(token) {
+            return prisma.user.create({
+                data: {
+                    name: token.email,
+                    email: token.email,
+                    password: token.password,
+                }
+            })
+        }
+        res.redirect(`${FRONTEND_HOST}/verificationFail`);
+        return;
+    })
+    .then(newUser => {
+        if(newUser) {
+            // newUser.objectID = newUser.id;
+            // indices.users_index.saveObject(newUser, {
+            //     autoGenerateObjectIDIfNotExist: true,
+            // });
+
+            const deletePromise = prisma.userVerification.delete({
+                where: {
+                    id: tokenId
+                }
+            })
+
+            return Promise.all([newUser, deletePromise]);
+        }
+    })
+    .then(([newUser, doneDelete]) => {
+        if(doneDelete) {
+            req.logIn(newUser, err => {
+                if (err) { 
+                    return res.sendStatus(500); 
+                }
+                return res.redirect(`${FRONTEND_HOST}/verificationSucceed`);
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    })
+})
+
+// other APIs:
+app.use('/userData', require('./routes/user'));
+
 
 app.listen(port, () => {
     console.log(`app is listening on port ${port}`);

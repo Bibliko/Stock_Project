@@ -2,20 +2,24 @@ const { PrismaClient } = require('@prisma/client');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const prisma = new PrismaClient();
 const {
-    HOST,
     FACEBOOK_APP_ID, 
     FACEBOOK_APP_SECRET,
+    PASSPORT_CALLBACK_HOST
 } = process.env;
 //const { indices } = require('../../algolia');
 
 const facebookStrategy = new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: `${HOST}/auth/facebook/callback`,
+    callbackURL: `${PASSPORT_CALLBACK_HOST}/auth/facebook/callback`,
     profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified']
   },
   function(accessToken, refreshToken, profile, done) {
     const { id, email, first_name, last_name } = profile._json;
+
+    if(!email) 
+        return done(err);
+        
     prisma.user.findOne({
         where: {
             email
@@ -32,7 +36,7 @@ const facebookStrategy = new FacebookStrategy({
                     name: `${first_name} ${last_name}`,
                     email,
                     password: "",
-                    avatarUrl: `http://graph.facebook.com/${id}/picture?type=large`
+                    avatarUrl: `https://graph.facebook.com/${id}/picture?type=large`
                 }
             })
         }
