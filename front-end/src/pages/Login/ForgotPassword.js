@@ -120,53 +120,66 @@ class ForgotPassword extends React.Component {
     }
 
     sendCode = () => {
-        this.context.sendPasswordVerificationCode(this.email)
-        .then(res => {
-            this.setState({ 
-                success: res,
-                error: "",
-                allowCode: true
-            });
-        })  
-        .catch(err => {
-            this.setState({ error: err });
-        })
+        if(_.isEmpty(this.email)) {
+            this.setState({
+                error: this.errorTypes[1],
+            })
+        }
+        else {
+            this.context.sendPasswordVerificationCode(this.email)
+            .then(res => {
+                this.setState({ 
+                    success: res,
+                    error: "",
+                    allowCode: true
+                });
+            })  
+            .catch(err => {
+                this.setState({ error: err });
+            })
+        }
     }
 
     verifyCode = () => {
         this.setState({ success: "" });
-        this.context.checkVerificationCode(this.code)
-        .then(() => {
-            this.setState({ 
-                allowButtonSendCode: false,
-                allowCode: false,
-                allowPassword: true
-            });
-        })
-        .catch(err => {
+        if(_.isEmpty(this.code)) {
             this.setState({
-                error: err,
+                error: this.errorTypes[1],
             });
-        })
+        }
+        else {
+            this.context.checkVerificationCode(this.code)
+            .then(() => {
+                this.setState({ 
+                    allowButtonSendCode: false,
+                    allowCode: false,
+                    allowPassword: true
+                });
+            })
+            .catch(err => {
+                this.setState({
+                    error: err,
+                });
+            })
+        }
     }
 
     submit = () => {
         if(
+            _.isEmpty(this.email) ||
             _.isEmpty(this.password) ||
             _.isEmpty(this.confirmPassword)
         ) {
             this.setState({ error: this.errorTypes[1] }); 
         }
         else {
-            if(_.isEmpty(this.state.error)) {
-                this.context.changePassword(this.password, this.email)
-                .then(res => {
-                    this.setState({ success: res });
-                })
-                .catch(err => {
-                    this.setState({ error: err });
-                })
-            }
+            this.context.changePassword(this.password, this.email)
+            .then(res => {
+                this.setState({ success: res });
+            })
+            .catch(err => {
+                this.setState({ error: err });
+            })
         }
     }
 
