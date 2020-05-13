@@ -67,7 +67,7 @@ class PersistentAppBar extends React.Component {
             >
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h6" noWrap>
-                        Fun Stock Market
+                        Bibliko
                     </Typography>
                     <IconButton
                         color="inherit"
