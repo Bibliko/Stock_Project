@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -53,17 +52,14 @@ class PersistentAppBar extends React.Component {
     render() {
         const { 
             classes, 
-            open,
             user, 
-            handleDrawerOpen 
+            toggleDrawer 
         } = this.props;
 
         return(
             <AppBar
                 position="fixed"
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
-                })}
+                className={classes.appBar}
             >
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h6" noWrap>
@@ -72,9 +68,9 @@ class PersistentAppBar extends React.Component {
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={handleDrawerOpen}
+                        onClick={toggleDrawer(true)}
                         edge="end"
-                        className={clsx(classes.menuButton, open && classes.hide)}
+                        className={classes.menuButton}
                     >
                         {
                             _.isEmpty(user.avatarUrl)?
