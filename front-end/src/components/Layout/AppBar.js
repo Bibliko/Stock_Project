@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -12,21 +11,11 @@ import Avatar from '@material-ui/core/Avatar';
 
 import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
 
-const drawerWidth = 240;
-
 const styles = theme => ({
     appBar: {
         transition: theme.transitions.create(['margin', 'width'], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    appBarShift: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginRight: drawerWidth,
-        transition: theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
         }),
     },
     menuButton: {
@@ -53,17 +42,14 @@ class PersistentAppBar extends React.Component {
     render() {
         const { 
             classes, 
-            open,
             user, 
-            handleDrawerOpen 
+            toggleDrawer 
         } = this.props;
 
         return(
             <AppBar
                 position="fixed"
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
-                })}
+                className={classes.appBar}
             >
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h6" noWrap>
@@ -72,9 +58,9 @@ class PersistentAppBar extends React.Component {
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={handleDrawerOpen}
+                        onClick={toggleDrawer(true)}
                         edge="end"
-                        className={clsx(classes.menuButton, open && classes.hide)}
+                        className={classes.menuButton}
                     >
                         {
                             _.isEmpty(user.avatarUrl)?

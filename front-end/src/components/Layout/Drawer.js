@@ -3,23 +3,21 @@ import { withRouter } from 'react-router';
 
 import UserProvider from '../../contexts/UserProvider';
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
 
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import MeetingRoomRoundedIcon from '@material-ui/icons/MeetingRoomRounded';
+import ExitToAppRoundedIcon from '@material-ui/icons/ExitToAppRounded';
 import TuneRoundedIcon from '@material-ui/icons/TuneRounded';
 import DashboardRoundedIcon from '@material-ui/icons/DashboardRounded';
 import ShoppingCartRoundedIcon from '@material-ui/icons/ShoppingCartRounded';
 import AccountBoxRoundedIcon from '@material-ui/icons/AccountBoxRounded';
-import ReceiptRoundedIcon from '@material-ui/icons/ReceiptRounded';
+import HistoryRoundedIcon from '@material-ui/icons/HistoryRounded';
 import TimerRoundedIcon from '@material-ui/icons/TimerRounded';
 import ListAltRoundedIcon from '@material-ui/icons/ListAltRounded';
 import BusinessRoundedIcon from '@material-ui/icons/BusinessRounded';
@@ -36,20 +34,11 @@ const useStyles = makeStyles((theme) => ({
     drawerPaper: {
         width: drawerWidth,
     },
-    drawerHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-        justifyContent: 'flex-start',
-    },
 }));
 
 function PersistentDrawer(props) {
     const { logoutUser } = useContext(UserProvider.context);
     const classes = useStyles();
-    const theme = useTheme();
 
     const logout = () => {
         const { history } = props;
@@ -78,12 +67,12 @@ function PersistentDrawer(props) {
                     {
                         text==="Account Settings"? <TuneRoundedIcon/>:
                         text==="Dashboard"? <DashboardRoundedIcon/>:
-                        text==="Place An Order"? <ShoppingCartRoundedIcon/>:
-                        text==="Account Summary"? <AccountBoxRoundedIcon/>:
-                        text==="Transactions"? <ReceiptRoundedIcon/>:
+                        text==="Buy Stock"? <ShoppingCartRoundedIcon/>:
+                        text==="Portfolio"? <AccountBoxRoundedIcon/>:
+                        text==="Trading History"? <HistoryRoundedIcon/>:
                         text==="Pending Orders"? <TimerRoundedIcon/>:
                         text==="Watchlist"? <ListAltRoundedIcon/>:
-                        text==="Company List"? <BusinessRoundedIcon/>:
+                        text==="Companies"? <BusinessRoundedIcon/>:
                         text==="Charts"? <AssessmentRoundedIcon/>:
                         <EmojiEventsRoundedIcon/> //text==="Rankings"
                     }
@@ -96,39 +85,78 @@ function PersistentDrawer(props) {
     return (
         <Drawer
             className={classes.drawer}
-            variant="persistent"
             anchor="right"
             open={props.open}
             classes={{
                 paper: classes.drawerPaper,
             }}
-            >
-            <div className={classes.drawerHeader}>
-                <IconButton onClick={props.handleDrawerClose}>
-                    {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                </IconButton>
-            </div>
-            <Divider />
+            onClose={props.toggleDrawer(false)}
+        >
             <List>
                 {[
-                    'Account Settings'
+                    'Dashboard', 
                 ].map((text) => 
                     menuComponents(text)
                 )}
             </List>
             <Divider />
-            <List>
+            <List
+                subheader={
+                    <ListSubheader disableSticky={true}>
+                        Account
+                    </ListSubheader>
+                }
+            >
                 {[
-                    'Dashboard', 
-                    'Place An Order', 
-                    'Account Summary', 
-                    'Transactions',
+                    'Account Settings',
+                    'Portfolio', 
+                ].map((text) => 
+                    menuComponents(text)
+                )}
+            </List>
+            <Divider/>
+            <List
+                subheader={
+                    <ListSubheader disableSticky={true}>
+                        Transactions
+                    </ListSubheader>
+                }
+            >
+                {[
+                    'Buy Stock',  
+                    'Trading History',
                     'Pending Orders',
+
+                ].map((text) => 
+                    menuComponents(text)
+                )}
+            </List>
+            <Divider/>  
+            <List
+                subheader={
+                    <ListSubheader disableSticky={true}>
+                        List
+                    </ListSubheader>
+                }
+            >
+                {[
                     'Watchlist',
-                    'Company List',
+                    'Companies',
+                ].map((text) => 
+                    menuComponents(text)
+                )}
+            </List>
+            <Divider/>
+            <List
+                subheader={
+                    <ListSubheader disableSticky={true}>
+                        Explore
+                    </ListSubheader>
+                }
+            >
+                {[
                     'Charts',
                     'Rankings'
-
                 ].map((text) => 
                     menuComponents(text)
                 )}
@@ -137,7 +165,7 @@ function PersistentDrawer(props) {
             <List>
                 <ListItem button onClick={logout}>
                     <ListItemIcon>
-                        <MeetingRoomRoundedIcon/>
+                        <ExitToAppRoundedIcon/>
                     </ListItemIcon>
                     <ListItemText primary="Log Out"/>
                 </ListItem>

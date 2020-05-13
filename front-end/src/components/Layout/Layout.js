@@ -1,5 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
 
@@ -10,9 +9,6 @@ import UserProvider from '../../contexts/UserProvider';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 
-
-const drawerWidth = 240;
-
 const styles = theme => ({
   root: {
     display: 'flex',
@@ -22,18 +18,6 @@ const styles = theme => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginRight: -drawerWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: 0,
   },
   contentHeader: {
     display: 'flex',
@@ -52,12 +36,12 @@ class Layout extends React.Component {
   }
 
   //drawer open and close
-  handleDrawerOpen = () => {
-    this.setState({ open: true });
-  };
-  handleDrawerClose = () => {
-    if(this.state.open) 
-      this.setState({ open: false });
+  toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    this.setState({ open });
   };
 
   componentCheck = () => {
@@ -91,22 +75,18 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar 
-          open={open}
-          handleDrawerOpen={this.handleDrawerOpen}
+          toggleDrawer={this.toggleDrawer}
           user={user}
         />
         <main
-          className={clsx(classes.content, {
-            [classes.contentShift]: open,
-          })}
-          onClick={this.handleDrawerClose}
+          className={classes.content}
         >
-          <div className={classes.contentHeader} />
+          <div className={classes.contentHeader}/>
           {this.props.children}
         </main>
         <Drawer 
           open={open}
-          handleDrawerClose={this.handleDrawerClose}
+          toggleDrawer={this.toggleDrawer}
         />
       </div>
     );
