@@ -11,21 +11,11 @@ import Avatar from '@material-ui/core/Avatar';
 
 import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
 
-const drawerWidth = 240;
-
 const styles = theme => ({
     appBar: {
         transition: theme.transitions.create(['margin', 'width'], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    appBarShift: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginRight: drawerWidth,
-        transition: theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
         }),
     },
     menuButton: {
