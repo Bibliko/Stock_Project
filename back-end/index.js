@@ -6,15 +6,18 @@ try {
 
 const { 
     PORT:port,
-    FRONTEND_HOST
+    FRONTEND_HOST,
+    MAILGUN_API_KEY
 } = process.env;
 const express = require('express');
 const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const mailgun = require("mailgun-js");
+const DOMAIN = 'minecommand.us';
+const mg = mailgun({apiKey: MAILGUN_API_KEY, domain: DOMAIN});
+
 const fs = require('fs-extra');
 const randomKey = require('random-key');
 let passwordVerificationCode = "";
@@ -159,12 +162,12 @@ app.get('/passwordVerification', (req, res) => {
     .then(data => {
         const htmlFile = data.replace("{{ verificationKey }}", passwordVerificationCode);
         const msg = {
-            to: req.query.email,
-            from: 'customerservice@minecommand.us',
-            subject: 'Verification Code For Password Recovery',
+            from: 'Bibliko <biblikoorg@gmail.com>',
+            to: `${req.query.email}`,
+            subject: 'Password Recovery',
             html: htmlFile,
         };
-        return sgMail.send(msg);
+        return mg.messages().send(msg);
     })
     .then(() => {
         console.log("Code for password recovery has been sent.");

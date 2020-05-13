@@ -2,8 +2,9 @@ const { PrismaClient } = require('@prisma/client');
 const LocalStrategy = require('passport-local').Strategy;
 const prisma = new PrismaClient();
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const mailgun = require("mailgun-js");
+const DOMAIN = 'minecommand.us';
+const mg = mailgun({apiKey: process.env.MAILGUN_API_KEY, domain: DOMAIN});
 const fs = require('fs-extra');
 
 const { PASSPORT_CALLBACK_HOST } = process.env;
@@ -76,13 +77,12 @@ const signupStrategy = new LocalStrategy({
                 `${PASSPORT_CALLBACK_HOST}/verification/${verificationToken.id}`
             );
             const msg = {
-                to: email,
-                from: 'customerservice@minecommand.us',
-                subject: 'Email Verification',
+                from: 'Bibliko <biblikoorg@gmail.com>',
+                to: `${email}`,
+                subject: 'Password Recovery',
                 html: file,
             };
-
-            return sgMail.send(msg);
+            return mg.messages().send(msg);
 
         })
         .then(emailVerification => {
