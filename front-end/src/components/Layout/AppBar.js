@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -42,7 +43,7 @@ class PersistentAppBar extends React.Component {
     render() {
         const { 
             classes, 
-            user, 
+            userSession, 
             toggleDrawer 
         } = this.props;
 
@@ -63,9 +64,9 @@ class PersistentAppBar extends React.Component {
                         className={classes.menuButton}
                     >
                         {
-                            _.isEmpty(user.avatarUrl)?
+                            _.isEmpty(userSession.avatarUrl)?
                             <AccountCircleRoundedIcon className={classes.avatarIcon}/>:
-                            <Avatar src={user.avatarUrl}/>
+                            <Avatar src={userSession.avatarUrl}/>
                         }
                     </IconButton>
                 </Toolbar>
@@ -74,5 +75,10 @@ class PersistentAppBar extends React.Component {
     }
 }
 
-export default withStyles(styles)(withRouter(PersistentAppBar));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
 
+export default connect(mapStateToProps)(
+    withStyles(styles)(withRouter(PersistentAppBar))
+);

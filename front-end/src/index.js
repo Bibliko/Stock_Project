@@ -5,6 +5,8 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
 
+//Redux: https://codesandbox.io/s/oj7px08qy9?file=/Page.js
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>

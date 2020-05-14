@@ -1,9 +1,13 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+import {
+    userAction,
+} from '../../redux/storeActions/actions';
 
 import UserProvider from '../../contexts/UserProvider';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
@@ -26,7 +30,7 @@ import EmojiEventsRoundedIcon from '@material-ui/icons/EmojiEventsRounded';
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
+const styles = theme => ({
     drawer: {
         width: drawerWidth,
         flexShrink: 0,
@@ -34,33 +38,18 @@ const useStyles = makeStyles((theme) => ({
     drawerPaper: {
         width: drawerWidth,
     },
-}));
+});
 
-function PersistentDrawer(props) {
-    const { logoutUser } = useContext(UserProvider.context);
-    const classes = useStyles();
-
-    const logout = () => {
-        const { history } = props;
-
-        logoutUser()
-        .then(() => {
-            history.push('/login');
-        })
-        .catch(err => {
-            console.log(err);
-        })
-    }
-
-    const chooseMenu = (text) => {
+class PersistentDrawer extends React.Component {
+    chooseMenu = (text) => {
 
     }
 
-    const menuComponents = (text) => {
+    menuComponents = (text) => {
         return (
             <ListItem button key={text}
                 onClick={() => {
-                    chooseMenu(text);
+                    this.chooseMenu(text);
                 }}
             >
                 <ListItemIcon>
@@ -82,96 +71,130 @@ function PersistentDrawer(props) {
         );
     }
 
-    return (
-        <Drawer
-            className={classes.drawer}
-            anchor="right"
-            open={props.open}
-            classes={{
-                paper: classes.drawerPaper,
-            }}
-            onClose={props.toggleDrawer(false)}
-        >
-            <List>
-                {[
-                    'Dashboard', 
-                ].map((text) => 
-                    menuComponents(text)
-                )}
-            </List>
-            <Divider />
-            <List
-                subheader={
-                    <ListSubheader disableSticky={true}>
-                        Account
-                    </ListSubheader>
-                }
-            >
-                {[
-                    'Account Settings',
-                    'Portfolio', 
-                ].map((text) => 
-                    menuComponents(text)
-                )}
-            </List>
-            <Divider/>
-            <List
-                subheader={
-                    <ListSubheader disableSticky={true}>
-                        Transactions
-                    </ListSubheader>
-                }
-            >
-                {[
-                    'Buy Stock',  
-                    'Trading History',
-                    'Pending Orders',
+    logout = () => {
+        this.context.logoutUser()
+        .then(() => {
+            this.props.mutateUser();
+            console.log(this.props.userSession);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
 
-                ].map((text) => 
-                    menuComponents(text)
-                )}
-            </List>
-            <Divider/>  
-            <List
-                subheader={
-                    <ListSubheader disableSticky={true}>
-                        List
-                    </ListSubheader>
-                }
+    render() {
+        const { 
+            classes,
+            toggleDrawer,
+            open
+        } = this.props;
+
+        return (
+            <Drawer
+                className={classes.drawer}
+                anchor="right"
+                open={open}
+                classes={{
+                    paper: classes.drawerPaper,
+                }}
+                onClose={toggleDrawer(false)}
             >
-                {[
-                    'Watchlist',
-                    'Companies',
-                ].map((text) => 
-                    menuComponents(text)
-                )}
-            </List>
-            <Divider/>
-            <List
-                subheader={
-                    <ListSubheader disableSticky={true}>
-                        Explore
-                    </ListSubheader>
-                }
-            >
-                {[
-                    'Charts',
-                    'Rankings'
-                ].map((text) => 
-                    menuComponents(text)
-                )}
-            </List>
-            <Divider/>
-            <List>
-                <ListItem button onClick={logout}>
-                    <ListItemIcon>
-                        <ExitToAppRoundedIcon/>
-                    </ListItemIcon>
-                    <ListItemText primary="Log Out"/>
-                </ListItem>
-            </List>
-        </Drawer>
-    );
+                <List>
+                    {[
+                        'Dashboard', 
+                    ].map((text) => 
+                        this.menuComponents(text)
+                    )}
+                </List>
+                <Divider />
+                <List
+                    subheader={
+                        <ListSubheader disableSticky={true}>
+                            Account
+                        </ListSubheader>
+                    }
+                >
+                    {[
+                        'Account Settings',
+                        'Portfolio', 
+                    ].map((text) => 
+                        this.menuComponents(text)
+                    )}
+                </List>
+                <Divider/>
+                <List
+                    subheader={
+                        <ListSubheader disableSticky={true}>
+                            Transactions
+                        </ListSubheader>
+                    }
+                >
+                    {[
+                        'Buy Stock',  
+                        'Trading History',
+                        'Pending Orders',
+    
+                    ].map((text) => 
+                        this.menuComponents(text)
+                    )}
+                </List>
+                <Divider/>  
+                <List
+                    subheader={
+                        <ListSubheader disableSticky={true}>
+                            List
+                        </ListSubheader>
+                    }
+                >
+                    {[
+                        'Watchlist',
+                        'Companies',
+                    ].map((text) => 
+                        this.menuComponents(text)
+                    )}
+                </List>
+                <Divider/>
+                <List
+                    subheader={
+                        <ListSubheader disableSticky={true}>
+                            Explore
+                        </ListSubheader>
+                    }
+                >
+                    {[
+                        'Charts',
+                        'Rankings'
+                    ].map((text) => 
+                        this.menuComponents(text)
+                    )}
+                </List>
+                <Divider/>
+                <List>
+                    <ListItem button onClick={this.logout}>
+                        <ListItemIcon>
+                            <ExitToAppRoundedIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary="Log Out"/>
+                    </ListItem>
+                </List>
+            </Drawer>
+        );
+    }
 }
 
-export default withRouter(PersistentDrawer);
+PersistentDrawer.contextType = UserProvider.context;
+
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
+  
+const mapDispatchToProps = (dispatch) => ({
+    mutateUser: () => dispatch(userAction(
+        'logout',
+    )),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+    withStyles(styles)(withRouter(PersistentDrawer))
+);
+

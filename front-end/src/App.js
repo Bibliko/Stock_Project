@@ -4,6 +4,8 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import { Provider } from 'react-redux';
+import store from './redux/store';
 
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
@@ -150,35 +152,37 @@ class App extends React.Component {
     return (
       <UserProvider>
         <ThemeProvider theme={this.createTheme()}>
-          {
-            this.state.path==="/login" &&
-            <Login/>
-          }
-          {
-            this.state.path==="/signup" &&
-            <Signup/>
-          }
-          {
-            this.state.path==="/forgotpassword" &&
-            <ForgotPassword/>
-          }
-          {
-            this.state.path==="/verificationSucceed" &&
-            <Succeed/>
-          }
-          {
-            this.state.path==="/verificationFail" &&
-            <Fail/>
-          }
-          {
-            !this.specialLinks.includes(this.state.path) &&
-            <Switch>
-              <Layout toggleTheme={this.toggleTheme}>
-                <Route path="/" component={Test}/>
-                {/* <Route exact path="/browse" component={Browse} /> */}
-              </Layout>
-            </Switch>
-          }
+          <Provider store={store}>
+            {
+              this.state.path==="/login" &&
+              <Login/>
+            }
+            {
+              this.state.path==="/signup" &&
+              <Signup/>
+            }
+            {
+              this.state.path==="/forgotpassword" &&
+              <ForgotPassword/>
+            }
+            {
+              this.state.path==="/verificationSucceed" &&
+              <Succeed/>
+            }
+            {
+              this.state.path==="/verificationFail" &&
+              <Fail/>
+            }
+            {
+              !this.specialLinks.includes(this.state.path) &&
+              <Switch>
+                <Layout toggleTheme={this.toggleTheme}>
+                  <Route path="/" component={Test}/>
+                  {/* <Route exact path="/browse" component={Browse} /> */}
+                </Layout>
+              </Switch>
+            }
+          </Provider>
         </ThemeProvider>
       </UserProvider>
     );
