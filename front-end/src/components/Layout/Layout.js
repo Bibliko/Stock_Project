@@ -1,6 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+import {
+  userAction
+} from '../../redux/storeActions/actions';
 
 import AppBar from './AppBar';
 import Drawer from './Drawer';
@@ -32,7 +36,6 @@ const styles = theme => ({
 class Layout extends React.Component {
   state = {
     open: false,
-    user: {}
   }
 
   //drawer open and close
@@ -44,23 +47,25 @@ class Layout extends React.Component {
     this.setState({ open });
   };
 
-  componentCheck = () => {
+  redirect = (link) => {
     const { history } = this.props;
+    history.push(link);
+  } 
 
-    this.context.getUser()
-    .then(user => {
-      if(_.isEmpty(user.data))
-        history.push('/login');
-      else {
-        if(!_.isEqual(user.data, this.state.user)) {
-          this.setState({ user: user.data });
-        }
-      }
-    })
+  componentCheck = () => {
+    if(_.isEmpty(this.props.userSession)) {
+      this.redirect('/login');
+    }
   }
 
   componentDidMount() {
-    this.componentCheck();
+    this.context.getUser() 
+    .then(user => {
+      this.props.mutateUser(user.data);
+    })
+    .catch(err => {
+      console.log(err);
+    })
   }
 
   componentDidUpdate() {
@@ -69,14 +74,13 @@ class Layout extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { open, user } = this.state;
+    const { open } = this.state;
 
     return (
       <div className={classes.root}>
         <CssBaseline />
         <AppBar 
           toggleDrawer={this.toggleDrawer}
-          user={user}
         />
         <main
           className={classes.content}
@@ -95,5 +99,18 @@ class Layout extends React.Component {
 
 Layout.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(Layout));
+const mapStateToProps = (state) => ({
+  userSession: state.userSession
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  mutateUser: (userProps) => dispatch(userAction(
+    'default',
+    userProps
+  )),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+  withStyles(styles)(withRouter(Layout))
+);
 

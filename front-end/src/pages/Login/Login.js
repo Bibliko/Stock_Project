@@ -1,6 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+import {
+    userAction,
+} from '../../redux/storeActions/actions';
 
 import UserProvider from '../../contexts/UserProvider';
 
@@ -102,10 +106,17 @@ class Login extends React.Component {
             this.setState({ error: "" });
         }
     }
+
     changePassword = (event) => {
         this.password = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
+        }
+    }
+
+    handleKeyDown = (event) => {
+        if(event.key==="Enter") {
+            this.submit();
         }
     }
 
@@ -115,8 +126,6 @@ class Login extends React.Component {
     }
 
     submit = () => {
-        const { history } = this.props;
-
         if(
             _.isEmpty(this.email) ||
             _.isEmpty(this.password)
@@ -130,7 +139,10 @@ class Login extends React.Component {
                     password: this.password
                 })
                 .then(() => {
-                    history.push('/');
+                    return this.context.getUser();
+                })
+                .then(user => {
+                    this.props.mutateUser(user.data);
                 })
                 .catch(err => {
                     this.setState({ error: err });
@@ -138,31 +150,21 @@ class Login extends React.Component {
             }
         }
     }
-
-    handleKeyDown = (event) => {
-        if(event.key==="Enter") {
-            this.submit();
-        }
-    }
     
     componentCheck = () => {
-        const { history } = this.props;
-    
-        this.context.getUser()
-        .then(user => {
-          if(!_.isEmpty(user.data)) {
-            history.push('/');
-          }
-        })
-      }
-    
-      componentDidMount() {
+        if(!_.isEmpty(this.props.userSession)) {
+            this.redirect('/');
+        }
+    }
+
+    componentDidMount() {
         this.componentCheck();
-      }
+    }
     
-      componentDidUpdate() {
+    
+    componentDidUpdate() {
         this.componentCheck();
-      }
+    }
 
     render() {
         const { classes } = this.props;
@@ -286,4 +288,17 @@ class Login extends React.Component {
 
 Login.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(Login));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
+  
+const mapDispatchToProps = (dispatch) => ({
+    mutateUser: (userProps) => dispatch(userAction(
+        'default',
+        userProps
+    )),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+    withStyles(styles)(withRouter(Login))
+);

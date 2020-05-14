@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
 
 import UserProvider from '../../contexts/UserProvider';
 
@@ -85,12 +86,14 @@ class Signup extends React.Component {
             this.setState({ error: "" });
         }
     }
+
     changePassword = (event) => {
         this.password = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
+
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
 
@@ -104,7 +107,6 @@ class Signup extends React.Component {
         else {
             this.setState({ error: "" });
         }
-        
     }
 
     submit = () => {
@@ -131,35 +133,30 @@ class Signup extends React.Component {
         }
     }
 
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-
     handleKeyDown = (event) => {
         if(event.key==="Enter") {
             this.submit();
         }
     }
+
+    redirect = (link) => {
+        const { history } = this.props;
+        history.push(link);
+    }
     
     componentCheck = () => {
-        const { history } = this.props;
+        if(!_.isEmpty(this.props.userSession)) {
+            this.redirect('/');
+        }
+    }
     
-        this.context.getUser()
-        .then(user => {
-          if(!_.isEmpty(user.data)) {
-            history.push('/');
-          }
-        })
-      }
-    
-      componentDidMount() {
+    componentDidMount() {
         this.componentCheck();
-      }
+    }
     
-      componentDidUpdate() {
+    componentDidUpdate() {
         this.componentCheck();
-      }
+    }
 
     render() {
         const { classes } = this.props;
@@ -253,4 +250,10 @@ class Signup extends React.Component {
 
 Signup.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(Signup));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
+
+export default connect(mapStateToProps)(
+    withStyles(styles)(withRouter(Signup))
+);

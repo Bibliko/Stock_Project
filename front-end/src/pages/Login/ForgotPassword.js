@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
 
 import UserProvider from '../../contexts/UserProvider';
 
@@ -207,12 +208,9 @@ class ForgotPassword extends React.Component {
     }
     
     componentCheck = () => {
-        this.context.getUser()
-        .then(user => {
-          if(!_.isEmpty(user.data)) {
+        if(!_.isEmpty(this.props.userSession)) {
             this.redirect('/');
-          }
-        })
+        }
       }
     
     componentDidMount() {
@@ -351,4 +349,10 @@ class ForgotPassword extends React.Component {
 
 ForgotPassword.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(ForgotPassword));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
+
+export default connect(mapStateToProps)(
+    withStyles(styles)(withRouter(ForgotPassword))
+);

@@ -1,5 +1,7 @@
 import React from 'react';
+import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
 
 import UserProvider from '../../../contexts/UserProvider';
 
@@ -46,6 +48,20 @@ class Fail extends React.Component {
         history.push(link);
     }
 
+    componentCheck = () => {
+        if(!_.isEmpty(this.props.userSession)) {
+            this.redirect('/');
+        }
+    }
+
+    componentDidMount() {
+        this.componentCheck();
+    }
+
+    componentDidUpdate() {
+        this.componentCheck();
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -88,4 +104,10 @@ class Fail extends React.Component {
 
 Fail.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(Fail));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
+
+export default connect(mapStateToProps)(
+    withStyles(styles)(withRouter(Fail))
+);

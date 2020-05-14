@@ -1,11 +1,15 @@
 import React from 'react';
+import _ from 'lodash';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+import {
+    userAction,
+} from '../../../redux/storeActions/actions';
 
 import UserProvider from '../../../contexts/UserProvider';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -46,6 +50,20 @@ class Succeed extends React.Component {
         history.push(link);
     }
 
+    componentCheck = () => {
+        if(!_.isEmpty(this.props.userSession)) {
+            this.redirect('/');
+        }
+    }
+
+    componentDidMount() {
+        this.componentCheck();
+    }
+
+    componentDidUpdate() {
+        this.componentCheck();
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -67,14 +85,9 @@ class Succeed extends React.Component {
                         <Grid 
                             item xs className={classes.center}
                         >
-                            <Button 
-                                color="primary" variant="outlined"
-                                onClick={() => {
-                                    this.redirect("/")
-                                }}
-                            >
-                                Go Back To Home Page
-                            </Button>
+                            <Typography>
+                                Redirecting to Home Page...
+                            </Typography>
                         </Grid>
                     </Grid>
                 </Paper>
@@ -85,4 +98,17 @@ class Succeed extends React.Component {
 
 Succeed.contextType = UserProvider.context;
 
-export default withStyles(styles)(withRouter(Succeed));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    mutateUser: (userProps) => dispatch(userAction(
+        'default',
+        userProps
+    )),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+    withStyles(styles)(withRouter(Succeed))
+);
