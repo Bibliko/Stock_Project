@@ -289,7 +289,7 @@ class Login extends React.Component {
 Login.contextType = UserProvider.context;
 
 const mapStateToProps = (state) => ({
-    userSession: state.userSession
+    userSession: state.userSession,
 });
   
 const mapDispatchToProps = (dispatch) => ({
