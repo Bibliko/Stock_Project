@@ -13,7 +13,7 @@ import Signup from './pages/Login/Signup';
 import ForgotPassword from './pages/Login/ForgotPassword';
 import Succeed from './pages/Login/Verification/Succeed';
 import Fail from './pages/Login/Verification/Fail';
-import UserProvider from './contexts/UserProvider';
+import FunctionsProvider from './provider/FunctionsProvider';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
@@ -150,7 +150,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <UserProvider>
+      <FunctionsProvider>
         <ThemeProvider theme={this.createTheme()}>
           <Provider store={store}>
             {
@@ -184,7 +184,7 @@ class App extends React.Component {
             }
           </Provider>
         </ThemeProvider>
-      </UserProvider>
+      </FunctionsProvider>
     );
   }
 }

@@ -8,9 +8,11 @@ import axios from 'axios';
 const context = createContext(null);
 const { REACT_APP_BACKEND_HOST : BACKEND_HOST } = process.env;
 
-class UserProvider extends React.Component {
+class FunctionsProvider extends React.Component {
 
     typeLogin = ['facebook', 'google'];
+
+    // user section:
 
     getUser = () => {
         return new Promise((resolve, reject) => {
@@ -76,6 +78,7 @@ class UserProvider extends React.Component {
     }
 
     //Forgot password process includes 3 functions below:
+
     sendPasswordVerificationCode = (email) => {
         return new Promise((resolve, reject) => {
             axios(`${BACKEND_HOST}/passwordVerification`, {
@@ -93,6 +96,7 @@ class UserProvider extends React.Component {
             })
         })
     }
+
     checkVerificationCode = (code) => {
         return new Promise((resolve, reject) => {
             axios(`${BACKEND_HOST}/checkVerificationCode`, {
@@ -110,6 +114,7 @@ class UserProvider extends React.Component {
             })
         });
     }
+
     changePassword = (password, email) => {
         return new Promise((resolve, reject) => {
             axios(`${BACKEND_HOST}/userData/changeData`, {
@@ -129,12 +134,14 @@ class UserProvider extends React.Component {
         }); 
     }
 
+    // stock section:
+    
+
     render() {
-
-
         return (
             <context.Provider 
                 value={{
+                    // user functions:
                     getUser: this.getUser,
                     logoutUser: this.logoutUser,
                     loginUser: this.loginUser,
@@ -142,6 +149,9 @@ class UserProvider extends React.Component {
                     sendPasswordVerificationCode: this.sendPasswordVerificationCode,
                     checkVerificationCode: this.checkVerificationCode,
                     changePassword: this.changePassword
+
+                    // stock functions:
+                    // ...
                 }} 
             >
                 {this.props.children}
@@ -150,7 +160,7 @@ class UserProvider extends React.Component {
     }
 }
 
-UserProvider = withRouter(UserProvider);
-UserProvider.context = context;
+FunctionsProvider = withRouter(FunctionsProvider);
+FunctionsProvider.context = context;
 
-export default UserProvider;
+export default FunctionsProvider;
