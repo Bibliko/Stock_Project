@@ -6,7 +6,7 @@ import {
     userAction,
 } from '../../../redux/storeActions/actions';
 
-import UserProvider from '../../../contexts/UserProvider';
+import FunctionsProvider from '../../../provider/FunctionsProvider';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -96,7 +96,7 @@ class Succeed extends React.Component {
     }
 }
 
-Succeed.contextType = UserProvider.context;
+Succeed.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

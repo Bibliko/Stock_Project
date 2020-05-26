@@ -6,7 +6,7 @@ import {
     userAction,
 } from '../../redux/storeActions/actions';
 
-import UserProvider from '../../contexts/UserProvider';
+import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -286,7 +286,7 @@ class Login extends React.Component {
     }
 }
 
-Login.contextType = UserProvider.context;
+Login.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,

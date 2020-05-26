@@ -5,7 +5,7 @@ import {
     userAction,
 } from '../../redux/storeActions/actions';
 
-import UserProvider from '../../contexts/UserProvider';
+import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -182,7 +182,7 @@ class PersistentDrawer extends React.Component {
     }
 }
 
-PersistentDrawer.contextType = UserProvider.context;
+PersistentDrawer.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession
