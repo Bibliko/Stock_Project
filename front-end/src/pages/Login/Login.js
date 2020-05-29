@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import {
     userAction,
 } from '../../redux/storeActions/actions';
+import { socket } from '../../App';
 
 import FunctionsProvider from '../../provider/FunctionsProvider';
 
@@ -159,6 +160,11 @@ class Login extends React.Component {
 
     componentDidMount() {
         this.componentCheck();
+        
+        // testing socket
+        socket.on("FromAPI", (data) => {
+            console.log(data);
+        })
     }
     
     

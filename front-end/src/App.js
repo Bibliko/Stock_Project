@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import socketIOClient from "socket.io-client";
 
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
@@ -41,7 +42,14 @@ function Test() {
   );
 }
 
+var socket;
+
 class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+    socket = socketIOClient(process.env.REACT_APP_BACKEND_HOST_FOR_SOCKET);
+  }
   
   specialLinks = [
     '/login', 
@@ -189,4 +197,5 @@ class App extends React.Component {
   }
 }
 
+export { socket };
 export default withRouter(App);
