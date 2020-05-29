@@ -29,6 +29,7 @@
     "express-session": "^1.17.1",
     "firebase": "^7.14.3",
     "fs-extra": "^9.0.0",
+    "http": "0.0.1-security",
     "lodash": "^4.17.15",
     "mailgun-js": "^0.22.0",
     "nodemon": "^2.0.3",
@@ -37,6 +38,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "random-key": "^0.3.2",
+    "socket.io": "^2.3.0",
     "xhr2": "^0.2.0"
   }
 }

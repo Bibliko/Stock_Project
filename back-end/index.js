@@ -22,6 +22,10 @@ const fs = require('fs-extra');
 const randomKey = require('random-key');
 let passwordVerificationCode = "";
 
+const http = require('http');
+const server = http.createServer(app);
+const socketIO = require('socket.io');
+const io = socketIO(server);
 
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -92,6 +96,8 @@ function setDaysTimeout(callback, days) {
 }
 
 setDaysTimeout(deleteExpiredVerification, 1); 
+
+// all app routes are written below this comment:
 
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
 app.get('/auth/facebook/callback', 
@@ -248,6 +254,33 @@ app.use('/verification/:tokenId', (req, res) => {
 app.use('/userData', require('./routes/user'));
 
 
-app.listen(port, () => {
-    console.log(`app is listening on port ${port}`);
+// set up socket.io server
+var intervalForSocket;
+
+const getApiAndEmit = (socket) => {
+    // new Date() will take timezone GMT +0
+    const response = new Date();
+    // Emitting a new message. Will be consumed by the client
+    socket.emit("FromAPI", response);
+};
+
+io.on("connection", (socket) => {
+    console.log("New client connected");
+
+    if (intervalForSocket) {
+        clearInterval(intervalForSocket);
+    }
+
+    intervalForSocket = setInterval(() => getApiAndEmit(socket), 1000);
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
+        clearInterval(intervalForSocket);
+    });
+});
+
+
+// back-end server listen
+server.listen(port, () => {
+    console.log(`server is listening on port ${port}`);
 });
