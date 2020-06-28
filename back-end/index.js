@@ -99,6 +99,8 @@ setDaysTimeout(deleteExpiredVerification, 1);
 
 // all app routes are written below this comment:
 
+// APIs for Passport are listed below:
+
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ["email"] }));
 app.get('/auth/facebook/callback', 
     passport.authenticate('facebook', { 
@@ -117,11 +119,13 @@ app.get('/auth/google/callback',
 
 app.post('/auth/signup', (req, res, next) => {
     passport.authenticate('local-signup', (err, user, info) => {
-        if (err) 
+        if(err) {
             return res.sendStatus(500); 
+        }
 
-        if(user)
+        if(user) {
             return res.status(401).send(info);
+        }
 
         return res.status(202).send(info);
         
@@ -130,14 +134,18 @@ app.post('/auth/signup', (req, res, next) => {
 
 app.post('/auth/login', (req, res, next) => {
     passport.authenticate('local-login', (err, user, info) => {
-        if (err) { 
+        if(err) { 
             return res.sendStatus(500); 
         }
-        if (!user) { 
+        
+        if(!user) { 
             return res.status(401).send(info);
         }
+
         req.logIn(user, err => {
-            if (err) { return res.sendStatus(500); }
+            if(err) { 
+                return res.sendStatus(500); 
+            }
             return res.sendStatus(200);
         });
     })(req, res, next);
