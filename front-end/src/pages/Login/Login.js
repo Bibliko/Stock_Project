@@ -6,9 +6,7 @@ import {
     userAction,
 } from '../../redux/storeActions/actions';
 import { socket } from '../../App';
-
 import FunctionsProvider from '../../provider/FunctionsProvider';
-
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
@@ -16,9 +14,14 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+
 
 const styles = theme => ({
-    root: {
+
+    root: { 
+        background: 'black',
         position: 'absolute',
         height: '-webkit-fill-available',
         width: '-webkit-fill-available',
@@ -27,36 +30,48 @@ const styles = theme => ({
         justifyContent: 'center'
     },
     paper: {
+        background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF',
+
+        //original
+        //background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 100%), linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 100%), linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 100%), #9ED2EF',
+        //background: 'linear-gradient(180deg, #300B66 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(180deg, #FF3747 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(180deg, #FFFFFF 30%, rgba(255, 255, 255, 0) 100%),linear-gradient(180deg, #FFFFFF 80%, rgba(255, 255, 255, 0) 100%), #9ED2EF',
         position: 'absolute',
-        height: 500,
-        width: 450,
+        height: '700px',
+        width: '542px',
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
     },
+    
     center: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
-        flexBasis: 'unset'
+        flexBasis: 'unset',
+        
     },
     title: {
+        
+        top: '245px',
         fontSize: 'x-large',
         fontWeight: 'bold'
     },
     submit: {
-        marginTop: '16px',
+        marginTop: '8px',
         padding: theme.spacing(1),
         minHeight: '40px',
-        background: theme.palette.barButton.main,
+        width: '120px',
+        background: 'black',
         '&:hover': {
             opacity: 0.85
         },
+        color: 'white',
         fontWeight: 'bold'
     },
     link: {
+        color: 'black',
         fontWeight: 'bold',
         fontSize: 'small'
     },
@@ -64,6 +79,19 @@ const styles = theme => ({
         borderRadius: '50%',
         height: "50px",
         width: "50px" 
+    },
+    avatar: {
+
+        height: "150px",
+        width: "150px", 
+        margin: theme.spacing(1)
+    },
+    rememberMe:{
+        color: 'black',
+        fontSize: 'small',
+        fontWeight: 'bold',
+        marginTop: theme.spacing(1)
+
     },
     alternativeLoginButton: {
         maxHeight: 'fit-content',
@@ -75,9 +103,10 @@ const styles = theme => ({
         borderRadius: '50%'
     },
     orLogInWith: {
+        fontWeight: '500',
         color: theme.palette.subText.main,
-        fontSize: 'small',
-        marginTop: theme.spacing(1)
+        fontSize: '500'
+        
     },
     error: {
         marginTop: 5,
@@ -87,7 +116,33 @@ const styles = theme => ({
     errorText: {
         fontSize: 'small'
     },
+    input: {
+        backgroundColor: 'white'
+    }
+    
 });
+const AccountTextField = withStyles({
+    root: {
+      "& label.Mui-focused": {
+        color: "black"
+      },
+      "& .MuiInput-underline:after": {
+        borderBottomColor: "black"
+      },
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": {
+          borderColor: "black"
+        },
+        "&:hover fieldset": {
+          borderColor: "black"
+        },
+        "&.Mui-focused fieldset": {
+          borderColor: "black"
+        }
+      }
+    }
+  })(TextField);
+
 
 class Login extends React.Component {
     state = {
@@ -95,14 +150,14 @@ class Login extends React.Component {
     }
 
     errorTypes = [
-        "Missing some fields"
+        "Incorrect username or password."
     ]
 
-    email=""
+    username=""
     password=""
 
-    changeEmail = (event) => {
-        this.email = event.target.value;
+    changeUsername = (event) => {
+        this.username = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
@@ -128,7 +183,7 @@ class Login extends React.Component {
 
     submit = () => {
         if(
-            _.isEmpty(this.email) ||
+            _.isEmpty(this.username) ||
             _.isEmpty(this.password)
         ) {
             this.setState({ error: this.errorTypes[0] });
@@ -136,7 +191,7 @@ class Login extends React.Component {
         else {
             if(_.isEmpty(this.state.error)) {
                 this.context.loginUser('local', {
-                    email: this.email,
+                    username: this.username,
                     password: this.password
                 })
                 .then(() => {
@@ -167,7 +222,6 @@ class Login extends React.Component {
         })
     }
     
-    
     componentDidUpdate() {
         this.componentCheck();
     }
@@ -179,8 +233,8 @@ class Login extends React.Component {
         return (
             <div className={classes.root}>
                 <Paper 
+                    backgroundColor='transparent'
                     className={classes.paper}
-                    variant="outlined"
                     elevation={2}
                 >
                     <Grid container spacing={2} direction="column"
@@ -188,7 +242,11 @@ class Login extends React.Component {
                     >
                         <Grid item xs className={classes.center}>
                             <Typography className={classes.title}>
-                                Log In
+                                <img 
+                                    src="/bib.png"// change title to Bibliko '.
+                                    alt="Bibliko"
+                                    className={classes.avatar}
+                                />
                             </Typography>
                         </Grid>
                         <Grid 
@@ -196,20 +254,45 @@ class Login extends React.Component {
                             item xs className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Email"
-                                    label="Email"
-                                    onChange={this.changeEmail}
+                                <AccountTextField 
+
+                                    variant="outlined"
+                                    InputProps={{
+                                       className: classes.input,
+                                    }}
+                                    margin="normal"
+                                    color='primary'
+                                    required
+                                    fullWidth
+                                    id="Username"
+                                    label="Username"
+                                    name="Username"
+                                    autoComplete="Username"
+                                    //autoFocus
+                                    onChange={this.changeUsername}
                                     onKeyDown={this.handleKeyDown}
+                                    //className={classes.textField}
+                                    
+                                    
                                 />
                             </Grid>
                             <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Password"
+                                <AccountTextField 
+                                    
+                                    variant= "outlined"
+                                    //margin="normal"
+                                    required
+                                    fullWidth
+                                    name="password"
                                     label="Password"
                                     type="password"
+                                    id="password"
+                                    autoComplete="current-password"
                                     onChange={this.changePassword}
                                     onKeyDown={this.handleKeyDown}
+                                    InputProps={{
+                                        className: classes.input,
+                                    }}
                                 />
                             </Grid>
                             {
@@ -222,17 +305,23 @@ class Login extends React.Component {
                                     </Typography>
                                 </Grid>
                             }
+                            
+                            <FormControlLabel
+                                className={classes.rememberMe}
+                                control={<Checkbox value="remember" color="gray" />}
+                                label="Remember me"// a checkbox for Remember me.
+                            />
                             <Grid item xs className={classes.center}>
                                 <Button className={classes.submit}
                                     onClick={this.submit}
                                 >
-                                    Submit
+                                    Log in
                                 </Button>
                             </Grid>
                         </Grid>
                         <Grid item xs className={classes.center}>
                             <Button 
-                                color="primary" 
+                                color="primary" //or "transparent"???
                                 onClick={() => {this.redirect("/signup")}}
                                 className={classes.link}
                             >
@@ -240,7 +329,7 @@ class Login extends React.Component {
                             </Button>
                             <Divider orientation="vertical" flexItem/>
                             <Button 
-                                color="primary" 
+                                color="primary" //or "transparent"???
                                 onClick={() => {this.redirect("/forgotpassword")}}
                                 className={classes.link}
                             >
@@ -259,6 +348,19 @@ class Login extends React.Component {
                             <Grid item xs
                                 className={classes.center}
                             >
+                                <Button //Google icon swap with Facebook icon
+                                    onClick={() => {loginUser("google")}}
+                                    classes={{
+                                        root: classes.alternativeLoginButton
+                                    }}
+                                >
+                                    <img 
+                                        src="/google-logo-png-open-2000.png"//change the logo to fit with the background
+                                        alt="google"
+                                        className={classes.image}
+                                    />
+                                </Button>
+                            
                                 <Button 
                                     onClick={() => {loginUser("facebook")}}
                                     classes={{
@@ -271,18 +373,7 @@ class Login extends React.Component {
                                         className={classes.image}
                                     />
                                 </Button>
-                                <Button 
-                                    onClick={() => {loginUser("google")}}
-                                    classes={{
-                                        root: classes.alternativeLoginButton
-                                    }}
-                                >
-                                    <img 
-                                        src="/google.jpg"
-                                        alt="google"
-                                        className={classes.image}
-                                    />
-                                </Button>
+                                
                             </Grid>
                         </Grid>
                     </Grid>
