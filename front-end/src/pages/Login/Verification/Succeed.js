@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+
 const styles = theme => ({
     root: {
         position: 'absolute',
@@ -20,16 +22,22 @@ const styles = theme => ({
         width: '-webkit-fill-available',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: '#000000',
     },
     paper: {
         position: 'absolute',
-        height: 500,
+        height: 550,
         width: 450,
+        [theme.breakpoints.down('xs')]: {
+            height: '80%',
+            width: '100%'
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF',
     },
     center: {
         display: 'flex',
@@ -39,8 +47,26 @@ const styles = theme => ({
         flexBasis: 'unset'
     },
     title: {
-        fontSize: 'x-large',
-        fontWeight: 'bold'
+        fontSize: 'large',
+        color: theme.palette.succeed.main
+    },
+    avatar: {
+        height: "130px",
+        width: "130px", 
+        marginBottom: '30px'
+    },
+    succeedIcon: {
+        height: "100px",
+        width: "100px",
+        color: theme.palette.succeed.main
+    },
+    mainGridOfPaper: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 'auto',
+        marginTop: '10px',
+        flexBasis: 'unset'
     },
 });
 
@@ -71,20 +97,25 @@ class Succeed extends React.Component {
             <div className={classes.root}>
                 <Paper 
                     className={classes.paper}
-                    variant="outlined"
                     elevation={2}
                 >
                     <Grid container spacing={2} direction="column"
-                        className={classes.center}
+                        className={classes.mainGridOfPaper}
                     >
                         <Grid item xs className={classes.center}>
+                            <img 
+                                src="/bib.png"
+                                alt="Bibliko"
+                                className={classes.avatar}
+                            />
+                        </Grid>
+                        <Grid item xs className={classes.center} container direction="column">
+                            <CheckCircleOutlineIcon className={classes.succeedIcon} />
                             <Typography className={classes.title}>
-                                Verficiation Succeeds
+                                Email Verified Successfully
                             </Typography>
                         </Grid>
-                        <Grid 
-                            item xs className={classes.center}
-                        >
+                        <Grid item className={classes.center}>
                             <Typography>
                                 Redirecting to Home Page...
                             </Typography>

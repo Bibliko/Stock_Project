@@ -78,6 +78,14 @@ class App extends React.Component {
         main: 'rgba(5, 5, 5, 1)'
       },
 
+      succeed: {
+        main: '#209A54',
+      },
+
+      fail: {
+        main: '#DC3D4A',
+      },
+
       type: 'light'
     },
   }

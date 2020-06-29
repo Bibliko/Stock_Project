@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+
 const styles = theme => ({
     root: {
         position: 'absolute',
@@ -18,16 +20,22 @@ const styles = theme => ({
         width: '-webkit-fill-available',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: "#000000"
     },
     paper: {
         position: 'absolute',
-        height: 500,
+        height: 550,
         width: 450,
+        [theme.breakpoints.down('xs')]: {
+            height: '80%',
+            width: '100%'
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF',
     },
     center: {
         display: 'flex',
@@ -37,8 +45,30 @@ const styles = theme => ({
         flexBasis: 'unset'
     },
     title: {
-        fontSize: 'x-large',
-        fontWeight: 'bold'
+        fontSize: 'large',
+        color: theme.palette.fail.main
+    },
+    avatar: {
+        height: "130px",
+        width: "130px", 
+        marginBottom: '30px'
+    },
+    failIcon: {
+        height: "100px",
+        width: "100px",
+        color: theme.palette.fail.main
+    },
+    mainGridOfPaper: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 'auto',
+        marginTop: '10px',
+        flexBasis: 'unset'
+    },
+    backToLoginText: {
+        fontSize: '15px',
+        fontWeight: '600'
     },
 });
 
@@ -69,30 +99,39 @@ class Fail extends React.Component {
             <div className={classes.root}>
                 <Paper 
                     className={classes.paper}
-                    variant="outlined"
                     elevation={2}
                 >
                     <Grid container spacing={2} direction="column"
-                        className={classes.center}
+                        className={classes.mainGridOfPaper}
                     >
                         <Grid item xs className={classes.center}>
+                            <img
+                                src="/bib.png"
+                                alt="Bibliko"
+                                className={classes.avatar}
+                            />
+                        </Grid>
+                        <Grid item xs className={classes.center} container direction="column">
+                            <HighlightOffIcon className={classes.failIcon}/>
                             <Typography 
                                 color="error"
                                 className={classes.title}
                             >
-                                Verficiation Fails
+                                Email Verified Failed
                             </Typography>
                         </Grid>
                         <Grid 
                             item xs className={classes.center}
                         >
                             <Button 
-                                color="primary" variant="outlined"
+                                classes={{
+                                    root: classes.backToLoginText
+                                }}
                                 onClick={() => {
                                     this.redirect("/login")
                                 }}
                             >
-                                Go Back To Login Page
+                                Back To Login
                             </Button>
                         </Grid>
                     </Grid>
