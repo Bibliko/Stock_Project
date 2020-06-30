@@ -25,10 +25,10 @@ const styles = theme => ({
     },
     paper: {
         position: 'absolute',
-        height: 550,
+        height: 'fit-content',
         width: 450,
         [theme.breakpoints.down('xs')]: {
-            height: '80%',
+            height: '100%',
             width: '100%'
         },
         padding: theme.spacing(1),
@@ -51,7 +51,7 @@ const styles = theme => ({
     avatar: {
         height: "130px",
         width: "130px", 
-        marginBottom: '30px'
+        marginBottom: '10px'
     },
     failIcon: {
         height: "100px",
@@ -63,7 +63,8 @@ const styles = theme => ({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
-        marginTop: '10px',
+        marginTop: '30px',
+        marginBottom: '30px',
         flexBasis: 'unset'
     },
     backToLoginText: {
