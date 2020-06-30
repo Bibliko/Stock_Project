@@ -30,7 +30,7 @@ const styles = theme => ({
         justifyContent: 'center'
     },
     paper: {
-        background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF',
+        background: theme.palette.gradientPaper.main,
         position: 'absolute',
         height: 'fit-content',
         width: 450,
@@ -313,7 +313,7 @@ class Login extends React.Component {
                             
                             <FormControlLabel
                                 className={classes.rememberMe}
-                                control={<Checkbox value="remember" color="gray" />}
+                                control={<Checkbox value="remember" />}
                                 label="Remember me"// a checkbox for Remember me.
                             />
                             <Grid item xs className={classes.center}>
