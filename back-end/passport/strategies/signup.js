@@ -79,7 +79,7 @@ const signupStrategy = new LocalStrategy({
             const msg = {
                 from: 'Bibliko <biblikoorg@gmail.com>',
                 to: `${email}`,
-                subject: 'Password Recovery',
+                subject: 'Email Verification',
                 html: file,
             };
             return mg.messages().send(msg);
