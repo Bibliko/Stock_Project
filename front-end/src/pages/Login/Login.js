@@ -78,8 +78,8 @@ const styles = theme => ({
     },
     image: {
         borderRadius: '50%',
-        height: "45px",
-        width: "45px" 
+        height: "40px",
+        width: "40px" 
     },
     avatar: {
 
@@ -103,11 +103,8 @@ const styles = theme => ({
         borderRadius: '50%'
     },
     orLogInWith: {
-        marginTop: 0,
-        fontWeight: '500',
+        fontWeight: 'lighter',
         color: theme.palette.subText.main,
-        fontSize: 15
-        
     },
     error: {
         marginTop: 5,
@@ -347,7 +344,7 @@ class Login extends React.Component {
                         >
                             <Grid item xs className={classes.center}>
                                 <Typography className={classes.orLogInWith}>
-                                    Or Log In with:
+                                    or login with
                                 </Typography>
                             </Grid>
                             <Grid item xs
