@@ -16,7 +16,7 @@ import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-
+//import { black } from '@material-ui/core/colors';
 
 const styles = theme => ({
 
@@ -31,13 +31,13 @@ const styles = theme => ({
     },
     paper: {
         background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF',
-
-        //original
-        //background: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 100%), linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 100%), linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 100%), #9ED2EF',
-        //background: 'linear-gradient(180deg, #300B66 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(180deg, #FF3747 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(180deg, #FFFFFF 30%, rgba(255, 255, 255, 0) 100%),linear-gradient(180deg, #FFFFFF 80%, rgba(255, 255, 255, 0) 100%), #9ED2EF',
         position: 'absolute',
-        height: '700px',
-        width: '542px',
+        height: 'fit-content',
+        width: 450,
+        [theme.breakpoints.down('xs')]: {
+            height: '100%',
+            width: '100%',
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
@@ -59,14 +59,15 @@ const styles = theme => ({
         fontWeight: 'bold'
     },
     submit: {
-        marginTop: '8px',
+        marginTop: '4px',
         padding: theme.spacing(1),
-        minHeight: '40px',
+        height: '40px',
         width: '120px',
         background: 'black',
         '&:hover': {
             opacity: 0.85
         },
+        borderRadius: 30,
         color: 'white',
         fontWeight: 'bold'
     },
@@ -77,20 +78,19 @@ const styles = theme => ({
     },
     image: {
         borderRadius: '50%',
-        height: "50px",
-        width: "50px" 
+        height: "45px",
+        width: "45px" 
     },
     avatar: {
 
-        height: "150px",
-        width: "150px", 
+        height: "120px",
+        width: "120px", 
         margin: theme.spacing(1)
     },
     rememberMe:{
         color: 'black',
         fontSize: 'small',
-        fontWeight: 'bold',
-        marginTop: theme.spacing(1)
+        
 
     },
     alternativeLoginButton: {
@@ -103,9 +103,10 @@ const styles = theme => ({
         borderRadius: '50%'
     },
     orLogInWith: {
+        marginTop: 0,
         fontWeight: '500',
         color: theme.palette.subText.main,
-        fontSize: '500'
+        fontSize: 15
         
     },
     error: {
@@ -117,32 +118,37 @@ const styles = theme => ({
         fontSize: 'small'
     },
     input: {
-        backgroundColor: 'white'
+        color:'black',
+        backgroundColor: 'rgba(225,225,225,0.65)',
+        
+    },
+    textField: {
+        width: '100%',
+        height: 50,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        paddingBottom: 0,
+        marginTop: 0,
+        fontWeight: 500,
+        "& label.Mui-focused": {
+            color: "black"
+          },
+        "& .MuiInput-underline:after": {
+            borderBottomColor: 'black'
+          },
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'black',
+            },
+            '&:hover fieldset': {
+              borderColor: 'black',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'black',
+            },
+          },
     }
-    
 });
-const AccountTextField = withStyles({
-    root: {
-      "& label.Mui-focused": {
-        color: "black"
-      },
-      "& .MuiInput-underline:after": {
-        borderBottomColor: "black"
-      },
-      "& .MuiOutlinedInput-root": {
-        "& fieldset": {
-          borderColor: "black"
-        },
-        "&:hover fieldset": {
-          borderColor: "black"
-        },
-        "&.Mui-focused fieldset": {
-          borderColor: "black"
-        }
-      }
-    }
-  })(TextField);
-
 
 class Login extends React.Component {
     state = {
@@ -233,7 +239,7 @@ class Login extends React.Component {
         return (
             <div className={classes.root}>
                 <Paper 
-                    backgroundColor='transparent'
+                    //backgroundColor='transparent'
                     className={classes.paper}
                     elevation={2}
                 >
@@ -243,7 +249,7 @@ class Login extends React.Component {
                         <Grid item xs className={classes.center}>
                             <Typography className={classes.title}>
                                 <img 
-                                    src="/bib.png"// change title to Bibliko '.
+                                    src="/bib.png"
                                     alt="Bibliko"
                                     className={classes.avatar}
                                 />
@@ -254,33 +260,31 @@ class Login extends React.Component {
                             item xs className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
-                                <AccountTextField 
+                                <TextField 
 
-                                    variant="outlined"
-                                    InputProps={{
-                                       className: classes.input,
-                                    }}
+                                    variant="filled"
                                     margin="normal"
-                                    color='primary'
                                     required
                                     fullWidth
                                     id="Username"
                                     label="Username"
                                     name="Username"
                                     autoComplete="Username"
-                                    //autoFocus
                                     onChange={this.changeUsername}
                                     onKeyDown={this.handleKeyDown}
-                                    //className={classes.textField}
+                                    InputProps={{
+                                        className: classes.input,
+                                     }}
+                                    className={classes.textField}
                                     
                                     
                                 />
                             </Grid>
                             <Grid item xs className={classes.center}>
-                                <AccountTextField 
+                                <TextField 
                                     
-                                    variant= "outlined"
-                                    //margin="normal"
+                                    variant= "filled"
+                                    margin="normal"
                                     required
                                     fullWidth
                                     name="password"
@@ -290,6 +294,7 @@ class Login extends React.Component {
                                     autoComplete="current-password"
                                     onChange={this.changePassword}
                                     onKeyDown={this.handleKeyDown}
+                                    className={classes.textField}
                                     InputProps={{
                                         className: classes.input,
                                     }}
@@ -321,7 +326,7 @@ class Login extends React.Component {
                         </Grid>
                         <Grid item xs className={classes.center}>
                             <Button 
-                                color="primary" //or "transparent"???
+                                color="primary"
                                 onClick={() => {this.redirect("/signup")}}
                                 className={classes.link}
                             >
@@ -329,7 +334,7 @@ class Login extends React.Component {
                             </Button>
                             <Divider orientation="vertical" flexItem/>
                             <Button 
-                                color="primary" //or "transparent"???
+                                color="primary"
                                 onClick={() => {this.redirect("/forgotpassword")}}
                                 className={classes.link}
                             >
@@ -348,15 +353,15 @@ class Login extends React.Component {
                             <Grid item xs
                                 className={classes.center}
                             >
-                                <Button //Google icon swap with Facebook icon
+                                <Button 
                                     onClick={() => {loginUser("google")}}
                                     classes={{
                                         root: classes.alternativeLoginButton
                                     }}
                                 >
                                     <img 
-                                        src="/google-logo-png-open-2000.png"//change the logo to fit with the background
-                                        alt="google"
+                                        src="/google-logo-png-open-2000.png"
+                                        alt='google'
                                         className={classes.image}
                                     />
                                 </Button>
