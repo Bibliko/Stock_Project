@@ -78,6 +78,18 @@ class App extends React.Component {
         main: 'rgba(5, 5, 5, 1)'
       },
 
+      succeed: {
+        main: '#209A54',
+      },
+
+      fail: {
+        main: '#DC3D4A',
+      },
+
+      gradientPaper: {
+        main: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF'
+      },
+
       type: 'light'
     },
   }
