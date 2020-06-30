@@ -43,17 +43,14 @@ const styles = theme => ({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    
     center: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
         flexBasis: 'unset',
-        
     },
     title: {
-        
         top: '245px',
         fontSize: 'x-large',
         fontWeight: 'bold'
@@ -65,7 +62,8 @@ const styles = theme => ({
         width: '120px',
         background: 'black',
         '&:hover': {
-            opacity: 0.85
+            backgroundColor: 'black',
+            opacity: 0.8
         },
         borderRadius: 30,
         color: 'white',
@@ -78,11 +76,10 @@ const styles = theme => ({
     },
     image: {
         borderRadius: '50%',
-        height: "40px",
-        width: "40px" 
+        height: "45px",
+        width: "45px" 
     },
     avatar: {
-
         height: "120px",
         width: "120px", 
         margin: theme.spacing(1)
@@ -90,8 +87,6 @@ const styles = theme => ({
     rememberMe:{
         color: 'black',
         fontSize: 'small',
-        
-
     },
     alternativeLoginButton: {
         maxHeight: 'fit-content',
@@ -103,8 +98,10 @@ const styles = theme => ({
         borderRadius: '50%'
     },
     orLogInWith: {
-        fontWeight: 'lighter',
+        marginTop: 0,
+        fontWeight: '500',
         color: theme.palette.subText.main,
+        fontSize: 15   
     },
     error: {
         marginTop: 5,
@@ -116,19 +113,18 @@ const styles = theme => ({
     },
     input: {
         color:'black',
-        backgroundColor: 'rgba(225,225,225,0.65)',
-        
+        backgroundColor: 'rgba(225,225,225,0.65)', 
     },
     textField: {
         width: '100%',
-        height: 50,
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        paddingBottom: 0,
-        marginTop: 0,
-        fontWeight: 500,
+        height: 50,  
+        marginTop: 5,
+        fontWeight: 'normal',
         "& label.Mui-focused": {
             color: "black"
+          },
+        "& .MuiInput-underline:after": {
+            borderBottomColor: "black"
         },
     }
 });
@@ -221,8 +217,7 @@ class Login extends React.Component {
 
         return (
             <div className={classes.root}>
-                <Paper 
-                    //backgroundColor='transparent'
+                <Paper
                     className={classes.paper}
                     elevation={2}
                 >
@@ -243,8 +238,7 @@ class Login extends React.Component {
                             item xs className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
-                                <TextField 
-
+                                <TextField
                                     variant="filled"
                                     margin="normal"
                                     required
@@ -259,13 +253,10 @@ class Login extends React.Component {
                                         className: classes.input,
                                      }}
                                     className={classes.textField}
-                                    
-                                    
                                 />
                             </Grid>
                             <Grid item xs className={classes.center}>
                                 <TextField 
-                                    
                                     variant= "filled"
                                     margin="normal"
                                     required
@@ -296,7 +287,7 @@ class Login extends React.Component {
                             
                             <FormControlLabel
                                 className={classes.rememberMe}
-                                control={<Checkbox value="remember" />}
+                                control={<Checkbox value="remember" color="gray" />}
                                 label="Remember me"// a checkbox for Remember me.
                             />
                             <Grid item xs className={classes.center}>
