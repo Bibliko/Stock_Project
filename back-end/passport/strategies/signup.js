@@ -88,7 +88,7 @@ const signupStrategy = new LocalStrategy({
         .then(emailVerification => {
             if(emailVerification)
                 done(null, false, { 
-                    message: "Verification has been sent to your email. Waiting..." 
+                    message: "Processing (Can take a while). Check your inboxes." 
                 });
             return null;
         })
