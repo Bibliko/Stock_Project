@@ -19,7 +19,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 //import { black } from '@material-ui/core/colors';
 
 const styles = theme => ({
-
     root: { 
         background: 'black',
         position: 'absolute',
@@ -50,11 +49,6 @@ const styles = theme => ({
         margin: 'auto',
         flexBasis: 'unset',
     },
-    title: {
-        top: '245px',
-        fontSize: 'x-large',
-        fontWeight: 'bold'
-    },
     submit: {
         marginTop: '4px',
         padding: theme.spacing(1),
@@ -65,7 +59,7 @@ const styles = theme => ({
             backgroundColor: 'black',
             opacity: 0.8
         },
-        borderRadius: 30,
+        borderRadius: '40px',
         color: 'white',
         fontWeight: 'bold'
     },
@@ -76,8 +70,8 @@ const styles = theme => ({
     },
     image: {
         borderRadius: '50%',
-        height: "45px",
-        width: "45px" 
+        height: "40px",
+        width: "40px" 
     },
     avatar: {
         height: "120px",
@@ -114,6 +108,9 @@ const styles = theme => ({
     input: {
         color:'black',
         backgroundColor: 'rgba(225,225,225,0.65)', 
+        "&:hover": {
+            backgroundColor: 'rgba(225,225,225,0.5)', 
+        },
     },
     textField: {
         width: '100%',
@@ -122,8 +119,16 @@ const styles = theme => ({
         fontWeight: 'normal',
         "& label.Mui-focused": {
             color: "black"
-          },
-        }        
+        },
+        '& .MuiFilledInput-underline:after': {
+            borderBottom: '2px solid #000000',
+        },
+        '& .MuiFilledInput-root': {
+            '&.Mui-focused': {
+                backgroundColor: 'rgba(225,225,225,0.5)'
+            },
+        },
+    }
 });
 
 class Login extends React.Component {
@@ -132,14 +137,14 @@ class Login extends React.Component {
     }
 
     errorTypes = [
-        "Incorrect username or password."
+        "Missing field."
     ]
-
-    username=""
+    
+    email=""
     password=""
 
-    changeUsername = (event) => {
-        this.username = event.target.value;
+    changeEmail = (event) => {
+        this.email = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
@@ -165,7 +170,7 @@ class Login extends React.Component {
 
     submit = () => {
         if(
-            _.isEmpty(this.username) ||
+            _.isEmpty(this.email) ||
             _.isEmpty(this.password)
         ) {
             this.setState({ error: this.errorTypes[0] });
@@ -173,7 +178,7 @@ class Login extends React.Component {
         else {
             if(_.isEmpty(this.state.error)) {
                 this.context.loginUser('local', {
-                    username: this.username,
+                    email: this.email,
                     password: this.password
                 })
                 .then(() => {
@@ -222,13 +227,11 @@ class Login extends React.Component {
                         className={classes.center}
                     >
                         <Grid item xs className={classes.center}>
-                            <Typography className={classes.title}>
-                                <img 
-                                    src="/bib.png"
-                                    alt="Bibliko"
-                                    className={classes.avatar}
-                                />
-                            </Typography>
+                            <img 
+                                src="/bib.png"
+                                alt="Bibliko"
+                                className={classes.avatar}
+                            />
                         </Grid>
                         <Grid 
                             container spacing={1} direction="column"
@@ -240,11 +243,11 @@ class Login extends React.Component {
                                     margin="normal"
                                     required
                                     fullWidth
-                                    id="Username"
-                                    label="Username"
-                                    name="Username"
-                                    autoComplete="Username"
-                                    onChange={this.changeUsername}
+                                    id="Email"
+                                    label="Email"
+                                    name="Email"
+                                    autoComplete="Email"
+                                    onChange={this.changeEmail}
                                     onKeyDown={this.handleKeyDown}
                                     InputProps={{
                                         className: classes.input,
@@ -284,8 +287,10 @@ class Login extends React.Component {
                             
                             <FormControlLabel
                                 className={classes.rememberMe}
-                                control={<Checkbox value="remember" color="gray" />}
-                                label="Remember me"// a checkbox for Remember me.
+                                control={
+                                    <Checkbox value="remember" />
+                                }
+                                label="Remember me" // a checkbox for Remember me.
                             />
                             <Grid item xs className={classes.center}>
                                 <Button className={classes.submit}
