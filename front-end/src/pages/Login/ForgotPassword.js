@@ -20,29 +20,45 @@ const styles = theme => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: "#000000"
     },
     paper: {
         position: 'absolute',
-        height: 500,
+        height: 'fit-content',
         width: 450,
+        [theme.breakpoints.down('xs')]: {
+            height: '100%',
+            width: '100%'
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: theme.palette.gradientPaper.main,
     },
     center: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
-        flexBasis: 'unset'
+        flexBasis: 'unset',
+        flexGrow: 0
     },
-    title: {
-        fontSize: 'x-large',
+    instruction: {
         fontWeight: 'bold',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    image: {
+        borderRadius: '50%',
+        height: "40px",
+        width: "40px" 
+    },
+    avatar: {
+        height: "130px",
+        width: "130px", 
+        marginBottom: "10px",
     },
     submit: {
         marginTop: '16px',
@@ -54,17 +70,25 @@ const styles = theme => ({
         },
         fontWeight: 'bold'
     },
-    link: {
-        fontWeight: 'bold',
-        fontSize: 'small'
-    },
-    announcement: {
-        marginTop: 5,
-        display: 'flex',
-        justifyContent: 'center',
-    },
     announcementText: {
         fontSize: 'small'
+    },
+    orLogInWith: {
+        fontWeight: 'lighter',
+        color: theme.palette.subText.main,
+    },
+    alternativeLoginButton: {
+        maxHeight: 'fit-content',
+        maxWidth: 'fit-content',
+        padding: 0,
+        minWidth: 0,
+        marginLeft: 10,
+        marginRight: 10,
+        borderRadius: '50%'
+    },
+    backToLoginText: {
+        fontSize: '15px',
+        fontWeight: '600'
     },
 });
 
@@ -223,26 +247,29 @@ class ForgotPassword extends React.Component {
 
     render() {
         const { classes } = this.props;
+        const { loginUser } = this.context;
 
         return (
             <div className={classes.root}>
                 <Paper 
                     className={classes.paper}
-                    variant="outlined"
                     elevation={2}
                 >
                     <Grid container spacing={2} direction="column"
                         className={classes.center}
                     >
-                        <Grid item xs>
-                            <Typography className={classes.title}>
-                                Change Password
-                            </Typography>
-                        </Grid>
                         <Grid 
                             container spacing={1} direction="column"
                             item xs className={classes.center}
                         >
+                            <img 
+                                className={classes.avatar}
+                                src="/bib.png"
+                                alt="Bibliko"
+                            />
+                            <Typography className={classes.instruction}>
+                                Please enter your email and we’ll send you a code.
+                            </Typography>
                             <Grid item xs className={classes.center}>
                                 <TextField 
                                     id="Email"
@@ -257,7 +284,7 @@ class ForgotPassword extends React.Component {
                                     <Button color="primary" variant="outlined"
                                         onClick={this.sendCode}
                                     >
-                                        Send Code
+                                        Send
                                     </Button>
                                 </Grid>
                             }
@@ -314,7 +341,7 @@ class ForgotPassword extends React.Component {
                             }
                             {
                                 !_.isEmpty(this.state.error) &&
-                                <Grid item xs className={classes.announcement}>
+                                <Grid item xs className={classes.center}>
                                     <Typography color="error" align="center"
                                         className={classes.announcementText}
                                     >
@@ -324,7 +351,7 @@ class ForgotPassword extends React.Component {
                             }
                             {
                                 !_.isEmpty(this.state.success) &&
-                                <Grid item xs className={classes.announcement}>
+                                <Grid item xs className={classes.center}>
                                     <Typography color="primary" align="center"
                                         className={classes.announcementText}
                                     >
@@ -333,12 +360,59 @@ class ForgotPassword extends React.Component {
                                 </Grid>
                             }
                         </Grid>
-                        <Grid item xs className={classes.center}>
-                            <Button color="primary" onClick={() => {this.redirect("/login")}}
-                                className={classes.link}
+                        <Grid 
+                            container spacing={1} direction="column"
+                            item xs className={classes.center}
+                        >
+                            <Grid item xs className={classes.center}>
+                                <Button 
+                                    classes={{
+                                        root: classes.backToLoginText
+                                    }}
+                                    onClick={() => {
+                                        this.redirect("/login")
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                            </Grid>
+                            <Grid item xs className={classes.center}>
+                                <Typography className={classes.orLogInWith}>
+                                    or login with
+                                </Typography>
+                            </Grid>
+                            <Grid item xs
+                                className={classes.center}
                             >
-                                Log In
-                            </Button>
+                                <Button //Google icon swap with Facebook icon
+                                    onClick={() => { 
+                                        loginUser("google") 
+                                    }}
+                                    classes={{
+                                        root: classes.alternativeLoginButton
+                                    }}
+                                >
+                                    <img 
+                                        src="/google-logo-png-open-2000.png"//change the logo to fit with the background
+                                        alt="google"
+                                        className={classes.image}
+                                    />
+                                </Button>
+                                <Button 
+                                    onClick={() => {
+                                        loginUser("facebook")
+                                    }}
+                                    classes={{
+                                        root: classes.alternativeLoginButton
+                                    }}
+                                >
+                                    <img 
+                                        src="/facebook.png"
+                                        alt="facebook"
+                                        className={classes.image}
+                                    />
+                                </Button> 
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Paper>

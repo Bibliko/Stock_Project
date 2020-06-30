@@ -27,7 +27,7 @@ const styles = theme => ({
     },
     paper: {
         position: 'absolute',
-        height: 550,
+        height: 'fit-content',
         width: 450,
         [theme.breakpoints.down('xs')]: {
             height: '80%',
@@ -53,7 +53,7 @@ const styles = theme => ({
     avatar: {
         height: "130px",
         width: "130px", 
-        marginBottom: '30px'
+        marginBottom: '10px'
     },
     succeedIcon: {
         height: "100px",
@@ -66,6 +66,7 @@ const styles = theme => ({
         alignItems: 'center',
         margin: 'auto',
         marginTop: '10px',
+        marginBottom: '20px',
         flexBasis: 'unset'
     },
 });
