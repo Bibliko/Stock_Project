@@ -137,14 +137,14 @@ class Login extends React.Component {
     }
 
     errorTypes = [
-        "Incorrect username or password."
+        "Missing field."
     ]
-
-    username=""
+    
+    email=""
     password=""
 
-    changeUsername = (event) => {
-        this.username = event.target.value;
+    changeEmail = (event) => {
+        this.email = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
@@ -170,7 +170,7 @@ class Login extends React.Component {
 
     submit = () => {
         if(
-            _.isEmpty(this.username) ||
+            _.isEmpty(this.email) ||
             _.isEmpty(this.password)
         ) {
             this.setState({ error: this.errorTypes[0] });
@@ -178,7 +178,7 @@ class Login extends React.Component {
         else {
             if(_.isEmpty(this.state.error)) {
                 this.context.loginUser('local', {
-                    username: this.username,
+                    email: this.email,
                     password: this.password
                 })
                 .then(() => {
@@ -243,11 +243,11 @@ class Login extends React.Component {
                                     margin="normal"
                                     required
                                     fullWidth
-                                    id="Username"
-                                    label="Username"
-                                    name="Username"
-                                    autoComplete="Username"
-                                    onChange={this.changeUsername}
+                                    id="Email"
+                                    label="Email"
+                                    name="Email"
+                                    autoComplete="Email"
+                                    onChange={this.changeEmail}
                                     onKeyDown={this.handleKeyDown}
                                     InputProps={{
                                         className: classes.input,
