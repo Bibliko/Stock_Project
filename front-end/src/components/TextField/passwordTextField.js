@@ -78,7 +78,7 @@ class PasswordTextField extends React.Component {
                                 onMouseDown={this.mouseDownPassword}
                                 edge="end"
                             >
-                                {!this.state.visibility? <Visibility /> : <VisibilityOff />}
+                                {this.state.visibility? <Visibility /> : <VisibilityOff />}
                             </IconButton>
                         </InputAdornment>
                     ),
