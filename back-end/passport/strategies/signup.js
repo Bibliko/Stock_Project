@@ -2,12 +2,19 @@ const { PrismaClient } = require('@prisma/client');
 const LocalStrategy = require('passport-local').Strategy;
 const prisma = new PrismaClient();
 
-const mailgun = require("mailgun-js");
-const DOMAIN = 'minecommand.us';
-const mg = mailgun({apiKey: process.env.MAILGUN_API_KEY, domain: DOMAIN});
-const fs = require('fs-extra');
+const { 
+    PASSPORT_CALLBACK_HOST,
+    SENDGRID_API_KEY
+} = process.env;
 
-const { PASSPORT_CALLBACK_HOST } = process.env;
+// const mailgun = require("mailgun-js");
+// const DOMAIN = 'minecommand.us';
+// const mg = mailgun({apiKey: process.env.MAILGUN_API_KEY, domain: DOMAIN});
+
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(SENDGRID_API_KEY);
+
+const fs = require('fs-extra');
 
 /* Verification flow:
  * - Create VerificationToken
@@ -76,14 +83,22 @@ const signupStrategy = new LocalStrategy({
                 "{{ formAction }}", 
                 `${PASSPORT_CALLBACK_HOST}/verification/${verificationToken.id}`
             );
+
+            // const msg = {
+            //     from: 'Bibliko <biblikoorg@gmail.com>',
+            //     to: `${email}`,
+            //     subject: 'Password Recovery',
+            //     html: file,
+            // };
+            // return mg.messages().send(msg);
+
             const msg = {
-                from: 'Bibliko <biblikoorg@gmail.com>',
                 to: `${email}`,
-                subject: 'Password Recovery',
+                from: 'Bibliko <biblikoorg@gmail.com>',
+                subject: 'Email Verification',
                 html: file,
             };
-            return mg.messages().send(msg);
-
+            return sgMail.send(msg);
         })
         .then(emailVerification => {
             if(emailVerification)

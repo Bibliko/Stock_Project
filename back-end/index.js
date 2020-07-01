@@ -7,16 +7,20 @@ try {
 const { 
     PORT:port,
     FRONTEND_HOST,
-    MAILGUN_API_KEY
+    MAILGUN_API_KEY,
+    SENDGRID_API_KEY
 } = process.env;
 const express = require('express');
 const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const mailgun = require("mailgun-js");
-const DOMAIN = 'minecommand.us';
-const mg = mailgun({apiKey: MAILGUN_API_KEY, domain: DOMAIN});
+// const mailgun = require("mailgun-js");
+// const DOMAIN = 'minecommand.us';
+// const mg = mailgun({apiKey: MAILGUN_API_KEY, domain: DOMAIN});
+
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 const fs = require('fs-extra');
 const randomKey = require('random-key');
@@ -175,13 +179,23 @@ app.get('/passwordVerification', (req, res) => {
     fs.readFile('./verificationHTML/verifyPassword.html', 'utf8') 
     .then(data => {
         const htmlFile = data.replace("{{ verificationKey }}", passwordVerificationCode);
+        
+        // const msg = {
+        //     from: 'Bibliko <biblikoorg@gmail.com>',
+        //     to: `${req.query.email}`,
+        //     subject: 'Password Recovery',
+        //     html: htmlFile,
+        // };
+        // return mg.messages().send(msg);
+
         const msg = {
-            from: 'Bibliko <biblikoorg@gmail.com>',
             to: `${req.query.email}`,
-            subject: 'Password Recovery',
+            from: 'Bibliko <biblikoorg@gmail.com>',
+            subject: 'Password Reset Code',
             html: htmlFile,
         };
-        return mg.messages().send(msg);
+    
+        return sgMail.send(msg);
     })
     .then(() => {
         console.log("Code for password recovery has been sent.");
@@ -190,10 +204,10 @@ app.get('/passwordVerification', (req, res) => {
             clearInterval(timerForSendCodeVerifyingPassword);
         }, 15000);
 
-        res.status(200).send("Code for password recovery has been sent.");
+        res.sendStatus(200);
     })
     .catch(err => {
-        console.log(err);
+        console.log(err.response.body.errors);
     })
 })
 
