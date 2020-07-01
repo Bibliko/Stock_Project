@@ -207,7 +207,7 @@ app.get('/passwordVerification', (req, res) => {
         res.sendStatus(200);
     })
     .catch(err => {
-        console.log(err.response.body.errors);
+        console.log(err);
     })
 })
 
