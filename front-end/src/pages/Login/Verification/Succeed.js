@@ -12,32 +12,42 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '-webkit-fill-available',
-        width: '-webkit-fill-available',
+        height: '100vh',
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#000000',
+        maxWidth: 'none',
+        minHeight: '410px'
     },
     paper: {
-        position: 'absolute',
         height: 'fit-content',
-        width: 450,
+        width: 'fit-content',
+        minWidth: '450px',
         [theme.breakpoints.down('xs')]: {
-            height: '80%',
-            width: '100%'
+            height: '-webkit-fill-available',
+            width: '-webkit-fill-available',
+            minWidth: 0,
         },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         background: theme.palette.gradientPaper.main,
+    },
+    div: {
+        backgroundColor: 'black',
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100vw',
+        position: 'fixed'
     },
     center: {
         display: 'flex',
@@ -95,34 +105,37 @@ class Succeed extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div className={classes.root}>
-                <Paper 
-                    className={classes.paper}
-                    elevation={2}
-                >
-                    <Grid container spacing={2} direction="column"
-                        className={classes.mainGridOfPaper}
+            <div>
+                <div className={classes.div}/>
+                <Container className={classes.root} disableGutters>
+                    <Paper 
+                        className={classes.paper}
+                        elevation={2}
                     >
-                        <Grid item xs className={classes.center}>
-                            <img 
-                                src="/bib.png"
-                                alt="Bibliko"
-                                className={classes.avatar}
-                            />
+                        <Grid container spacing={2} direction="column"
+                            className={classes.mainGridOfPaper}
+                        >
+                            <Grid item xs className={classes.center}>
+                                <img 
+                                    src="/bib.png"
+                                    alt="Bibliko"
+                                    className={classes.avatar}
+                                />
+                            </Grid>
+                            <Grid item xs className={classes.center} container direction="column">
+                                <CheckCircleOutlineIcon className={classes.succeedIcon} />
+                                <Typography className={classes.title}>
+                                    Email Verified Successfully
+                                </Typography>
+                            </Grid>
+                            <Grid item className={classes.center}>
+                                <Typography>
+                                    Redirecting to Home Page...
+                                </Typography>
+                            </Grid>
                         </Grid>
-                        <Grid item xs className={classes.center} container direction="column">
-                            <CheckCircleOutlineIcon className={classes.succeedIcon} />
-                            <Typography className={classes.title}>
-                                Email Verified Successfully
-                            </Typography>
-                        </Grid>
-                        <Grid item className={classes.center}>
-                            <Typography>
-                                Redirecting to Home Page...
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                </Paper>
+                    </Paper>
+                </Container>
             </div>
         );
     }
