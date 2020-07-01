@@ -275,14 +275,15 @@ class Login extends React.Component {
                                         </Typography>
                                     </Grid>
                                 }
-                                
-                                <FormControlLabel
-                                    className={classes.rememberMe}
-                                    control={
-                                        <Checkbox value="remember" />
-                                    }
-                                    label="Remember me" // a checkbox for Remember me.
-                                />
+                                <Grid item xs className={classes.center}>
+                                    <FormControlLabel
+                                        className={classes.rememberMe}
+                                        control={
+                                            <Checkbox value="remember" />
+                                        }
+                                        label="Remember me" // a checkbox for Remember me.
+                                    />
+                                </Grid>
                                 <Grid item xs className={classes.center}>
                                     <Button className={classes.submit}
                                         onClick={this.submit}
