@@ -6,65 +6,120 @@ import { connect } from 'react-redux';
 import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+
+import PasswordTextField from '../../components/TextField/passwordTextField';
+import NormalTextField from '../../components/TextField/normalTextField';
 
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '-webkit-fill-available',
-        width: '-webkit-fill-available',
+        height: '100vh',
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        maxWidth: 'none',
+        minHeight: '610px'
     },
     paper: {
-        position: 'absolute',
-        height: 500,
-        width: 450,
+        height: 'fit-content',
+        width: 'fit-content',
+        minWidth: '450px',
+        [theme.breakpoints.down('xs')]: {
+            height: '-webkit-fill-available',
+            width: '-webkit-fill-available',
+            minWidth: 0,
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: theme.palette.gradientPaper.main,
+    },
+    div: {
+        backgroundColor: 'black',
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100vw',
+        position: 'fixed'
     },
     center: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
-        flexBasis: 'unset'
+        flexBasis: 'unset',
+        flexGrow: 0
+    }, 
+    textFieldGrid: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexBasis: 'unset',
+        flexGrow: 0,
     },
-    title: {
-        fontSize: 'x-large',
+    mainGridOfPaper: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'start',
+        margin: '5px',
+        flexBasis: 'unset',
+        flexGrow: 0,
+    },
+    instruction: {
         fontWeight: 'bold',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    submit: {
-        marginTop: '16px',
-        padding: theme.spacing(1),
-        minHeight: '40px',
-        background: theme.palette.barButton.main,
-        '&:hover': {
-            opacity: 0.85
-        },
-        fontWeight: 'bold'
+    image: {
+        borderRadius: '50%',
+        height: "40px",
+        width: "40px" 
     },
-    link: {
-        fontWeight: 'bold',
-        fontSize: 'small'
-    },
-    announcement: {
-        marginTop: 5,
-        display: 'flex',
-        justifyContent: 'center',
+    avatar: {
+        height: "130px",
+        width: "130px", 
+        marginBottom: "10px",
     },
     announcementText: {
         fontSize: 'small'
+    },
+    orLogInWith: {
+        fontWeight: 'lighter',
+        color: theme.palette.subText.main,
+    },
+    alternativeLoginButton: {
+        maxHeight: 'fit-content',
+        maxWidth: 'fit-content',
+        padding: 0,
+        minWidth: 0,
+        marginLeft: 10,
+        marginRight: 10,
+        borderRadius: '50%'
+    },
+    backToLoginText: {
+        fontSize: '15px',
+        fontWeight: '600'
+    },
+    buttonStyles: {
+        marginTop: '4px',
+        padding: theme.spacing(1),
+        height: '40px',
+        width: '120px',
+        background: 'black',
+        '&:hover': {
+            backgroundColor: 'black',
+            opacity: 0.8
+        },
+        borderRadius: '40px',
+        color: 'white',
+        fontWeight: 'bold'
     },
 });
 
@@ -74,7 +129,7 @@ class ForgotPassword extends React.Component {
         success: "",
         allowButtonSendCode: true,
         allowCode: false,
-        allowPassword: false
+        allowPassword: false,
     }
 
     errorTypes = [
@@ -128,9 +183,9 @@ class ForgotPassword extends React.Component {
         }
         else {
             this.context.sendPasswordVerificationCode(this.email)
-            .then(res => {
+            .then(() => {
                 this.setState({ 
-                    success: res,
+                    success: "Reset Code has been sent.",
                     error: "",
                     allowCode: true
                 });
@@ -223,98 +278,95 @@ class ForgotPassword extends React.Component {
 
     render() {
         const { classes } = this.props;
+        const { loginUser } = this.context;
 
         return (
-            <div className={classes.root}>
-                <Paper 
-                    className={classes.paper}
-                    variant="outlined"
-                    elevation={2}
-                >
-                    <Grid container spacing={2} direction="column"
-                        className={classes.center}
+            <div>
+                <div className={classes.div}/>
+                <Container className={classes.root} disableGutters>
+                    <Paper 
+                        className={classes.paper}
+                        elevation={2}
                     >
-                        <Grid item xs>
-                            <Typography className={classes.title}>
-                                Change Password
-                            </Typography>
-                        </Grid>
-                        <Grid 
-                            container spacing={1} direction="column"
-                            item xs className={classes.center}
+                        <Grid container spacing={1} direction="column"
+                            className={classes.center}
                         >
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Email"
-                                    label="Email"
-                                    onChange={this.changeEmail}
-                                    onKeyDown={this.enterEmail}
-                                />
-                            </Grid>
-                            {
-                                this.state.allowButtonSendCode &&
-                                <Grid item xs className={classes.center}>
-                                    <Button color="primary" variant="outlined"
-                                        onClick={this.sendCode}
-                                    >
-                                        Send Code
-                                    </Button>
-                                </Grid>
-                            }
-                            {
-                                this.state.allowCode &&
-                                <Grid item xs className={classes.center}>
-                                    <TextField 
-                                        id="Code"
-                                        label="Code"
-                                        onChange={this.changeCode}
-                                        onKeyDown={this.enterCode}
+                            <img 
+                                className={classes.avatar}
+                                src="/bib.png"
+                                alt="Bibliko"
+                            />
+                            <Typography className={classes.instruction}>
+                                Please enter your email and we’ll send you a code.
+                            </Typography>
+                            <Grid 
+                                item xs 
+                                container direction="column"
+                                className={classes.mainGridOfPaper}
+                            >
+                                <Grid item xs className={classes.textFieldGrid} 
+                                    container direction="column"
+                                >
+                                    <NormalTextField 
+                                        name="Email"
+                                        changeData={this.changeEmail}
+                                        enterData={this.enterEmail}
                                     />
+                                    {
+                                        this.state.allowButtonSendCode &&
+                                        <Button
+                                            onClick={this.sendCode}
+                                            className={classes.buttonStyles}
+                                        >
+                                            Send
+                                        </Button>
+                                    }
                                 </Grid>
-                            }
-                            {
-                                this.state.allowCode &&
-                                <Grid item xs className={classes.center}>
-                                    <Button color="primary" variant="outlined"
-                                        onClick={this.verifyCode}
+                                {
+                                    this.state.allowCode &&
+                                    <Grid item xs className={classes.textFieldGrid}
+                                        container direction="column"
                                     >
-                                        Next
-                                    </Button>
-                                </Grid>
-                            }
-                            {   
-                                this.state.allowPassword &&
-                                <div>
-                                    <Grid item xs className={classes.center}>
-                                        <TextField 
-                                            id="Password"
-                                            label="Password"
-                                            type="password"
-                                            onChange={this.changePassword}
-                                            onKeyDown={this.enterPassword}
+                                        <NormalTextField 
+                                            name="Code"
+                                            changeData={this.changeCode}
+                                            enterData={this.enterCode}
                                         />
+                                        <Button
+                                            onClick={this.verifyCode}
+                                            className={classes.buttonStyles}
+                                        >
+                                            Confirm
+                                        </Button>
                                     </Grid>
-                                    <Grid item xs className={classes.center}>
-                                        <TextField 
-                                            id="Confirm Password"
-                                            label="Confirm Password"
-                                            type="password"
-                                            onChange={this.changeConfirmPassword}
-                                            onKeyDown={this.enterPassword}
+                                }
+                                {   
+                                    this.state.allowPassword &&
+                                    <Grid item xs container direction="column"
+                                        className={classes.textFieldGrid}
+                                    >
+                                        <PasswordTextField 
+                                            name="Password"
+                                            changePassword={this.changePassword}
+                                            enterPassword={this.enterPassword}
                                         />
-                                    </Grid>
-                                    <Grid item xs className={classes.center}>
-                                        <Button className={classes.submit}
+                                        <PasswordTextField 
+                                            name="Confirm Password"
+                                            changePassword={this.changeConfirmPassword}
+                                            enterPassword={this.enterPassword}
+                                        />
+                                        <Button
                                             onClick={this.submit}
+                                            className={classes.buttonStyles}
                                         >
                                             Submit
                                         </Button>
                                     </Grid>
-                                </div>
-                            }
+                                }
+                            </Grid>
                             {
                                 !_.isEmpty(this.state.error) &&
-                                <Grid item xs className={classes.announcement}>
+                                <Grid item xs className={classes.center}>
                                     <Typography color="error" align="center"
                                         className={classes.announcementText}
                                     >
@@ -324,7 +376,7 @@ class ForgotPassword extends React.Component {
                             }
                             {
                                 !_.isEmpty(this.state.success) &&
-                                <Grid item xs className={classes.announcement}>
+                                <Grid item xs className={classes.center}>
                                     <Typography color="primary" align="center"
                                         className={classes.announcementText}
                                     >
@@ -332,16 +384,63 @@ class ForgotPassword extends React.Component {
                                     </Typography>
                                 </Grid>
                             }
-                        </Grid>
-                        <Grid item xs className={classes.center}>
-                            <Button color="primary" onClick={() => {this.redirect("/login")}}
-                                className={classes.link}
+                            <Grid 
+                                container spacing={1} direction="column"
+                                item xs className={classes.center}
                             >
-                                Log In
-                            </Button>
+                                <Grid item xs className={classes.center}>
+                                    <Button 
+                                        classes={{
+                                            root: classes.backToLoginText
+                                        }}
+                                        onClick={() => {
+                                            this.redirect("/login")
+                                        }}
+                                    >
+                                        Login
+                                    </Button>
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <Typography className={classes.orLogInWith}>
+                                        or login with
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs
+                                    className={classes.center}
+                                >
+                                    <Button //Google icon swap with Facebook icon
+                                        onClick={() => { 
+                                            loginUser("google") 
+                                        }}
+                                        classes={{
+                                            root: classes.alternativeLoginButton
+                                        }}
+                                    >
+                                        <img 
+                                            src="/google-logo-png-open-2000.png"//change the logo to fit with the background
+                                            alt="google"
+                                            className={classes.image}
+                                        />
+                                    </Button>
+                                    <Button 
+                                        onClick={() => {
+                                            loginUser("facebook")
+                                        }}
+                                        classes={{
+                                            root: classes.alternativeLoginButton
+                                        }}
+                                    >
+                                        <img 
+                                            src="/facebook.png"
+                                            alt="facebook"
+                                            className={classes.image}
+                                        />
+                                    </Button> 
+                                </Grid>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
+                    </Paper>
+                </Container>
             </div>
         );
     }

@@ -10,32 +10,42 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '-webkit-fill-available',
-        width: '-webkit-fill-available',
+        height: '100vh',
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: "#000000"
+        maxWidth: 'none',
+        minHeight: '410px'
     },
     paper: {
-        position: 'absolute',
         height: 'fit-content',
-        width: 450,
+        width: 'fit-content',
+        minWidth: '450px',
         [theme.breakpoints.down('xs')]: {
-            height: '100%',
-            width: '100%'
+            height: '-webkit-fill-available',
+            width: '-webkit-fill-available',
+            minWidth: 0,
         },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         background: theme.palette.gradientPaper.main,
+    },
+    div: {
+        backgroundColor: 'black',
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100vw',
+        position: 'fixed'
     },
     center: {
         display: 'flex',
@@ -63,8 +73,8 @@ const styles = theme => ({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 'auto',
-        marginTop: '30px',
-        marginBottom: '30px',
+        marginTop: '10px',
+        marginBottom: '20px',
         flexBasis: 'unset'
     },
     backToLoginText: {
@@ -97,46 +107,49 @@ class Fail extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div className={classes.root}>
-                <Paper 
-                    className={classes.paper}
-                    elevation={2}
-                >
-                    <Grid container spacing={2} direction="column"
-                        className={classes.mainGridOfPaper}
+            <div>
+                <div className={classes.div}/>
+                <Container className={classes.root} disableGutters>
+                    <Paper 
+                        className={classes.paper}
+                        elevation={2}
                     >
-                        <Grid item xs className={classes.center}>
-                            <img
-                                src="/bib.png"
-                                alt="Bibliko"
-                                className={classes.avatar}
-                            />
-                        </Grid>
-                        <Grid item xs className={classes.center} container direction="column">
-                            <HighlightOffIcon className={classes.failIcon}/>
-                            <Typography 
-                                color="error"
-                                className={classes.title}
-                            >
-                                Email Verified Failed
-                            </Typography>
-                        </Grid>
-                        <Grid 
-                            item xs className={classes.center}
+                        <Grid container spacing={2} direction="column"
+                            className={classes.mainGridOfPaper}
                         >
-                            <Button 
-                                classes={{
-                                    root: classes.backToLoginText
-                                }}
-                                onClick={() => {
-                                    this.redirect("/login")
-                                }}
+                            <Grid item xs className={classes.center}>
+                                <img
+                                    src="/bib.png"
+                                    alt="Bibliko"
+                                    className={classes.avatar}
+                                />
+                            </Grid>
+                            <Grid item xs className={classes.center} container direction="column">
+                                <HighlightOffIcon className={classes.failIcon}/>
+                                <Typography 
+                                    color="error"
+                                    className={classes.title}
+                                >
+                                    Email Verified Failed
+                                </Typography>
+                            </Grid>
+                            <Grid 
+                                item xs className={classes.center}
                             >
-                                Back To Login
-                            </Button>
+                                <Button 
+                                    classes={{
+                                        root: classes.backToLoginText
+                                    }}
+                                    onClick={() => {
+                                        this.redirect("/login")
+                                    }}
+                                >
+                                    Back To Login
+                                </Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
+                    </Paper>
+                </Container>
             </div>
         );
     }
