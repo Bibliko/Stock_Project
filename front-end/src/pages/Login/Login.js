@@ -7,8 +7,8 @@ import {
 } from '../../redux/storeActions/actions';
 import { socket } from '../../App';
 import FunctionsProvider from '../../provider/FunctionsProvider';
+
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -16,31 +16,43 @@ import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-//import { black } from '@material-ui/core/colors';
+import Container from '@material-ui/core/Container';
+
+import NormalTextField from '../../components/TextField/normalTextField';
+import PasswordTextField from '../../components/TextField/passwordTextField';
 
 const styles = theme => ({
     root: { 
-        background: 'black',
         position: 'absolute',
-        height: '-webkit-fill-available',
-        width: '-webkit-fill-available',
+        height: '100vh',
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        maxWidth: 'none',
+        minHeight: '605px'
     },
     paper: {
-        background: theme.palette.gradientPaper.main,
-        position: 'absolute',
         height: 'fit-content',
-        width: 450,
+        width: 'fit-content',
+        minWidth: '450px',
         [theme.breakpoints.down('xs')]: {
-            height: '100%',
-            width: '100%',
+            height: '-webkit-fill-available',
+            width: '-webkit-fill-available',
+            minWidth: 0,
         },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: theme.palette.gradientPaper.main,
+    },
+    div: {
+        backgroundColor: 'black',
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100vw',
+        position: 'fixed'
     },
     center: {
         display: 'flex',
@@ -218,147 +230,127 @@ class Login extends React.Component {
         const { loginUser } = this.context;
 
         return (
-            <div className={classes.root}>
-                <Paper
-                    className={classes.paper}
-                    elevation={2}
-                >
-                    <Grid container spacing={2} direction="column"
-                        className={classes.center}
+            <div>
+                <div className={classes.div}/>
+                <Container className={classes.root} disableGutters>
+                    <Paper
+                        className={classes.paper}
+                        elevation={2}
                     >
-                        <Grid item xs className={classes.center}>
-                            <img 
-                                src="/bib.png"
-                                alt="Bibliko"
-                                className={classes.avatar}
-                            />
-                        </Grid>
-                        <Grid 
-                            container spacing={1} direction="column"
-                            item xs className={classes.center}
+                        <Grid container spacing={2} direction="column"
+                            className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
-                                <TextField
-                                    variant="filled"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="Email"
-                                    label="Email"
-                                    name="Email"
-                                    autoComplete="Email"
-                                    onChange={this.changeEmail}
-                                    onKeyDown={this.handleKeyDown}
-                                    InputProps={{
-                                        className: classes.input,
-                                     }}
-                                    className={classes.textField}
+                                <img 
+                                    src="/bib.png"
+                                    alt="Bibliko"
+                                    className={classes.avatar}
                                 />
+                            </Grid>
+                            <Grid 
+                                container spacing={1} direction="column"
+                                item xs className={classes.center}
+                            >
+                                <Grid item xs className={classes.center}>
+                                    <NormalTextField 
+                                        name="Email"
+                                        changeData={this.changeEmail}
+                                        enterData={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <PasswordTextField 
+                                        name="Password"
+                                        changePassword={this.changePassword}
+                                        enterPassword={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                {
+                                    !_.isEmpty(this.state.error) &&
+                                    <Grid item xs className={classes.error}>
+                                        <Typography color="error" align="center"
+                                            className={classes.errorText}
+                                        >
+                                            Error: {this.state.error}
+                                        </Typography>
+                                    </Grid>
+                                }
+                                
+                                <FormControlLabel
+                                    className={classes.rememberMe}
+                                    control={
+                                        <Checkbox value="remember" />
+                                    }
+                                    label="Remember me" // a checkbox for Remember me.
+                                />
+                                <Grid item xs className={classes.center}>
+                                    <Button className={classes.submit}
+                                        onClick={this.submit}
+                                    >
+                                        Log in
+                                    </Button>
+                                </Grid>
                             </Grid>
                             <Grid item xs className={classes.center}>
-                                <TextField 
-                                    variant= "filled"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    type="password"
-                                    id="password"
-                                    autoComplete="current-password"
-                                    onChange={this.changePassword}
-                                    onKeyDown={this.handleKeyDown}
-                                    className={classes.textField}
-                                    InputProps={{
-                                        className: classes.input,
-                                    }}
-                                />
+                                <Button 
+                                    color="primary"
+                                    onClick={() => {this.redirect("/signup")}}
+                                    className={classes.link}
+                                >
+                                    Create an account
+                                </Button>
+                                <Divider orientation="vertical" flexItem/>
+                                <Button 
+                                    color="primary"
+                                    onClick={() => {this.redirect("/forgotpassword")}}
+                                    className={classes.link}
+                                >
+                                    Forgot password
+                                </Button>
                             </Grid>
-                            {
-                                !_.isEmpty(this.state.error) &&
-                                <Grid item xs className={classes.error}>
-                                    <Typography color="error" align="center"
-                                        className={classes.errorText}
-                                    >
-                                        Error: {this.state.error}
+                            <Grid 
+                                container spacing={1} direction="column"
+                                item xs className={classes.center}
+                            >
+                                <Grid item xs className={classes.center}>
+                                    <Typography className={classes.orLogInWith}>
+                                        or login with
                                     </Typography>
                                 </Grid>
-                            }
-                            
-                            <FormControlLabel
-                                className={classes.rememberMe}
-                                control={
-                                    <Checkbox value="remember" />
-                                }
-                                label="Remember me" // a checkbox for Remember me.
-                            />
-                            <Grid item xs className={classes.center}>
-                                <Button className={classes.submit}
-                                    onClick={this.submit}
+                                <Grid item xs
+                                    className={classes.center}
                                 >
-                                    Log in
-                                </Button>
-                            </Grid>
-                        </Grid>
-                        <Grid item xs className={classes.center}>
-                            <Button 
-                                color="primary"
-                                onClick={() => {this.redirect("/signup")}}
-                                className={classes.link}
-                            >
-                                Create an account
-                            </Button>
-                            <Divider orientation="vertical" flexItem/>
-                            <Button 
-                                color="primary"
-                                onClick={() => {this.redirect("/forgotpassword")}}
-                                className={classes.link}
-                            >
-                                Forgot password
-                            </Button>
-                        </Grid>
-                        <Grid 
-                            container spacing={1} direction="column"
-                            item xs className={classes.center}
-                        >
-                            <Grid item xs className={classes.center}>
-                                <Typography className={classes.orLogInWith}>
-                                    or login with
-                                </Typography>
-                            </Grid>
-                            <Grid item xs
-                                className={classes.center}
-                            >
-                                <Button 
-                                    onClick={() => {loginUser("google")}}
-                                    classes={{
-                                        root: classes.alternativeLoginButton
-                                    }}
-                                >
-                                    <img 
-                                        src="/google-logo-png-open-2000.png"
-                                        alt='google'
-                                        className={classes.image}
-                                    />
-                                </Button>
-                            
-                                <Button 
-                                    onClick={() => {loginUser("facebook")}}
-                                    classes={{
-                                        root: classes.alternativeLoginButton
-                                    }}
-                                >
-                                    <img 
-                                        src="/facebook.png"
-                                        alt="facebook"
-                                        className={classes.image}
-                                    />
-                                </Button>
+                                    <Button 
+                                        onClick={() => {loginUser("google")}}
+                                        classes={{
+                                            root: classes.alternativeLoginButton
+                                        }}
+                                    >
+                                        <img 
+                                            src="/google-logo-png-open-2000.png"
+                                            alt='google'
+                                            className={classes.image}
+                                        />
+                                    </Button>
                                 
+                                    <Button 
+                                        onClick={() => {loginUser("facebook")}}
+                                        classes={{
+                                            root: classes.alternativeLoginButton
+                                        }}
+                                    >
+                                        <img 
+                                            src="/facebook.png"
+                                            alt="facebook"
+                                            className={classes.image}
+                                        />
+                                    </Button>
+                                    
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
+                    </Paper>
+                </Container>
             </div>
         );
     }
