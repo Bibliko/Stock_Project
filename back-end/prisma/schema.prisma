@@ -18,6 +18,22 @@ model User {
   avatarUrl   String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
+  region      String?
+  occupation  String?
+  ranking     Int?
+  amount      Int?
+  stock       String[]
+  watchlist   String[]
+  transaction Transaction[]
+}
+
+model Transaction {
+  id       String   @default(cuid()) @id
+  createAt DateTime @default(now())
+  company  String[]
+  quantity Int?
+  price    Int?
+  kind     String?
 }
 
 model UserVerification {
