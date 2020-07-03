@@ -21,7 +21,8 @@ const styles = theme => ({
   mainContent: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
     height: '100vh',
     width: '100vw'
   },
