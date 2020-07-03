@@ -40,6 +40,7 @@ model Share {
 model Transaction {
   id              String   @default(cuid()) @id
   createdAt       DateTime @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
   companyCode     String?
   quantity        Int?
   instantPrice    Float?
@@ -50,7 +51,6 @@ model Transaction {
   cancelDate      DateTime?
   type            String?
   note            String?
-  updatedAt       DateTime  @default(now()) @updatedAt
   user            User      @relation(fields: [userID], references: [id])
   userID          String
 }
