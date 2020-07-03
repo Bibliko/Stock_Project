@@ -31,7 +31,7 @@ model Share {
   id              String    @default(cuid()) @id
   companyCode     String?
   quantity        Int?
-  createdAt        DateTime  @default(now())
+  createdAt       DateTime  @default(now())
   updatedAt       DateTime  @default(now())
   user            User      @relation(fields: [userID], references: [id])
   userID          String
@@ -40,21 +40,19 @@ model Share {
 model Transaction {
   id              String   @default(cuid()) @id
   createdAt       DateTime @default(now())
-  companyCode     String
+  companyCode     String?
   quantity        Int?
-  price           Int?
-  kind            String?
+  instantPrice    Float?
+  limitPrice      Float?
+  brokerage       Float?
+  filled          Int?
+  status          String?
+  cancelDate      String?
+  type            String?
+  note            String?
+  updatedAt       DateTime  @default(now())
   user            User      @relation(fields: [userID], references: [id])
   userID          String
-  instantPrice    Int
-  limitPrice      Int
-  brokerage       Int
-  filled          Int
-  status          String?
-  cancelDate      String
-  type            String
-  note            String
-  updatedAt       DateTime  @default(now())
 }
 
 model UserVerification {
