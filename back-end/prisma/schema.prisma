@@ -47,7 +47,7 @@ model Transaction {
   brokerage       Float?
   filled          Int?
   status          String?
-  cancelDate      String?
+  cancelDate      DateTime?
   type            String?
   note            String?
   updatedAt       DateTime  @default(now()) @updatedAt
