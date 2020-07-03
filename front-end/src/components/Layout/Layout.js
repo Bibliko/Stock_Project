@@ -50,6 +50,7 @@ const styles = theme => ({
 
   secondBackground: {
     background: theme.palette.paperBackground.gradient,
+    transition: 'background 1s linear',
     [theme.breakpoints.down('xs')]: {
       display: 'none'
     },
