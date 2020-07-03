@@ -250,7 +250,7 @@ class PersistentAppBar extends React.Component {
                             {
                                 _.isEmpty(userSession.avatarUrl)?
                                 <AccountCircleRoundedIcon className={classes.avatarIcon}/>:
-                                <Avatar src={userSession.avatarUrl}/>
+                                <Avatar className={classes.avatarIcon} src={userSession.avatarUrl}/>
                             }   
                         </IconButton>
                         <Popper 
