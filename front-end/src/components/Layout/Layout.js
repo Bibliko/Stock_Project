@@ -32,7 +32,7 @@ const styles = theme => ({
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
     //...theme.mixins.toolbar,
-    minHeight: '60px',
+    height: '60px',
     justifyContent: 'flex-start',
   },
 
