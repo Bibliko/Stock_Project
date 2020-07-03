@@ -50,14 +50,14 @@ const styles = theme => ({
 
   secondBackground: {
     background: theme.palette.paperBackground.gradient,
-    transition: 'background 1s linear',
+    transition: 'transform 1s linear',
     [theme.breakpoints.down('xs')]: {
       display: 'none'
     },
     backgroundSize: 'cover',
     height: '100vh',
     width: '75%',
-    position: 'fixed'
+    position: 'sticky'
   }
 });
 
