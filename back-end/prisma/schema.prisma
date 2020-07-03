@@ -17,12 +17,12 @@ model User {
   name        String?
   avatarUrl   String?
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())	
 }
 
 model UserVerification {
   id        String    @default(cuid()) @id
   email     String?
   password  String?
-  expiredAt String?
+  expiredAt String? //handle specially -> don't need to use DateTime type
 }

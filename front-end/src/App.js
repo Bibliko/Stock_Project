@@ -18,29 +18,7 @@ import FunctionsProvider from './provider/FunctionsProvider';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
-import logo from './logo.svg';
-import './css/App.css';
-
-function Test() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import LandingPage from './pages/Main/LandingPage';
 
 var socket;
 
@@ -68,6 +46,23 @@ class App extends React.Component {
     palette: {
       primary: {
         main: '#2196f3'
+      },
+
+      backgroundBlue: {
+        main: '#619FD7'
+      },
+
+      paperBackground: {
+        main: '#1E1E1E',
+        gradient: 'linear-gradient(180deg, #1E1E1E 0%, #180B66 100%)'
+      },
+
+      menuBackground: {
+        main: '#303030'
+      },
+
+      appBarBlue: {
+        main: '#180B66'
       },
 
       barButton: {
@@ -197,7 +192,7 @@ class App extends React.Component {
               !this.specialLinks.includes(this.state.path) &&
               <Switch>
                 <Layout toggleTheme={this.toggleTheme}>
-                  <Route path="/" component={Test}/>
+                  <Route path="/" component={LandingPage}/>
                   {/* <Route exact path="/browse" component={Browse} /> */}
                 </Layout>
               </Switch>
