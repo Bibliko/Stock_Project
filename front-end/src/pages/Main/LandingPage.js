@@ -22,15 +22,13 @@ const styles = theme => ({
         height: '100%',
         width: '75%',
         [theme.breakpoints.down('xs')]: {
-            width: '100vw',
-            backgroundColor: 'rgba(0,0,0,0)',
-            background: 'rgba(0,0,0,0)'
+            width: '85%',
         },
+        background: 'rgba(0,0,0,0)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         maxWidth: 'none',
-        background: theme.palette.paperBackground.gradient
     },
     center: {
         display: 'flex',

@@ -47,6 +47,17 @@ const styles = theme => ({
     width: '100vw',
     position: 'fixed'
   },
+
+  secondBackground: {
+    background: theme.palette.paperBackground.gradient,
+    [theme.breakpoints.down('xs')]: {
+      display: 'none'
+    },
+    backgroundSize: 'cover',
+    height: '100vh',
+    width: '75%',
+    position: 'fixed'
+  }
 });
 
 class Layout extends React.Component {
@@ -86,6 +97,7 @@ class Layout extends React.Component {
           <div className={classes.contentHeader}/>
           <div className={classes.mainContent}>
             <div className={classes.mainBackground}/>
+            <div className={classes.secondBackground}/>
             {this.props.children}
           </div>
         </main>
