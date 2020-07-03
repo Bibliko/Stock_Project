@@ -11,13 +11,48 @@ generator client {
 }
 
 model User {
-  id          String    @default(cuid()) @id
-  email       String?   @unique
-  password    String?
-  name        String?
-  avatarUrl   String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  id            String    @default(cuid()) @id
+  email         String?   @unique
+  password      String?
+  name          String?
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  region        String?
+  occupation    String?
+  ranking       Int?
+  cash          Float?
+  watchlist     String[]
+  transactions  Transaction[]
+  shares        Share[]
+}
+
+model Share {
+  id              String    @default(cuid()) @id
+  companyCode     String?
+  quantity        Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+  user            User      @relation(fields: [userID], references: [id])
+  userID          String
+}
+
+model Transaction {
+  id              String   @default(cuid()) @id
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+  companyCode     String?
+  quantity        Int?
+  instantPrice    Float?
+  limitPrice      Float?
+  brokerage       Float?
+  filled          Int?
+  status          String?
+  cancelDate      DateTime?
+  type            String?
+  note            String?
+  user            User      @relation(fields: [userID], references: [id])
+  userID          String
 }
 
 model UserVerification {
