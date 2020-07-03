@@ -22,7 +22,6 @@ model User {
   occupation    String?
   ranking       Int?
   cash          Float?
-  stock         String[]
   watchlist     String[]
   transactions  Transaction[]
   shares        Share[]
@@ -32,7 +31,7 @@ model Share {
   id              String    @default(cuid()) @id
   companyCode     String?
   quantity        Int?
-  createAt        DateTime  @default(now())
+  createdAt        DateTime  @default(now())
   updatedAt       DateTime  @default(now())
   user            User      @relation(fields: [userID], references: [id])
   userID          String
@@ -40,8 +39,8 @@ model Share {
 
 model Transaction {
   id              String   @default(cuid()) @id
-  createAt        DateTime @default(now())
-  company         String[]
+  createdAt       DateTime @default(now())
+  companyCode     String
   quantity        Int?
   price           Int?
   kind            String?
