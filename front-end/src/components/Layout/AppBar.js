@@ -54,7 +54,10 @@ const styles = theme => ({
     },
     logo: {
         height: '50px',
-        width: '50px'
+        width: '50px',
+        '&:hover': {
+            cursor: 'pointer'
+        },
     },
     navbarButton: {
         color: 'white',
@@ -134,6 +137,11 @@ class PersistentAppBar extends React.Component {
         })
     }
 
+    redirect = (link) => {
+        const { history } = this.props;
+        history.push(link);
+    } 
+
     reFocusWhenTransitionMenu = () => {
         if (this.prevOpenAccountMenu && !this.state.openAccountMenu) {
             this.accountAnchorRef.current.focus();
@@ -176,6 +184,7 @@ class PersistentAppBar extends React.Component {
                         src="/bib.png"
                         alt="Bibliko"
                         className={classes.logo}
+                        onClick={() => { this.redirect('/') }}
                     />
                     <Grid className={classes.leftNavbarGrid}>
                         <Button 
