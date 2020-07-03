@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import {
     userAction,
 } from '../../redux/storeActions/actions';
-import { socket } from '../../App';
+//import { socket } from '../../App';
 import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import Paper from '@material-ui/core/Paper';
@@ -216,9 +216,9 @@ class Login extends React.Component {
         this.componentCheck();
         
         // testing socket
-        socket.on("FromAPI", (data) => {
-            console.log(data);
-        })
+        // socket.on("FromAPI", (data) => {
+        //     console.log(data);
+        // })
     }
     
     componentDidUpdate() {

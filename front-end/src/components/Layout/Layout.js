@@ -7,7 +7,6 @@ import {
 } from '../../redux/storeActions/actions';
 
 import AppBar from './AppBar';
-import Drawer from './Drawer';
 import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -19,34 +18,37 @@ const styles = theme => ({
   },
   
   //content. Write new CSS above this comment
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
+  mainContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    width: '100vw'
   },
+
   contentHeader: {
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
+    //...theme.mixins.toolbar,
+    minHeight: '60px',
     justifyContent: 'flex-start',
+  },
+
+  mainBackground: {
+    backgroundColor: theme.palette.backgroundBlue.main,
+    [theme.breakpoints.down('xs')]: {
+      background: theme.palette.paperBackground.gradient
+    },
+    backgroundSize: 'cover',
+    height: '100vh',
+    width: '100vw',
+    position: 'fixed'
   },
 });
 
 class Layout extends React.Component {
-  state = {
-    open: false,
-  }
-
-  //drawer open and close
-  toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-
-    this.setState({ open });
-  };
-
   redirect = (link) => {
     const { history } = this.props;
     history.push(link);
@@ -74,24 +76,18 @@ class Layout extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { open } = this.state;
 
     return (
       <div className={classes.root}>
         <CssBaseline />
-        <AppBar 
-          toggleDrawer={this.toggleDrawer}
-        />
-        <main
-          className={classes.content}
-        >
+        <AppBar />
+        <main>
           <div className={classes.contentHeader}/>
-          {this.props.children}
+          <div className={classes.mainContent}>
+            <div className={classes.mainBackground}/>
+            {this.props.children}
+          </div>
         </main>
-        <Drawer 
-          open={open}
-          toggleDrawer={this.toggleDrawer}
-        />
       </div>
     );
   }
