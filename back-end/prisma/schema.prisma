@@ -17,7 +17,7 @@ model User {
   name          String?
   avatarUrl     String?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
   region        String?
   occupation    String?
   ranking       Int?
@@ -32,7 +32,7 @@ model Share {
   companyCode     String?
   quantity        Int?
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
   user            User      @relation(fields: [userID], references: [id])
   userID          String
 }
@@ -50,7 +50,7 @@ model Transaction {
   cancelDate      String?
   type            String?
   note            String?
-  updatedAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
   user            User      @relation(fields: [userID], references: [id])
   userID          String
 }
