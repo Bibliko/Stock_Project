@@ -4,11 +4,11 @@ import clsx from 'clsx';
 import { withRouter } from 'react-router';
 import FunctionsProvider from '../../provider/FunctionsProvider';
 
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 // import {
 //     userAction,
 // } from '../../redux/storeActions/actions';
-// import { socket } from '../../App';
+import { socket } from '../../App';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -71,9 +71,14 @@ const styles = theme => ({
     },
 });
 
-class LandingPage extends React.Component {
+class AccountSummary extends React.Component {
     state = {
         error: "",
+    }
+
+    componentDidMount() {
+        // testing socket
+        socket.emit("setupUserInformation", this.props.userSession)
     }
 
     render() {
@@ -114,6 +119,12 @@ class LandingPage extends React.Component {
     }
 }
 
-LandingPage.contextType = FunctionsProvider.context;
+AccountSummary.contextType = FunctionsProvider.context;
 
-export default withStyles(styles)(withRouter(LandingPage));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession,
+});
+
+export default connect(mapStateToProps)(
+    withStyles(styles)(withRouter(AccountSummary))
+);

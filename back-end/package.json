@@ -33,6 +33,7 @@
     "http": "0.0.1-security",
     "lodash": "^4.17.15",
     "mailgun-js": "^0.22.0",
+    "node-fetch": "^2.6.0",
     "nodemon": "^2.0.3",
     "passport": "^0.4.1",
     "passport-facebook": "^3.0.0",

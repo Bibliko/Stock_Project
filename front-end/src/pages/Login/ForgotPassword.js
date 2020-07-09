@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
 import FunctionsProvider from '../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -148,18 +149,21 @@ class ForgotPassword extends React.Component {
             this.setState({ error: "" });
         }
     }
+
     changeCode = (event) => {
         this.code = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
+
     changePassword = (event) => {
         this.password=event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
+
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
 
@@ -256,29 +260,26 @@ class ForgotPassword extends React.Component {
             this.submit();
         }
     }
-
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-    
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
-        }
-      }
     
     componentDidMount() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     render() {
         const { classes } = this.props;
         const { loginUser } = this.context;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div>
@@ -394,7 +395,7 @@ class ForgotPassword extends React.Component {
                                             root: classes.backToLoginText
                                         }}
                                         onClick={() => {
-                                            this.redirect("/login")
+                                            redirectToPage("/login", this.props)
                                         }}
                                     >
                                         Login
