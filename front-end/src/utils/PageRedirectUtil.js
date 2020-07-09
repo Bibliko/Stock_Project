@@ -13,8 +13,8 @@ export const redirectToPage = (link, props) => {
     history.push(link);
 } 
 
-/**
- *  shouldRedirectToLogin,
- *  shouldRedirectToLandingPag     
- *  redirectToPage
- */ 
+export default {
+    shouldRedirectToLogin,
+    shouldRedirectToLandingPage,
+    redirectToPage
+}
