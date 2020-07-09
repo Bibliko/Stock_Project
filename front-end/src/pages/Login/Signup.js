@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
 import FunctionsProvider from '../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -138,28 +139,25 @@ class Signup extends React.Component {
             this.submit();
         }
     }
-
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-    
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
-        }
-    }
     
     componentDidMount() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
-    
+
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     render() {
         const { classes } = this.props;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div className={classes.root}>
@@ -235,7 +233,7 @@ class Signup extends React.Component {
                             </Grid>
                         </Grid>
                         <Grid item xs className={classes.center}>
-                            <Button color="primary" onClick={() => {this.redirect("/login")}}
+                            <Button color="primary" onClick={() => {redirectToPage("/login", this.props)}}
                                 className={classes.link}
                             >
                                 Log In

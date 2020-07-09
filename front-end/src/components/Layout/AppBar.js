@@ -7,6 +7,7 @@ import {
 } from '../../redux/storeActions/actions';
 
 import FunctionsProvider from '../../provider/FunctionsProvider';
+import { redirectToPage } from '../../utils/PageRedirectUtil';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -131,17 +132,11 @@ class PersistentAppBar extends React.Component {
         this.context.logoutUser()
         .then(() => {
             this.props.mutateUser();
-            console.log(this.props.userSession);
         })
         .catch(err => {
             console.log(err);
         })
     }
-
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    } 
 
     reFocusWhenTransitionMenu = () => {
         if (this.prevOpenAccountMenu && !this.state.openAccountMenu) {
@@ -185,7 +180,7 @@ class PersistentAppBar extends React.Component {
                         src="/bib.png"
                         alt="Bibliko"
                         className={classes.logo}
-                        onClick={() => { this.redirect('/') }}
+                        onClick={() => { redirectToPage('/', this.props) }}
                     />
                     <Grid className={classes.leftNavbarGrid}>
                         <Button 
@@ -270,7 +265,11 @@ class PersistentAppBar extends React.Component {
                                         <ClickAwayListener onClickAway={this.handleClose}>
                                             <MenuList autoFocusItem={openAccountMenu} id="menu-list-grow" onKeyDown={this.handleListKeyDown}>
                                                 <MenuItem>Account Settings</MenuItem>
-                                                <MenuItem>Portfolio</MenuItem>
+                                                <MenuItem
+                                                    onClick={() => { redirectToPage('/accountSummary', this.props); }}
+                                                >
+                                                    Portfolio
+                                                </MenuItem>
                                                 <MenuItem onClick={this.logout}>Log Out</MenuItem>
                                             </MenuList>
                                         </ClickAwayListener>

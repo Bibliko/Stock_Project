@@ -1,10 +1,11 @@
 import React from 'react';
-import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import {
   userAction
 } from '../../redux/storeActions/actions';
+
+import { shouldRedirectToLogin, redirectToPage } from '../../utils/PageRedirectUtil';
 
 import AppBar from './AppBar';
 import FunctionsProvider from '../../provider/FunctionsProvider';
@@ -61,33 +62,26 @@ const styles = theme => ({
 });
 
 class Layout extends React.Component {
-  redirect = (link) => {
-    const { history } = this.props;
-    history.push(link);
-  } 
-
-  componentCheck = () => {
-    if(_.isEmpty(this.props.userSession)) {
-      this.redirect('/login');
+  componentDidMount() {
+    console.log(this.props.userSession);
+    
+    if(shouldRedirectToLogin(this.props)) {
+      redirectToPage('/login', this.props);
     }
   }
 
-  componentDidMount() {
-    this.context.getUser() 
-    .then(user => {
-      this.props.mutateUser(user.data);
-    })
-    .catch(err => {
-      console.log(err);
-    })
-  }
-
   componentDidUpdate() {
-    this.componentCheck();
+    if(shouldRedirectToLogin(this.props)) {
+      redirectToPage('/login', this.props);
+    }
   }
 
   render() {
     const { classes } = this.props;
+
+    if (shouldRedirectToLogin(this.props)) {
+      return null;
+    }
 
     return (
       <div className={classes.root}>

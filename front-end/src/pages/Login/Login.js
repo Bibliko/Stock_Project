@@ -1,12 +1,14 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+
 import { connect } from 'react-redux';
 import {
     userAction,
 } from '../../redux/storeActions/actions';
 //import { socket } from '../../App';
 import FunctionsProvider from '../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -175,11 +177,6 @@ class Login extends React.Component {
         }
     }
 
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-
     submit = () => {
         if(
             _.isEmpty(this.email) ||
@@ -205,29 +202,27 @@ class Login extends React.Component {
             }
         }
     }
-    
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
+
+    componentDidMount() {
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
         }
     }
 
-    componentDidMount() {
-        this.componentCheck();
-        
-        // testing socket
-        // socket.on("FromAPI", (data) => {
-        //     console.log(data);
-        // })
-    }
-    
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
+
 
     render() {
         const { classes } = this.props;
         const { loginUser } = this.context;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div>
@@ -295,7 +290,7 @@ class Login extends React.Component {
                             <Grid item xs className={classes.center}>
                                 <Button 
                                     color="primary"
-                                    onClick={() => {this.redirect("/signup")}}
+                                    onClick={() => {redirectToPage("/signup", this.props)}}
                                     className={classes.link}
                                 >
                                     Create an account
@@ -303,7 +298,7 @@ class Login extends React.Component {
                                 <Divider orientation="vertical" flexItem/>
                                 <Button 
                                     color="primary"
-                                    onClick={() => {this.redirect("/forgotpassword")}}
+                                    onClick={() => {redirectToPage("/forgotpassword", this.props)}}
                                     className={classes.link}
                                 >
                                     Forgot password

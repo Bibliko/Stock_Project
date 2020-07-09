@@ -1,9 +1,9 @@
 import React from 'react';
-import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
 import FunctionsProvider from '../../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -84,27 +84,24 @@ const styles = theme => ({
 });
 
 class Fail extends React.Component {
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
+    componentDidMount() {
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
         }
     }
 
-    componentDidMount() {
-        this.componentCheck();
-    }
-
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     render() {
         const { classes } = this.props;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div>
@@ -141,7 +138,7 @@ class Fail extends React.Component {
                                         root: classes.backToLoginText
                                     }}
                                     onClick={() => {
-                                        this.redirect("/login")
+                                        redirectToPage("/login", this.props)
                                     }}
                                 >
                                     Back To Login

@@ -1,3 +1,13 @@
+/**
+ * Table of content of this file:
+ * - 1st part: set up passport
+ * - 2nd part: important intervals
+ * - 3rd part: APIs for Passport
+ * - 4th part: verification APIs
+ * - 5th part: other APIs and functions
+ * - 6th part: socket
+ */
+
 try {
     require('./config/config');
 } catch(err) {
@@ -25,6 +35,8 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 const fs = require('fs-extra');
 const randomKey = require('random-key');
 let passwordVerificationCode = "";
+
+const fetch = require('node-fetch');
 
 const http = require('http');
 const server = http.createServer(app);
@@ -272,32 +284,66 @@ app.use('/verification/:tokenId', (req, res) => {
     })
 })
 
-// other APIs:
+// other APIs and functions
 app.use('/userData', require('./routes/user'));
+
+// const updateUsersRanking = () => {
+//     prisma.user.findMany({
+//         orderBy: {
+//             totalPortfolio: 'desc'
+//         }
+//     })
+//     .then(rankedUsers => {
+//         var usersLength = rankedUsers.length;
+//         for(var i = 0; i < usersLength; i++) {
+
+//         }
+//     })
+//     .catch(err => {
+//         console.log(err);
+//     })
+// }
 
 
 // set up socket.io server
-var intervalForSocket;
+var intervalAllSharesPrices;
 
-const getApiAndEmit = (socket) => {
-    // new Date() will take timezone GMT +0
-    const response = new Date();
+const oneMinute = 1000*60; // 1000ms * 60 = 1s * 60 => 60s
+
+const checkAllSharesPrices = (socket) => {
     // Emitting a new message. Will be consumed by the client
-    socket.emit("FromAPI", response);
+    // prisma.user.findOne({
+    //     where: {
+    //         email: req.user.email
+    //     },
+    //     select: {
+    //         shares: true
+    //     }
+    // })
+    // fetch('https://api.github.com/users/github')
+    // .then(res => {
+    //     JSON.parse(res);
+    // })
+    // .then(json => console.log(json));
+
+    socket.emit("checkAllSharesPrices", {});
 };
 
 io.on("connection", (socket) => {
     console.log("New client connected");
 
-    if (intervalForSocket) {
-        clearInterval(intervalForSocket);
+    if (intervalAllSharesPrices) {
+        clearInterval(intervalAllSharesPrices);
     }
 
-    intervalForSocket = setInterval(() => getApiAndEmit(socket), 1000);
+    intervalAllSharesPrices = setInterval(() => 
+        checkAllSharesPrices(socket), 
+        5 * oneMinute
+    );
 
     socket.on("disconnect", () => {
         console.log("Client disconnected");
-        clearInterval(intervalForSocket);
+        clearInterval(intervalAllSharesPrices);
     });
 });
 
