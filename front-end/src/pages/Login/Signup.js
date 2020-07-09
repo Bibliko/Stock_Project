@@ -3,8 +3,8 @@ import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
-import FunctionsProvider from '../../provider/FunctionsProvider';
 import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
+import { signupUser } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -120,7 +120,7 @@ class Signup extends React.Component {
         }
         else {
             if(_.isEmpty(this.state.error)) {
-                this.context.signupUser({
+                signupUser({
                     email: this.email,
                     password: this.password
                 })
@@ -245,8 +245,6 @@ class Signup extends React.Component {
         );
     }
 }
-
-Signup.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

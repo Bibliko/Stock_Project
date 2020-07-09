@@ -2,7 +2,6 @@ import React from 'react';
 //import _ from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
-import FunctionsProvider from '../../provider/FunctionsProvider';
 
 // import { connect } from 'react-redux';
 // import {
@@ -113,7 +112,5 @@ class LandingPage extends React.Component {
         );
     }
 }
-
-LandingPage.contextType = FunctionsProvider.context;
 
 export default withStyles(styles)(withRouter(LandingPage));

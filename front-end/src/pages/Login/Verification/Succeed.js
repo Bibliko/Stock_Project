@@ -5,7 +5,6 @@ import {
     userAction,
 } from '../../../redux/storeActions/actions';
 
-import FunctionsProvider from '../../../provider/FunctionsProvider';
 import { shouldRedirectToLandingPage, redirectToPage } from '../../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
@@ -133,8 +132,6 @@ class Succeed extends React.Component {
         );
     }
 }
-
-Succeed.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

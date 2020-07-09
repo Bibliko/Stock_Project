@@ -2,7 +2,6 @@ import React from 'react';
 //import _ from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
-import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import { connect } from 'react-redux';
 // import {
@@ -118,8 +117,6 @@ class AccountSummary extends React.Component {
         );
     }
 }
-
-AccountSummary.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,
