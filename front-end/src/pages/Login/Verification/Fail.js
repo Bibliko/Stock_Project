@@ -2,7 +2,6 @@ import React from 'react';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
-import FunctionsProvider from '../../../provider/FunctionsProvider';
 import { shouldRedirectToLandingPage, redirectToPage } from '../../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
@@ -151,8 +150,6 @@ class Fail extends React.Component {
         );
     }
 }
-
-Fail.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

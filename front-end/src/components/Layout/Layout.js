@@ -8,7 +8,6 @@ import {
 import { shouldRedirectToLogin, redirectToPage } from '../../utils/PageRedirectUtil';
 
 import AppBar from './AppBar';
-import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
@@ -99,8 +98,6 @@ class Layout extends React.Component {
     );
   }
 }
-
-Layout.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
   userSession: state.userSession

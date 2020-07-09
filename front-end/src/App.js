@@ -22,7 +22,6 @@ import LandingPage from './pages/Main/LandingPage';
 import AccountSummary from './pages/Main/AccountSummary';
 
 import Layout from './components/Layout/Layout';
-import FunctionsProvider from './provider/FunctionsProvider';
 import { createTheme } from './theme/ThemeUtil';
 
 import { ThemeProvider } from '@material-ui/core/styles';
@@ -110,41 +109,39 @@ class App extends React.Component {
     }
 
     return (
-      <FunctionsProvider>
-        <ThemeProvider theme={createTheme()}>
-          <Provider store={this.getReduxStore()}>
-            {
-              this.state.path==="/login" &&
-              <Login/>
-            }
-            {
-              this.state.path==="/signup" &&
-              <Signup/>
-            }
-            {
-              this.state.path==="/forgotpassword" &&
-              <ForgotPassword/>
-            }
-            {
-              this.state.path==="/verificationSucceed" &&
-              <Succeed/>
-            }
-            {
-              this.state.path==="/verificationFail" &&
-              <Fail/>
-            }
-            {
-              !this.specialLinks.includes(this.state.path) &&
-              <Switch>
-                <Layout toggleTheme={this.toggleTheme}>
-                  <Route path="/" component={LandingPage}/>
-                  <Route path="/accountSummary" component={AccountSummary} />
-                </Layout>
-              </Switch>
-            }
-          </Provider>
-        </ThemeProvider>
-      </FunctionsProvider>
+      <ThemeProvider theme={createTheme()}>
+        <Provider store={this.getReduxStore()}>
+          {
+            this.state.path==="/login" &&
+            <Login/>
+          }
+          {
+            this.state.path==="/signup" &&
+            <Signup/>
+          }
+          {
+            this.state.path==="/forgotpassword" &&
+            <ForgotPassword/>
+          }
+          {
+            this.state.path==="/verificationSucceed" &&
+            <Succeed/>
+          }
+          {
+            this.state.path==="/verificationFail" &&
+            <Fail/>
+          }
+          {
+            !this.specialLinks.includes(this.state.path) &&
+            <Switch>
+              <Layout toggleTheme={this.toggleTheme}>
+                <Route path="/" component={LandingPage}/>
+                <Route path="/accountSummary" component={AccountSummary} />
+              </Layout>
+            </Switch>
+          }
+        </Provider>
+      </ThemeProvider>
     );
   }
 }

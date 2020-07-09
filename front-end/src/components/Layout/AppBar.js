@@ -6,8 +6,8 @@ import {
     userAction,
 } from '../../redux/storeActions/actions';
 
-import FunctionsProvider from '../../provider/FunctionsProvider';
 import { redirectToPage } from '../../utils/PageRedirectUtil';
+import { logoutUser } from '../../utils/UserUtil';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -129,7 +129,7 @@ class PersistentAppBar extends React.Component {
     }
 
     logout = () => {
-        this.context.logoutUser()
+        logoutUser()
         .then(() => {
             this.props.mutateUser();
         })
@@ -283,8 +283,6 @@ class PersistentAppBar extends React.Component {
         );
     }
 }
-
-PersistentAppBar.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession
