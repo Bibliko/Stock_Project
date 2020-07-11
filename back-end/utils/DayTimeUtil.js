@@ -4,13 +4,13 @@ const oneHour = 60 * oneMinute;
 const oneDay = 24 * oneHour;
 
 const clearIntervals = (intervals) => {
-    for (interval of intervals) {
+    for (var interval of intervals) {
         clearInterval(interval);
     }
 }
 
 const clearIntervalsIfIntervalsNotEmpty = (intervals) => {
-    for (interval of intervals) {
+    for (var interval of intervals) {
         if(interval) {
             clearInterval(interval);
         }
