@@ -1,13 +1,14 @@
 import React from 'react';
-//import _ from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
+//import _ from 'lodash';
+//import fetch from 'node-fetch';
 
 import { connect } from 'react-redux';
+import { socket } from '../../App';
 // import {
 //     userAction,
 // } from '../../redux/storeActions/actions';
-import { socket } from '../../App';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -77,7 +78,11 @@ class AccountSummary extends React.Component {
 
     componentDidMount() {
         // testing socket
-        socket.emit("setupUserInformation", this.props.userSession)
+        socket.emit("setupUserInformation", this.props.userSession);
+    } 
+
+    componentDidUpdate() {
+        socket.emit("setupUserInformation", this.props.userSession);
     }
 
     render() {

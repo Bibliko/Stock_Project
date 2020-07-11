@@ -1,10 +1,10 @@
 /**
  * Table of content of this file:
  * - 1st part: set up passport
- * - 2nd part: important intervals
+ * - 2nd part: important timers and intervals
  * - 3rd part: APIs for Passport
  * - 4th part: verification APIs
- * - 5th part: other APIs and functions
+ * - 5th part: other APIs
  * - 6th part: socket
  */
 
@@ -17,7 +17,7 @@ try {
 const { 
     PORT:port,
     FRONTEND_HOST,
-    MAILGUN_API_KEY,
+    //MAILGUN_API_KEY,
     SENDGRID_API_KEY
 } = process.env;
 const express = require('express');
@@ -29,14 +29,27 @@ const prisma = new PrismaClient();
 // const DOMAIN = 'minecommand.us';
 // const mg = mailgun({apiKey: MAILGUN_API_KEY, domain: DOMAIN});
 
+const {
+    oneSecond, 
+    oneDay,
+    clearIntervals,
+    clearIntervalsIfIntervalsNotEmpty
+} = require('./utils/DayTimeUtil');
+
+const {
+    deleteExpiredVerification
+} = require('./utils/UserUtil');
+
+const {
+    checkAllSharePricesForUser
+} = require('./utils/SocketUtil');
+
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const fs = require('fs-extra');
 const randomKey = require('random-key');
 let passwordVerificationCode = "";
-
-const fetch = require('node-fetch');
 
 const http = require('http');
 const server = http.createServer(app);
@@ -77,43 +90,13 @@ app.use(passport.session());
 
 setupPassport(passport);
 
-var timerForDeleteVerification;
+// important timers and intervals
+var intervalForDeleteVerification;
 var timerForSendCodeVerifyingPassword;
 
-const deleteExpiredVerification = () => {
-    let date = new Date();
-    date = (date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear(); 
-    prisma.userVerification.deleteMany({
-        where: {
-            expiredAt: date
-        }
-    })
-    .then(res => {
-        console.log('Deleted', res, 'email verifications');
-    })
-    .catch(err => {
-        console.log(err);
-    })
-}
+intervalForDeleteVerification = setInterval(deleteExpiredVerification, oneDay);
 
-function setDaysTimeout(callback, days) {
-    // 86400 seconds in a day
-    var msInDay = 86400*1000; 
-
-    var dayCount = 0;
-    timerForDeleteVerification = setInterval(function() {
-        dayCount++;  // a day has passed
-
-        if(dayCount == days) {
-           clearInterval(timerForDeleteVerification);
-           callback.apply(this, []);
-        }
-    }, msInDay);
-}
-
-setDaysTimeout(deleteExpiredVerification, 1); 
-
-// all app routes are written below this comment:
+// All app routes are written below this comment:
 
 // APIs for Passport are listed below:
 
@@ -176,7 +159,7 @@ app.get('/logout', (req, res) => {
     res.send("Successful");
 });
 
-//verification APIs are listed below:
+// verification APIs are listed below:
 
 app.get('/passwordVerification', (req, res) => {
     if(
@@ -191,14 +174,6 @@ app.get('/passwordVerification', (req, res) => {
     fs.readFile('./verificationHTML/verifyPassword.html', 'utf8') 
     .then(data => {
         const htmlFile = data.replace("{{ verificationKey }}", passwordVerificationCode);
-        
-        // const msg = {
-        //     from: 'Bibliko <biblikoorg@gmail.com>',
-        //     to: `${req.query.email}`,
-        //     subject: 'Password Recovery',
-        //     html: htmlFile,
-        // };
-        // return mg.messages().send(msg);
 
         const msg = {
             to: `${req.query.email}`,
@@ -207,14 +182,18 @@ app.get('/passwordVerification', (req, res) => {
             html: htmlFile,
         };
     
+        // return mg.messages().send(msg);
         return sgMail.send(msg);
     })
     .then(() => {
         console.log("Code for password recovery has been sent.");
 
-        timerForSendCodeVerifyingPassword = setTimeout(() => {
-            clearInterval(timerForSendCodeVerifyingPassword);
-        }, 15000);
+        timerForSendCodeVerifyingPassword = setTimeout(
+            () => {
+                clearTimeout(timerForSendCodeVerifyingPassword);
+            }, 
+            15 * oneSecond
+        );
 
         res.sendStatus(200);
     })
@@ -255,10 +234,12 @@ app.use('/verification/:tokenId', (req, res) => {
     })
     .then(newUser => {
         if(newUser) {
-            // newUser.objectID = newUser.id;
-            // indices.users_index.saveObject(newUser, {
-            //     autoGenerateObjectIDIfNotExist: true,
-            // });
+            /** 
+             * newUser.objectID = newUser.id;
+             * indices.users_index.saveObject(newUser, {
+             *    autoGenerateObjectIDIfNotExist: true,
+             * });
+             */
 
             const deletePromise = prisma.userVerification.delete({
                 where: {
@@ -284,66 +265,37 @@ app.use('/verification/:tokenId', (req, res) => {
     })
 })
 
-// other APIs and functions
+// other APIs
 app.use('/userData', require('./routes/user'));
-
-// const updateUsersRanking = () => {
-//     prisma.user.findMany({
-//         orderBy: {
-//             totalPortfolio: 'desc'
-//         }
-//     })
-//     .then(rankedUsers => {
-//         var usersLength = rankedUsers.length;
-//         for(var i = 0; i < usersLength; i++) {
-
-//         }
-//     })
-//     .catch(err => {
-//         console.log(err);
-//     })
-// }
 
 
 // set up socket.io server
-var intervalAllSharesPrices;
-
-const oneMinute = 1000*60; // 1000ms * 60 = 1s * 60 => 60s
-
-const checkAllSharesPrices = (socket) => {
-    // Emitting a new message. Will be consumed by the client
-    // prisma.user.findOne({
-    //     where: {
-    //         email: req.user.email
-    //     },
-    //     select: {
-    //         shares: true
-    //     }
-    // })
-    // fetch('https://api.github.com/users/github')
-    // .then(res => {
-    //     JSON.parse(res);
-    // })
-    // .then(json => console.log(json));
-
-    socket.emit("checkAllSharesPrices", {});
-};
+var intervalCheckSharePricesForUser;
+var userData;
 
 io.on("connection", (socket) => {
     console.log("New client connected");
 
-    if (intervalAllSharesPrices) {
-        clearInterval(intervalAllSharesPrices);
-    }
+    // Get user data from front-end: Main/AccountSummary
+    socket.on("setupUserInformation", (data) => {
+        userData = data;
+    })
 
-    intervalAllSharesPrices = setInterval(() => 
-        checkAllSharesPrices(socket), 
-        5 * oneMinute
+    clearIntervalsIfIntervalsNotEmpty([
+        intervalCheckSharePricesForUser
+    ]);
+
+    intervalCheckSharePricesForUser = setInterval(() => 
+        checkAllSharePricesForUser(socket, userData), 
+        5 * oneSecond
     );
 
+    // disconnect
     socket.on("disconnect", () => {
         console.log("Client disconnected");
-        clearInterval(intervalAllSharesPrices);
+        clearIntervals([
+            intervalCheckSharePricesForUser
+        ]);
     });
 });
 

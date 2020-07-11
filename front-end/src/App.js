@@ -9,7 +9,6 @@ import axios from 'axios';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import initializeStoreState from './redux/storeReducer';
-//import store from './redux/store';
 
 import socketIOClient from "socket.io-client";
 
