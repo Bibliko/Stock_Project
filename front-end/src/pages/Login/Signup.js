@@ -11,24 +11,47 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import NormalTextField from '../../components/TextField/normalTextField';
+import PasswordTextField from '../../components/TextField/passwordTextField';
+import { Container } from '@material-ui/core';
+//import Container from '@material-ui/core/Container';
+import MenuItem from '@material-ui/core/MenuItem';
+import NativeSelect from '@material-ui/core/NativeSelect';
+
 
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '-webkit-fill-available',
-        width: '-webkit-fill-available',
+        height: '100vh',//'-webkit-fill-available
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        maxWidth: 'none',
+        minHeight: '605px'
+
     },
     paper: {
-        position: 'absolute',
-        height: 500,
-        width: 450,
+        height: 'fit-content',
+        width: 'fit-content',
+        minWidth: '450px',
+        [theme.breakpoints.down('xs')]: {
+            height: '-webkit-fill-available',
+            width: '-webkit-fill-available',
+            minWidth: 0,
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: theme.palette.gradientPaper.main,
+    },
+    div: {
+        background: 'black',
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100vw',
+        position: 'fixed'
     },
     center: {
         display: 'flex',
@@ -41,17 +64,28 @@ const styles = theme => ({
         fontSize: 'x-large',
         fontWeight: 'bold'
     },
+    avatar: {
+        height: '120px',
+        width: '120px',
+        margin: theme.spacing(1)
+    },
     submit: {
-        marginTop: '16px',
+        marginTop: '4px',
         padding: theme.spacing(1),
-        minHeight: '40px',
-        background: theme.palette.barButton.main,
+        height: '40px',
+        width: '120px',
+        background: 'black',
         '&:hover': {
-            opacity: 0.85
+            backgroundColor: 'black',
+            opacity: 0.8
         },
+        borderRadius: '40px',
+        color: 'white',
         fontWeight: 'bold'
     },
     link: {
+        backgroundColor: 'transparent',
+        color: 'black',
         fontWeight: 'bold',
         fontSize: 'small'
     },
@@ -63,8 +97,84 @@ const styles = theme => ({
     announcementText: {
         fontSize: 'small'
     },
+    textField: {
+        height: 50,
+        width: 132,
+        margin: '8px',
+        fontWeight: 'normal',
+        "& label.Mui-focused": {
+            color: "black"
+        },
+        '& .MuiFilledInput-underline:after': {
+            borderBottom: '2px solid #000000',
+        },
+        '& .MuiFilledInput-root': {
+            '&.Mui-focused': {
+                backgroundColor: 'rgba(225,225,225,0.5)'
+            },
+        },
+    },
+    input: {
+        color:'black',
+        backgroundColor: 'rgba(225,225,225,0.65)', 
+        "&:hover": {
+            backgroundColor: 'rgba(225,225,225,0.5)', 
+        },
+        "& input": {
+            backgroundColor: 'rgba(225,225,225,0)'
+        }
+    },
 });
 
+const Occupation = [
+    {
+      value: 'Student',
+      label: 'Student',
+    },
+    {
+      value: 'Teacher',
+      label: 'Teacher',
+    },
+    {
+      value: 'others',
+      label: 'Others',
+    },
+];
+
+const Regions = [
+    {
+        value: 'Africa',
+        label: 'Africa',
+    },
+    {
+        value: 'Asia',
+        label: 'Asia',
+    },
+    {
+        value: 'Eur',
+        label: 'Europe',
+    },
+    {
+        value: 'NAmerica',
+        label: 'North America',
+    },
+    {
+        value: 'CAmerica',
+        label: 'Central America',
+    },
+    {
+        value: 'Oceania',
+        label: 'Oceania',
+    },
+    {
+        value: 'Oceania',
+        label: 'Oceania',
+    },
+    {
+        value: 'others',
+        label: 'Others',
+    },
+];
 class Signup extends React.Component {
     state = {
         error: "",
@@ -138,7 +248,6 @@ class Signup extends React.Component {
             this.submit();
         }
     }
-
     redirect = (link) => {
         const { history } = this.props;
         history.push(link);
@@ -162,87 +271,147 @@ class Signup extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div className={classes.root}>
-                <Paper 
-                    className={classes.paper}
-                    variant="outlined"
-                    elevation={2}
-                >
-                    <Grid container spacing={2} direction="column"
-                        className={classes.center}
+            <div className={classes.div}>
+                <Container className={classes.root} disableGutters>
+                    <Paper 
+                        className={classes.paper}
+                        elevation={2}
                     >
-                        <Grid item xs className={classes.center}>
-                            <Typography className={classes.title}>
-                                Sign Up
-                            </Typography>
-                        </Grid>
-                        <Grid 
-                            container spacing={1} direction="column"
-                            item xs className={classes.center}
+                        <Grid container spacing={2} direction="column"
+                            className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Email"
-                                    label="Email"
-                                    onChange={this.changeEmail}
-                                    onKeyDown={this.handleKeyDown}
+                                <img 
+                                    src="/bib.png"
+                                    alt="Bibliko"
+                                    className={classes.avatar}
                                 />
                             </Grid>
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Password"
-                                    label="Password"
-                                    type="password"
-                                    onChange={this.changePassword}
-                                    onKeyDown={this.handleKeyDown}
-                                />
-                            </Grid>
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Confirm Password"
-                                    label="Confirm Password"
-                                    type="password"
-                                    onChange={this.changeConfirmPassword}
-                                    onKeyDown={this.handleKeyDown}
-                                />
-                            </Grid>
-                            {
-                                !_.isEmpty(this.state.error) &&
-                                <Grid item xs className={classes.announcement}>
-                                    <Typography color="error" align="center"
-                                        className={classes.announcementText}
-                                    >
-                                        Error: {this.state.error}
-                                    </Typography>
-                                </Grid>
-                            }
-                            {
-                                !_.isEmpty(this.state.success) &&
-                                <Grid item xs className={classes.announcement}>
-                                    <Typography color="primary" align="center"
-                                        className={classes.announcementText}
-                                    >
-                                        Success: {this.state.success}
-                                    </Typography>
-                                </Grid>
-                            }
-                            <Grid item xs className={classes.center}>
-                                <Button className={classes.submit}
-                                    onClick={this.submit}
-                                >
-                                    Submit
-                                </Button>
-                            </Grid>
-                        </Grid>
-                        <Grid item xs className={classes.center}>
-                            <Button color="primary" onClick={() => {this.redirect("/login")}}
-                                className={classes.link}
+                            <Grid 
+                                container spacing={1} direction="column"
+                                item xs className={classes.center}
                             >
-                                Log In
-                            </Button>
+                                <Grid item xs className={classes.center}>
+                                    <TextField
+                                        name= 'First Name'
+                                        id='fname'
+                                        label='First name'
+                                        variant= 'filled'
+                                        className= {classes.textField}
+                                        InputProps={{
+                                            className: classes.input
+                                        }}
+
+                                    />
+                                    <TextField
+                                        name= 'Last Name'
+                                        id='fname'
+                                        label='Last name'
+                                        variant= 'filled'
+                                        className= {classes.textField}
+                                        InputProps={{
+                                            className: classes.input
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <TextField
+                                        id="filled-select-occupation"
+                                        select
+                                        label="Occupation"
+                                        value={Occupation}
+                                        
+                                        //onChange={handleChange}
+                                        onKeyDown={this.handleKeyDown}
+                                        variant="filled"
+                                        SelectProps={{
+                                            className: classes.input
+                                        }}
+                                        className={classes.textField}
+                                        >
+                                        {Occupation.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                        </MenuItem>
+                                    ))}
+                                    </TextField>
+                                    <TextField
+                                        id="filled-select-occupation"
+                                        select
+                                        label="Regions"
+                                        value={Regions}
+                                        //onChange={handleChange}
+                                        variant="filled"
+                                        SelectProps={{
+                                            //native: true,
+                                            className: classes.input
+                                        }}
+                                        className={classes.textField}
+                                        >
+                                        {Regions.map((option) => (
+                                        <MenuItem value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                    </TextField>
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <NormalTextField
+                                        name= 'Email'
+                                        onChange={this.changeEmail}
+                                        onKeyDown={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <PasswordTextField 
+                                        name= 'Password'
+                                        onChange={this.changePassword}
+                                        onKeyDown={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <PasswordTextField
+                                        name= 'Confirm Passsword'
+                                        onChange={this.changeConfirmPassword}
+                                        onKeyDown={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                {
+                                    !_.isEmpty(this.state.error) &&
+                                    <Grid item xs className={classes.announcement}>
+                                        <Typography color="error" align="center"
+                                            className={classes.announcementText}
+                                        >
+                                            Error: {this.state.error}
+                                        </Typography>
+                                    </Grid>
+                                }
+                                {
+                                    !_.isEmpty(this.state.success) &&
+                                    <Grid item xs className={classes.announcement}>
+                                        <Typography color="primary" align="center"
+                                            className={classes.announcementText}
+                                        >
+                                            Success: {this.state.success}
+                                        </Typography>
+                                    </Grid>
+                                }
+                                <Grid item xs className={classes.center}>
+                                    <Button className={classes.submit}
+                                        onClick={this.submit}
+                                    >
+                                        Sign Up
+                                    </Button>
+                                    <Button color="primary" onClick={() => {this.redirect("/login")}}
+                                        className={classes.link}
+                                    >
+                                        Back to Login
+                                    </Button>
+                                </Grid>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
+                    </Paper>
+                </Container>
             </div>
         );
     }
