@@ -1,7 +1,7 @@
 /**
  * Table of content of this file:
  * - 1st part: set up passport
- * - 2nd part: important intervals and intervals
+ * - 2nd part: important timers and intervals
  * - 3rd part: APIs for Passport
  * - 4th part: verification APIs
  * - 5th part: other APIs
