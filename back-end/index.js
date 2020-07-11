@@ -31,6 +31,7 @@ const prisma = new PrismaClient();
 
 const {
     oneSecond, 
+    oneMinute,
     oneDay,
     clearIntervals,
     clearIntervalsIfIntervalsNotEmpty
@@ -285,9 +286,10 @@ io.on("connection", (socket) => {
         intervalCheckSharePricesForUser
     ]);
 
+    // Every minute, check all prices of stock for user and update.
     intervalCheckSharePricesForUser = setInterval(() => 
         checkAllSharePricesForUser(socket, userData), 
-        5 * oneSecond
+        oneMinute
     );
 
     // disconnect

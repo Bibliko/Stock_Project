@@ -4,6 +4,7 @@ const _ = require('lodash');
 const fetch = require('node-fetch');
 
 const checkAllSharePricesForUser = (socket, userData) => {
+    //console.log(userData);
     if(!_.isEmpty(userData)) {
         prisma.user.findOne({
             where: {
@@ -20,7 +21,10 @@ const checkAllSharePricesForUser = (socket, userData) => {
                 socket.emit("checkAllSharesPrices", 0);
             }
             else {
-
+                var stringShareSymbols = new String('');
+                for (var share of shares) {
+                    stringShareSymbols = stringShareSymbols.concat(share.companyCode,',');
+                }
             }
 
             /** 
