@@ -57,6 +57,7 @@ const socketIO = require('socket.io');
 const io = socketIO(server);
 
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const passport = require('passport');
 const { setupPassport } = require('./passport');
@@ -147,6 +148,19 @@ app.post('/auth/login', (req, res, next) => {
             }
             return res.sendStatus(200);
         });
+	
+	if (!req.body.remember) {
+            return next();
+        }
+
+        let token = utils.generateToken(64);
+        Token.save(token, {userId: user.id}, (err) => {
+            if (err) {
+                return done(err);
+            }
+            res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 }); // 7 days
+            return next();
+
     })(req, res, next);
 })
 
