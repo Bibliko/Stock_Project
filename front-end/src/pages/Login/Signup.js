@@ -137,7 +137,7 @@ const occupation = [
       label: 'Teacher',
     },
     {
-      value: 'others',
+      value: 'Others',
       label: 'Others',
     },
 ];
@@ -176,6 +176,8 @@ class Signup extends React.Component {
     state = {
         error: "",
         success: "",
+        occupation: "",
+        regions:"",
     }
 
     errorTypes = [
@@ -188,7 +190,7 @@ class Signup extends React.Component {
     confirmPassword=""
     
     handleChange = (event) => {
-        this.state.occupation = event.target.value;
+        this.setState({ occupation: event.target.value });
     }
     changeEmail = (event) => {
         this.email = event.target.value;
