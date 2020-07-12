@@ -22,3 +22,7 @@ yarn-error.log*
 
 # Next.js
 /.next
+
+# Yarn and Npm lock
+yarn.lock
+package-lock.json
