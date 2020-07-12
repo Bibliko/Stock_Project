@@ -6,26 +6,31 @@ const prisma = new PrismaClient();
 //const { indices } = require('../algolia');
 
 router.put('/changeData', (req, res) => {
-    const { password, email } = req.body;
+    const { dataNeedChange, email } = req.body;
 
-    let data = {};
+    const dataJSON = JSON.parse(dataNeedChange);
 
-    if(password) {
-        data.password = password;
-    }
+    /**
+     * dataNeedChange in form: 
+     *  dataNeedChange: {
+     *      password: "...",
+     *      email: "...",
+     *      [...]
+     *  }
+     */
 
     prisma.user.update({
         where: {
             email,
         },
-        data,
+        data: dataJSON,
     })
     .then(user => {
         res.send(user);
     })
     .catch(err => {
         console.log(err);
-        res.status(404).send("Your email or credentials may be wrong.");
+        res.status(500).send("Change data of user fails.");
     })
 });
 

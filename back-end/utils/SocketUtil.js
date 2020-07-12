@@ -1,10 +1,12 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const _ = require('lodash');
-const fetch = require('node-fetch');
+const {
+    getStockQuotesFromFMP
+} = require('./FinancialModelingPrepUtil');
 
-const checkAllSharePricesForUser = (socket, userData) => {
-    //console.log(userData);
+
+const checkStockQuotesForUser = (socket, userData) => {
     if(!_.isEmpty(userData)) {
         prisma.user.findOne({
             where: {
@@ -18,33 +20,23 @@ const checkAllSharePricesForUser = (socket, userData) => {
             const { shares } = userWithShares;
 
             if(_.isEmpty(shares)) {
-                socket.emit("checkAllSharesPrices", 0);
+                socket.emit("checkStockQuotesForUser", []);
+                return null;
             }
             else {
-                var stringShareSymbols = new String('');
-                for (var share of shares) {
-                    stringShareSymbols = stringShareSymbols.concat(share.companyCode,',');
-                }
+                /** 
+                 * Uncomment below line if in Production:
+                 * - We are using Financial Modeling Prep free API key
+                 * -> The amount of requests is limited. Use wisely when testing!
+                 */
+                // return getStockQuotesFromFMP(shares);
             }
-
-            /** 
-             *  This code works. Asked and still waiting about request limits for APIs 
-             *  on Financial Modeling Prep.
-             * 
-             *  fetchData = () => {
-             *      fetch('https://financialmodelingprep.com/api/v3/quote-short/AAPL,FB?apikey=a0cca36a1992fbe5b55abcf0058df1e3')
-             *      .then(res => {
-             *          return res.json();
-             *      })
-             *      .then(json => {
-             *          console.log(json);
-             *      })
-             *      .catch(err => {
-             *          console.log(err);
-             *      })
-             *   }
-             */
-
+        })
+        .then(stockQuotesJSON => {
+            if(stockQuotesJSON) {
+                //console.log(stockQuotesJSON);
+                socket.emit("checkStockQuotesForUser", stockQuotesJSON);
+            }
         })
         .catch(err => {
             console.log(err);
@@ -53,5 +45,5 @@ const checkAllSharePricesForUser = (socket, userData) => {
 };
 
 module.exports = {
-    checkAllSharePricesForUser
+    checkStockQuotesForUser
 }

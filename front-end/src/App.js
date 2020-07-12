@@ -11,6 +11,7 @@ import { createStore } from 'redux';
 import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
+import { updateUserDataForSocket } from './utils/SocketUtil';
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -98,6 +99,9 @@ class App extends React.Component {
 
   componentDidUpdate() {
     this.changePath();
+    if(this.state.isAppReady) {
+      updateUserDataForSocket(socket);
+    }
   }
 
   render() {

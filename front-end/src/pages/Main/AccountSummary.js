@@ -10,6 +10,9 @@ import { socket } from '../../App';
 //     userAction,
 // } from '../../redux/storeActions/actions';
 
+import { checkStockQuotesForUser, updateUserDataForSocket } from '../../utils/SocketUtil';
+import { calculateTotalSharesValue } from '../../utils/UserUtil';
+
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
@@ -74,15 +77,26 @@ const styles = theme => ({
 class AccountSummary extends React.Component {
     state = {
         error: "",
+        userTotalSharesValue: 0
     }
 
     componentDidMount() {
-        // testing socket
-        socket.emit("setupUserInformation", this.props.userSession);
-    } 
+        // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
+        socket.on(checkStockQuotesForUser, (stockQuotesJSON) => {
+            calculateTotalSharesValue(stockQuotesJSON, this.props.userSession.email)
+            .then(totalSharesValue => {
+                this.setState({
+                    userTotalSharesValue: totalSharesValue
+                });
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        })
+    }
 
     componentDidUpdate() {
-        socket.emit("setupUserInformation", this.props.userSession);
+        updateUserDataForSocket(socket);
     }
 
     render() {

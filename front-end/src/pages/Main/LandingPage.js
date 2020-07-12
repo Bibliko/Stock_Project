@@ -3,11 +3,13 @@ import React from 'react';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 // import {
 //     userAction,
 // } from '../../redux/storeActions/actions';
-// import { socket } from '../../App';
+import { socket } from '../../App';
+
+import { updateUserDataForSocket } from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -71,8 +73,8 @@ const styles = theme => ({
 });
 
 class LandingPage extends React.Component {
-    state = {
-        error: "",
+    componentDidUpdate() {
+        updateUserDataForSocket(socket);
     }
 
     render() {
@@ -113,4 +115,10 @@ class LandingPage extends React.Component {
     }
 }
 
-export default withStyles(styles)(withRouter(LandingPage));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession,
+});
+
+export default connect(mapStateToProps)(
+ withStyles(styles)(withRouter(LandingPage))
+);

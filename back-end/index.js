@@ -42,7 +42,7 @@ const {
 } = require('./utils/UserUtil');
 
 const {
-    checkAllSharePricesForUser
+    checkStockQuotesForUser
 } = require('./utils/SocketUtil');
 
 const sgMail = require('@sendgrid/mail');
@@ -271,7 +271,7 @@ app.use('/userData', require('./routes/user'));
 
 
 // set up socket.io server
-var intervalCheckSharePricesForUser;
+var intervalCheckStockQuotesForUser;
 var userData;
 
 io.on("connection", (socket) => {
@@ -283,12 +283,12 @@ io.on("connection", (socket) => {
     })
 
     clearIntervalsIfIntervalsNotEmpty([
-        intervalCheckSharePricesForUser
+        intervalCheckStockQuotesForUser
     ]);
 
     // Every minute, check all prices of stock for user and update.
-    intervalCheckSharePricesForUser = setInterval(() => 
-        checkAllSharePricesForUser(socket, userData), 
+    intervalCheckStockQuotesForUser = setInterval(() => 
+        checkStockQuotesForUser(socket, userData), 
         oneMinute
     );
 
@@ -296,7 +296,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         console.log("Client disconnected");
         clearIntervals([
-            intervalCheckSharePricesForUser
+            intervalCheckStockQuotesForUser
         ]);
     });
 });
