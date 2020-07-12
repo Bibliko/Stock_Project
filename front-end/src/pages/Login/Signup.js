@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import {isEmpty, isEqual} from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
@@ -83,14 +83,14 @@ class Signup extends React.Component {
 
     changeEmail = (event) => {
         this.email = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
 
     changePassword = (event) => {
         this.password = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
@@ -98,9 +98,9 @@ class Signup extends React.Component {
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
 
-        if(!_.isEqual(this.password, this.confirmPassword)) {
+        if(!isEqual(this.password, this.confirmPassword)) {
 
-            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
+            if(!isEqual(this.state.error, this.errorTypes[0])) {
                 this.setState({ error: this.errorTypes[0] });
             }
 
@@ -112,14 +112,14 @@ class Signup extends React.Component {
 
     submit = () => {
         if(
-            _.isEmpty(this.email) ||
-            _.isEmpty(this.password) ||
-            _.isEmpty(this.confirmPassword)
+            isEmpty(this.email) ||
+            isEmpty(this.password) ||
+            isEmpty(this.confirmPassword)
         ) {
             this.setState({ error: this.errorTypes[1] }); 
         }
         else {
-            if(_.isEmpty(this.state.error)) {
+            if(isEmpty(this.state.error)) {
                 signupUser({
                     email: this.email,
                     password: this.password
@@ -205,7 +205,7 @@ class Signup extends React.Component {
                                 />
                             </Grid>
                             {
-                                !_.isEmpty(this.state.error) &&
+                                !isEmpty(this.state.error) &&
                                 <Grid item xs className={classes.announcement}>
                                     <Typography color="error" align="center"
                                         className={classes.announcementText}
@@ -215,7 +215,7 @@ class Signup extends React.Component {
                                 </Grid>
                             }
                             {
-                                !_.isEmpty(this.state.success) &&
+                                !isEmpty(this.state.success) &&
                                 <Grid item xs className={classes.announcement}>
                                     <Typography color="primary" align="center"
                                         className={classes.announcementText}
