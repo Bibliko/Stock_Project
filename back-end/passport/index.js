@@ -4,6 +4,7 @@ const loginStrategy = require("./strategies/login");
 const signupStrategy = require("./strategies/signup");
 const facebookStrategy = require("./strategies/facebook");
 const googleStrategy = require("./strategies/google");
+const rememberMeStrategy = require("./strategies/rememberMe");
 
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -31,6 +32,7 @@ const setupPassport = (passport) => {
     passport.use('local-signup', signupStrategy);
     passport.use(facebookStrategy);
     passport.use(googleStrategy);
+    passport.use(rememberMeStrategy);
 }
 
 module.exports = { setupPassport };
