@@ -10,7 +10,8 @@ import VpnKeyRoundedIcon from '@material-ui/icons/VpnKeyRounded';
 
 const styles = theme => ({
     textField: {
-        height: 50,  
+        height: 50,
+        //width: '-webkit-fill-available',
         margin: '8px',
         fontWeight: 'normal',
         "& label.Mui-focused": {
