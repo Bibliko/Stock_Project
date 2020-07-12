@@ -2,6 +2,8 @@ const { PrismaClient } = require('@prisma/client');
 const LocalStrategy = require('passport-local').Strategy;
 const prisma = new PrismaClient();
 
+const {SHA3} = require('sha3');
+
 const { 
     PASSPORT_CALLBACK_HOST,
     SENDGRID_API_KEY
@@ -55,10 +57,13 @@ const signupStrategy = new LocalStrategy({
              */
             date = (date.getMonth()+1) + '/' + (date.getDate()+1) + '/' + date.getFullYear();
             const verificationToken = new Promise((resolve, reject) => {
-                prisma.userVerification.create({
+                const hash = new SHA3(256);
+		hash.update(password);
+		const pass = hash.digest('hex');
+		prisma.userVerification.create({
                     data: {
                         email,
-                        password,
+                        pass,
                         expiredAt: date
                     }
                 })
