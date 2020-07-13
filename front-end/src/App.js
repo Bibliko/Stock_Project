@@ -63,11 +63,9 @@ class App extends React.Component {
         userSession: user.data
       };
 
-      if(!this.state.isAppReady) {
-        this.setState({
-          isAppReady: true
-        });
-      }
+      this.setState({
+        isAppReady: true
+      });
     })
     .catch(e => {
       console.log(e);
