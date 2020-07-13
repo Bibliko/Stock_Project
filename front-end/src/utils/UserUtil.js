@@ -123,6 +123,7 @@ export const changePassword = (password, email) => {
             resolve("Successfully change password");
         })
         .catch(err => {
+            console.log(err);
             reject("Your email or credentials may be wrong.");
         })
     }); 
