@@ -17,8 +17,8 @@ import { Container } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 //import MobileStepper from '@material-ui/core/MobileStepper';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
+//import FormControl from '@material-ui/core/FormControl';
+//import InputLabel from '@material-ui/core/InputLabel';
 
 const styles = theme => ({
     root: {
@@ -142,7 +142,7 @@ const occupation = [
     },
 ];
 
-const regions = [
+const region = [
     {
         value: 'Africa',
         label: 'Africa',
@@ -189,9 +189,6 @@ class Signup extends React.Component {
     password=""
     confirmPassword=""
     
-    handleChange = (event) => {
-        this.setState({ occupation: event.target.value });
-    }
     changeEmail = (event) => {
         this.email = event.target.value;
         if(!_.isEmpty(this.state.error)) {
@@ -245,7 +242,14 @@ class Signup extends React.Component {
         }
     }
 
-    
+    changeOccupation = (event) => {
+        this.setState({ occupation: event.target.value });
+    }
+
+    changeRegion = (event) => {
+        this.setState({ region: event.target.value });
+    }
+
     handleKeyDown = (event) => {
         if(event.key==="Enter") {
             this.submit();
@@ -274,7 +278,8 @@ class Signup extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div className={classes.div}>
+            <div>
+                <div className={classes.div}/>
                 <Container className={classes.root} disableGutters>
                     <Paper 
                         className={classes.paper}
@@ -318,14 +323,14 @@ class Signup extends React.Component {
                                 </Grid>
                                 <Grid item xs className={classes.center}>
                                     <TextField
-                                        id="filled-select-occupation"
+                                        id="Occupation"
                                         select
                                         label="Occupation"
-                                        //value={occupation}
-                                        onChange={this.handleChange}
+                                        value={this.state.occupation}
+                                        onChange={this.changeOccupation}
                                         variant="filled"
                                         SelectProps={{
-                                            className: classes.input
+                                            className: classes.input,
                                         }}
                                         className={classes.textField}
                                         >
@@ -335,22 +340,24 @@ class Signup extends React.Component {
                                         </MenuItem>
                                         ))}
                                     </TextField>
-                                    <FormControl variant="filled" className={classes.textField}>
-                                        <InputLabel id="">Regions</InputLabel>
-                                        <Select
-                                        className={classes.input}
-                                        labelId="regions"
-                                        id="regions"
-                                        //value={regions}
-                                        //onChange={handleChange}
+                                    <TextField
+                                        id="Regions"
+                                        select
+                                        label="Regions"
+                                        value={this.state.region}
+                                        onChange={this.changeRegion}
+                                        variant="filled"
+                                        SelectProps={{
+                                            className: classes.input,
+                                        }}
+                                        className={classes.textField}
                                         >
-                                        {regions.map((option) => (
+                                        {region.map((option) => (
                                         <MenuItem key={option.value} value={option.value}>
                                         {option.label}
                                         </MenuItem>
                                         ))}
-                                        </Select>
-                                    </FormControl>
+                                    </TextField>
                                 </Grid>
                                 <Grid item xs className={classes.center}>
                                     <NormalTextField
