@@ -7,6 +7,7 @@ const {
 
 
 const checkStockQuotesForUser = (socket, userData) => {
+    //console.log(userData, 'userData');
     if(!_.isEmpty(userData)) {
         prisma.user.findOne({
             where: {

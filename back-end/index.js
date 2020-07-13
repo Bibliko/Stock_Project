@@ -289,7 +289,7 @@ io.on("connection", (socket) => {
     // Every minute, check all prices of stock for user and update.
     intervalCheckStockQuotesForUser = setInterval(() => 
         checkStockQuotesForUser(socket, userData), 
-        oneMinute
+        10 * oneSecond
     );
 
     // disconnect

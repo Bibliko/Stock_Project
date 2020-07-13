@@ -73,6 +73,10 @@ const styles = theme => ({
 });
 
 class LandingPage extends React.Component {
+    componentDidMount() {
+        console.log(this.props.userSession);
+    }
+
     componentDidUpdate() {
         updateUserDataForSocket(socket);
     }

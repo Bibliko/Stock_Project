@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 router.put('/changeData', (req, res) => {
     const { dataNeedChange, email } = req.body;
 
-    const dataJSON = JSON.parse(dataNeedChange);
+    //const dataJSON = JSON.parse(dataNeedChange);
 
     /**
      * dataNeedChange in form: 
@@ -23,7 +23,7 @@ router.put('/changeData', (req, res) => {
         where: {
             email,
         },
-        data: dataJSON,
+        data: dataNeedChange,
     })
     .then(user => {
         res.send(user);

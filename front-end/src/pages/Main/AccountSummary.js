@@ -10,8 +10,10 @@ import { socket } from '../../App';
 //     userAction,
 // } from '../../redux/storeActions/actions';
 
-import { checkStockQuotesForUser, updateUserDataForSocket } from '../../utils/SocketUtil';
-import { calculateTotalSharesValue } from '../../utils/UserUtil';
+import { 
+    updateUserDataForSocket,
+    setupSocketToCheckStockQuotes 
+} from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -77,26 +79,28 @@ const styles = theme => ({
 class AccountSummary extends React.Component {
     state = {
         error: "",
-        userTotalSharesValue: 0
+        userTotalSharesValue: -1,
+        userTotalPortfolioValue: -1,
     }
 
     componentDidMount() {
-        // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-        socket.on(checkStockQuotesForUser, (stockQuotesJSON) => {
-            calculateTotalSharesValue(stockQuotesJSON, this.props.userSession.email)
-            .then(totalSharesValue => {
-                this.setState({
-                    userTotalSharesValue: totalSharesValue
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            })
-        })
+        console.log(this.props.userSession);
+
+        this.setState({
+            userTotalPortfolioValue: this.props.userSession.totalPortfolio
+        });
+
+        setupSocketToCheckStockQuotes(
+            socket,
+            this.props.userSession,
+            this.setState.bind(this)
+        );
     }
 
     componentDidUpdate() {
         updateUserDataForSocket(socket);
+        console.log(this.state.userTotalSharesValue);
+        console.log(this.state.userTotalPortfolioValue);
     }
 
     render() {
@@ -109,25 +113,7 @@ class AccountSummary extends React.Component {
                 >
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle, classes.marketWatch)}>
-                            MARKET WATCH
-                        </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.stocksOnTheMove)}>
-                            STOCKS ON THE MOVE
-                        </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.accountSummary)}>
-                            ACCOUNT SUMMARY
-                        </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.rankings)}>
-                            RANKINGS
+                            {this.state.userTotalPortfolioValue}
                         </Typography>
                         <Paper className={classes.fullHeightWidth}/>
                     </Grid>

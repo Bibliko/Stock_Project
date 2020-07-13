@@ -63,9 +63,11 @@ class App extends React.Component {
         userSession: user.data
       };
 
-      this.setState({
-        isAppReady: true
-      });
+      if(!this.state.isAppReady) {
+        this.setState({
+          isAppReady: true
+        });
+      }
     })
     .catch(e => {
       console.log(e);
@@ -78,7 +80,7 @@ class App extends React.Component {
         initializeStoreState(this.reduxStoreInitialState)
       );
     }
-    console.log(this.reduxStoreInitialState);
+    //console.log(this.reduxStoreInitialState);
     return this.reduxStore_USE_THE_ACCESSOR;
   }
   
@@ -138,7 +140,8 @@ class App extends React.Component {
             !this.specialLinks.includes(this.state.path) &&
             <Switch>
               <Layout toggleTheme={this.toggleTheme}>
-                <Route path="/" component={LandingPage}/>
+                <Route exact path="/" component={LandingPage} />
+
                 <Route path="/accountSummary" component={AccountSummary} />
               </Layout>
             </Switch>
