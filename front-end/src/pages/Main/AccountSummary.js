@@ -99,8 +99,9 @@ class AccountSummary extends React.Component {
 
     componentDidUpdate() {
         updateUserDataForSocket(socket);
-        console.log(this.state.userTotalSharesValue);
-        console.log(this.state.userTotalPortfolioValue);
+        
+        // console.log(this.state.userTotalSharesValue);
+        // console.log(this.state.userTotalPortfolioValue);
     }
 
     render() {

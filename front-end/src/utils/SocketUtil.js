@@ -64,8 +64,8 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn) =
         return "No need to update user data.";
       }
     })
-    .then(res => {
-      console.log(res);
+    .then(log => {
+      //console.log(log);
     })
     .catch(err => {
       console.log(err);
