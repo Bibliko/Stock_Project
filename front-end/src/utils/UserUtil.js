@@ -130,7 +130,7 @@ export const changePassword = (password, email) => {
 
 // User Data Related:
 
-export const changeUserData = (dataNeedChange, email) => {
+export const changeUserData = (dataNeedChange, email, mutateUser) => {
     /**
      * dataNeedChange in form: 
      *  dataNeedChange: {
@@ -149,8 +149,9 @@ export const changeUserData = (dataNeedChange, email) => {
             },
             withCredentials: true
         })
-        .then(() => {
+        .then(userDataRes => {
             resolve("Successfully change data");
+            mutateUser(userDataRes.data);
         })
         .catch(err => {
             reject(err);

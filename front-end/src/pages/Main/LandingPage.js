@@ -78,7 +78,7 @@ class LandingPage extends React.Component {
     }
 
     componentDidUpdate() {
-        updateUserDataForSocket(socket);
+        updateUserDataForSocket(socket, this.props.userSession);
     }
 
     render() {

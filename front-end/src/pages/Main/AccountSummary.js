@@ -6,9 +6,9 @@ import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
 import { socket } from '../../App';
-// import {
-//     userAction,
-// } from '../../redux/storeActions/actions';
+import {
+    userAction,
+} from '../../redux/storeActions/actions';
 
 import { 
     updateUserDataForSocket,
@@ -93,12 +93,13 @@ class AccountSummary extends React.Component {
         setupSocketToCheckStockQuotes(
             socket,
             this.props.userSession,
-            this.setState.bind(this)
+            this.setState.bind(this),
+            this.props.mutateUser
         );
     }
 
     componentDidUpdate() {
-        updateUserDataForSocket(socket);
+        updateUserDataForSocket(socket, this.props.userSession);
         
         // console.log(this.state.userTotalSharesValue);
         // console.log(this.state.userTotalPortfolioValue);
@@ -128,6 +129,13 @@ const mapStateToProps = (state) => ({
     userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(
+const mapDispatchToProps = (dispatch) => ({
+    mutateUser: (userProps) => dispatch(userAction(
+        'default',
+        userProps
+    )),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
     withStyles(styles)(withRouter(AccountSummary))
 );

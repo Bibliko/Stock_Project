@@ -19,7 +19,12 @@ export const setupUserInformation = "setupUserInformation";
  */
 export const checkStockQuotesForUser = "checkStockQuotesForUser";
 
-export const updateUserDataForSocket = (socket) => {
+export const updateUserDataForSocket = (socket, userSession) => {
+  if(userSession) {
+    socket.emit(setupUserInformation, userSession);
+    return;
+  }
+
   axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
   .then(user => {
     socket.emit(setupUserInformation, user.data);
@@ -33,7 +38,7 @@ export const updateUserDataForSocket = (socket) => {
  * Set up Socket Check Stock Quotes for user
  * Use in front-end/src/pages/Main/AccountSummary
  */
-export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn) => {
+export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, mutateUser) => {
 
   // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
   socket.on(checkStockQuotesForUser, (stockQuotesJSON) => {
@@ -58,7 +63,7 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn) =
       };
 
       if(!_.isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
-        return changeUserData(dataNeedChange, userSession.email);
+        return changeUserData(dataNeedChange, userSession.email, mutateUser);
       }
       else {
         return "No need to update user data.";
