@@ -41,7 +41,7 @@ const getStockQuotesFromFMP = (prismaShares) => {
 
     for (let share of prismaShares) {
 
-        // if we already add this share symbols into the String, we don't need to add again
+        // if we already add this share symbol into the String, we don't need to add again
         // if not, add to String and to Set
         if(!arrayShareSymbols.has(share.companyCode)) {
             stringShareSymbols = stringShareSymbols.concat(share.companyCode,',');
