@@ -1,7 +1,10 @@
 import axios from 'axios';
+import _ from 'lodash';
 
 const typeLoginUtil = ['facebook', 'google'];
 const { REACT_APP_BACKEND_HOST : BACKEND_HOST } = process.env;
+
+// User Authorization and Login Related:
 
 export const getUser = () => {
     return new Promise((resolve, reject) => {
@@ -66,7 +69,7 @@ export const signupUser = (credentials) => {
     });
 }
 
-//Forgot password process includes 3 functions below:
+// Forgot password process includes 3 functions below:
 
 export const sendPasswordVerificationCode = (email) => {
     return new Promise((resolve, reject) => {
@@ -104,13 +107,15 @@ export const checkVerificationCode = (code) => {
     });
 }
 
-export const changePassword = (password, email) => {
+export const changePassword = (password, email) => {    
     return new Promise((resolve, reject) => {
         axios(`${BACKEND_HOST}/userData/changeData`, {
             method: 'put',
             data: {
-                password,
                 email,  
+                dataNeedChange: {
+                    password,
+                }
             },
             withCredentials: true
         })
@@ -118,9 +123,114 @@ export const changePassword = (password, email) => {
             resolve("Successfully change password");
         })
         .catch(err => {
-            reject(err.response.data);
+            console.log(err);
+            reject("Your email or credentials may be wrong.");
         })
     }); 
+}
+
+// User Data Related:
+
+export const changeUserData = (dataNeedChange, email, mutateUser) => {
+    /**
+     * dataNeedChange in form: 
+     *  dataNeedChange: {
+     *      password: "...",
+     *      email: "...",
+     *      [...]
+     *  }
+     */
+
+    return new Promise((resolve, reject) => {
+        axios(`${BACKEND_HOST}/userData/changeData`, {
+            method: 'put',
+            data: {
+                email, 
+                dataNeedChange
+            },
+            withCredentials: true
+        })
+        .then(userDataRes => {
+            resolve("Successfully change data");
+            mutateUser(userDataRes.data);
+        })
+        .catch(err => {
+            reject(err);
+        })
+    }); 
+}
+
+export const getUserData = (dataNeeded, email) => {
+    /** 
+     *  dataNeeded in form of:
+     *      dataNeeded: {
+     *          cash: true,
+     *          region: true,
+     *          ...
+     *      }
+     */
+
+    return new Promise((resolve, reject) => {
+        axios(`${BACKEND_HOST}/userData/getData`, {
+            method: 'get',
+            params: {
+                email, 
+                dataNeeded
+            },
+            withCredentials: true
+        })
+        .then(userData => {
+            resolve(userData.data);
+        })
+        .catch(err => {
+            reject(err);
+        })
+    }); 
+}
+
+// User Calculations Related:
+
+// example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
+export const calculateTotalSharesValue = (stockQuotesJSON, email) => {
+    return new Promise((resolve, reject) => {
+        if(_.isEmpty(stockQuotesJSON)) {
+            resolve(0);
+        }
+
+        var totalValue = 0;
+
+        var dataNeeded = {
+            shares: true
+        };
+
+        getUserData(dataNeeded, email)
+        .then(userShares => {
+            let { shares: sharesResult } = userShares;
+
+            for (let stockQuote of stockQuotesJSON) {
+
+                let quantityOfUserShareWithMatchedSymbol = 0;
+                
+                // filter shares of user having matched symbol with this stock quote
+                const arraySharesWithMatchedSymbol = sharesResult.filter(
+                    share => _.isEqual(share.companyCode, stockQuote.symbol)
+                );
+
+                // add quantities of all shares with matched symbol together
+                for (let shareWithMatchedSymbol of arraySharesWithMatchedSymbol) {
+                    quantityOfUserShareWithMatchedSymbol += shareWithMatchedSymbol.quantity;
+                }
+
+                // add into total value this stock value: stock price * stock quantity
+                totalValue += stockQuote.price * quantityOfUserShareWithMatchedSymbol;
+            }   
+        
+            resolve(totalValue);
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
 }
 
 export default {
@@ -130,5 +240,8 @@ export default {
     signupUser,
     sendPasswordVerificationCode,
     checkVerificationCode,
-    changePassword
+    changePassword,
+    changeUserData,
+    getUserData,
+    calculateTotalSharesValue
 }

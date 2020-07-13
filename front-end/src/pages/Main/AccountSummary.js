@@ -6,9 +6,14 @@ import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
 import { socket } from '../../App';
-// import {
-//     userAction,
-// } from '../../redux/storeActions/actions';
+import {
+    userAction,
+} from '../../redux/storeActions/actions';
+
+import { 
+    updateUserDataForSocket,
+    setupSocketToCheckStockQuotes 
+} from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -74,15 +79,30 @@ const styles = theme => ({
 class AccountSummary extends React.Component {
     state = {
         error: "",
+        userTotalSharesValue: -1,
+        userTotalPortfolioValue: -1,
     }
 
     componentDidMount() {
-        // testing socket
-        socket.emit("setupUserInformation", this.props.userSession);
-    } 
+        console.log(this.props.userSession);
+
+        this.setState({
+            userTotalPortfolioValue: this.props.userSession.totalPortfolio
+        });
+
+        setupSocketToCheckStockQuotes(
+            socket,
+            this.props.userSession,
+            this.setState.bind(this),
+            this.props.mutateUser
+        );
+    }
 
     componentDidUpdate() {
-        socket.emit("setupUserInformation", this.props.userSession);
+        updateUserDataForSocket(socket, this.props.userSession);
+        
+        // console.log(this.state.userTotalSharesValue);
+        // console.log(this.state.userTotalPortfolioValue);
     }
 
     render() {
@@ -95,25 +115,7 @@ class AccountSummary extends React.Component {
                 >
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle, classes.marketWatch)}>
-                            MARKET WATCH
-                        </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.stocksOnTheMove)}>
-                            STOCKS ON THE MOVE
-                        </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.accountSummary)}>
-                            ACCOUNT SUMMARY
-                        </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.rankings)}>
-                            RANKINGS
+                            {this.state.userTotalPortfolioValue}
                         </Typography>
                         <Paper className={classes.fullHeightWidth}/>
                     </Grid>
@@ -127,6 +129,13 @@ const mapStateToProps = (state) => ({
     userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(
+const mapDispatchToProps = (dispatch) => ({
+    mutateUser: (userProps) => dispatch(userAction(
+        'default',
+        userProps
+    )),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
     withStyles(styles)(withRouter(AccountSummary))
 );

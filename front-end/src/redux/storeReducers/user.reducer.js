@@ -2,6 +2,8 @@ const userReducer = (action, state) => {
     const { method, whichPropsToChange } = action;
 
     if(method==="default") {
+        //console.log('Changed');
+        
         return { 
             ...state, 
             userSession: {

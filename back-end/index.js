@@ -31,6 +31,7 @@ const prisma = new PrismaClient();
 
 const {
     oneSecond, 
+    oneMinute,
     oneDay,
     clearIntervals,
     clearIntervalsIfIntervalsNotEmpty
@@ -41,7 +42,7 @@ const {
 } = require('./utils/UserUtil');
 
 const {
-    checkAllSharePricesForUser
+    checkStockQuotesForUser
 } = require('./utils/SocketUtil');
 
 const sgMail = require('@sendgrid/mail');
@@ -270,7 +271,7 @@ app.use('/userData', require('./routes/user'));
 
 
 // set up socket.io server
-var intervalCheckSharePricesForUser;
+var intervalCheckStockQuotesForUser;
 var userData;
 
 io.on("connection", (socket) => {
@@ -282,19 +283,20 @@ io.on("connection", (socket) => {
     })
 
     clearIntervalsIfIntervalsNotEmpty([
-        intervalCheckSharePricesForUser
+        intervalCheckStockQuotesForUser
     ]);
 
-    intervalCheckSharePricesForUser = setInterval(() => 
-        checkAllSharePricesForUser(socket, userData), 
-        5 * oneSecond
+    // For now, every 10 sec, check all prices of stock for user and update.
+    intervalCheckStockQuotesForUser = setInterval(() => 
+        checkStockQuotesForUser(socket, userData), 
+        10 * oneSecond
     );
 
     // disconnect
     socket.on("disconnect", () => {
         console.log("Client disconnected");
         clearIntervals([
-            intervalCheckSharePricesForUser
+            intervalCheckStockQuotesForUser
         ]);
     });
 });

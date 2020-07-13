@@ -24,7 +24,7 @@ model User {
   cash            Float?    @default(100000)
   totalPortfolio  Float?    @default(100000)
   watchlist       String[]
-  transactions    Transaction[]
+  transactions    UserTransaction[]
   shares          Share[]
 }
 
@@ -39,7 +39,7 @@ model Share {
   userID          String
 }
 
-model Transaction {
+model UserTransaction {
   id              String    @default(cuid()) @id
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @default(now()) @updatedAt

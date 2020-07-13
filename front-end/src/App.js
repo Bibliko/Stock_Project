@@ -11,6 +11,7 @@ import { createStore } from 'redux';
 import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
+import { updateUserDataForSocket } from './utils/SocketUtil';
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -77,7 +78,7 @@ class App extends React.Component {
         initializeStoreState(this.reduxStoreInitialState)
       );
     }
-    console.log(this.reduxStoreInitialState);
+    //console.log(this.reduxStoreInitialState);
     return this.reduxStore_USE_THE_ACCESSOR;
   }
   
@@ -98,6 +99,9 @@ class App extends React.Component {
 
   componentDidUpdate() {
     this.changePath();
+    if(this.state.isAppReady) {
+      updateUserDataForSocket(socket);
+    }
   }
 
   render() {
@@ -134,7 +138,8 @@ class App extends React.Component {
             !this.specialLinks.includes(this.state.path) &&
             <Switch>
               <Layout toggleTheme={this.toggleTheme}>
-                <Route path="/" component={LandingPage}/>
+                <Route exact path="/" component={LandingPage} />
+
                 <Route path="/accountSummary" component={AccountSummary} />
               </Layout>
             </Switch>
