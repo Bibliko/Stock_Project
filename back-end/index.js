@@ -286,7 +286,7 @@ io.on("connection", (socket) => {
         intervalCheckStockQuotesForUser
     ]);
 
-    // Every minute, check all prices of stock for user and update.
+    // For now, every 10 sec, check all prices of stock for user and update.
     intervalCheckStockQuotesForUser = setInterval(() => 
         checkStockQuotesForUser(socket, userData), 
         10 * oneSecond
