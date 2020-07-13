@@ -37,15 +37,15 @@ const getStockQuotesFromFMP = (prismaShares) => {
     // prismaShares means: shares with companyCode attribute
 
     var stringShareSymbols = new String('');
-    var arrayShareSymbols = new Set();
+    var setShareSymbols = new Set();
 
     for (let share of prismaShares) {
 
         // if we already add this share symbol into the String, we don't need to add again
         // if not, add to String and to Set
-        if(!arrayShareSymbols.has(share.companyCode)) {
+        if(!setShareSymbols.has(share.companyCode)) {
             stringShareSymbols = stringShareSymbols.concat(share.companyCode,',');
-            arrayShareSymbols.add(share.companyCode);
+            setShareSymbols.add(share.companyCode);
         }
     }
 
