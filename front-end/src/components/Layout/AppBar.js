@@ -177,7 +177,7 @@ class PersistentAppBar extends React.Component {
             >
                 <Toolbar className={classes.toolbar}>
                     <img 
-                        src="/bib.png"
+                        src="/bibOfficial.jpg"
                         alt="Bibliko"
                         className={classes.logo}
                         onClick={() => { redirectToPage('/', this.props) }}
