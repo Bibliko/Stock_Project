@@ -1,3 +1,13 @@
+/**
+ * Table of content of this file:
+ * - 1st part: set up passport
+ * - 2nd part: important timers and intervals
+ * - 3rd part: APIs for Passport
+ * - 4th part: verification APIs
+ * - 5th part: other APIs
+ * - 6th part: socket
+ */
+
 try {
     require('./config/config');
 } catch(err) {
@@ -7,7 +17,7 @@ try {
 const { 
     PORT:port,
     FRONTEND_HOST,
-    MAILGUN_API_KEY,
+    //MAILGUN_API_KEY,
     SENDGRID_API_KEY
 } = process.env;
 const express = require('express');
@@ -18,6 +28,22 @@ const prisma = new PrismaClient();
 // const mailgun = require("mailgun-js");
 // const DOMAIN = 'minecommand.us';
 // const mg = mailgun({apiKey: MAILGUN_API_KEY, domain: DOMAIN});
+
+const {
+    oneSecond, 
+    oneMinute,
+    oneDay,
+    clearIntervals,
+    clearIntervalsIfIntervalsNotEmpty
+} = require('./utils/DayTimeUtil');
+
+const {
+    deleteExpiredVerification
+} = require('./utils/UserUtil');
+
+const {
+    checkStockQuotesForUser
+} = require('./utils/SocketUtil');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -65,43 +91,13 @@ app.use(passport.session());
 
 setupPassport(passport);
 
-var timerForDeleteVerification;
+// important timers and intervals
+var intervalForDeleteVerification;
 var timerForSendCodeVerifyingPassword;
 
-const deleteExpiredVerification = () => {
-    let date = new Date();
-    date = (date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear(); 
-    prisma.userVerification.deleteMany({
-        where: {
-            expiredAt: date
-        }
-    })
-    .then(res => {
-        console.log('Deleted', res, 'email verifications');
-    })
-    .catch(err => {
-        console.log(err);
-    })
-}
+intervalForDeleteVerification = setInterval(deleteExpiredVerification, oneDay);
 
-function setDaysTimeout(callback, days) {
-    // 86400 seconds in a day
-    var msInDay = 86400*1000; 
-
-    var dayCount = 0;
-    timerForDeleteVerification = setInterval(function() {
-        dayCount++;  // a day has passed
-
-        if(dayCount == days) {
-           clearInterval(timerForDeleteVerification);
-           callback.apply(this, []);
-        }
-    }, msInDay);
-}
-
-setDaysTimeout(deleteExpiredVerification, 1); 
-
-// all app routes are written below this comment:
+// All app routes are written below this comment:
 
 // APIs for Passport are listed below:
 
@@ -164,7 +160,7 @@ app.get('/logout', (req, res) => {
     res.send("Successful");
 });
 
-//verification APIs are listed below:
+// verification APIs are listed below:
 
 app.get('/passwordVerification', (req, res) => {
     if(
@@ -179,14 +175,6 @@ app.get('/passwordVerification', (req, res) => {
     fs.readFile('./verificationHTML/verifyPassword.html', 'utf8') 
     .then(data => {
         const htmlFile = data.replace("{{ verificationKey }}", passwordVerificationCode);
-        
-        // const msg = {
-        //     from: 'Bibliko <biblikoorg@gmail.com>',
-        //     to: `${req.query.email}`,
-        //     subject: 'Password Recovery',
-        //     html: htmlFile,
-        // };
-        // return mg.messages().send(msg);
 
         const msg = {
             to: `${req.query.email}`,
@@ -195,14 +183,18 @@ app.get('/passwordVerification', (req, res) => {
             html: htmlFile,
         };
     
+        // return mg.messages().send(msg);
         return sgMail.send(msg);
     })
     .then(() => {
         console.log("Code for password recovery has been sent.");
 
-        timerForSendCodeVerifyingPassword = setTimeout(() => {
-            clearInterval(timerForSendCodeVerifyingPassword);
-        }, 15000);
+        timerForSendCodeVerifyingPassword = setTimeout(
+            () => {
+                clearTimeout(timerForSendCodeVerifyingPassword);
+            }, 
+            15 * oneSecond
+        );
 
         res.sendStatus(200);
     })
@@ -243,10 +235,12 @@ app.use('/verification/:tokenId', (req, res) => {
     })
     .then(newUser => {
         if(newUser) {
-            // newUser.objectID = newUser.id;
-            // indices.users_index.saveObject(newUser, {
-            //     autoGenerateObjectIDIfNotExist: true,
-            // });
+            /** 
+             * newUser.objectID = newUser.id;
+             * indices.users_index.saveObject(newUser, {
+             *    autoGenerateObjectIDIfNotExist: true,
+             * });
+             */
 
             const deletePromise = prisma.userVerification.delete({
                 where: {
@@ -272,32 +266,38 @@ app.use('/verification/:tokenId', (req, res) => {
     })
 })
 
-// other APIs:
+// other APIs
 app.use('/userData', require('./routes/user'));
 
 
 // set up socket.io server
-var intervalForSocket;
-
-const getApiAndEmit = (socket) => {
-    // new Date() will take timezone GMT +0
-    const response = new Date();
-    // Emitting a new message. Will be consumed by the client
-    socket.emit("FromAPI", response);
-};
+var intervalCheckStockQuotesForUser;
+var userData;
 
 io.on("connection", (socket) => {
     console.log("New client connected");
 
-    if (intervalForSocket) {
-        clearInterval(intervalForSocket);
-    }
+    // Get user data from front-end: Main/AccountSummary
+    socket.on("setupUserInformation", (data) => {
+        userData = data;
+    })
 
-    intervalForSocket = setInterval(() => getApiAndEmit(socket), 1000);
+    clearIntervalsIfIntervalsNotEmpty([
+        intervalCheckStockQuotesForUser
+    ]);
 
+    // For now, every 10 sec, check all prices of stock for user and update.
+    intervalCheckStockQuotesForUser = setInterval(() => 
+        checkStockQuotesForUser(socket, userData), 
+        10 * oneSecond
+    );
+
+    // disconnect
     socket.on("disconnect", () => {
         console.log("Client disconnected");
-        clearInterval(intervalForSocket);
+        clearIntervals([
+            intervalCheckStockQuotesForUser
+        ]);
     });
 });
 

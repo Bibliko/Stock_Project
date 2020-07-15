@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
-import FunctionsProvider from '../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
+import { signupUser } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -243,7 +244,7 @@ class Signup extends React.Component {
         }
         else {
             if(_.isEmpty(this.state.error)) {
-                this.context.signupUser({
+                signupUser({
                     email: this.email,
                     password: this.password
                 })
@@ -270,6 +271,7 @@ class Signup extends React.Component {
             this.submit();
         }
     }
+<<<<<<< HEAD
     redirect = (link) => {
         const { history } = this.props;
         history.push(link);
@@ -280,17 +282,27 @@ class Signup extends React.Component {
             this.redirect('/');
         }
     }
+=======
+>>>>>>> master
     
     componentDidMount() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
-    
+
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     render() {
         const { classes } = this.props;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div>
@@ -435,14 +447,24 @@ class Signup extends React.Component {
                                 </Grid>
                             </Grid>
                         </Grid>
+<<<<<<< HEAD
                     </Paper>
                 </Container>
+=======
+                        <Grid item xs className={classes.center}>
+                            <Button color="primary" onClick={() => {redirectToPage("/login", this.props)}}
+                                className={classes.link}
+                            >
+                                Log In
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Paper>
+>>>>>>> master
             </div>
         );
     }
 }
-
-Signup.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

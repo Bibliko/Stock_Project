@@ -1,12 +1,11 @@
 import React from 'react';
-import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import {
     userAction,
 } from '../../../redux/storeActions/actions';
 
-import FunctionsProvider from '../../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../../utils/PageRedirectUtil';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -82,23 +81,16 @@ const styles = theme => ({
 });
 
 class Succeed extends React.Component {
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
+    componentDidMount() {
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
         }
     }
 
-    componentDidMount() {
-        this.componentCheck();
-    }
-
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     render() {
@@ -117,7 +109,7 @@ class Succeed extends React.Component {
                         >
                             <Grid item xs className={classes.center}>
                                 <img 
-                                    src="/bib.png"
+                                    src="/bibOfficial.jpg"
                                     alt="Bibliko"
                                     className={classes.avatar}
                                 />
@@ -140,8 +132,6 @@ class Succeed extends React.Component {
         );
     }
 }
-
-Succeed.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
-import FunctionsProvider from '../../provider/FunctionsProvider';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
+import { loginUser, sendPasswordVerificationCode, checkVerificationCode, changePassword } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -148,18 +149,21 @@ class ForgotPassword extends React.Component {
             this.setState({ error: "" });
         }
     }
+
     changeCode = (event) => {
         this.code = event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
+
     changePassword = (event) => {
         this.password=event.target.value;
         if(!_.isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
+
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
 
@@ -182,7 +186,7 @@ class ForgotPassword extends React.Component {
             })
         }
         else {
-            this.context.sendPasswordVerificationCode(this.email)
+            sendPasswordVerificationCode(this.email)
             .then(() => {
                 this.setState({ 
                     success: "Reset Code has been sent.",
@@ -204,7 +208,7 @@ class ForgotPassword extends React.Component {
             });
         }
         else {
-            this.context.checkVerificationCode(this.code)
+            checkVerificationCode(this.code)
             .then(() => {
                 this.setState({ 
                     allowButtonSendCode: false,
@@ -229,7 +233,7 @@ class ForgotPassword extends React.Component {
             this.setState({ error: this.errorTypes[1] }); 
         }
         else {
-            this.context.changePassword(this.password, this.email)
+            changePassword(this.password, this.email)
             .then(res => {
                 this.setState({ success: res });
             })
@@ -256,29 +260,25 @@ class ForgotPassword extends React.Component {
             this.submit();
         }
     }
-
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-    
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
-        }
-      }
     
     componentDidMount() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
 
     render() {
         const { classes } = this.props;
-        const { loginUser } = this.context;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div>
@@ -293,7 +293,7 @@ class ForgotPassword extends React.Component {
                         >
                             <img 
                                 className={classes.avatar}
-                                src="/bib.png"
+                                src="/bibOfficial.jpg"
                                 alt="Bibliko"
                             />
                             <Typography className={classes.instruction}>
@@ -394,7 +394,7 @@ class ForgotPassword extends React.Component {
                                             root: classes.backToLoginText
                                         }}
                                         onClick={() => {
-                                            this.redirect("/login")
+                                            redirectToPage("/login", this.props)
                                         }}
                                     >
                                         Login
@@ -445,8 +445,6 @@ class ForgotPassword extends React.Component {
         );
     }
 }
-
-ForgotPassword.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession

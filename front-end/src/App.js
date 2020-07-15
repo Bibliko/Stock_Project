@@ -4,45 +4,32 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import { Provider } from 'react-redux';
-import store from './redux/store';
-import socketIOClient from "socket.io-client";
+import axios from 'axios';
 
-import Layout from './components/Layout/Layout';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import initializeStoreState from './redux/storeReducer';
+
+import socketIOClient from "socket.io-client";
+import { updateUserDataForSocket } from './utils/SocketUtil';
+
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
 import ForgotPassword from './pages/Login/ForgotPassword';
 import Succeed from './pages/Login/Verification/Succeed';
 import Fail from './pages/Login/Verification/Fail';
-import FunctionsProvider from './provider/FunctionsProvider';
+import LandingPage from './pages/Main/LandingPage';
+import AccountSummary from './pages/Main/AccountSummary';
 
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import Layout from './components/Layout/Layout';
+import { createTheme } from './theme/ThemeUtil';
 
-import logo from './logo.svg';
-import './css/App.css';
-
-function Test() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import { ThemeProvider } from '@material-ui/core/styles';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 var socket;
+
+const { REACT_APP_BACKEND_HOST: BACKEND_HOST } = process.env;
 
 class App extends React.Component {
 
@@ -50,7 +37,8 @@ class App extends React.Component {
     super(props);
     socket = socketIOClient(process.env.REACT_APP_BACKEND_HOST_FOR_SOCKET);
   }
-  
+
+  // variables
   specialLinks = [
     '/login', 
     '/signup', 
@@ -61,150 +49,103 @@ class App extends React.Component {
 
   state = {
     path: "",
-    prefersDarkMode: false
+    isAppReady: false
   }
 
-  theme = {
-    palette: {
-      primary: {
-        main: '#2196f3'
-      },
+  reduxStore_USE_THE_ACCESSOR = undefined
+  reduxStoreInitialState = undefined
 
-      barButton: {
-        main: 'linear-gradient(45deg, #2196f3, #03b6fc)',
-      },
+  // setupRedux
+  setupReduxStoreState = () => {
+    axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
+    .then(user => {
+      this.reduxStoreInitialState = {
+        userSession: user.data
+      };
 
-      subText: {
-        main: 'rgba(5, 5, 5, 1)'
-      },
-
-      succeed: {
-        main: '#209A54',
-      },
-
-      fail: {
-        main: '#DC3D4A',
-      },
-
-      gradientPaper: {
-        main: 'linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF'
-      },
-
-      type: 'light'
-    },
-  }
-
-  ColorLuminance(hex, lum) {
-
-    // validate hex string
-    hex = String(hex).replace(/[^0-9a-f]/gi, '');
-    if (hex.length < 6) {
-      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-    }
-    lum = lum || 0;
-
-    // convert to decimal and change luminosity
-    var rgb = "#", c, i;
-    for (i = 0; i < 3; i++) {
-      c = parseInt(hex.substr(i * 2, 2), 16);
-      c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-      rgb += ("00" + c).substr(c.length);
-    }
-
-    return rgb;
-  }
-
-  muiTheme = {}
-
-  toggleTheme = () => {
-    const { prefersDarkMode } = this.state;
-    this.setState({
-      prefersDarkMode: !prefersDarkMode
+      this.setState({
+        isAppReady: true
+      });
+    })
+    .catch(e => {
+      console.log(e);
     })
   }
 
-  createTheme = () => {
-    const { prefersDarkMode } = this.state;
-    this.theme.palette.type = prefersDarkMode ? 'dark' : 'light';
-    this.muiTheme = this.customizeTheme(createMuiTheme(this.theme));
-    return this.muiTheme;
-  }
-
-  customizeTheme = (theme) => {
-    theme.getColor = this.getColor;
-    for (let colorKey in theme.palette) {
-      const color = theme.palette[colorKey];
-      if (color.main) {
-        if (!color.light)
-          theme.palette[colorKey].light = this.ColorLuminance(color.main, 0.2);
-        if (!color.dark)
-          theme.palette[colorKey].dark = this.ColorLuminance(color.main, -0.2);
-      }
+  getReduxStore = () => {
+    if (this.reduxStore_USE_THE_ACCESSOR === undefined) {
+      this.reduxStore_USE_THE_ACCESSOR = createStore(
+        initializeStoreState(this.reduxStoreInitialState)
+      );
     }
-    return theme;
+    //console.log(this.reduxStoreInitialState);
+    return this.reduxStore_USE_THE_ACCESSOR;
   }
-
-  getColor = (colorChoice) => {
-    const { prefersDarkMode } = this.state;
-    for (let colorKey in this.muiTheme.palette) {
-      if (colorKey === colorChoice) {
-        const color = this.muiTheme.palette[colorKey];
-        return prefersDarkMode ? color.dark : color.light;
-      }
-    }
-  }
-
+  
+  // componentDid... related
   changePath = () => {
     const { pathname } = this.props.location;
-    if (pathname !== this.state.path)
-      this.setState({ path: pathname });
+    if (pathname !== this.state.path) {
+      this.setState({ 
+        path: pathname 
+      });
+    }
   }
 
   componentDidMount() {
     this.changePath();
+    this.setupReduxStoreState();
   } 
 
   componentDidUpdate() {
     this.changePath();
+    if(this.state.isAppReady) {
+      updateUserDataForSocket(socket);
+    }
   }
 
   render() {
+    const { isAppReady } = this.state;
+
+    if(!isAppReady) {
+      return <LinearProgress />
+    }
+
     return (
-      <FunctionsProvider>
-        <ThemeProvider theme={this.createTheme()}>
-          <Provider store={store}>
-            {
-              this.state.path==="/login" &&
-              <Login/>
-            }
-            {
-              this.state.path==="/signup" &&
-              <Signup/>
-            }
-            {
-              this.state.path==="/forgotpassword" &&
-              <ForgotPassword/>
-            }
-            {
-              this.state.path==="/verificationSucceed" &&
-              <Succeed/>
-            }
-            {
-              this.state.path==="/verificationFail" &&
-              <Fail/>
-            }
-            {
-              !this.specialLinks.includes(this.state.path) &&
-              <Switch>
-                <Layout toggleTheme={this.toggleTheme}>
-                  <Route path="/" component={Test}/>
-                  {/* <Route exact path="/browse" component={Browse} /> */}
-                </Layout>
-              </Switch>
-            }
-          </Provider>
-        </ThemeProvider>
-      </FunctionsProvider>
+      <ThemeProvider theme={createTheme()}>
+        <Provider store={this.getReduxStore()}>
+          {
+            this.state.path==="/login" &&
+            <Login/>
+          }
+          {
+            this.state.path==="/signup" &&
+            <Signup/>
+          }
+          {
+            this.state.path==="/forgotpassword" &&
+            <ForgotPassword/>
+          }
+          {
+            this.state.path==="/verificationSucceed" &&
+            <Succeed/>
+          }
+          {
+            this.state.path==="/verificationFail" &&
+            <Fail/>
+          }
+          {
+            !this.specialLinks.includes(this.state.path) &&
+            <Switch>
+              <Layout toggleTheme={this.toggleTheme}>
+                <Route exact path="/" component={LandingPage} />
+
+                <Route path="/accountSummary" component={AccountSummary} />
+              </Layout>
+            </Switch>
+          }
+        </Provider>
+      </ThemeProvider>
     );
   }
 }

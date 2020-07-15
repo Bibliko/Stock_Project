@@ -1,14 +1,13 @@
 import React from 'react';
-import _ from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import {
   userAction
 } from '../../redux/storeActions/actions';
 
+import { shouldRedirectToLogin, redirectToPage } from '../../utils/PageRedirectUtil';
+
 import AppBar from './AppBar';
-import Drawer from './Drawer';
-import FunctionsProvider from '../../provider/FunctionsProvider';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
@@ -19,85 +18,86 @@ const styles = theme => ({
   },
   
   //content. Write new CSS above this comment
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
+  mainContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    height: '100vh',
+    width: '100vw'
   },
+
   contentHeader: {
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
+    //...theme.mixins.toolbar,
+    minHeight: '60px',
     justifyContent: 'flex-start',
   },
+
+  mainBackground: {
+    backgroundColor: theme.palette.backgroundBlue.main,
+    [theme.breakpoints.down('xs')]: {
+      background: theme.palette.paperBackground.gradient
+    },
+    backgroundSize: 'cover',
+    height: '100vh',
+    width: '100vw',
+    position: 'fixed'
+  },
+
+  secondBackground: {
+    background: theme.palette.paperBackground.gradient,
+    [theme.breakpoints.down('xs')]: {
+      display: 'none'
+    },
+    backgroundSize: 'cover',
+    height: '100vh',
+    width: '75%',
+    position: 'sticky'
+  }
 });
 
 class Layout extends React.Component {
-  state = {
-    open: false,
-  }
-
-  //drawer open and close
-  toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-
-    this.setState({ open });
-  };
-
-  redirect = (link) => {
-    const { history } = this.props;
-    history.push(link);
-  } 
-
-  componentCheck = () => {
-    if(_.isEmpty(this.props.userSession)) {
-      this.redirect('/login');
-    }
-  }
-
   componentDidMount() {
-    this.context.getUser() 
-    .then(user => {
-      this.props.mutateUser(user.data);
-    })
-    .catch(err => {
-      console.log(err);
-    })
+    console.log(this.props.userSession);
+    
+    if(shouldRedirectToLogin(this.props)) {
+      redirectToPage('/login', this.props);
+    }
   }
 
   componentDidUpdate() {
-    this.componentCheck();
+    if(shouldRedirectToLogin(this.props)) {
+      redirectToPage('/login', this.props);
+    }
   }
 
   render() {
     const { classes } = this.props;
-    const { open } = this.state;
+
+    if (shouldRedirectToLogin(this.props)) {
+      return null;
+    }
 
     return (
       <div className={classes.root}>
         <CssBaseline />
-        <AppBar 
-          toggleDrawer={this.toggleDrawer}
-        />
-        <main
-          className={classes.content}
-        >
+        <AppBar />
+        <main>
           <div className={classes.contentHeader}/>
-          {this.props.children}
+          <div className={classes.mainContent}>
+            <div className={classes.mainBackground}/>
+            <div className={classes.secondBackground}/>
+            {this.props.children}
+          </div>
         </main>
-        <Drawer 
-          open={open}
-          toggleDrawer={this.toggleDrawer}
-        />
       </div>
     );
   }
 }
-
-Layout.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
   userSession: state.userSession

@@ -1,12 +1,14 @@
 import React from 'react';
 import _ from 'lodash';
 import { withRouter } from 'react-router';
+
 import { connect } from 'react-redux';
 import {
     userAction,
 } from '../../redux/storeActions/actions';
-import { socket } from '../../App';
-import FunctionsProvider from '../../provider/FunctionsProvider';
+//import { socket } from '../../App';
+import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRedirectUtil';
+import { getUser, loginUser } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -174,11 +176,6 @@ class Login extends React.Component {
         }
     }
 
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-
     submit = () => {
         if(
             _.isEmpty(this.email) ||
@@ -188,12 +185,12 @@ class Login extends React.Component {
         }
         else {
             if(_.isEmpty(this.state.error)) {
-                this.context.loginUser('local', {
+                loginUser('local', {
                     email: this.email,
                     password: this.password
                 })
                 .then(() => {
-                    return this.context.getUser();
+                    return getUser();
                 })
                 .then(user => {
                     this.props.mutateUser(user.data);
@@ -204,29 +201,26 @@ class Login extends React.Component {
             }
         }
     }
-    
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
+
+    componentDidMount() {
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
         }
     }
 
-    componentDidMount() {
-        this.componentCheck();
-        
-        // testing socket
-        socket.on("FromAPI", (data) => {
-            console.log(data);
-        })
-    }
-    
     componentDidUpdate() {
-        this.componentCheck();
+        if(shouldRedirectToLandingPage(this.props)) {
+            redirectToPage('/', this.props);
+        }
     }
+
 
     render() {
         const { classes } = this.props;
-        const { loginUser } = this.context;
+
+        if (shouldRedirectToLandingPage(this.props)) {
+            return null;
+        }
 
         return (
             <div>
@@ -241,7 +235,7 @@ class Login extends React.Component {
                         >
                             <Grid item xs className={classes.center}>
                                 <img 
-                                    src="/bib.png"
+                                    src="/bibOfficial.jpg"
                                     alt="Bibliko"
                                     className={classes.avatar}
                                 />
@@ -294,7 +288,7 @@ class Login extends React.Component {
                             <Grid item xs className={classes.center}>
                                 <Button 
                                     color="primary"
-                                    onClick={() => {this.redirect("/signup")}}
+                                    onClick={() => {redirectToPage("/signup", this.props)}}
                                     className={classes.link}
                                 >
                                     Create an account
@@ -302,7 +296,7 @@ class Login extends React.Component {
                                 <Divider orientation="vertical" flexItem/>
                                 <Button 
                                     color="primary"
-                                    onClick={() => {this.redirect("/forgotpassword")}}
+                                    onClick={() => {redirectToPage("/forgotpassword", this.props)}}
                                     className={classes.link}
                                 >
                                     Forgot password
@@ -321,7 +315,7 @@ class Login extends React.Component {
                                     className={classes.center}
                                 >
                                     <Button 
-                                        onClick={() => {loginUser("google")}}
+                                        onClick={() => { loginUser("google") }}
                                         classes={{
                                             root: classes.alternativeLoginButton
                                         }}
@@ -334,7 +328,7 @@ class Login extends React.Component {
                                     </Button>
                                 
                                     <Button 
-                                        onClick={() => {loginUser("facebook")}}
+                                        onClick={() => { loginUser("facebook") }}
                                         classes={{
                                             root: classes.alternativeLoginButton
                                         }}
@@ -355,8 +349,6 @@ class Login extends React.Component {
         );
     }
 }
-
-Login.contextType = FunctionsProvider.context;
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,

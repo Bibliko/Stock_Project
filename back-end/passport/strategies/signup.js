@@ -74,8 +74,9 @@ const signupStrategy = new LocalStrategy({
             return Promise.all([file, verificationToken]);
         })
         .then(([file, verificationToken]) => {
-            if(!file && !verificationToken)
+            if(!file && !verificationToken) {
                 return null;
+            }
             
             //file is a string of the html file, we replace substring {{ formAction }}
             //by the string 'something else'...
@@ -101,11 +102,11 @@ const signupStrategy = new LocalStrategy({
             return sgMail.send(msg);
         })
         .then(emailVerification => {
-            if(emailVerification)
+            if(emailVerification) {
                 done(null, false, { 
                     message: "Processing (Can take a while). Check your inboxes." 
                 });
-            return null;
+            }
         })
         .catch(err => {
             console.log(err);
