@@ -293,7 +293,7 @@ class ForgotPassword extends React.Component {
                         >
                             <img 
                                 className={classes.avatar}
-                                src="/bib.png"
+                                src="/bibOfficial.jpg"
                                 alt="Bibliko"
                             />
                             <Typography className={classes.instruction}>
