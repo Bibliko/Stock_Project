@@ -30,7 +30,7 @@ const styles = theme => ({
         alignItems: 'center',
         justifyContent: 'center',
         maxWidth: 'none',
-        minHeight: '605px'
+        minHeight: '660px'
     },
     paper: {
         height: 'fit-content',
@@ -100,7 +100,7 @@ const styles = theme => ({
     },
     textField: {
         height: 50,
-        width: 132,
+        width: 110,
         margin: '8px',
         fontWeight: 'normal',
         "& label.Mui-focused": {
@@ -127,7 +127,7 @@ const styles = theme => ({
     },
 });
 
-const occupation = [
+const occupations = [
     {
       value: 'Student',
       label: 'Student',
@@ -142,7 +142,7 @@ const occupation = [
     },
 ];
 
-const region = [
+const regions = [
     {
         value: 'Africa',
         label: 'Africa',
@@ -168,16 +168,17 @@ const region = [
         label: 'Oceania',
     },
     {
-        value: 'others',
+        value: 'Others',
         label: 'Others',
     },
 ];
+
 class Signup extends React.Component {
     state = {
         error: "",
         success: "",
         occupation: "",
-        regions:"",
+        region:"",
     }
 
     errorTypes = [
@@ -259,6 +260,7 @@ class Signup extends React.Component {
     }
 
     changeOccupation = (event) => {
+        console.log(event.target.value);
         this.setState({ occupation: event.target.value });
     }
 
@@ -330,35 +332,35 @@ class Signup extends React.Component {
                                     <TextField
                                         name= 'First Name'
                                         id='fname'
-                                        label='First name'
+                                        label='First Name'
                                         variant= 'filled'
                                         fullWidth
                                         className= {classes.textField}
                                         InputProps={{
                                             className: classes.input
                                         }}
-                                        changeData={this.changeFirstName}
-                                        enterData={this.handleKeyDown}
+                                        onChange={this.changeFirstName}
+                                        onKeyDown={this.handleKeyDown}
                                     />
                                     <TextField
                                         name= 'Last Name'
                                         id='lname'
-                                        label='Last name'
+                                        label='Last Name'
                                         variant= 'filled'
                                         fullWidth
                                         className= {classes.textField}
                                         InputProps={{
                                             className: classes.input
                                         }}
-                                        changeData={this.changeLastName}
-                                        enterData={this.handleKeyDown}
+                                        onChange={this.changeLastName}
+                                        onKeyDown={this.handleKeyDown}
                                     />
                                 </Grid>
                                 <Grid item xs className={classes.center}>
                                     <TextField
                                         select
                                         id="Occupation"
-                                        label="Occupation"
+                                        label="OCC"
                                         variant="filled"
                                         SelectProps={{
                                             className: classes.input,
@@ -367,7 +369,7 @@ class Signup extends React.Component {
                                         value={this.state.occupation}
                                         onChange={this.changeOccupation}
                                     >
-                                        {occupation.map((option) => (
+                                        {occupations.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
@@ -375,17 +377,17 @@ class Signup extends React.Component {
                                     </TextField>
                                     <TextField
                                         select
-                                        id="Regions"
-                                        label="Regions"
+                                        id="Region"
+                                        label="Region"
                                         variant="filled"
                                         SelectProps={{
                                             className: classes.input,
                                         }}
                                         className={classes.textField}
                                         value={this.state.region}
-                                        changeData={this.changeRegion}
+                                        onChange={this.changeRegion}
                                     >
-                                        {region.map((option) => (
+                                        {regions.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
@@ -401,16 +403,16 @@ class Signup extends React.Component {
                                 </Grid>
                                 <Grid item xs className={classes.center}>
                                     <PasswordTextField 
-                                        name= 'Password'
+                                        name='Password'
                                         changePassword={this.changePassword}
                                         enterPassword={this.handleKeyDown}
                                     />
                                 </Grid>
                                 <Grid item xs className={classes.center}>
                                     <PasswordTextField
-                                        name= 'Confirm Passsword'
-                                        onChange={this.changeConfirmPassword}
-                                        onKeyDown={this.handleKeyDown}
+                                        name='Confirm Passsword'
+                                        changePassword={this.changeConfirmPassword}
+                                        enterPassword={this.handleKeyDown}
                                     />
                                 </Grid>
                                 {
