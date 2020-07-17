@@ -8,8 +8,8 @@ export const oneDay = 24 * oneHour;
  * https://www.google.com/search?rlz=1C5CHFA_enUS873US873&sxsrf=ALeKk013CdIZ70zSkWRJpY35E7Ids9sE0g%3A1594856100801&ei=pJIPX-bFMJCitQWc3I6YAw&q=time+NYSE+and+NASDAQ+close+UTC+time&oq=time+NYSE+and+NASDAQ+close+UTC+time&gs_lcp=CgZwc3ktYWIQAzIFCCEQqwIyBQghEKsCMgUIIRCrAjoHCAAQRxCwAzoHCCMQrgIQJzoICCEQFhAdEB46BAghEAo6BQghEKABOgcIIRAKEKABUMZDWMVPYMpQaABwAHgAgAF1iAGtB5IBAzcuM5gBAKABAaoBB2d3cy13aXq4AQI&sclient=psy-ab&ved=0ahUKEwjmp-z6tdDqAhUQUa0KHRyuAzMQ4dUDCAw&uact=5
  * 
  * Country	        Stock Exchange	                 UTC
- * United States	New York Stock Exchange (NYSE)	 (UTC -5) 2:30 p.m. to 9 p.m.
- * United States	NASDAQ	                         (UTC -5) 2:30 p.m. to 9 p.m.
+ * United States	New York Stock Exchange (NYSE)	 (UTC -4) 1:30 p.m. to 8 p.m.
+ * United States	NASDAQ	                         (UTC -4) 1:30 p.m. to 8 p.m.
  * 
  * new Date() -> toUTCString() -> String: Thu, 16 Jul 2020 00:10:14 GMT
  */
@@ -43,11 +43,11 @@ export const marketCountdownUpdate = (setStateFn) => {
     var UTCSeconds = getSecondsUTCString(timeNow);    
     //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
 
-    // (UTC -5) to (UTC 0) 2:30 p.m. to 9 p.m. -> 14:30 to 21:00
+    // (UTC -4) to (UTC 0) 1:30 p.m. to 8 p.m. -> 13:30 to 20:00
     if(
-        UTCHours < 14 || 
-        (UTCHours === 14 && UTCMinutes < 30) ||
-        (UTCHours >= 21 && UTCMinutes >= 0)
+        UTCHours < 13 || 
+        (UTCHours === 13 && UTCMinutes < 30) ||
+        (UTCHours >= 20 && UTCMinutes >= 0)
     ) {
         setStateFn({
             countdown: '00:00:00'
@@ -55,7 +55,7 @@ export const marketCountdownUpdate = (setStateFn) => {
         return;
     }
     
-    var hours = 21 - 1 - UTCHours;
+    var hours = 20 - 1 - UTCHours;
     var min = 60 - UTCMinutes;
     var sec = 60 - UTCSeconds;
 
@@ -86,11 +86,11 @@ export const isMarketClosedCheck = () => {
     var UTCMinutes = getMinutesUTCString(timeNow);
     //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
 
-    // (UTC -5) to (UTC 0) 2:30 p.m. to 9 p.m. -> 14:30 to 21:00
+    // (UTC -4) to (UTC 0) 1:30 p.m. to 8 p.m. -> 13:30 to 20:00
     if(
-        UTCHours < 14 || 
-        (UTCHours === 14 && UTCMinutes < 30) ||
-        (UTCHours >= 21 && UTCMinutes >= 0)
+        UTCHours < 13 || 
+        (UTCHours === 13 && UTCMinutes < 30) ||
+        (UTCHours >= 20 && UTCMinutes >= 0)
     ) {
         return true;
     }
