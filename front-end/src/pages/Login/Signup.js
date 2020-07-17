@@ -33,7 +33,7 @@ const styles = theme => ({
         minHeight: '660px'
     },
     paper: {
-        height: 'fit-content',
+        height: '550px',
         width: 'fit-content',
         minWidth: '450px',
         [theme.breakpoints.down('xs')]: {
@@ -71,7 +71,7 @@ const styles = theme => ({
         margin: theme.spacing(1)
     },
     submit: {
-        marginTop: '4px',
+        marginTop: '6px',
         padding: theme.spacing(1),
         height: '40px',
         width: '120px',
@@ -85,10 +85,12 @@ const styles = theme => ({
         fontWeight: 'bold'
     },
     link: {
+        marginTop: '6px',
         backgroundColor: 'transparent',
         color: 'black',
         fontWeight: 'bold',
-        fontSize: 'small'
+        textTransform: 'none',
+        fontSize: '16px'
     },
     announcement: {
         marginTop: 5,
@@ -100,7 +102,7 @@ const styles = theme => ({
     },
     textField: {
         height: 50,
-        width: 110,
+        width: 165,
         margin: '8px',
         fontWeight: 'normal',
         "& label.Mui-focused": {
@@ -127,7 +129,7 @@ const styles = theme => ({
     },
 });
 
-const occupations = [
+/*const occupations = [
     {
       value: 'Student',
       label: 'Student',
@@ -171,7 +173,7 @@ const regions = [
         value: 'Others',
         label: 'Others',
     },
-];
+];*/
 
 class Signup extends React.Component {
     state = {
@@ -273,19 +275,6 @@ class Signup extends React.Component {
             this.submit();
         }
     }
-<<<<<<< HEAD
-    redirect = (link) => {
-        const { history } = this.props;
-        history.push(link);
-    }
-    
-    componentCheck = () => {
-        if(!_.isEmpty(this.props.userSession)) {
-            this.redirect('/');
-        }
-    }
-=======
->>>>>>> master
     
     componentDidMount() {
         if(shouldRedirectToLandingPage(this.props)) {
@@ -319,7 +308,7 @@ class Signup extends React.Component {
                         >
                             <Grid item xs className={classes.center}>
                                 <img 
-                                    src="/bib.png"
+                                    src="/bibOfficial.jpg"
                                     alt="Bibliko"
                                     className={classes.avatar}
                                 />
@@ -328,7 +317,7 @@ class Signup extends React.Component {
                                 container spacing={1} direction="column"
                                 item xs className={classes.center}
                             >
-                                <Grid item xs className={classes.center}>
+                                {/*<Grid item xs className={classes.center}>
                                     <TextField
                                         name= 'First Name'
                                         id='fname'
@@ -393,7 +382,7 @@ class Signup extends React.Component {
                                             </MenuItem>
                                         ))}
                                     </TextField>
-                                </Grid>
+                                </Grid>*/}
                                 <Grid item xs className={classes.center}>
                                     <NormalTextField
                                         name= 'Email'
@@ -410,7 +399,7 @@ class Signup extends React.Component {
                                 </Grid>
                                 <Grid item xs className={classes.center}>
                                     <PasswordTextField
-                                        name='Confirm Passsword'
+                                        name='Confirm Password'
                                         changePassword={this.changeConfirmPassword}
                                         enterPassword={this.handleKeyDown}
                                     />
@@ -441,7 +430,9 @@ class Signup extends React.Component {
                                     >
                                         Sign Up
                                     </Button>
-                                    <Button color="primary" onClick={() => {this.redirect("/login")}}
+                                    <Button 
+                                        color="primary"
+                                        onClick={() => {redirectToPage("/login", this.props)}}
                                         className={classes.link}
                                     >
                                         Back to Login
@@ -449,20 +440,8 @@ class Signup extends React.Component {
                                 </Grid>
                             </Grid>
                         </Grid>
-<<<<<<< HEAD
                     </Paper>
                 </Container>
-=======
-                        <Grid item xs className={classes.center}>
-                            <Button color="primary" onClick={() => {redirectToPage("/login", this.props)}}
-                                className={classes.link}
-                            >
-                                Log In
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Paper>
->>>>>>> master
             </div>
         );
     }
