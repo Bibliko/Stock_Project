@@ -4,9 +4,17 @@ const _ = require('lodash');
 const {
     getStockQuotesFromFMP
 } = require('./FinancialModelingPrepUtil');
+const { 
+    isMarketClosedCheck
+} = require('./DayTimeUtil');
 
+const checkStockQuotesForUserString = "checkStockQuotesForUser";
 
 const checkStockQuotesForUser = (socket, userData) => {
+    if(isMarketClosedCheck()) {
+        return null;
+    }
+
     //console.log(userData, 'userData');
     if(!_.isEmpty(userData)) {
         prisma.user.findOne({
@@ -21,7 +29,7 @@ const checkStockQuotesForUser = (socket, userData) => {
             const { shares } = userWithShares;
 
             if(_.isEmpty(shares)) {
-                socket.emit("checkStockQuotesForUser", []);
+                socket.emit(checkStockQuotesForUserString, []);
                 return null;
             }
             else {
@@ -30,13 +38,13 @@ const checkStockQuotesForUser = (socket, userData) => {
                  * - We are using Financial Modeling Prep free API key
                  * -> The amount of requests is limited. Use wisely when testing!
                  */
-                // return getStockQuotesFromFMP(shares);
+                //return getStockQuotesFromFMP(shares);
             }
         })
         .then(stockQuotesJSON => {
             if(stockQuotesJSON) {
                 //console.log(stockQuotesJSON);
-                socket.emit("checkStockQuotesForUser", stockQuotesJSON);
+                socket.emit(checkStockQuotesForUserString, stockQuotesJSON);
             }
         })
         .catch(err => {
@@ -46,5 +54,5 @@ const checkStockQuotesForUser = (socket, userData) => {
 };
 
 module.exports = {
-    checkStockQuotesForUser
+    checkStockQuotesForUser,
 }

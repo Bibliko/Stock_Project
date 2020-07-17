@@ -44,14 +44,15 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, m
   socket.on(checkStockQuotesForUser, (stockQuotesJSON) => {
     calculateTotalSharesValue(stockQuotesJSON, userSession.email)
     .then(totalSharesValue => {
-      // console.log(totalSharesValue);
+      //console.log(totalSharesValue);
 
       const newTotalPortfolioValue = userSession.cash + totalSharesValue;
       
       // setState so that these variables can be used locally immediately.
       setStateFn({
         userTotalSharesValue: totalSharesValue,
-        userTotalPortfolioValue: newTotalPortfolioValue
+        userTotalPortfolioValue: newTotalPortfolioValue,
+        userDailyChange: (newTotalPortfolioValue-userSession.totalPortfolioLastClosure) / userSession.totalPortfolioLastClosure
       });
 
       /** 
@@ -78,9 +79,17 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, m
   })
 }
 
+/**
+ * options are listed at the beginning of front-end/src/utils/SocketUtil
+ */
+export const offSocketListener = (socket, option) => {
+  socket.off(option);
+}
+
 export default {
   setupUserInformation,
   checkStockQuotesForUser,
   updateUserDataForSocket,
-  setupSocketToCheckStockQuotes
+  setupSocketToCheckStockQuotes,
+  offSocketListener
 }

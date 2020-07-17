@@ -1,21 +1,7 @@
-const oneSecond = 1000; // 1000 ms = 1 second
-const oneMinute = 60 * oneSecond;
-const oneHour = 60 * oneMinute;
-const oneDay = 24 * oneHour;
-
-const clearIntervals = (intervals) => {
-    for (var interval of intervals) {
-        clearInterval(interval);
-    }
-}
-
-const clearIntervalsIfIntervalsNotEmpty = (intervals) => {
-    for (var interval of intervals) {
-        if(interval) {
-            clearInterval(interval);
-        }
-    }
-}
+export const oneSecond = 1000; // 1000 ms = 1 second
+export const oneMinute = 60 * oneSecond;
+export const oneHour = 60 * oneMinute;
+export const oneDay = 24 * oneHour;
 
 /**
  * Stock Market NYSE and NASDAQ conversion open time to UTC
@@ -28,36 +14,76 @@ const clearIntervalsIfIntervalsNotEmpty = (intervals) => {
  * new Date() -> toUTCString() -> String: Thu, 16 Jul 2020 00:10:14 GMT
  */
 
-const getHoursUTCString = (UTCString) => {
+export const getHoursUTCString = (UTCString) => {
     var hoursString = UTCString.substring(17, 19);
     return parseInt(hoursString, 10);
 }
 
-const getMinutesUTCString = (UTCString) => {
+export const getMinutesUTCString = (UTCString) => {
     var minutesString = UTCString.substring(20, 22);
     return parseInt(minutesString, 10);
 }
 
-const getSecondsUTCString = (UTCString) => {
+export const getSecondsUTCString = (UTCString) => {
     var secondsString = UTCString.substring(23, 25);
     return parseInt(secondsString, 10);
 }
 
-const newDate = () => {
+export const newDate = () => {
     var timeNow = new Date().toUTCString();
     return timeNow;
 }
 
-/**
- * return true if market closed
- * else return false if market opened
- */
-const isMarketClosedCheck = () => {
+export const marketCountdownUpdate = (setStateFn) => {
     var timeNow = newDate();
     //console.log(timeNow);
   
     var UTCHours = getHoursUTCString(timeNow);
-    var UTCMinutes = getMinutesUTCString(timeNow); 
+    var UTCMinutes = getMinutesUTCString(timeNow);
+    var UTCSeconds = getSecondsUTCString(timeNow);    
+    //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
+
+    // (UTC -5) to (UTC 0) 2:30 p.m. to 9 p.m. -> 14:30 to 21:00
+    if(
+        UTCHours < 14 || 
+        (UTCHours === 14 && UTCMinutes < 30) ||
+        (UTCHours >= 21 && UTCMinutes >= 0)
+    ) {
+        setStateFn({
+            countdown: '00:00:00'
+        });
+        return;
+    }
+    
+    var hours = 21 - 1 - UTCHours;
+    var min = 60 - UTCMinutes;
+    var sec = 60 - UTCSeconds;
+
+    if((hours + '').length === 1) {
+        hours = '0' + hours;
+    }
+
+    if((min + '').length === 1) {
+        min = '0' + min;
+    }
+
+    if((sec + '').length === 1) {
+            sec = '0' + sec;
+    }
+
+    var countdown = hours+':'+min+':'+sec;
+
+    setStateFn({
+        countdown
+    });
+}
+
+export const isMarketClosedCheck = () => {
+    var timeNow = newDate();
+    //console.log(timeNow);
+  
+    var UTCHours = getHoursUTCString(timeNow);
+    var UTCMinutes = getMinutesUTCString(timeNow);
     //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
 
     // (UTC -5) to (UTC 0) 2:30 p.m. to 9 p.m. -> 14:30 to 21:00
@@ -68,20 +94,19 @@ const isMarketClosedCheck = () => {
     ) {
         return true;
     }
-    
+
     return false;
 }
 
-module.exports = {
+export default {
     oneSecond, 
     oneMinute,
     oneHour,
     oneDay,
-    clearIntervals,
-    clearIntervalsIfIntervalsNotEmpty,
     getHoursUTCString,
     getMinutesUTCString,
     getSecondsUTCString,
     newDate,
+    marketCountdownUpdate,
     isMarketClosedCheck
 }

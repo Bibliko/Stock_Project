@@ -12,7 +12,9 @@ import {
 
 import { 
     updateUserDataForSocket,
-    setupSocketToCheckStockQuotes 
+    setupSocketToCheckStockQuotes,
+    offSocketListener,
+    checkStockQuotesForUser
 } from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -26,6 +28,7 @@ const styles = theme => ({
         position: 'absolute',
         height: '100%',
         width: '75%',
+        marginTop: '44px',
         [theme.breakpoints.down('xs')]: {
             width: '85%',
         },
@@ -81,13 +84,26 @@ class AccountSummary extends React.Component {
         error: "",
         userTotalSharesValue: -1,
         userTotalPortfolioValue: -1,
+        userDailyChange: -1,
     }
 
     componentDidMount() {
         console.log(this.props.userSession);
 
+        const {
+            cash,
+            totalPortfolio,
+            totalPortfolioLastClosure
+        } = this.props.userSession;
+
+        const totalSharesValue = totalPortfolio - cash;
+
+        const dailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
+
         this.setState({
-            userTotalPortfolioValue: this.props.userSession.totalPortfolio
+            userTotalSharesValue: totalSharesValue,
+            userTotalPortfolioValue: totalPortfolio,
+            userDailyChange: dailyChange,
         });
 
         setupSocketToCheckStockQuotes(
@@ -100,9 +116,18 @@ class AccountSummary extends React.Component {
 
     componentDidUpdate() {
         updateUserDataForSocket(socket, this.props.userSession);
-        
-        // console.log(this.state.userTotalSharesValue);
-        // console.log(this.state.userTotalPortfolioValue);
+    
+        //console.log(this.state);
+
+        //console.log(this.props.isMarketClosed);
+
+        if(this.props.isMarketClosed) {
+            offSocketListener(socket, checkStockQuotesForUser);
+        }
+    }
+
+    componentWillUnmount() {
+        offSocketListener(socket, checkStockQuotesForUser);
     }
 
     render() {
@@ -127,6 +152,7 @@ class AccountSummary extends React.Component {
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,
+    isMarketClosed: state.isMarketClosed
 });
 
 const mapDispatchToProps = (dispatch) => ({

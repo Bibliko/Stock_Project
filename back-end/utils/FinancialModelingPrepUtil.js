@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const _ = require('lodash');
 
 const {
     FINANCIAL_MODELING_PREP_API_KEY
@@ -35,6 +36,7 @@ const {
 */
 const getStockQuotesFromFMP = (prismaShares) => {
     // prismaShares means: shares with companyCode attribute
+    // prismaShares won't be empty since you need to eliminate that case before using this function
 
     var stringShareSymbols = new String('');
     var setShareSymbols = new Set();

@@ -12,6 +12,7 @@ import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
 import { updateUserDataForSocket } from './utils/SocketUtil';
+import { isMarketClosedCheck } from './utils/DayTimeUtil';
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -60,7 +61,8 @@ class App extends React.Component {
     axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
     .then(user => {
       this.reduxStoreInitialState = {
-        userSession: user.data
+        userSession: user.data,
+        isMarketClosed: isMarketClosedCheck(),
       };
 
       this.setState({

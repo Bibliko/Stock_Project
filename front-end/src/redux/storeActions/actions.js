@@ -9,3 +9,10 @@ export function userAction(method, whichPropsToChange) {
         whichPropsToChange,
     };
 }
+
+export function marketAction(method) {
+    return {
+        type: actionTypes.MARKET,
+        method, // method: 'closeMarket', 'openMarket'
+    };
+}
