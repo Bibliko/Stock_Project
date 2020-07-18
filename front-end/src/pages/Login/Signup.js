@@ -24,10 +24,11 @@ const styles = theme => ({
         alignItems: 'center',
         justifyContent: 'center',
         maxWidth: 'none',
-        minHeight: '570px'
+        minHeight: '605px'
     },
     paper: {
-        height: '550px',
+        height: 'fit-content',
+        minHeight: '550px',
         width: 'fit-content',
         minWidth: '450px',
         [theme.breakpoints.down('xs')]: {
