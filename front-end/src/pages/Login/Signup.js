@@ -7,29 +7,47 @@ import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRed
 import { signupUser } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import NormalTextField from '../../components/TextField/normalTextField';
+import PasswordTextField from '../../components/TextField/passwordTextField';
+import { Container } from '@material-ui/core';
 
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '-webkit-fill-available',
-        width: '-webkit-fill-available',
+        height: '100vh',
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        maxWidth: 'none',
+        minHeight: '605px'
     },
     paper: {
-        position: 'absolute',
-        height: 500,
-        width: 450,
+        height: 'fit-content',
+        minHeight: '550px',
+        width: 'fit-content',
+        minWidth: '450px',
+        [theme.breakpoints.down('xs')]: {
+            height: '-webkit-fill-available',
+            width: '-webkit-fill-available',
+            minWidth: 0,
+        },
         padding: theme.spacing(1),
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: theme.palette.gradientPaper.main,
+    },
+    div: {
+        background: 'black',
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100vw',
+        position: 'fixed'
     },
     center: {
         display: 'flex',
@@ -42,19 +60,32 @@ const styles = theme => ({
         fontSize: 'x-large',
         fontWeight: 'bold'
     },
+    avatar: {
+        height: '130px',
+        width: '130px',
+        margin: theme.spacing(3)
+    },
     submit: {
-        marginTop: '16px',
+        marginTop: '10px',
         padding: theme.spacing(1),
-        minHeight: '40px',
-        background: theme.palette.barButton.main,
+        height: '40px',
+        width: '120px',
+        background: 'black',
         '&:hover': {
-            opacity: 0.85
+            backgroundColor: 'black',
+            opacity: 0.8
         },
+        borderRadius: '40px',
+        color: 'white',
         fontWeight: 'bold'
     },
     link: {
+        marginTop: '6px',
+        backgroundColor: 'transparent',
+        color: 'black',
         fontWeight: 'bold',
-        fontSize: 'small'
+        textTransform: 'none',
+        fontSize: '16px'
     },
     announcement: {
         marginTop: 5,
@@ -76,38 +107,43 @@ class Signup extends React.Component {
         "Confirm Password does not match Password.",
         "Missing some fields"
     ]
-
+    
     email=""
     password=""
     confirmPassword=""
 
+    setStateErrorPassword = () => {
+        if(!_.isEqual(this.password, this.confirmPassword)) {
+
+            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
+                this.setState({ error: this.errorTypes[0] });
+            }
+        }
+        else {
+            if(!_.isEmpty(this.state.error)) {
+                this.setState({ error: "" });
+            }
+        }
+    }
+
     changeEmail = (event) => {
         this.email = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(
+            _.isEqual(this.password, this.confirmPassword) &&
+            !_.isEmpty(this.state.error)
+        ) {
             this.setState({ error: "" });
         }
     }
 
     changePassword = (event) => {
         this.password = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
-            this.setState({ error: "" });
-        }
+        this.setStateErrorPassword();
     }
 
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
-
-        if(!_.isEqual(this.password, this.confirmPassword)) {
-
-            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
-                this.setState({ error: this.errorTypes[0] });
-            }
-
-        }
-        else {
-            this.setState({ error: "" });
-        }
+        this.setStateErrorPassword();
     }
 
     submit = () => {
@@ -160,87 +196,86 @@ class Signup extends React.Component {
         }
 
         return (
-            <div className={classes.root}>
-                <Paper 
-                    className={classes.paper}
-                    variant="outlined"
-                    elevation={2}
-                >
-                    <Grid container spacing={2} direction="column"
-                        className={classes.center}
+            <div>
+                <div className={classes.div}/>
+                <Container className={classes.root} disableGutters>
+                    <Paper 
+                        className={classes.paper}
+                        elevation={2}
                     >
-                        <Grid item xs className={classes.center}>
-                            <Typography className={classes.title}>
-                                Sign Up
-                            </Typography>
-                        </Grid>
-                        <Grid 
-                            container spacing={1} direction="column"
-                            item xs className={classes.center}
+                        <Grid container spacing={1} direction="column"
+                            className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Email"
-                                    label="Email"
-                                    onChange={this.changeEmail}
-                                    onKeyDown={this.handleKeyDown}
+                                <img 
+                                    src="/bibOfficial.jpg"
+                                    alt="Bibliko"
+                                    className={classes.avatar}
                                 />
                             </Grid>
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Password"
-                                    label="Password"
-                                    type="password"
-                                    onChange={this.changePassword}
-                                    onKeyDown={this.handleKeyDown}
-                                />
-                            </Grid>
-                            <Grid item xs className={classes.center}>
-                                <TextField 
-                                    id="Confirm Password"
-                                    label="Confirm Password"
-                                    type="password"
-                                    onChange={this.changeConfirmPassword}
-                                    onKeyDown={this.handleKeyDown}
-                                />
-                            </Grid>
-                            {
-                                !_.isEmpty(this.state.error) &&
-                                <Grid item xs className={classes.announcement}>
-                                    <Typography color="error" align="center"
-                                        className={classes.announcementText}
-                                    >
-                                        Error: {this.state.error}
-                                    </Typography>
-                                </Grid>
-                            }
-                            {
-                                !_.isEmpty(this.state.success) &&
-                                <Grid item xs className={classes.announcement}>
-                                    <Typography color="primary" align="center"
-                                        className={classes.announcementText}
-                                    >
-                                        Success: {this.state.success}
-                                    </Typography>
-                                </Grid>
-                            }
-                            <Grid item xs className={classes.center}>
-                                <Button className={classes.submit}
-                                    onClick={this.submit}
-                                >
-                                    Submit
-                                </Button>
-                            </Grid>
-                        </Grid>
-                        <Grid item xs className={classes.center}>
-                            <Button color="primary" onClick={() => {redirectToPage("/login", this.props)}}
-                                className={classes.link}
+                            <Grid 
+                                container spacing={2} direction="column"
+                                item xs className={classes.center}
                             >
-                                Log In
-                            </Button>
+                                <Grid item xs className={classes.center}>
+                                    <NormalTextField
+                                        name= 'Email'
+                                        changeData={this.changeEmail}
+                                        enterData={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <PasswordTextField 
+                                        name='Password'
+                                        changePassword={this.changePassword}
+                                        enterPassword={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                <Grid item xs className={classes.center}>
+                                    <PasswordTextField
+                                        name='Confirm Password'
+                                        changePassword={this.changeConfirmPassword}
+                                        enterPassword={this.handleKeyDown}
+                                    />
+                                </Grid>
+                                {
+                                    !_.isEmpty(this.state.error) &&
+                                    <Grid item xs className={classes.announcement}>
+                                        <Typography color="error" align="center"
+                                            className={classes.announcementText}
+                                        >
+                                            Error: {this.state.error}
+                                        </Typography>
+                                    </Grid>
+                                }
+                                {
+                                    !_.isEmpty(this.state.success) &&
+                                    <Grid item xs className={classes.announcement}>
+                                        <Typography color="primary" align="center"
+                                            className={classes.announcementText}
+                                        >
+                                            Success: {this.state.success}
+                                        </Typography>
+                                    </Grid>
+                                }
+                                <Grid item xs className={classes.center}>
+                                    <Button className={classes.submit}
+                                        onClick={this.submit}
+                                    >
+                                        Sign Up
+                                    </Button>
+                                    <Button 
+                                        color="primary"
+                                        onClick={() => {redirectToPage("/login", this.props)}}
+                                        className={classes.link}
+                                    >
+                                        Back to Login
+                                    </Button>
+                                </Grid>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
+                    </Paper>
+                </Container>
             </div>
         );
     }
