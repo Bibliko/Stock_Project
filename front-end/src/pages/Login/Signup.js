@@ -7,7 +7,6 @@ import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRed
 import { signupUser } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
-//import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -15,11 +14,6 @@ import { withStyles } from '@material-ui/core/styles';
 import NormalTextField from '../../components/TextField/normalTextField';
 import PasswordTextField from '../../components/TextField/passwordTextField';
 import { Container } from '@material-ui/core';
-import MenuItem from '@material-ui/core/MenuItem';
-//import Select from '@material-ui/core/Select';
-//import MobileStepper from '@material-ui/core/MobileStepper';
-//import FormControl from '@material-ui/core/FormControl';
-//import InputLabel from '@material-ui/core/InputLabel';
 
 const styles = theme => ({
     root: {
@@ -30,7 +24,7 @@ const styles = theme => ({
         alignItems: 'center',
         justifyContent: 'center',
         maxWidth: 'none',
-        minHeight: '660px'
+        minHeight: '570px'
     },
     paper: {
         height: '550px',
@@ -117,33 +111,38 @@ class Signup extends React.Component {
     password=""
     confirmPassword=""
 
+    setStateErrorPassword = () => {
+        if(!_.isEqual(this.password, this.confirmPassword)) {
+
+            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
+                this.setState({ error: this.errorTypes[0] });
+            }
+        }
+        else {
+            if(!_.isEmpty(this.state.error)) {
+                this.setState({ error: "" });
+            }
+        }
+    }
+
     changeEmail = (event) => {
         this.email = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(
+            _.isEqual(this.password, this.confirmPassword) &&
+            !_.isEmpty(this.state.error)
+        ) {
             this.setState({ error: "" });
         }
     }
 
     changePassword = (event) => {
         this.password = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
-            this.setState({ error: "" });
-        }
+        this.setStateErrorPassword();
     }
 
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
-
-        if(!_.isEqual(this.password, this.confirmPassword)) {
-
-            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
-                this.setState({ error: this.errorTypes[0] });
-            }
-
-        }
-        else {
-            this.setState({ error: "" });
-        }
+        this.setStateErrorPassword();
     }
 
     submit = () => {
