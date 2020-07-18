@@ -4,7 +4,6 @@ const {
 } = require('./DayTimeUtil');
 
 const { PrismaClient } = require('@prisma/client');
-const { update } = require('lodash');
 const prisma = new PrismaClient();
 
 const deleteExpiredVerification = () => {
@@ -23,30 +22,36 @@ const deleteExpiredVerification = () => {
     })
 }
 
-const updatePortfolioLastClosureForAllUsers = () => {
+const updateAllUsers = () => {
+    // update portfolioLastClosure and ranking for all users
+
     prisma.user.findMany({
         select: {
             email: true,
             totalPortfolio: true
+        },
+        orderBy: {
+            totalPortfolio: 'desc'
         }
     })
     .then(usersArray => {
         //console.log(usersArray);
 
-        const updateAllUsersPromise = usersArray.map(user => {
+        const updateAllUsersPromise = usersArray.map((user, index) => {
             return prisma.user.update({
                 where: {
                     email: user.email,
                 },
                 data: {
-                    totalPortfolioLastClosure: user.totalPortfolio
+                    totalPortfolioLastClosure: user.totalPortfolio,
+                    ranking: index + 1
                 },
             })
-        })
+        });
         return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
-        console.log('Update portfolio last closure for all users successfully');
+        console.log('Update all users successfully.');
     })
     .catch(err => {
         console.log(err);
@@ -56,7 +61,7 @@ const updatePortfolioLastClosureForAllUsers = () => {
 /**
  * objVariables: object passed in from back-end/index
  */
-const checkAndUpdatePortfolioLastClosure = (objVariables) => {
+const checkAndUpdateAllUsers = (objVariables) => {
     //console.log(objVariables);
 
     // check if market is closed and update the status of objVariables
@@ -68,23 +73,23 @@ const checkAndUpdatePortfolioLastClosure = (objVariables) => {
     // -> change it to true AND updatePortfolioLastClosure
     if(
         objVariables.isMarketClosed && 
-        !objVariables.isAlreadyUpdatePortfolioLastClosure
+        !objVariables.isAlreadyUpdateAllUsers
     ) {
-        objVariables.isAlreadyUpdatePortfolioLastClosure = true;
-        updatePortfolioLastClosureForAllUsers();
+        objVariables.isAlreadyUpdateAllUsers = true;
+        updateAllUsers();
     }
 
     // if market is opened but flag isAlreadyUpdate not switch to false yet -> change it to false
     if(
         !objVariables.isMarketClosed && 
-        objVariables.isAlreadyUpdatePortfolioLastClosure
+        objVariables.isAlreadyUpdateAllUsers
     ) {
-        objVariables.isAlreadyUpdatePortfolioLastClosure = false;
+        objVariables.isAlreadyUpdateAllUsers = false;
     }
 }
 
 module.exports = {
     deleteExpiredVerification,
-    updatePortfolioLastClosureForAllUsers,
-    checkAndUpdatePortfolioLastClosure
+    updateAllUsers,
+    checkAndUpdateAllUsers
 }

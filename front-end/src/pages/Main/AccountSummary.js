@@ -85,6 +85,7 @@ class AccountSummary extends React.Component {
         userTotalSharesValue: -1,
         userTotalPortfolioValue: -1,
         userDailyChange: -1,
+        overallRanking: 0
     }
 
     componentDidMount() {
@@ -93,7 +94,8 @@ class AccountSummary extends React.Component {
         const {
             cash,
             totalPortfolio,
-            totalPortfolioLastClosure
+            totalPortfolioLastClosure,
+            ranking
         } = this.props.userSession;
 
         const totalSharesValue = totalPortfolio - cash;
@@ -104,6 +106,7 @@ class AccountSummary extends React.Component {
             userTotalSharesValue: totalSharesValue,
             userTotalPortfolioValue: totalPortfolio,
             userDailyChange: dailyChange,
+            overallRanking: ranking
         });
 
         setupSocketToCheckStockQuotes(

@@ -39,7 +39,7 @@ const {
 
 const {
     deleteExpiredVerification,
-    checkAndUpdatePortfolioLastClosure
+    checkAndUpdateAllUsers
 } = require('./utils/UserUtil');
 
 const {
@@ -94,7 +94,7 @@ setupPassport(passport);
 
 // important timers and intervals
 var intervalForDeleteVerification;
-var intervalForUpdatePortfolioLastClosure;
+var intervalForUpdateAllUsers;
 var timerForSendCodeVerifyingPassword;
 
 intervalForDeleteVerification = setInterval(
@@ -108,11 +108,11 @@ intervalForDeleteVerification = setInterval(
  */
 var objVariables = {
     isMarketClosed: false,
-    isAlreadyUpdatePortfolioLastClosure: false,
+    isAlreadyUpdateAllUsers: false,
 };
 
-intervalForUpdatePortfolioLastClosure = setInterval(
-    checkAndUpdatePortfolioLastClosure.bind(this, objVariables),
+intervalForUpdateAllUsers = setInterval(
+    checkAndUpdateAllUsers.bind(this, objVariables),
     oneSecond
 );
 
