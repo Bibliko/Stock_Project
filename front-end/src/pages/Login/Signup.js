@@ -7,7 +7,7 @@ import { shouldRedirectToLandingPage, redirectToPage } from '../../utils/PageRed
 import { signupUser } from '../../utils/UserUtil';
 
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
+//import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -24,7 +24,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '100vh',//'-webkit-fill-available
+        height: '100vh',
         width: '100vw',
         display: 'flex',
         alignItems: 'center',
@@ -66,12 +66,12 @@ const styles = theme => ({
         fontWeight: 'bold'
     },
     avatar: {
-        height: '120px',
-        width: '120px',
-        margin: theme.spacing(1)
+        height: '130px',
+        width: '130px',
+        margin: theme.spacing(3)
     },
     submit: {
-        marginTop: '6px',
+        marginTop: '10px',
         padding: theme.spacing(1),
         height: '40px',
         width: '120px',
@@ -100,87 +100,12 @@ const styles = theme => ({
     announcementText: {
         fontSize: 'small'
     },
-    textField: {
-        height: 50,
-        width: 165,
-        margin: '8px',
-        fontWeight: 'normal',
-        "& label.Mui-focused": {
-            color: "black"
-        },
-        '& .MuiFilledInput-underline:after': {
-            borderBottom: '2px solid #000000',
-        },
-        '& .MuiFilledInput-root': {
-            '&.Mui-focused': {
-                backgroundColor: 'rgba(225,225,225,0.5)'
-            },
-        },
-    },
-    input: {
-        color:'black',
-        backgroundColor: 'rgba(225,225,225,0.65)', 
-        "&:hover": {
-            backgroundColor: 'rgba(225,225,225,0.5)', 
-        },
-        "& input": {
-            backgroundColor: 'rgba(225,225,225,0)'
-        }
-    },
 });
-
-/*const occupations = [
-    {
-      value: 'Student',
-      label: 'Student',
-    },
-    {
-      value: 'Teacher',
-      label: 'Teacher',
-    },
-    {
-      value: 'Others',
-      label: 'Others',
-    },
-];
-
-const regions = [
-    {
-        value: 'Africa',
-        label: 'Africa',
-    },
-    {
-        value: 'Asia',
-        label: 'Asia',
-    },
-    {
-        value: 'Eur',
-        label: 'Europe',
-    },
-    {
-        value: 'NAmerica',
-        label: 'North America',
-    },
-    {
-        value: 'CAmerica',
-        label: 'Central America',
-    },
-    {
-        value: 'Oceania',
-        label: 'Oceania',
-    },
-    {
-        value: 'Others',
-        label: 'Others',
-    },
-];*/
 
 class Signup extends React.Component {
     state = {
         error: "",
         success: "",
-        occupation: "",
-        region:"",
     }
 
     errorTypes = [
@@ -191,8 +116,6 @@ class Signup extends React.Component {
     email=""
     password=""
     confirmPassword=""
-    firstname=""
-    lastname=""
 
     changeEmail = (event) => {
         this.email = event.target.value;
@@ -223,20 +146,6 @@ class Signup extends React.Component {
         }
     }
 
-    changeFirstName = (event) => {
-        this.firstname = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
-            this.setState({ error: "" });
-        }
-    }
-
-    changeLastName = (event) => {
-        this.lastname = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
-            this.setState({ error: "" });
-        }
-    }
-
     submit = () => {
         if(
             _.isEmpty(this.email) ||
@@ -259,15 +168,6 @@ class Signup extends React.Component {
                 })
             }
         }
-    }
-
-    changeOccupation = (event) => {
-        console.log(event.target.value);
-        this.setState({ occupation: event.target.value });
-    }
-
-    changeRegion = (event) => {
-        this.setState({ region: event.target.value });
     }
 
     handleKeyDown = (event) => {
@@ -303,7 +203,7 @@ class Signup extends React.Component {
                         className={classes.paper}
                         elevation={2}
                     >
-                        <Grid container spacing={2} direction="column"
+                        <Grid container spacing={1} direction="column"
                             className={classes.center}
                         >
                             <Grid item xs className={classes.center}>
@@ -314,75 +214,9 @@ class Signup extends React.Component {
                                 />
                             </Grid>
                             <Grid 
-                                container spacing={1} direction="column"
+                                container spacing={2} direction="column"
                                 item xs className={classes.center}
                             >
-                                {/*<Grid item xs className={classes.center}>
-                                    <TextField
-                                        name= 'First Name'
-                                        id='fname'
-                                        label='First Name'
-                                        variant= 'filled'
-                                        fullWidth
-                                        className= {classes.textField}
-                                        InputProps={{
-                                            className: classes.input
-                                        }}
-                                        onChange={this.changeFirstName}
-                                        onKeyDown={this.handleKeyDown}
-                                    />
-                                    <TextField
-                                        name= 'Last Name'
-                                        id='lname'
-                                        label='Last Name'
-                                        variant= 'filled'
-                                        fullWidth
-                                        className= {classes.textField}
-                                        InputProps={{
-                                            className: classes.input
-                                        }}
-                                        onChange={this.changeLastName}
-                                        onKeyDown={this.handleKeyDown}
-                                    />
-                                </Grid>
-                                <Grid item xs className={classes.center}>
-                                    <TextField
-                                        select
-                                        id="Occupation"
-                                        label="OCC"
-                                        variant="filled"
-                                        SelectProps={{
-                                            className: classes.input,
-                                        }}
-                                        className={classes.textField}
-                                        value={this.state.occupation}
-                                        onChange={this.changeOccupation}
-                                    >
-                                        {occupations.map((option) => (
-                                            <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                    <TextField
-                                        select
-                                        id="Region"
-                                        label="Region"
-                                        variant="filled"
-                                        SelectProps={{
-                                            className: classes.input,
-                                        }}
-                                        className={classes.textField}
-                                        value={this.state.region}
-                                        onChange={this.changeRegion}
-                                    >
-                                        {regions.map((option) => (
-                                            <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </Grid>*/}
                                 <Grid item xs className={classes.center}>
                                     <NormalTextField
                                         name= 'Email'
