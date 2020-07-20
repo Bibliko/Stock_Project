@@ -151,8 +151,8 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
             withCredentials: true
         })
         .then(userDataRes => {
-            resolve("Successfully change data");
             mutateUser(userDataRes.data);
+            resolve("Successfully change data");
         })
         .catch(err => {
             reject(err);

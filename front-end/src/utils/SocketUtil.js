@@ -48,11 +48,11 @@ export const socketCheckStockQuotes = (socket, userSession, userSharesValue, mut
     .then(totalSharesValue => {
       //console.log(totalSharesValue);
 
-      const newTotalPortfolioValue = userSession.cash + totalSharesValue;
-      
       if(!_.isEqual(userSharesValue, totalSharesValue)) {
-        mutateUserSharesValue(totalSharesValue);  
+        mutateUserSharesValue(totalSharesValue);
       }
+
+      const newTotalPortfolioValue = userSession.cash + totalSharesValue;
 
       /** 
        * changeData so that when we reload page or go to other page, the data
@@ -63,7 +63,7 @@ export const socketCheckStockQuotes = (socket, userSession, userSharesValue, mut
       };
 
       if(!_.isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
-        return changeUserData(dataNeedChange, userSession.email, mutateUser);
+        changeUserData(dataNeedChange, userSession.email, mutateUser);
       }
       else {
         //console.log("No need to update user data.");

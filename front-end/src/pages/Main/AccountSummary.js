@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import _ from 'lodash';
 import { withRouter } from 'react-router';
 //import _ from 'lodash';
 //import fetch from 'node-fetch';
@@ -80,34 +79,14 @@ const styles = theme => ({
 class AccountSummary extends React.Component {
     state = {
         error: "",
-        userDailyChange: -1,
-    }
-
-    updateDailyChange = () => {
-        const {
-            totalPortfolio,
-            totalPortfolioLastClosure,
-        } = this.props.userSession;
-
-        const dailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
-
-        if(!_.isEqual(dailyChange, this.state.userDailyChange)) {
-            this.setState({
-                userDailyChange: dailyChange
-            });
-        }
     }
 
     componentDidMount() {
         console.log(this.props.userSession);
-
-        this.updateDailyChange();
     }
 
     componentDidUpdate() {
         updateUserDataForSocket(socket, this.props.userSession);
-    
-        this.updateDailyChange();
     }
 
     render() {
@@ -122,7 +101,7 @@ class AccountSummary extends React.Component {
 
         const userSharesValue = this.props.userSharesValue;
 
-        const { userDailyChange } = this.state;
+        const userDailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
 
         console.log(`${cash}, ${totalPortfolio}, ${totalPortfolioLastClosure}, ${ranking}, ${userSharesValue}, ${userDailyChange}`);
 
