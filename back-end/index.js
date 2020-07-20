@@ -34,16 +34,26 @@ const {
     oneMinute,
     oneDay,
     clearIntervals,
-    clearIntervalsIfIntervalsNotEmpty
+    clearIntervalsIfIntervalsNotEmpty,
 } = require('./utils/DayTimeUtil');
 
 const {
-    deleteExpiredVerification
+    deleteExpiredVerification,
+    checkAndUpdateAllUsers
 } = require('./utils/UserUtil');
 
 const {
-    checkStockQuotesForUser
+    checkStockQuotesForUser,
+    checkMarketClosed
 } = require('./utils/SocketUtil');
+
+const {
+    deletePrismaMarketHolidays,
+} = require('./utils/MarketHolidaysUtil');
+
+const {
+    updateMarketHolidaysFromFMP
+} = require('./utils/FinancialModelingPrepUtil');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -93,9 +103,44 @@ setupPassport(passport);
 
 // important timers and intervals
 var intervalForDeleteVerification;
+var intervalForUpdateAllUsers;
+var intervalForUpdateMarketHolidays;
+var intervalForDeleteMarketHolidays;
 var timerForSendCodeVerifyingPassword;
 
-intervalForDeleteVerification = setInterval(deleteExpiredVerification, oneDay);
+/**
+ * objVariables allow us to change variables inside the object by using 
+ * functions and passing in object as parameter
+ */
+var objVariables = {
+    isMarketClosed: false,
+    isAlreadyUpdateAllUsers: false,
+    isPrismaMarketHolidaysInitialized: false,
+};
+
+intervalForDeleteVerification = setInterval(
+    deleteExpiredVerification, 
+    oneDay
+);
+
+// This function to help initialize prisma market holidays at first run
+updateMarketHolidaysFromFMP(objVariables);
+
+intervalForUpdateMarketHolidays = setInterval(
+    updateMarketHolidaysFromFMP.bind(this, objVariables),
+    oneDay
+);
+
+intervalForDeleteMarketHolidays = setInterval(
+    deletePrismaMarketHolidays,
+    oneDay
+);
+
+intervalForUpdateAllUsers = setInterval(
+    checkAndUpdateAllUsers.bind(this, objVariables),
+    oneSecond
+);
+
 
 // All app routes are written below this comment:
 
@@ -268,10 +313,12 @@ app.use('/verification/:tokenId', (req, res) => {
 
 // other APIs
 app.use('/userData', require('./routes/user'));
+app.use('/marketHolidaysData', require('./routes/marketHolidays'));
 
 
 // set up socket.io server
 var intervalCheckStockQuotesForUser;
+var intervalCheckMarketClosed;
 var userData;
 
 io.on("connection", (socket) => {
@@ -283,20 +330,31 @@ io.on("connection", (socket) => {
     })
 
     clearIntervalsIfIntervalsNotEmpty([
-        intervalCheckStockQuotesForUser
+        intervalCheckStockQuotesForUser,
+        intervalCheckMarketClosed
     ]);
 
-    // For now, every 10 sec, check all prices of stock for user and update.
-    intervalCheckStockQuotesForUser = setInterval(() => 
-        checkStockQuotesForUser(socket, userData), 
-        10 * oneSecond
+    /** 
+     * For now, every 10 sec, check all prices of stock for user and update.
+     * If market closed, checkStockQuotesForUser return null
+     */
+    intervalCheckStockQuotesForUser = setInterval(
+        () => checkStockQuotesForUser(socket, userData), 
+        5 * oneSecond
+        //20 * oneSecond // For Testing
+    );
+
+    intervalCheckMarketClosed = setInterval(
+        () => checkMarketClosed(socket, objVariables),
+        oneSecond
     );
 
     // disconnect
     socket.on("disconnect", () => {
         console.log("Client disconnected");
         clearIntervals([
-            intervalCheckStockQuotesForUser
+            intervalCheckStockQuotesForUser,
+            intervalCheckMarketClosed
         ]);
     });
 });

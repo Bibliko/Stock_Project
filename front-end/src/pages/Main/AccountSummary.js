@@ -12,7 +12,6 @@ import {
 
 import { 
     updateUserDataForSocket,
-    setupSocketToCheckStockQuotes 
 } from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -26,6 +25,7 @@ const styles = theme => ({
         position: 'absolute',
         height: '100%',
         width: '75%',
+        marginTop: '44px',
         [theme.breakpoints.down('xs')]: {
             width: '85%',
         },
@@ -79,34 +79,31 @@ const styles = theme => ({
 class AccountSummary extends React.Component {
     state = {
         error: "",
-        userTotalSharesValue: -1,
-        userTotalPortfolioValue: -1,
     }
 
     componentDidMount() {
         console.log(this.props.userSession);
-
-        this.setState({
-            userTotalPortfolioValue: this.props.userSession.totalPortfolio
-        });
-
-        setupSocketToCheckStockQuotes(
-            socket,
-            this.props.userSession,
-            this.setState.bind(this),
-            this.props.mutateUser
-        );
     }
 
     componentDidUpdate() {
         updateUserDataForSocket(socket, this.props.userSession);
-        
-        // console.log(this.state.userTotalSharesValue);
-        // console.log(this.state.userTotalPortfolioValue);
     }
 
     render() {
         const { classes } = this.props;
+
+        const {
+            cash,
+            totalPortfolio,
+            totalPortfolioLastClosure,
+            ranking
+        } = this.props.userSession;
+
+        const userSharesValue = this.props.userSharesValue;
+
+        const userDailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
+
+        console.log(`${cash}, ${totalPortfolio}, ${totalPortfolioLastClosure}, ${ranking}, ${userSharesValue}, ${userDailyChange}`);
 
         return (
             <Container className={classes.root} disableGutters>
@@ -115,7 +112,7 @@ class AccountSummary extends React.Component {
                 >
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle, classes.marketWatch)}>
-                            {this.state.userTotalPortfolioValue}
+                            {totalPortfolio}
                         </Typography>
                         <Paper className={classes.fullHeightWidth}/>
                     </Grid>
@@ -127,6 +124,7 @@ class AccountSummary extends React.Component {
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,
+    userSharesValue: state.userSharesValue,
 });
 
 const mapDispatchToProps = (dispatch) => ({

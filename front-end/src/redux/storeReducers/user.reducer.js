@@ -1,5 +1,5 @@
 const userReducer = (action, state) => {
-    const { method, whichPropsToChange } = action;
+    const { method, whichPropsToChangeOrWhatDataForChanging } = action;
 
     if(method==="default") {
         //console.log('Changed');
@@ -8,7 +8,7 @@ const userReducer = (action, state) => {
             ...state, 
             userSession: {
                 ...state.userSession,
-                ...whichPropsToChange
+                ...whichPropsToChangeOrWhatDataForChanging
             }
         };
     }
@@ -17,6 +17,13 @@ const userReducer = (action, state) => {
         return {
             ...state,
             userSession: {}
+        }
+    }
+
+    if(method==="updateUserSharesValue") {
+        return {
+            ...state,
+            userSharesValue: whichPropsToChangeOrWhatDataForChanging
         }
     }
 };

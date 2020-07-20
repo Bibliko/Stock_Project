@@ -22,6 +22,7 @@ const styles = theme => ({
         position: 'absolute',
         height: '100%',
         width: '75%',
+        marginTop: '44px',
         [theme.breakpoints.down('xs')]: {
             width: '85%',
         },

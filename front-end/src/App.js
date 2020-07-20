@@ -60,7 +60,9 @@ class App extends React.Component {
     axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
     .then(user => {
       this.reduxStoreInitialState = {
-        userSession: user.data
+        userSession: user.data,
+        userSharesValue: -1,
+        isMarketClosed: false,
       };
 
       this.setState({
