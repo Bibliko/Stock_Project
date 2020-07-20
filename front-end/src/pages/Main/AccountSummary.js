@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import _ from 'lodash';
 import { withRouter } from 'react-router';
 //import _ from 'lodash';
 //import fetch from 'node-fetch';
@@ -12,9 +13,6 @@ import {
 
 import { 
     updateUserDataForSocket,
-    setupSocketToCheckStockQuotes,
-    offSocketListener,
-    checkStockQuotesForUser
 } from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -82,14 +80,38 @@ const styles = theme => ({
 class AccountSummary extends React.Component {
     state = {
         error: "",
-        userTotalSharesValue: -1,
-        userTotalPortfolioValue: -1,
         userDailyChange: -1,
-        overallRanking: 0
+    }
+
+    updateDailyChange = () => {
+        const {
+            totalPortfolio,
+            totalPortfolioLastClosure,
+        } = this.props.userSession;
+
+        const dailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
+
+        if(!_.isEqual(dailyChange, this.state.userDailyChange)) {
+            this.setState({
+                userDailyChange: dailyChange
+            });
+        }
     }
 
     componentDidMount() {
         console.log(this.props.userSession);
+
+        this.updateDailyChange();
+    }
+
+    componentDidUpdate() {
+        updateUserDataForSocket(socket, this.props.userSession);
+    
+        this.updateDailyChange();
+    }
+
+    render() {
+        const { classes } = this.props;
 
         const {
             cash,
@@ -98,43 +120,11 @@ class AccountSummary extends React.Component {
             ranking
         } = this.props.userSession;
 
-        const totalSharesValue = totalPortfolio - cash;
+        const userSharesValue = this.props.userSharesValue;
 
-        const dailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
+        const { userDailyChange } = this.state;
 
-        this.setState({
-            userTotalSharesValue: totalSharesValue,
-            userTotalPortfolioValue: totalPortfolio,
-            userDailyChange: dailyChange,
-            overallRanking: ranking
-        });
-
-        setupSocketToCheckStockQuotes(
-            socket,
-            this.props.userSession,
-            this.setState.bind(this),
-            this.props.mutateUser
-        );
-    }
-
-    componentDidUpdate() {
-        updateUserDataForSocket(socket, this.props.userSession);
-    
-        //console.log(this.state);
-
-        //console.log(this.props.isMarketClosed);
-
-        if(this.props.isMarketClosed) {
-            offSocketListener(socket, checkStockQuotesForUser);
-        }
-    }
-
-    componentWillUnmount() {
-        offSocketListener(socket, checkStockQuotesForUser);
-    }
-
-    render() {
-        const { classes } = this.props;
+        console.log(`${cash}, ${totalPortfolio}, ${totalPortfolioLastClosure}, ${ranking}, ${userSharesValue}, ${userDailyChange}`);
 
         return (
             <Container className={classes.root} disableGutters>
@@ -143,7 +133,7 @@ class AccountSummary extends React.Component {
                 >
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle, classes.marketWatch)}>
-                            {this.state.userTotalPortfolioValue}
+                            {totalPortfolio}
                         </Typography>
                         <Paper className={classes.fullHeightWidth}/>
                     </Grid>
@@ -155,7 +145,7 @@ class AccountSummary extends React.Component {
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,
-    isMarketClosed: state.isMarketClosed
+    userSharesValue: state.userSharesValue,
 });
 
 const mapDispatchToProps = (dispatch) => ({

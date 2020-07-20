@@ -19,6 +19,13 @@ const userReducer = (action, state) => {
             userSession: {}
         }
     }
+
+    if(method==="updateUserSharesValue") {
+        return {
+            ...state,
+            userSharesValue: whichPropsToChange
+        }
+    }
 };
 
 export default userReducer;

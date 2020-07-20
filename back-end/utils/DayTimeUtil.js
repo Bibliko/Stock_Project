@@ -1,3 +1,7 @@
+const _ = require('lodash');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const oneSecond = 1000; // 1000 ms = 1 second
 const oneMinute = 60 * oneSecond;
 const oneHour = 60 * oneMinute;
@@ -28,6 +32,49 @@ const clearIntervalsIfIntervalsNotEmpty = (intervals) => {
  * new Date() -> toUTCString() -> String: Thu, 16 Jul 2020 00:10:14 GMT
  */
 
+const getDateUTCString = (UTCString) => {
+    var dateString = UTCString.substring(5, 7);
+    return parseInt(dateString, 10);
+}
+
+const getMonthUTCString = (UTCString) => {
+    var monthString = UTCString.substring(8, 11);
+    switch(monthString) {
+        case 'Jan':
+            return 1;
+        case 'Feb':
+            return 2;
+        case 'Mar':
+            return 3;
+        case 'Apr':
+            return 4;
+        case 'May':
+            return 5;
+        case 'Jun':
+            return 6;
+        case 'Jul':
+            return 7;
+        case 'Aug':
+            return 8;
+        case 'Sep':
+            return 9;
+        case 'Oct':
+            return 10;
+        case 'Nov':
+            return 11;
+        case 'Dec':
+            return 12;
+
+        default:
+            return 0;
+    }
+}
+
+const getYearUTCString = (UTCString) => {
+    var yearString = UTCString.substring(12, 16);
+    return parseInt(yearString, 10);
+}
+
 const getHoursUTCString = (UTCString) => {
     var hoursString = UTCString.substring(17, 19);
     return parseInt(hoursString, 10);
@@ -49,13 +96,50 @@ const newDate = () => {
 }
 
 /**
- * return true if market closed
- * else return false if market opened
+ *  {
+ *      "year":2019,
+ *      "New Years Day":"2019-01-01", -> New York Timezone Date
+ *      "Martin Luther King, Jr. Day":"2019-01-21",
+ *      "Washington's Birthday":"2019-02-18",
+ *      "Good Friday":"2019-04-19",
+ *      "Memorial Day":"2019-05-27",
+ *      "Independence Day":"2019-07-04",
+ *      "Labor Day":"2019-09-02",
+ *      "Thanksgiving Day":"2019-11-28",
+ *      "Christmas":"2019-12-25"
+ *  }, 
+ * 
+ *  We still compare UTC with New York Timezone directly since 
+ *  it's only UTC -4, not a big deal in dates.
  */
-const isMarketClosedCheck = () => {
+const findIfTimeNowIsHoliday = (marketHolidayObj) => {
     var timeNow = newDate();
-    //console.log(timeNow);
-  
+
+    var UTCDate = getDateUTCString(timeNow);
+    var UTCMonth = getMonthUTCString(timeNow);
+
+    var checkResult = false;
+
+    Object.entries(marketHolidayObj).forEach(( [key, value] ) => {
+        if(_.isEqual(key, 'id') || _.isEqual(key, 'year')) {
+            return;
+        }
+        
+        const date = parseInt(value.substring(8, 10), 10);
+        const month = parseInt(value.substring(5, 7), 10);
+
+        if(
+            _.isEqual(UTCDate, date) &&
+            _.isEqual(UTCMonth, month)
+        ) {
+            checkResult = true;
+        }
+    });
+
+    return checkResult;
+}
+
+const findIfTimeNowIsOutOfRange = (timeNow) => {
     var UTCHours = getHoursUTCString(timeNow);
     var UTCMinutes = getMinutesUTCString(timeNow); 
     //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
@@ -72,6 +156,38 @@ const isMarketClosedCheck = () => {
     return false;
 }
 
+/**
+ * return true if market closed
+ * else return false if market opened
+ */
+const isMarketClosedCheck = () => {
+    var timeNow = newDate();
+    //console.log(timeNow);
+
+    var UTCYear = getYearUTCString(timeNow);
+
+    return new Promise((resolve, reject) => {
+        prisma.marketHolidays.findOne({
+            where: {
+                year: UTCYear
+            }
+        })
+        .then(marketHoliday => {
+            //console.log(findIfTimeNowIsHoliday(marketHoliday));
+
+            if(findIfTimeNowIsHoliday(marketHoliday) || findIfTimeNowIsOutOfRange(timeNow) ) {
+                resolve(true);
+            }
+            else {
+                resolve(false);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    });
+}
+
 module.exports = {
     oneSecond, 
     oneMinute,
@@ -79,9 +195,14 @@ module.exports = {
     oneDay,
     clearIntervals,
     clearIntervalsIfIntervalsNotEmpty,
+    getDateUTCString,
+    getMonthUTCString,
+    getYearUTCString,
     getHoursUTCString,
     getMinutesUTCString,
     getSecondsUTCString,
     newDate,
+    findIfTimeNowIsHoliday,
+    findIfTimeNowIsOutOfRange,
     isMarketClosedCheck
 }

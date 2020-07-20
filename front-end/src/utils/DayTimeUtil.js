@@ -14,6 +14,49 @@ export const oneDay = 24 * oneHour;
  * new Date() -> toUTCString() -> String: Thu, 16 Jul 2020 00:10:14 GMT
  */
 
+export const getDateUTCString = (UTCString) => {
+    var dateString = UTCString.substring(5, 7);
+    return parseInt(dateString, 10);
+}
+
+export const getMonthUTCString = (UTCString) => {
+    var monthString = UTCString.substring(8, 11);
+    switch(monthString) {
+        case 'Jan':
+            return 1;
+        case 'Feb':
+            return 2;
+        case 'Mar':
+            return 3;
+        case 'Apr':
+            return 4;
+        case 'May':
+            return 5;
+        case 'Jun':
+            return 6;
+        case 'Jul':
+            return 7;
+        case 'Aug':
+            return 8;
+        case 'Sep':
+            return 9;
+        case 'Oct':
+            return 10;
+        case 'Nov':
+            return 11;
+        case 'Dec':
+            return 12;
+
+        default:
+            return 0;
+    }
+}
+
+export const getYearUTCString = (UTCString) => {
+    var yearString = UTCString.substring(12, 16);
+    return parseInt(yearString, 10);
+}
+
 export const getHoursUTCString = (UTCString) => {
     var hoursString = UTCString.substring(17, 19);
     return parseInt(hoursString, 10);
@@ -44,16 +87,16 @@ export const marketCountdownUpdate = (setStateFn) => {
     //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
 
     // (UTC -4) to (UTC 0) 1:30 p.m. to 8 p.m. -> 13:30 to 20:00
-    if(
-        UTCHours < 13 || 
-        (UTCHours === 13 && UTCMinutes < 30) ||
-        (UTCHours >= 20 && UTCMinutes >= 0)
-    ) {
-        setStateFn({
-            countdown: '00:00:00'
-        });
-        return;
-    }
+    // if(
+    //     UTCHours < 13 || 
+    //     (UTCHours === 13 && UTCMinutes < 30) ||
+    //     (UTCHours >= 20 && UTCMinutes >= 0)
+    // ) {
+    //     setStateFn({
+    //         countdown: '00:00:00'
+    //     });
+    //     return;
+    // }
     
     var hours = 20 - 1 - UTCHours;
     var min = 60 - UTCMinutes;
@@ -73,29 +116,11 @@ export const marketCountdownUpdate = (setStateFn) => {
 
     var countdown = hours+':'+min+':'+sec;
 
+    //console.log(countdown);
+
     setStateFn({
         countdown
     });
-}
-
-export const isMarketClosedCheck = () => {
-    var timeNow = newDate();
-    //console.log(timeNow);
-  
-    var UTCHours = getHoursUTCString(timeNow);
-    var UTCMinutes = getMinutesUTCString(timeNow);
-    //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
-
-    // (UTC -4) to (UTC 0) 1:30 p.m. to 8 p.m. -> 13:30 to 20:00
-    if(
-        UTCHours < 13 || 
-        (UTCHours === 13 && UTCMinutes < 30) ||
-        (UTCHours >= 20 && UTCMinutes >= 0)
-    ) {
-        return true;
-    }
-
-    return false;
 }
 
 export default {
@@ -103,10 +128,12 @@ export default {
     oneMinute,
     oneHour,
     oneDay,
+    getDateUTCString,
+    getMonthUTCString,
+    getYearUTCString,
     getHoursUTCString,
     getMinutesUTCString,
     getSecondsUTCString,
     newDate,
     marketCountdownUpdate,
-    isMarketClosedCheck
 }

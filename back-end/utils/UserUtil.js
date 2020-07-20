@@ -64,28 +64,40 @@ const updateAllUsers = () => {
 const checkAndUpdateAllUsers = (objVariables) => {
     //console.log(objVariables);
 
-    // check if market is closed and update the status of objVariables
-    if(!_.isEqual(isMarketClosedCheck(), objVariables.isMarketClosed)) {
-        objVariables.isMarketClosed = isMarketClosedCheck();
+    if(!objVariables.isPrismaMarketHolidaysInitialized) {
+        console.log("UserUtil, 68");
+        return;
     }
 
-    // if market is closed but flag isAlreadyUpdate is still false 
-    // -> change it to true AND updatePortfolioLastClosure
-    if(
-        objVariables.isMarketClosed && 
-        !objVariables.isAlreadyUpdateAllUsers
-    ) {
-        objVariables.isAlreadyUpdateAllUsers = true;
-        updateAllUsers();
-    }
+    isMarketClosedCheck()
+    .then(checkResult => {
+        // check if market is closed and update the status of objVariables
+        if(!_.isEqual(checkResult, objVariables.isMarketClosed)) {
+            console.log(checkResult, 'UserUtil, 76');
+            objVariables.isMarketClosed = checkResult;
+        }
 
-    // if market is opened but flag isAlreadyUpdate not switch to false yet -> change it to false
-    if(
-        !objVariables.isMarketClosed && 
-        objVariables.isAlreadyUpdateAllUsers
-    ) {
-        objVariables.isAlreadyUpdateAllUsers = false;
-    }
+        // if market is closed but flag isAlreadyUpdate is still false 
+        // -> change it to true AND updatePortfolioLastClosure
+        if(
+            objVariables.isMarketClosed && 
+            !objVariables.isAlreadyUpdateAllUsers
+        ) {
+            objVariables.isAlreadyUpdateAllUsers = true;
+            updateAllUsers();
+        }
+
+        // if market is opened but flag isAlreadyUpdate not switch to false yet -> change it to false
+        if(
+            !objVariables.isMarketClosed && 
+            objVariables.isAlreadyUpdateAllUsers
+        ) {
+            objVariables.isAlreadyUpdateAllUsers = false;
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    })
 }
 
 module.exports = {

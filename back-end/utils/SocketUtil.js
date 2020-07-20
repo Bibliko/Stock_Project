@@ -10,49 +10,82 @@ const {
 
 const checkStockQuotesForUserString = "checkStockQuotesForUser";
 
+const checkMarketClosedString = "checkMarketClosed";
+
 const checkStockQuotesForUser = (socket, userData) => {
-    if(isMarketClosedCheck()) {
-        return null;
-    }
+    isMarketClosedCheck()
+    .then(checkResult => {
+        if(checkResult) {
+            //console.log('market is closed SocketUtil 17');
+            socket.emit(checkStockQuotesForUserString, []);
+            return null;
+        }
 
-    //console.log(userData, 'userData');
-    if(!_.isEmpty(userData)) {
-        prisma.user.findOne({
-            where: {
-                email: userData.email
-            },
-            select: {
-                shares: true
-            }
-        })
-        .then(userWithShares => {
-            const { shares } = userWithShares;
+        //console.log(userData, 'userData');
 
-            if(_.isEmpty(shares)) {
-                socket.emit(checkStockQuotesForUserString, []);
-                return null;
-            }
-            else {
-                /** 
-                 * Uncomment below line if in Production:
-                 * - We are using Financial Modeling Prep free API key
-                 * -> The amount of requests is limited. Use wisely when testing!
-                 */
-                //return getStockQuotesFromFMP(shares);
-            }
-        })
-        .then(stockQuotesJSON => {
-            if(stockQuotesJSON) {
-                //console.log(stockQuotesJSON);
-                socket.emit(checkStockQuotesForUserString, stockQuotesJSON);
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        })
-    }
+        if(!_.isEmpty(userData)) {
+            return prisma.user.findOne({
+                where: {
+                    email: userData.email
+                },
+                select: {
+                    shares: true
+                }
+            })
+        }
+    })
+    .then(userWithShares => {
+        if( !userWithShares ) {
+            return null;
+        }
+
+        const { shares } = userWithShares;
+
+        if(_.isEmpty(shares)) {
+            socket.emit(checkStockQuotesForUserString, []);
+            return null;
+        }
+        else {
+            /** 
+             * Uncomment below line if in Production:
+             * - We are using Financial Modeling Prep free API key
+             * -> The amount of requests is limited. Use wisely when testing!
+             */
+            //return getStockQuotesFromFMP(shares);
+        }
+    })
+    .then(stockQuotesJSON => {
+        if(stockQuotesJSON) {
+            //console.log(stockQuotesJSON);
+            socket.emit(checkStockQuotesForUserString, stockQuotesJSON);
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    })
 };
 
+const checkMarketClosed = (socket, objVariables) => {
+
+    if(!objVariables.isPrismaMarketHolidaysInitialized) {
+        console.log("SocketUtil, 70");
+        return;
+    }
+
+    isMarketClosedCheck()
+    .then(checkResult => {
+        //console.log(checkResult);
+
+        socket.emit(checkMarketClosedString, checkResult);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+}
+
 module.exports = {
+    checkStockQuotesForUserString,
+    checkMarketClosedString,
     checkStockQuotesForUser,
+    checkMarketClosed
 }

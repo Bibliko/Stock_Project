@@ -1,19 +1,32 @@
 import React from 'react';
 import { withRouter } from 'react-router';
 import _ from 'lodash';
-//import moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import {
-  userAction,
-  marketAction
+  userAction, 
+  marketAction,
 } from '../../redux/storeActions/actions';
 
-import { shouldRedirectToLogin, redirectToPage } from '../../utils/PageRedirectUtil';
+import { socket } from '../../App';
+
+import { 
+  shouldRedirectToLogin, 
+  redirectToPage 
+} from '../../utils/PageRedirectUtil';
+
 import { 
   marketCountdownUpdate, 
-  isMarketClosedCheck,
-  oneSecond 
+  oneSecond
 } from '../../utils/DayTimeUtil';
+
+import {
+  checkMarketClosed,
+  checkStockQuotesForUser,
+  socketCheckMarketClosed, 
+  socketCheckStockQuotes,
+  offSocketListeners
+} from '../../utils/SocketUtil';
+
 
 import AppBar from './AppBar';
 
@@ -85,20 +98,32 @@ const styles = theme => ({
 
 class Layout extends React.Component {
   state={
-    countdown: ''
+    countdown: '',
   }
 
   marketCountdownInterval;
 
-  marketCountdownAndCheck = () => {
-    marketCountdownUpdate(this.setState.bind(this));
-
-    if(isMarketClosedCheck() && !this.props.isMarketClosed) {
-      this.props.mutateMarket("closeMarket");
+  marketCountdownChooseComponent = (classes) => {
+    if(this.props.isMarketClosed) {
+      return (
+        <Typography className={classes.countdownText}>
+          Market Closed
+        </Typography>
+      );
     }
-
-    if(!isMarketClosedCheck() && this.props.isMarketClosed) {
-      this.props.mutateMarket("openMarket");
+    else {
+      if(_.isEmpty(this.state.countdown)) {
+        return ( 
+          <CircularProgress/>
+        );
+      }
+      else {
+        return (
+          <Typography className={classes.countdownText}>
+            Until Market Close {this.state.countdown}
+          </Typography>
+        );
+      }
     }
   }
 
@@ -109,18 +134,41 @@ class Layout extends React.Component {
       redirectToPage('/login', this.props);
     }
 
-    this.marketCountdownInterval = setInterval(() => {
-      marketCountdownUpdate(this.setState.bind(this));  
-    }, oneSecond);
+    this.marketCountdownInterval = setInterval( 
+      () => marketCountdownUpdate(this.setState.bind(this)),
+      oneSecond
+    );
+
+    socketCheckStockQuotes(
+      socket,
+      this.props.userSession,
+      this.props.userSharesValue,
+      this.props.mutateUser,
+      this.props.mutateUserSharesValue
+    );
+
+    socketCheckMarketClosed(
+      socket,
+      this.props.isMarketClosed,
+      this.props.mutateMarket
+    );
   }
 
   componentDidUpdate() {
     if(shouldRedirectToLogin(this.props)) {
       redirectToPage('/login', this.props);
     }
+
+    if(!_.isEmpty(this.state.countdown) && this.props.isMarketClosed) {
+      this.setState({
+        countdown: ''
+      });
+    }
   }
 
   componentWillUnmount() {
+    offSocketListeners(socket, checkMarketClosed);
+    offSocketListeners(socket, checkStockQuotesForUser);
     clearInterval(this.marketCountdownInterval);
   }
 
@@ -142,20 +190,7 @@ class Layout extends React.Component {
             <div className={classes.secondBackground}/>
             <div className={classes.countdown}>
               {
-                _.isEmpty(this.state.countdown) &&
-                <CircularProgress />
-              }
-              {
-                _.isEqual(this.state.countdown, '00:00:00') &&
-                <Typography className={classes.countdownText}>
-                  Market Closed
-                </Typography>
-              }
-              {
-                !_.isEmpty(this.state.countdown) && !_.isEqual(this.state.countdown, '00:00:00') &&
-                <Typography className={classes.countdownText}>
-                  Until Market Close {this.state.countdown}
-                </Typography>
+                this.marketCountdownChooseComponent(classes)
               }
             </div>
             {this.props.children}
@@ -168,7 +203,8 @@ class Layout extends React.Component {
 
 const mapStateToProps = (state) => ({
   userSession: state.userSession,
-  isMarketClosed: state.isMarketClosed
+  userSharesValue: state.userSharesValue,
+  isMarketClosed: state.isMarketClosed,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -176,8 +212,12 @@ const mapDispatchToProps = (dispatch) => ({
     'default',
     userProps
   )),
-  mutateMarket: (openMarket_closeMarket) => dispatch(marketAction(
-    openMarket_closeMarket
+  mutateUserSharesValue: (userSharesValue) => dispatch(userAction(
+    'updateUserSharesValue',
+    userSharesValue
+  )),
+  mutateMarket: (method) => dispatch(marketAction(
+    method
   ))
 });
 

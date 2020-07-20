@@ -19,6 +19,8 @@ export const setupUserInformation = "setupUserInformation";
  */
 export const checkStockQuotesForUser = "checkStockQuotesForUser";
 
+export const checkMarketClosed = "checkMarketClosed";
+
 export const updateUserDataForSocket = (socket, userSession) => {
   if(userSession) {
     socket.emit(setupUserInformation, userSession);
@@ -38,7 +40,7 @@ export const updateUserDataForSocket = (socket, userSession) => {
  * Set up Socket Check Stock Quotes for user
  * Use in front-end/src/pages/Main/AccountSummary
  */
-export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, mutateUser) => {
+export const socketCheckStockQuotes = (socket, userSession, userSharesValue, mutateUser, mutateUserSharesValue) => {
 
   // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
   socket.on(checkStockQuotesForUser, (stockQuotesJSON) => {
@@ -48,12 +50,9 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, m
 
       const newTotalPortfolioValue = userSession.cash + totalSharesValue;
       
-      // setState so that these variables can be used locally immediately.
-      setStateFn({
-        userTotalSharesValue: totalSharesValue,
-        userTotalPortfolioValue: newTotalPortfolioValue,
-        userDailyChange: (newTotalPortfolioValue-userSession.totalPortfolioLastClosure) / userSession.totalPortfolioLastClosure
-      });
+      if(!_.isEqual(userSharesValue, totalSharesValue)) {
+        mutateUserSharesValue(totalSharesValue);  
+      }
 
       /** 
        * changeData so that when we reload page or go to other page, the data
@@ -67,11 +66,8 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, m
         return changeUserData(dataNeedChange, userSession.email, mutateUser);
       }
       else {
-        return "No need to update user data.";
+        //console.log("No need to update user data.");
       }
-    })
-    .then(log => {
-      //console.log(log);
     })
     .catch(err => {
       console.log(err);
@@ -80,16 +76,40 @@ export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, m
 }
 
 /**
- * options are listed at the beginning of front-end/src/utils/SocketUtil
+ * classState is state of the class using this socket connection.
+ * state must include variable isMarketClosed (boolean)
  */
-export const offSocketListener = (socket, option) => {
+export const socketCheckMarketClosed = (socket, isMarketClosedInReduxStore, mutateMarket) => {
+  socket.on(checkMarketClosed, (ifClosed) => {
+    //console.log(ifClosed);
+
+    if(!_.isEqual(ifClosed, isMarketClosedInReduxStore)) {
+
+      if(ifClosed) {
+        mutateMarket('closeMarket');
+      }
+
+      else {
+        mutateMarket('openMarket');
+      }
+    }
+  })  
+}
+
+/**
+ * options are listed at the beginning of front-end/src/utils/SocketUtil
+ * Off All Listeners 
+ */
+export const offSocketListeners = (socket, option) => {
   socket.off(option);
 }
 
 export default {
   setupUserInformation,
   checkStockQuotesForUser,
+  checkMarketClosed,
   updateUserDataForSocket,
-  setupSocketToCheckStockQuotes,
-  offSocketListener
+  socketCheckStockQuotes,
+  socketCheckMarketClosed,
+  offSocketListeners
 }

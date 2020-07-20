@@ -19,7 +19,7 @@ const initializeStoreState = (initialState) => {
         switch(action.type) {
             case actionTypes.USER:
                 return userReducer(action, state);
-    
+
             case actionTypes.MARKET:
                 return marketReducer(action, state);
 

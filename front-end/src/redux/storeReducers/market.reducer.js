@@ -1,19 +1,19 @@
 const marketReducer = (action, state) => {
     const { method } = action;
 
-    if(method==="closeMarket") {
+    if(method==="openMarket") {
         //console.log('Changed');
         
         return { 
             ...state, 
-            isMarketClosed: true
+            isMarketClosed: false
         };
     }
 
-    if(method==="openMarket") {
+    if(method==="closeMarket") {
         return {
             ...state,
-            isMarketClosed: false
+            isMarketClosed: true
         }
     }
 };

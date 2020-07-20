@@ -58,6 +58,20 @@ model UserTransaction {
   userID          String
 }
 
+model MarketHolidays {
+  id                      String    @default(cuid())  @id
+  year                    Int?      @unique
+  newYearsDay             String?
+  martinLutherKingJrDay   String?
+  washingtonBirthday      String?
+  goodFriday              String?
+  memorialDay             String?
+  independenceDay         String?
+  laborDay                String?
+  thanksgivingDay         String?
+  christmas               String?
+}
+
 model UserVerification {
   id        String    @default(cuid()) @id
   email     String?
