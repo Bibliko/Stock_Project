@@ -1,31 +1,33 @@
 import React from 'react';
 import clsx from 'clsx';
+import _ from 'lodash';
 import { withRouter } from 'react-router';
 //import _ from 'lodash';
 //import fetch from 'node-fetch';
 
 import { connect } from 'react-redux';
-import { socket } from '../../App';
 import {
     userAction,
 } from '../../redux/storeActions/actions';
 
-import { 
-    updateUserDataForSocket,
-} from '../../utils/SocketUtil';
+import {
+    getUserData
+} from '../../utils/UserUtil';
+
+import HoldingsTableContainer from '../../components/Table/AccountSummaryTable/HoldingsTableContainer';
+import SummaryTableContainer from '../../components/Table/AccountSummaryTable/SummaryTableContainer';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import { Typography } from '@material-ui/core';
 
 const styles = theme => ({
     root: { 
         position: 'absolute',
-        height: '100%',
+        height: '75%',
         width: '75%',
-        marginTop: '44px',
+        marginTop: '100px',
         [theme.breakpoints.down('xs')]: {
             width: '85%',
         },
@@ -44,7 +46,11 @@ const styles = theme => ({
     },
     fullHeightWidth: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        padding: '24px',
+        [theme.breakpoints.down('xs')]: {
+            padding: 0,
+        },
     },
     itemGrid: {
         display: 'flex',
@@ -52,41 +58,103 @@ const styles = theme => ({
         alignItems: 'flex-start',
         flexDirection: 'column',
         minHeight: '125px',
-        //maxHeight: '300px'
+    },
+    noteGrid: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        padding: 0,
+        paddingLeft: '24px',
+        paddingRight: '24px'
     },
     gridTitle: {
-        fontSize: '25px',
-        [theme.breakpoints.down('md')]: {
-            fontSize: '15px'
+        fontSize: 'x-large',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'large'
         },
         fontWeight: 'bold',
-        marginBottom: '5px'
+        marginBottom: '10px'
     },
-    marketWatch: {
-        color: '#FF3747'
+    summary: {
+        color: '#DC3D4A'
     },
-    stocksOnTheMove: {
-        color: '#74E0EF'
-    },
-    accountSummary: {
-        color: '#F2C94C'
-    },
-    rankings: {
+    holdings: {
         color: '#9ED2EF'
+    },
+    portfolioChart: {
+        color: '#2F80ED'
+    },
+    holdingsText: {
+        color: 'white',
+        fontSize: 'large',
+        [theme.breakpoints.down('xs')]: {
+          fontSize: 'medium'
+        },
+    },
+    smallNote: {
+        color: 'white'
     },
 });
 
 class AccountSummary extends React.Component {
     state = {
         error: "",
+        userShares: [],
+        holdingsRows: []
+    }
+
+    createHoldingData = (id, code, holding, buyPriceAvg, lastPrice) => {
+        return { id, code, holding, buyPriceAvg, lastPrice };
+    }
+
+    updateHoldingsTable = () => {
+        var holdingsRows = [];
+
+        for(let share of this.state.userShares) {
+            holdingsRows.push(
+                this.createHoldingData(
+                    share.id,
+                    share.companyCode, 
+                    share.quantity, 
+                    share.buyPriceAvg,
+                    share.lastPrice
+                )
+            );
+        }
+
+        if(!_.isEqual(this.state.holdingsRows, holdingsRows)) {
+            this.setState({
+                holdingsRows,
+            });
+        }
     }
 
     componentDidMount() {
         console.log(this.props.userSession);
-    }
 
-    componentDidUpdate() {
-        updateUserDataForSocket(socket, this.props.userSession);
+        const dataNeeded = {
+            shares: true
+        }
+
+        getUserData(dataNeeded, this.props.userSession.email)
+        .then(sharesData => {
+            const { shares } = sharesData;
+
+            if(!_.isEqual(this.state.userShares, shares)) {
+                this.setState(
+                    {
+                        userShares: shares
+                    },
+                    () => {
+                        this.updateHoldingsTable();
+                    }
+                );
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     render() {
@@ -99,22 +167,56 @@ class AccountSummary extends React.Component {
             ranking
         } = this.props.userSession;
 
-        const userSharesValue = this.props.userSharesValue;
+        const userDailyChange = totalPortfolio-totalPortfolioLastClosure;
 
-        const userDailyChange = (totalPortfolio-totalPortfolioLastClosure) / totalPortfolioLastClosure;
+        //console.log(`${cash}, ${totalPortfolio}, ${totalPortfolioLastClosure}, ${ranking}, ${userSharesValue}, ${userDailyChange}`);
 
-        console.log(`${cash}, ${totalPortfolio}, ${totalPortfolioLastClosure}, ${ranking}, ${userSharesValue}, ${userDailyChange}`);
+        //const { userShares, holdingsRows } = this.state;
+        // console.log(userShares);
+        // console.log(holdingsRows);
 
         return (
             <Container className={classes.root} disableGutters>
                 <Grid container spacing={6} direction="row"
                     className={classes.fullHeightWidth}
                 >
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.marketWatch)}>
-                            {totalPortfolio}
+                    <Grid item xs={12} className={classes.itemGrid}>
+                        <Typography className={clsx(classes.gridTitle, classes.summary)}>
+                            Summary
                         </Typography>
-                        <Paper className={classes.fullHeightWidth}/>
+                        <SummaryTableContainer
+                            cash={cash.toFixed(2)}
+                            totalPortfolio={totalPortfolio.toFixed(2)}
+                            ranking={ranking}
+                            userDailyChange={userDailyChange.toFixed(2)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} className={classes.noteGrid}>
+                        <Typography className={classes.smallNote}>
+                            Live during market hours
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12} className={classes.itemGrid}>
+                        <Typography className={clsx(classes.gridTitle, classes.holdings)}>
+                            Holdings
+                        </Typography>
+                        {
+                            _.isEmpty(this.state.holdingsRows) &&
+                            <Typography className={classes.holdingsText}>
+                                Start by buying some stocks!
+                            </Typography>
+                        }
+                        {
+                            !_.isEmpty(this.state.holdingsRows) &&
+                            <HoldingsTableContainer
+                                rows = {this.state.holdingsRows}
+                            />
+                        }
+                    </Grid>
+                    <Grid item xs={12} className={classes.noteGrid}>
+                        <Typography className={clsx(classes.gridTitle, classes.portfolioChart)}>
+                            Portfolio Chart
+                        </Typography>
                     </Grid>
                 </Grid>
             </Container>
@@ -124,7 +226,6 @@ class AccountSummary extends React.Component {
 
 const mapStateToProps = (state) => ({
     userSession: state.userSession,
-    userSharesValue: state.userSharesValue,
 });
 
 const mapDispatchToProps = (dispatch) => ({

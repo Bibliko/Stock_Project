@@ -1,6 +1,8 @@
 import axios from 'axios';
 import _ from 'lodash';
 
+import { getManyStockPricesFromFMP } from './FinancialModelingPrepUtil';
+
 const typeLoginUtil = ['facebook', 'google'];
 const { REACT_APP_BACKEND_HOST : BACKEND_HOST } = process.env;
 
@@ -190,16 +192,33 @@ export const getUserData = (dataNeeded, email) => {
 
 // User Calculations Related:
 
-// example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-export const calculateTotalSharesValue = (stockQuotesJSON, email) => {
+// example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
+export const calculateTotalSharesValue = (isMarketClosed, stockQuotesJSON, email) => {
     return new Promise((resolve, reject) => {
         if(_.isEmpty(stockQuotesJSON)) {
             resolve(0);
+            return;
         }
 
-        var totalValue = 0;
+        let totalValue = 0;
 
-        var dataNeeded = {
+        if(isMarketClosed) {
+
+            // if market closed, we will use lastPrice we saved in our database
+            for(let stockQuote of stockQuotesJSON) {
+                totalValue += stockQuote.lastPrice * stockQuote.quantity;
+            }
+
+            resolve(totalValue);
+            return;
+        }
+
+        /**
+         * if market opened, we use prices of stockQuotesJSON to calculate total shares
+         * value
+         */
+
+        let dataNeeded = {
             shares: true
         };
 
@@ -233,6 +252,96 @@ export const calculateTotalSharesValue = (stockQuotesJSON, email) => {
     })
 }
 
+export const checkStockQuotesForUser = (isMarketClosed, email) => {
+
+    return new Promise((resolve, reject) => {
+        const dataNeeded = {
+            shares: true
+        };
+    
+        getUserData(dataNeeded, email)
+        .then(sharesData => {
+    
+            if( !sharesData ) {
+                resolve([]);
+                return null;
+            }
+    
+            const { shares } = sharesData;
+    
+            if(_.isEmpty(shares)) {
+                resolve([]);
+                return null;
+            }
+            else {
+                /** 
+                 * Uncomment below line if in Production:
+                 * - We are using Financial Modeling Prep free API key
+                 * -> The amount of requests is limited. Use wisely when testing!
+                 */
+
+                if(!isMarketClosed) {
+                    //return getManyStockPricesFromFMP(shares);                 
+                }
+                else {
+                    return shares;
+                }
+            }
+        })
+        .then(stockQuotesJSON => {
+            
+            if(stockQuotesJSON) {
+                //console.log(stockQuotesJSON);
+                
+                resolve(stockQuotesJSON);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+};
+
+/** Usage setupSocketToCheckStockQuotes
+ * Set up Socket Check Stock Quotes for user
+ * Use in front-end/src/pages/Main/AccountSummary
+ */
+export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSession, userSharesValue, mutateUser, mutateUserSharesValue) => {
+
+    // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
+    checkStockQuotesForUser(isMarketClosed, userSession.email)
+    .then(stockQuotesJSON => {
+        return calculateTotalSharesValue(isMarketClosed, stockQuotesJSON, userSession.email);
+    })
+    .then(totalSharesValue => {
+        //console.log(totalSharesValue);
+
+        if(!_.isEqual(userSharesValue, totalSharesValue)) {
+            mutateUserSharesValue(totalSharesValue);
+        }
+
+        const newTotalPortfolioValue = userSession.cash + totalSharesValue;
+
+        /** 
+         * changeData so that when we reload page or go to other page, the data
+         * would be up-to-date.
+         */ 
+        const dataNeedChange = {
+            totalPortfolio: newTotalPortfolioValue
+        };
+
+        if(!_.isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
+            changeUserData(dataNeedChange, userSession.email, mutateUser);
+        }
+        else {
+            //console.log("No need to update user data.");
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    })
+}
+
 export default {
     getUser,
     logoutUser,
@@ -243,5 +352,7 @@ export default {
     changePassword,
     changeUserData,
     getUserData,
-    calculateTotalSharesValue
+    calculateTotalSharesValue,
+    checkStockQuotesForUser,
+    checkStockQuotesToCalculateSharesValue
 }

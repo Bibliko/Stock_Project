@@ -1,5 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router';
+//import clsx from 'clsx';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import {
@@ -21,11 +22,13 @@ import {
 
 import {
   checkMarketClosed,
-  checkStockQuotesForUser,
   socketCheckMarketClosed, 
-  socketCheckStockQuotes,
   offSocketListeners
 } from '../../utils/SocketUtil';
+
+import {
+  checkStockQuotesToCalculateSharesValue
+} from '../../utils/UserUtil';
 
 
 import AppBar from './AppBar';
@@ -39,7 +42,6 @@ const styles = theme => ({
   root: {
     display: 'flex',
   },
-  
   //content. Write new CSS above this comment
   mainContent: {
     display: 'flex',
@@ -49,7 +51,6 @@ const styles = theme => ({
     height: '100vh',
     width: '100vw'
   },
-
   contentHeader: {
     display: 'flex',
     alignItems: 'center',
@@ -59,7 +60,6 @@ const styles = theme => ({
     minHeight: '60px',
     justifyContent: 'flex-start',
   },
-
   mainBackground: {
     backgroundColor: theme.palette.backgroundBlue.main,
     [theme.breakpoints.down('xs')]: {
@@ -70,7 +70,6 @@ const styles = theme => ({
     width: '100vw',
     position: 'fixed'
   },
-
   secondBackground: {
     background: theme.palette.paperBackground.gradient,
     [theme.breakpoints.down('xs')]: {
@@ -81,12 +80,10 @@ const styles = theme => ({
     width: '75%',
     position: 'fixed'
   },
-
   countdown: {
     position: 'absolute',
-    marginTop: '10px',
+    marginTop: '65px',
   },
-
   countdownText: {
     color: 'white',
     fontSize: 'x-large',
@@ -94,14 +91,81 @@ const styles = theme => ({
       fontSize: 'large'
     },
   },
+  reminder: {
+    position: 'absolute',
+    color: 'white',
+    width: '100%',
+    height: '40px',
+    padding: '10px'
+  },
+  reminderText: {
+    fontSize: 'small',
+    [theme.breakpoints.down('xs')]: {
+      fontSize: 'x-small',
+    },
+  }
 });
 
 class Layout extends React.Component {
   state={
     countdown: '',
+    isUserFinishedSettingUpAccount: true,
+    hideReminder: false
   }
 
+  prevScrollpos = window.pageYOffset;
+
   marketCountdownInterval;
+
+  checkStockQuotesInterval;
+
+  hideReminderWhenScrollDownAndShowWhenScrollUp = () => {
+    window.onscroll = function() {
+      var currentScrollPos = window.pageYOffset;
+      if (this.prevScrollpos > currentScrollPos && this.state.hideReminder) {
+        this.setState({
+          hideReminder: false
+        });
+      } 
+      else {
+        if(!this.state.hideReminder) {
+          this.setState({
+            hideReminder: true
+          })
+        }
+      }
+      this.prevScrollpos = currentScrollPos;
+    }
+  }
+
+  setStateIfUserFinishedSettingUpAccount = () => {
+    const { firstName, lastName, region, occupation } = this.props.userSession;
+
+    if( !firstName || !lastName || !region || !occupation ) {
+      this.setState({
+        isUserFinishedSettingUpAccount: false
+      });
+    }
+  }
+
+  setupIntervals = () => {
+    this.marketCountdownInterval = setInterval( 
+      () => marketCountdownUpdate(this.setState.bind(this)),
+      oneSecond
+    );
+
+    this.checkStockQuotesInterval = setInterval(
+      () => checkStockQuotesToCalculateSharesValue(
+        this.props.isMarketClosed,
+        this.props.userSession,
+        this.props.userSharesValue,
+        this.props.mutateUser,
+        this.props.mutateUserSharesValue
+      ),
+      5 * oneSecond
+      //20 * oneSecond
+    );
+  }
 
   marketCountdownChooseComponent = (classes) => {
     if(this.props.isMarketClosed) {
@@ -132,20 +196,12 @@ class Layout extends React.Component {
     
     if(shouldRedirectToLogin(this.props)) {
       redirectToPage('/login', this.props);
+      return;
     }
 
-    this.marketCountdownInterval = setInterval( 
-      () => marketCountdownUpdate(this.setState.bind(this)),
-      oneSecond
-    );
+    this.setStateIfUserFinishedSettingUpAccount();
 
-    socketCheckStockQuotes(
-      socket,
-      this.props.userSession,
-      this.props.userSharesValue,
-      this.props.mutateUser,
-      this.props.mutateUserSharesValue
-    );
+    this.setupIntervals();
 
     socketCheckMarketClosed(
       socket,
@@ -167,9 +223,10 @@ class Layout extends React.Component {
   }
 
   componentWillUnmount() {
-    offSocketListeners(socket, checkMarketClosed);
-    offSocketListeners(socket, checkStockQuotesForUser);
     clearInterval(this.marketCountdownInterval);
+    clearInterval(this.checkStockQuotesInterval);
+
+    offSocketListeners(socket, checkMarketClosed);
   }
 
   render() {
@@ -188,6 +245,14 @@ class Layout extends React.Component {
           <div className={classes.mainContent}>
             <div className={classes.mainBackground}/>
             <div className={classes.secondBackground}/>
+            {
+              !this.state.isUserFinishedSettingUpAccount &&
+              <div className={classes.reminder}>
+                <Typography className={classes.reminderText}>
+                  You haven't finished setting up your account. Go to Account Settings to finish up.
+                </Typography>
+              </div>
+            }
             <div className={classes.countdown}>
               {
                 this.marketCountdownChooseComponent(classes)

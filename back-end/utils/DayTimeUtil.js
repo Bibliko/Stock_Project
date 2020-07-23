@@ -32,6 +32,11 @@ const clearIntervalsIfIntervalsNotEmpty = (intervals) => {
  * new Date() -> toUTCString() -> String: Thu, 16 Jul 2020 00:10:14 GMT
  */
 
+const getDayUTCString = (UTCString) => {
+    var dayString = UTCString.substring(0, 3);
+    return dayString;
+}
+
 const getDateUTCString = (UTCString) => {
     var dateString = UTCString.substring(5, 7);
     return parseInt(dateString, 10);
@@ -156,6 +161,14 @@ const findIfTimeNowIsOutOfRange = (timeNow) => {
     return false;
 }
 
+const findIfTimeNowIsWeekend = (timeNow) => {
+    const UTCDay = getDayUTCString(timeNow);
+    if(_.isEqual(UTCDay, "Sat") || _.isEqual(UTCDay, 'Sun')) {
+        return true;
+    }
+    return false;
+}
+
 /**
  * return true if market closed
  * else return false if market opened
@@ -175,7 +188,11 @@ const isMarketClosedCheck = () => {
         .then(marketHoliday => {
             //console.log(findIfTimeNowIsHoliday(marketHoliday));
 
-            if(findIfTimeNowIsHoliday(marketHoliday) || findIfTimeNowIsOutOfRange(timeNow) ) {
+            if(
+                findIfTimeNowIsHoliday(marketHoliday) || 
+                findIfTimeNowIsOutOfRange(timeNow) ||
+                findIfTimeNowIsWeekend(timeNow)
+            ) {
                 resolve(true);
             }
             else {
@@ -195,6 +212,7 @@ module.exports = {
     oneDay,
     clearIntervals,
     clearIntervalsIfIntervalsNotEmpty,
+    getDayUTCString,
     getDateUTCString,
     getMonthUTCString,
     getYearUTCString,
@@ -204,5 +222,6 @@ module.exports = {
     newDate,
     findIfTimeNowIsHoliday,
     findIfTimeNowIsOutOfRange,
+    findIfTimeNowIsWeekend,
     isMarketClosedCheck
 }
