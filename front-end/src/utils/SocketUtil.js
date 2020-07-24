@@ -5,9 +5,7 @@ import {
   calculateTotalSharesValue 
 } from './UserUtil';
 
-const {
-  REACT_APP_BACKEND_HOST: BACKEND_HOST
-} = process.env;
+const BACKEND_HOST = `${window.location.origin}/api`;
 
 /** Usage setupUserInformation
  * Use to set up user information for back-end Socket

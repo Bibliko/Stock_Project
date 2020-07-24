@@ -29,7 +29,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 
 var socket;
 
-const { REACT_APP_BACKEND_HOST: BACKEND_HOST } = process.env;
+const BACKEND_HOST = `${window.location.origin}/api`;
 
 class App extends React.Component {
 
