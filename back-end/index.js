@@ -192,11 +192,11 @@ app.post('/auth/login', (req, res, next) => {
                 return res.sendStatus(500); 
             }
 
-            if (req.body.remember) {
-                req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-            } else {
-                req.session.cookie.expires = false;
-            }
+            // if (req.body.remember) {
+            //     req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+            // } else {
+            //     req.session.cookie.expires = false;
+            // }
 
             return res.sendStatus(200);
         });

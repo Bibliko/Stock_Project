@@ -155,7 +155,7 @@ class Login extends React.Component {
     
     email=""
     password=""
-    remember=false
+    // remember=false
 
     changeEmail = (event) => {
         this.email = event.target.value;
@@ -171,12 +171,12 @@ class Login extends React.Component {
         }
     }
 
-    changeRemember = (event) => {
-        this.remember = event.target.checked;
-        if(!isEmpty(this.state.error)) {
-            this.setState({ error: "" });
-        }
-    }
+    // changeRemember = (event) => {
+    //     this.remember = event.target.checked;
+    //     if(!isEmpty(this.state.error)) {
+    //         this.setState({ error: "" });
+    //     }
+    // }
 
     handleKeyDown = (event) => {
         if(event.key==="Enter") {
@@ -196,7 +196,7 @@ class Login extends React.Component {
                 loginUser('local', {
                     email: this.email,
                     password: this.password,
-                    remember: this.remember
+                    // remember: this.remember
                 })
                 .then(() => {
                     return getUser();
@@ -277,18 +277,18 @@ class Login extends React.Component {
                                         </Typography>
                                     </Grid>
                                 }
-                                <Grid item xs className={classes.center}>
-                                    <FormControlLabel
-                                        className={classes.rememberMe}
-                                        control={
-                                            <Checkbox
-                                                value="remember"
-                                                onChange={this.changeRemember}
-                                                />
-                                        }
-                                        label="Remember me" // a checkbox for Remember me.
-                                    />
-                                </Grid>
+                                {/* <Grid item xs className={classes.center}> */}
+                                {/*     <FormControlLabel */}
+                                {/*         className={classes.rememberMe} */}
+                                {/*         control={ */}
+                                {/*             <Checkbox */}
+                                {/*                 value="remember" */}
+                                {/*                 onChange={this.changeRemember} */}
+                                {/*                 /> */}
+                                {/*         } */}
+                                {/*         label="Remember me" // a checkbox for Remember me. */}
+                                {/*     /> */}
+                                {/* </Grid> */}
                                 <Grid item xs className={classes.center}>
                                     <Button className={classes.submit}
                                         onClick={this.submit}
