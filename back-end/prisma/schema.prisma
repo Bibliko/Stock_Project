@@ -10,15 +10,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Dummy {
-  id      String      @default(cuid()) @id
-}
-
 model User {
   id                        String    @default(cuid()) @id
   email                     String?   @unique
   password                  String?
-  name                      String?
+  // name                      String?
   avatarUrl                 String?
   createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @default(now()) @updatedAt
