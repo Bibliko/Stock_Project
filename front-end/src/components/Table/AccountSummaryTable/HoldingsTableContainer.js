@@ -1,8 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
-//import _ from 'lodash';
-//import fetch from 'node-fetch';
 
 import HoldingsTableRow from './HoldingsTableRow';
 

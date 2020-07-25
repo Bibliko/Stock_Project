@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const { isEqual } = require('lodash');
 const {
     isMarketClosedCheck
 } = require('./DayTimeUtil');
@@ -72,7 +72,7 @@ const checkAndUpdateAllUsers = (objVariables) => {
     isMarketClosedCheck()
     .then(checkResult => {
         // check if market is closed and update the status of objVariables
-        if(!_.isEqual(checkResult, objVariables.isMarketClosed)) {
+        if(!isEqual(checkResult, objVariables.isMarketClosed)) {
             console.log(checkResult, 'UserUtil, 76');
             objVariables.isMarketClosed = checkResult;
         }

@@ -1,9 +1,7 @@
 import React from 'react';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
-//import _ from 'lodash';
-//import fetch from 'node-fetch';
 
 import { connect } from 'react-redux';
 import {
@@ -175,7 +173,7 @@ class HoldingsTableRow extends React.Component {
             brokerage = 20 + 0.25/100 * (lastPrice * holding - 10000);
         }
 
-        if(!_.isEqual(this.state.lastPrice, lastPrice)) {
+        if(!isEqual(this.state.lastPrice, lastPrice)) {
             this.setState({
                 lastPrice: lastPrice.toFixed(2),
                 profitOrLoss: ((lastPrice - buyPriceAvg) * holding - brokerage).toFixed(2)
@@ -203,7 +201,7 @@ class HoldingsTableRow extends React.Component {
             //         lastPrice: price
             //     }
 
-            //     if(!_.isEqual(lastPrice, price)) {
+            //     if(!isEqual(lastPrice, price)) {
             //         return changeShareData(dataNeedChange, id);
             //     }
 

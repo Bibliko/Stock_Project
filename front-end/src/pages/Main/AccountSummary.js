@@ -1,9 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import _ from 'lodash';
+import { isEqual, isEmpty } from 'lodash';
 import { withRouter } from 'react-router';
-//import _ from 'lodash';
-//import fetch from 'node-fetch';
 
 import { connect } from 'react-redux';
 import {
@@ -120,7 +118,7 @@ class AccountSummary extends React.Component {
             );
         }
 
-        if(!_.isEqual(this.state.holdingsRows, holdingsRows)) {
+        if(!isEqual(this.state.holdingsRows, holdingsRows)) {
             this.setState({
                 holdingsRows,
             });
@@ -138,7 +136,7 @@ class AccountSummary extends React.Component {
         .then(sharesData => {
             const { shares } = sharesData;
 
-            if(!_.isEqual(this.state.userShares, shares)) {
+            if(!isEqual(this.state.userShares, shares)) {
                 this.setState(
                     {
                         userShares: shares
@@ -193,13 +191,13 @@ class AccountSummary extends React.Component {
                             Holdings
                         </Typography>
                         {
-                            _.isEmpty(this.state.holdingsRows) &&
+                            isEmpty(this.state.holdingsRows) &&
                             <Typography className={classes.holdingsText}>
                                 Start by buying some stocks!
                             </Typography>
                         }
                         {
-                            !_.isEmpty(this.state.holdingsRows) &&
+                            !isEmpty(this.state.holdingsRows) &&
                             <HoldingsTableContainer
                                 rows = {this.state.holdingsRows}
                             />

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import _ from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 
 import { getManyStockPricesFromFMP } from './FinancialModelingPrepUtil';
 import { getBackendHost } from './NetworkUtil';
@@ -196,7 +196,7 @@ export const getUserData = (dataNeeded, email) => {
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
 export const calculateTotalSharesValue = (isMarketClosed, stockQuotesJSON, email) => {
     return new Promise((resolve, reject) => {
-        if(_.isEmpty(stockQuotesJSON)) {
+        if(isEmpty(stockQuotesJSON)) {
             resolve(0);
             return;
         }
@@ -233,7 +233,7 @@ export const calculateTotalSharesValue = (isMarketClosed, stockQuotesJSON, email
                 
                 // filter shares of user having matched symbol with this stock quote
                 const arraySharesWithMatchedSymbol = sharesResult.filter(
-                    share => _.isEqual(share.companyCode, stockQuote.symbol)
+                    share => isEqual(share.companyCode, stockQuote.symbol)
                 );
 
                 // add quantities of all shares with matched symbol together
@@ -270,7 +270,7 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
     
             const { shares } = sharesData;
     
-            if(_.isEmpty(shares)) {
+            if(isEmpty(shares)) {
                 resolve([]);
                 return null;
             }
@@ -317,7 +317,7 @@ export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSessi
     .then(totalSharesValue => {
         //console.log(totalSharesValue);
 
-        if(!_.isEqual(userSharesValue, totalSharesValue)) {
+        if(!isEqual(userSharesValue, totalSharesValue)) {
             mutateUserSharesValue(totalSharesValue);
         }
 
@@ -331,7 +331,7 @@ export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSessi
             totalPortfolio: newTotalPortfolioValue
         };
 
-        if(!_.isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
+        if(!isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
             changeUserData(dataNeedChange, userSession.email, mutateUser);
         }
         else {

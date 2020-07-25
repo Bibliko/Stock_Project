@@ -1,8 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router';
 import clsx from 'clsx';
-//import _ from 'lodash';
-//import fetch from 'node-fetch';
 
 import { connect } from 'react-redux';
 

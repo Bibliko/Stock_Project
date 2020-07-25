@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const _ = require('lodash');
+const { isEmpty, isEqual } = require('lodash');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -52,7 +52,7 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
         })
         .then(marketHolidaysPrisma => {
             if(
-                _.isEmpty(marketHolidaysPrisma) || 
+                isEmpty(marketHolidaysPrisma) || 
                 marketHolidaysPrisma[0].year <= year
             ) {
                 return fetch(`https://financialmodelingprep.com/api/v3/market-hours?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`);   
@@ -70,7 +70,7 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
                 let nyseMarket;
 
                 marketHoursJSON.map(marketHoursObj => {
-                    if(_.isEqual(marketHoursObj.stockExchangeName, "New York Stock Exchange")) {
+                    if(isEqual(marketHoursObj.stockExchangeName, "New York Stock Exchange")) {
                         nyseMarket = marketHoursObj;
                     }
                 })

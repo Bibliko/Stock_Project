@@ -11,7 +11,6 @@ if (process.env.NODE_ENV !== "production") {
 var storage = require('./firebase/firebaseStorage.js');
 var migrationsFolder = storage.ref('/system/migrations');
 var schemaFolder = storage.ref('/system/schema');
-const _ = require('lodash');
 const fs = require('fs-extra');
 const { exec } = require("child_process");
 

@@ -1,12 +1,8 @@
 import React from 'react';
-//import _ from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
-// import {
-//     userAction,
-// } from '../../redux/storeActions/actions';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';

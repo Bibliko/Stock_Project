@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router';
 //import clsx from 'clsx';
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import {
   userAction, 
@@ -171,7 +171,7 @@ class Layout extends React.Component {
       );
     }
     else {
-      if(_.isEmpty(this.state.countdown)) {
+      if(isEmpty(this.state.countdown)) {
         return ( 
           <CircularProgress/>
         );
@@ -210,7 +210,7 @@ class Layout extends React.Component {
       redirectToPage('/login', this.props);
     }
 
-    if(!_.isEmpty(this.state.countdown) && this.props.isMarketClosed) {
+    if(!isEmpty(this.state.countdown) && this.props.isMarketClosed) {
       this.setState({
         countdown: ''
       });

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 
 export const checkMarketClosed = "checkMarketClosed";
 
@@ -11,7 +11,7 @@ export const socketCheckMarketClosed = (socket, isMarketClosedInReduxStore, muta
   socket.on(checkMarketClosed, (ifClosed) => {
     //console.log(ifClosed);
 
-    if(!_.isEqual(ifClosed, isMarketClosedInReduxStore)) {
+    if(!isEqual(ifClosed, isMarketClosedInReduxStore)) {
 
       if(ifClosed) {
         mutateMarket('closeMarket');

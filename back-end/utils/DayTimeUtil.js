@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const { isEqual } = require('lodash');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -126,7 +126,7 @@ const findIfTimeNowIsHoliday = (marketHolidayObj) => {
     var checkResult = false;
 
     Object.entries(marketHolidayObj).forEach(( [key, value] ) => {
-        if(_.isEqual(key, 'id') || _.isEqual(key, 'year')) {
+        if(isEqual(key, 'id') || isEqual(key, 'year')) {
             return;
         }
         
@@ -134,8 +134,8 @@ const findIfTimeNowIsHoliday = (marketHolidayObj) => {
         const month = parseInt(value.substring(5, 7), 10);
 
         if(
-            _.isEqual(UTCDate, date) &&
-            _.isEqual(UTCMonth, month)
+            isEqual(UTCDate, date) &&
+            isEqual(UTCMonth, month)
         ) {
             checkResult = true;
         }
@@ -163,7 +163,7 @@ const findIfTimeNowIsOutOfRange = (timeNow) => {
 
 const findIfTimeNowIsWeekend = (timeNow) => {
     const UTCDay = getDayUTCString(timeNow);
-    if(_.isEqual(UTCDay, "Sat") || _.isEqual(UTCDay, 'Sun')) {
+    if(isEqual(UTCDay, "Sat") || isEqual(UTCDay, 'Sun')) {
         return true;
     }
     return false;
