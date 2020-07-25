@@ -1,24 +1,4 @@
 import _ from 'lodash';
-<<<<<<< HEAD
-=======
-import { 
-  changeUserData, 
-  calculateTotalSharesValue 
-} from './UserUtil';
-import { getBackendHost } from './NetworkUtil';
-
-const BACKEND_HOST = getBackendHost();
-
-/** Usage setupUserInformation
- * Use to set up user information for back-end Socket
- */
-export const setupUserInformation = "setupUserInformation";
-
-/** Usage checkStockQuotesForUser
- * Use to check stock quotes of user
- */
-export const checkStockQuotesForUser = "checkStockQuotesForUser";
->>>>>>> master
 
 export const checkMarketClosed = "checkMarketClosed";
 
