@@ -4,10 +4,9 @@ import {
   changeUserData, 
   calculateTotalSharesValue 
 } from './UserUtil';
+import { getBackendHost } from './NetworkUtil';
 
-const {
-  REACT_APP_BACKEND_HOST: BACKEND_HOST
-} = process.env;
+const BACKEND_HOST = getBackendHost();
 
 /** Usage setupUserInformation
  * Use to set up user information for back-end Socket

@@ -1,8 +1,10 @@
 import axios from 'axios';
 import _ from 'lodash';
 
+import { getBackendHost } from './NetworkUtil';
+
 const typeLoginUtil = ['facebook', 'google'];
-const { REACT_APP_BACKEND_HOST : BACKEND_HOST } = process.env;
+const BACKEND_HOST = getBackendHost();
 
 // User Authorization and Login Related:
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
@@ -16,8 +16,6 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Container from '@material-ui/core/Container';
 import NormalTextField from '../../components/TextField/normalTextField';
 import PasswordTextField from '../../components/TextField/passwordTextField';
@@ -155,20 +153,28 @@ class Login extends React.Component {
     
     email=""
     password=""
+    // remember=false
 
     changeEmail = (event) => {
         this.email = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
 
     changePassword = (event) => {
         this.password = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
+
+    // changeRemember = (event) => {
+    //     this.remember = event.target.checked;
+    //     if(!isEmpty(this.state.error)) {
+    //         this.setState({ error: "" });
+    //     }
+    // }
 
     handleKeyDown = (event) => {
         if(event.key==="Enter") {
@@ -178,16 +184,17 @@ class Login extends React.Component {
 
     submit = () => {
         if(
-            _.isEmpty(this.email) ||
-            _.isEmpty(this.password)
+            isEmpty(this.email) ||
+            isEmpty(this.password)
         ) {
             this.setState({ error: this.errorTypes[0] });
         }
         else {
-            if(_.isEmpty(this.state.error)) {
+            if(isEmpty(this.state.error)) {
                 loginUser('local', {
                     email: this.email,
-                    password: this.password
+                    password: this.password,
+                    // remember: this.remember
                 })
                 .then(() => {
                     return getUser();
@@ -259,7 +266,7 @@ class Login extends React.Component {
                                     />
                                 </Grid>
                                 {
-                                    !_.isEmpty(this.state.error) &&
+                                    !isEmpty(this.state.error) &&
                                     <Grid item xs className={classes.error}>
                                         <Typography color="error" align="center"
                                             className={classes.errorText}
@@ -268,15 +275,18 @@ class Login extends React.Component {
                                         </Typography>
                                     </Grid>
                                 }
-                                <Grid item xs className={classes.center}>
-                                    <FormControlLabel
-                                        className={classes.rememberMe}
-                                        control={
-                                            <Checkbox value="remember" />
-                                        }
-                                        label="Remember me" // a checkbox for Remember me.
-                                    />
-                                </Grid>
+                                {/* <Grid item xs className={classes.center}> */}
+                                {/*     <FormControlLabel */}
+                                {/*         className={classes.rememberMe} */}
+                                {/*         control={ */}
+                                {/*             <Checkbox */}
+                                {/*                 value="remember" */}
+                                {/*                 onChange={this.changeRemember} */}
+                                {/*                 /> */}
+                                {/*         } */}
+                                {/*         label="Remember me" // a checkbox for Remember me. */}
+                                {/*     /> */}
+                                {/* </Grid> */}
                                 <Grid item xs className={classes.center}>
                                     <Button className={classes.submit}
                                         onClick={this.submit}
