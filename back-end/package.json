@@ -14,7 +14,7 @@
     "docker-stop-containers-ps": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./powershell-scripts/docker-stop-containers.ps1",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
-    "dev": "nodemon index.js",
+    "dev": "node checkChangesInSchemaPrisma.js && nodemon index.js",
     "start": "node index.js"
   },
   "keywords": [],
