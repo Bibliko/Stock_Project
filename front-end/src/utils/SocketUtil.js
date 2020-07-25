@@ -4,8 +4,9 @@ import {
   changeUserData, 
   calculateTotalSharesValue 
 } from './UserUtil';
+import { getBackendHost } from './NetworkUtil';
 
-const BACKEND_HOST = `${window.location.origin}/api`;
+const BACKEND_HOST = getBackendHost();
 
 /** Usage setupUserInformation
  * Use to set up user information for back-end Socket
