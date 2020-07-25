@@ -12,7 +12,7 @@ import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
 
-import { getBackendHost } from './utils/NetworkUtil';
+import { getBackendHost, getBackendHostForSocket } from './utils/NetworkUtil';
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -31,12 +31,13 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 var socket;
 
 const BACKEND_HOST = getBackendHost();
+const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    socket = socketIOClient(process.env.REACT_APP_BACKEND_HOST_FOR_SOCKET);
+    socket = socketIOClient(BACKEND_HOST_FOR_SOCKET);
   }
 
   // variables
