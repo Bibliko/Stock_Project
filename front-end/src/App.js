@@ -11,6 +11,12 @@ import { createStore } from 'redux';
 import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
+<<<<<<< HEAD
+=======
+
+import { getBackendHost } from './utils/NetworkUtil';
+import { updateUserDataForSocket } from './utils/SocketUtil';
+>>>>>>> master
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -28,7 +34,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 
 var socket;
 
-const { REACT_APP_BACKEND_HOST: BACKEND_HOST } = process.env;
+const BACKEND_HOST = getBackendHost();
 
 class App extends React.Component {
 

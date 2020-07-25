@@ -17,7 +17,6 @@ try {
 const { 
     PORT:port,
     FRONTEND_HOST,
-    //MAILGUN_API_KEY,
     SENDGRID_API_KEY
 } = process.env;
 const express = require('express');
@@ -25,13 +24,13 @@ const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// const mailgun = require("mailgun-js");
-// const DOMAIN = 'minecommand.us';
-// const mg = mailgun({apiKey: MAILGUN_API_KEY, domain: DOMAIN});
+const {
+    getFrontendHost,
+    getPassportCallbackHost
+} = require('./utils/NetworkUtil');
 
 const {
     oneSecond, 
-    oneMinute,
     oneDay,
     clearIntervals,
     clearIntervalsIfIntervalsNotEmpty,
@@ -171,7 +170,75 @@ app.post('/auth/signup', (req, res, next) => {
             return res.status(401).send(info);
         }
 
-        return res.status(202).send(info);
+        const { email, password } = info;
+
+        /* month+1 because Date() counts month from 0 to 11, date+1 because
+         * we want this verification token to expire the next day
+         */
+        let date = new Date();
+        date = (date.getMonth()+1) + '/' + (date.getDate()+1) + '/' + date.getFullYear();
+
+        // If there is no user, send verification email to sign up email!
+
+        const file = new Promise((resolve, reject) => {
+            fs.readFile('./verificationHTML/verifyEmail.html', 'utf8', (err, data) => {
+                if (err) {
+                    reject(err);
+                }
+                console.log("read html file (verify email) successfully");
+                resolve(data);
+            })
+        });
+
+        const verificationToken = new Promise((resolve, reject) => {
+            prisma.userVerification.create({
+                data: {
+                    email,
+                    password,
+                    expiredAt: date
+                }
+            })
+            .then(res => {
+                console.log("create verification successfully");
+                resolve(res);
+            })
+            .catch(err => {
+                reject(err);
+            })
+        });
+
+        Promise.all([file, verificationToken])
+        .then(([file, verificationToken]) => {
+            const PASSPORT_CALLBACK_HOST = getPassportCallbackHost();
+            console.log(PASSPORT_CALLBACK_HOST);
+            
+            //file is a string of the html file, we replace substring {{ formAction }}
+            //by the string 'something else'...
+            file = file.replace(
+                "{{ formAction }}", 
+                `${PASSPORT_CALLBACK_HOST}/verification/${verificationToken.id}`
+            );
+
+            const msg = {
+                to: `${email}`,
+                from: 'Bibliko <biblikoorg@gmail.com>',
+                subject: 'Email Verification',
+                html: file,
+            };
+            return sgMail.send(msg);
+        })
+        .then(emailVerification => {
+            if(emailVerification) {
+                const notification = { 
+                    message: "Processing (Can take a while). Check your inboxes." 
+                };
+                return res.status(202).send(notification);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.sendStatus(500);
+        })
         
     })(req, res, next);
 });
@@ -190,6 +257,7 @@ app.post('/auth/login', (req, res, next) => {
             if(err) { 
                 return res.sendStatus(500); 
             }
+
             return res.sendStatus(200);
         });
     })(req, res, next);
@@ -273,18 +341,14 @@ app.use('/verification/:tokenId', (req, res) => {
                 }
             })
         }
-        res.redirect(`${FRONTEND_HOST}/verificationFail`);
+
+        const FRONTEND_HOST_HERE = getFrontendHost();
+
+        res.redirect(`${FRONTEND_HOST_HERE}/verificationFail`);
         return;
     })
     .then(newUser => {
         if(newUser) {
-            /** 
-             * newUser.objectID = newUser.id;
-             * indices.users_index.saveObject(newUser, {
-             *    autoGenerateObjectIDIfNotExist: true,
-             * });
-             */
-
             const deletePromise = prisma.userVerification.delete({
                 where: {
                     id: tokenId
@@ -300,7 +364,10 @@ app.use('/verification/:tokenId', (req, res) => {
                 if (err) { 
                     return res.sendStatus(500); 
                 }
-                return res.redirect(`${FRONTEND_HOST}/verificationSucceed`);
+
+                const FRONTEND_HOST_HERE = getFrontendHost();
+
+                return res.redirect(`${FRONTEND_HOST_HERE}/verificationSucceed`);
             });
         }
     })
