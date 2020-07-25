@@ -14,9 +14,8 @@ model User {
   id                        String    @default(cuid()) @id
   email                     String?   @unique
   password                  String?
-  // name                      String?
   avatarUrl                 String?
-  createdAt                 DateTime  @default(now())
+  // createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @default(now()) @updatedAt
   region                    String?
   occupation                String?
