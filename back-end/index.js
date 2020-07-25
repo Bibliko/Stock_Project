@@ -42,7 +42,6 @@ const {
 } = require('./utils/UserUtil');
 
 const {
-    checkStockQuotesForUser,
     checkMarketClosed
 } = require('./utils/SocketUtil');
 
@@ -337,7 +336,6 @@ app.use('/verification/:tokenId', (req, res) => {
         if(token) {
             return prisma.user.create({
                 data: {
-                    name: token.email,
                     email: token.email,
                     password: token.password,
                 }
@@ -381,49 +379,35 @@ app.use('/verification/:tokenId', (req, res) => {
 // other APIs
 app.use('/userData', require('./routes/user'));
 app.use('/marketHolidaysData', require('./routes/marketHolidays'));
+app.use('/shareData', require('./routes/share'));
 
 
 // set up socket.io server
-var intervalCheckStockQuotesForUser;
 var intervalCheckMarketClosed;
-var userData;
 
 io.on("connection", (socket) => {
     console.log("New client connected");
 
-    // Get user data from front-end: Main/AccountSummary
-    socket.on("setupUserInformation", (data) => {
-        userData = data;
-    })
-
-    clearIntervalsIfIntervalsNotEmpty([
-        intervalCheckStockQuotesForUser,
-        intervalCheckMarketClosed
-    ]);
-
-    /** 
-     * For now, every 10 sec, check all prices of stock for user and update.
-     * If market closed, checkStockQuotesForUser return null
-     */
-    intervalCheckStockQuotesForUser = setInterval(
-        () => checkStockQuotesForUser(socket, userData), 
-        5 * oneSecond
-        //20 * oneSecond // For Testing
-    );
-
-    intervalCheckMarketClosed = setInterval(
-        () => checkMarketClosed(socket, objVariables),
-        oneSecond
-    );
+    // Join socket by user ID
+    socket.on('userConnected', socket.join);
+    socket.on('userDisconnected', socket.leave);
 
     // disconnect
     socket.on("disconnect", () => {
         console.log("Client disconnected");
         clearIntervals([
-            intervalCheckStockQuotesForUser,
-            intervalCheckMarketClosed
+            intervalCheckMarketClosed,
         ]);
     });
+
+    clearIntervalsIfIntervalsNotEmpty([
+        intervalCheckMarketClosed,
+    ]);
+
+    intervalCheckMarketClosed = setInterval(
+        () => checkMarketClosed(socket, objVariables),
+        oneSecond
+    );
 });
 
 

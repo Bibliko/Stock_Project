@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const { isEqual } = require('lodash');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -31,6 +31,11 @@ const clearIntervalsIfIntervalsNotEmpty = (intervals) => {
  * 
  * new Date() -> toUTCString() -> String: Thu, 16 Jul 2020 00:10:14 GMT
  */
+
+const getDayUTCString = (UTCString) => {
+    var dayString = UTCString.substring(0, 3);
+    return dayString;
+}
 
 const getDateUTCString = (UTCString) => {
     var dateString = UTCString.substring(5, 7);
@@ -121,7 +126,7 @@ const findIfTimeNowIsHoliday = (marketHolidayObj) => {
     var checkResult = false;
 
     Object.entries(marketHolidayObj).forEach(( [key, value] ) => {
-        if(_.isEqual(key, 'id') || _.isEqual(key, 'year')) {
+        if(isEqual(key, 'id') || isEqual(key, 'year')) {
             return;
         }
         
@@ -129,8 +134,8 @@ const findIfTimeNowIsHoliday = (marketHolidayObj) => {
         const month = parseInt(value.substring(5, 7), 10);
 
         if(
-            _.isEqual(UTCDate, date) &&
-            _.isEqual(UTCMonth, month)
+            isEqual(UTCDate, date) &&
+            isEqual(UTCMonth, month)
         ) {
             checkResult = true;
         }
@@ -156,6 +161,14 @@ const findIfTimeNowIsOutOfRange = (timeNow) => {
     return false;
 }
 
+const findIfTimeNowIsWeekend = (timeNow) => {
+    const UTCDay = getDayUTCString(timeNow);
+    if(isEqual(UTCDay, "Sat") || isEqual(UTCDay, 'Sun')) {
+        return true;
+    }
+    return false;
+}
+
 /**
  * return true if market closed
  * else return false if market opened
@@ -175,7 +188,11 @@ const isMarketClosedCheck = () => {
         .then(marketHoliday => {
             //console.log(findIfTimeNowIsHoliday(marketHoliday));
 
-            if(findIfTimeNowIsHoliday(marketHoliday) || findIfTimeNowIsOutOfRange(timeNow) ) {
+            if(
+                findIfTimeNowIsHoliday(marketHoliday) || 
+                findIfTimeNowIsOutOfRange(timeNow) ||
+                findIfTimeNowIsWeekend(timeNow)
+            ) {
                 resolve(true);
             }
             else {
@@ -195,6 +212,7 @@ module.exports = {
     oneDay,
     clearIntervals,
     clearIntervalsIfIntervalsNotEmpty,
+    getDayUTCString,
     getDateUTCString,
     getMonthUTCString,
     getYearUTCString,
@@ -204,5 +222,6 @@ module.exports = {
     newDate,
     findIfTimeNowIsHoliday,
     findIfTimeNowIsOutOfRange,
+    findIfTimeNowIsWeekend,
     isMarketClosedCheck
 }

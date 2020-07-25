@@ -12,8 +12,7 @@ import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
 
-import { getBackendHost } from './utils/NetworkUtil';
-import { updateUserDataForSocket } from './utils/SocketUtil';
+import { getBackendHost, getBackendHostForSocket } from './utils/NetworkUtil';
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -32,12 +31,13 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 var socket;
 
 const BACKEND_HOST = getBackendHost();
+const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    socket = socketIOClient(process.env.REACT_APP_BACKEND_HOST_FOR_SOCKET);
+    socket = socketIOClient(BACKEND_HOST_FOR_SOCKET);
   }
 
   // variables
@@ -63,7 +63,7 @@ class App extends React.Component {
     .then(user => {
       this.reduxStoreInitialState = {
         userSession: user.data,
-        userSharesValue: -1,
+        userSharesValue: 'Updating',
         isMarketClosed: false,
       };
 
@@ -103,9 +103,6 @@ class App extends React.Component {
 
   componentDidUpdate() {
     this.changePath();
-    if(this.state.isAppReady) {
-      updateUserDataForSocket(socket);
-    }
   }
 
   render() {

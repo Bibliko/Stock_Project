@@ -13,6 +13,10 @@ const theme = {
             gradient: 'linear-gradient(180deg, #1E1E1E 0%, #180B66 100%)'
         },
 
+        tableBackground: {
+            gradient: 'linear-gradient(180deg, #1b163d 0%, #180f56 100%)'
+        }, 
+
         menuBackground: {
             main: '#303030'
         },

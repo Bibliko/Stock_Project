@@ -61,7 +61,7 @@ const styles = theme => ({
         flexBasis: 'unset',
     },
     submit: {
-        marginTop: '4px',
+        marginTop: '8px',
         padding: theme.spacing(1),
         height: '40px',
         width: '120px',
@@ -106,12 +106,13 @@ const styles = theme => ({
         marginTop: 0,
         fontWeight: '500',
         color: theme.palette.subText.main,
-        fontSize: 15   
+        fontSize: '15px'   
     },
     error: {
-        marginTop: 5,
+        marginTop: '5px',
         display: 'flex',
         justifyContent: 'center',
+        minHeight: '20px'
     },
     errorText: {
         fontSize: 'small'
@@ -168,13 +169,6 @@ class Login extends React.Component {
             this.setState({ error: "" });
         }
     }
-
-    // changeRemember = (event) => {
-    //     this.remember = event.target.checked;
-    //     if(!isEmpty(this.state.error)) {
-    //         this.setState({ error: "" });
-    //     }
-    // }
 
     handleKeyDown = (event) => {
         if(event.key==="Enter") {
@@ -275,18 +269,6 @@ class Login extends React.Component {
                                         </Typography>
                                     </Grid>
                                 }
-                                {/* <Grid item xs className={classes.center}> */}
-                                {/*     <FormControlLabel */}
-                                {/*         className={classes.rememberMe} */}
-                                {/*         control={ */}
-                                {/*             <Checkbox */}
-                                {/*                 value="remember" */}
-                                {/*                 onChange={this.changeRemember} */}
-                                {/*                 /> */}
-                                {/*         } */}
-                                {/*         label="Remember me" // a checkbox for Remember me. */}
-                                {/*     /> */}
-                                {/* </Grid> */}
                                 <Grid item xs className={classes.center}>
                                     <Button className={classes.submit}
                                         onClick={this.submit}

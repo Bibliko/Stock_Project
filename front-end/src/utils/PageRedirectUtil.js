@@ -1,11 +1,11 @@
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 export const shouldRedirectToLogin = (props) => {
-    return _.isEmpty(props.userSession);
+    return isEmpty(props.userSession);
 }
 
 export const shouldRedirectToLandingPage = (props) => {
-    return !_.isEmpty(props.userSession);
+    return !isEmpty(props.userSession);
 }
 
 export const redirectToPage = (link, props) => {

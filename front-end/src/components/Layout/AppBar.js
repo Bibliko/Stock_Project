@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import {
@@ -244,7 +244,7 @@ class PersistentAppBar extends React.Component {
                             disableRipple
                         >
                             {
-                                _.isEmpty(userSession.avatarUrl)?
+                                isEmpty(userSession.avatarUrl)?
                                 <AccountCircleRoundedIcon className={classes.avatarIcon}/>:
                                 <Avatar className={classes.avatarIcon} src={userSession.avatarUrl}/>
                             }   

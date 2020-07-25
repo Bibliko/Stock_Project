@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 //const { indices } = require('../algolia');
 
 router.put('/changeData', (req, res) => {
-    const { dataNeedChange, email } = req.body;
+    const { dataNeedChange, id } = req.body;
 
     //const dataJSON = JSON.parse(dataNeedChange);
 
@@ -18,35 +18,25 @@ router.put('/changeData', (req, res) => {
      *  }
      */
 
-    prisma.user.update({
+    prisma.share.update({
         where: {
-            email,
+            id,
         },
         data: dataNeedChange,
     })
-    .then(user => {
-        res.send(user);
+    .then(share => {
+        res.send(share);
     })
     .catch(err => {
         console.log(err);
-        res.status(500).send("Change data of user fails.");
+        res.status(500).send("Change data of share fails.");
     })
 });
 
 router.get('/getData', (req, res) => {
-    const { email, dataNeeded } = req.query;
+    const { id, dataNeeded } = req.query;
 
-    var dataJSON = JSON.parse(dataNeeded);
-
-    if(dataJSON.shares) {
-        dataJSON = {
-            shares: {
-                orderBy: {
-                    companyCode: "asc",
-                },
-            },
-        }
-    }
+    const dataJSON = JSON.parse(dataNeeded);
 
     /** 
      *  dataNeeded in form of:
@@ -56,9 +46,9 @@ router.get('/getData', (req, res) => {
      *          ...
      *      }
      */
-    prisma.user.findOne({
+    prisma.share.findOne({
         where: {
-            email,
+            id,
         },
         select: dataJSON
     })
@@ -67,7 +57,7 @@ router.get('/getData', (req, res) => {
     })
     .catch(err => {
         console.log(err);
-        res.status(500).send("Get data of user fails.");
+        res.status(500).send("Get data of share fails.");
     })
 });
 
