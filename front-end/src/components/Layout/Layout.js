@@ -1,6 +1,5 @@
 import React from 'react';
 import { withRouter } from 'react-router';
-//import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import {
@@ -56,8 +55,6 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    //...theme.mixins.toolbar,
     minHeight: '60px',
     justifyContent: 'flex-start',
   },
@@ -72,6 +69,16 @@ const styles = theme => ({
     position: 'fixed'
   },
   secondBackground: {
+    background: '#180B66',
+    [theme.breakpoints.down('xs')]: {
+      display: 'none'
+    },
+    backgroundSize: 'cover',
+    height: '100vh',
+    width: '75%',
+    position: 'fixed'
+  },
+  thirdBackground: {
     background: theme.palette.paperBackground.gradient,
     [theme.breakpoints.down('xs')]: {
       display: 'none'
@@ -240,6 +247,7 @@ class Layout extends React.Component {
           <div className={classes.mainContent}>
             <div className={classes.mainBackground}/>
             <div className={classes.secondBackground}/>
+            <div className={classes.thirdBackground}/>
             {
               !this.state.isUserFinishedSettingUpAccount &&
               <div className={classes.reminder}>

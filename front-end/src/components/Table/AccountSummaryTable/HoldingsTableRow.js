@@ -36,6 +36,10 @@ const styles = theme => ({
         color: 'white',
         border: 'hidden',
     },
+    tableRow: {
+        background: 'transparent',
+        backgroundColor: 'transparent'
+    },
     cellDiv: {
         display: 'flex',
         alignItems: 'center',
@@ -230,7 +234,7 @@ class HoldingsTableRow extends React.Component {
         } = this.props;
 
         return (   
-            <TableRow>
+            <TableRow className={classes.tableRow}>
                 { this.chooseTableCell("Code", classes) }
                 { this.chooseTableCell("Holding", classes) }
                 { this.chooseTableCell("Buy Price (Avg)", classes) }

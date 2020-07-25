@@ -10,7 +10,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import Paper from '@material-ui/core/Paper';
 
 import ArrowDropUpRoundedIcon from '@material-ui/icons/ArrowDropUpRounded';
 import ArrowDropDownRoundedIcon from '@material-ui/icons/ArrowDropDownRounded';
@@ -19,6 +18,10 @@ const styles = theme => ({
     table: {
         width: '100%',
         border: 'hidden'
+    },
+    tableContainer: {
+        borderRadius: '4px',
+        boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCell: {
         border: 'hidden'
@@ -127,7 +130,7 @@ class SummaryTableContainer extends React.Component {
         } = this.props;
 
         return (   
-            <TableContainer component={Paper}>
+            <TableContainer className={classes.tableContainer}>
                 <Table className={classes.table} aria-label="simple table">
                     <TableBody>
                         { this.chooseTableRow('Cash', classes) }

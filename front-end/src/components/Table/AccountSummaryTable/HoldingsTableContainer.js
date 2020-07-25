@@ -11,12 +11,15 @@ import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
-import Paper from '@material-ui/core/Paper';
 
 const styles = theme => ({
     table: {
         width: '100%',
         border: 'hidden'
+    },
+    tableContainer: {
+        borderRadius: '4px',
+        boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCellProfitOrLoss: {
         minWidth: '120px'
@@ -24,9 +27,6 @@ const styles = theme => ({
     tableCell: {
         fontSize: '12px',
         border: 'hidden',
-    },
-    tableBody: {
-        background: theme.palette.tableBackground.gradient
     },
     cellDiv: {
         display: 'flex',
@@ -69,7 +69,7 @@ class HoldingsTableContainer extends React.Component {
         } = this.props;
 
         return (   
-            <TableContainer component={Paper}>
+            <TableContainer className={classes.tableContainer}>
                 <Table className={classes.table} aria-label="simple table">
                     <TableHead>
                         <TableRow>
