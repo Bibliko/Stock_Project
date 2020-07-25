@@ -92,9 +92,6 @@ const styles = theme => ({
           fontSize: 'medium'
         },
     },
-    smallNote: {
-        color: 'white'
-    },
 });
 
 class AccountSummary extends React.Component {
@@ -190,11 +187,6 @@ class AccountSummary extends React.Component {
                             ranking={ranking}
                             userDailyChange={userDailyChange.toFixed(2)}
                         />
-                    </Grid>
-                    <Grid item xs={12} className={classes.noteGrid}>
-                        <Typography className={classes.smallNote}>
-                            Live during market hours
-                        </Typography>
                     </Grid>
                     <Grid item xs={12} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle, classes.holdings)}>
