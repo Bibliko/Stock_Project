@@ -31,12 +31,12 @@ import {
 
 
 import AppBar from './AppBar';
+import Reminder from '../Reminder/Reminder';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Link from '@material-ui/core/Link';
 
 const styles = theme => ({
   root: {
@@ -99,32 +99,6 @@ const styles = theme => ({
       fontSize: 'large'
     },
   },
-  reminder: {
-    position: 'absolute',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: 'white',
-    width: '100%',
-    height: '40px',
-    padding: '10px',
-    backgroundColor: '#e23d3d'
-  },
-  reminderText: {
-    fontSize: 'small',
-    [theme.breakpoints.down('xs')]: {
-      fontSize: 'x-small',
-    },
-  },
-  reminderLink: {
-    '&:hover': {
-      cursor: 'pointer'
-    },
-    marginLeft: '5px',
-    marginRight: '5px',
-    color: 'white',
-    textDecoration: 'underline'
-  },
 });
 
 class Layout extends React.Component {
@@ -137,8 +111,6 @@ class Layout extends React.Component {
   marketCountdownInterval;
 
   checkStockQuotesInterval;
-
-  preventDefault = (event) => event.preventDefault();
 
   setStateIfUserFinishedSettingUpAccount = () => {
     const { firstName, lastName, region, occupation } = this.props.userSession;
@@ -242,26 +214,15 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar />
+        <Reminder 
+          isUserFinishedSettingUpAccount = {this.state.isUserFinishedSettingUpAccount}
+        />
         <main>
           <div className={classes.contentHeader}/>
           <div className={classes.mainContent}>
             <div className={classes.mainBackground}/>
             <div className={classes.secondBackground}/>
             <div className={classes.thirdBackground}/>
-            {
-              !this.state.isUserFinishedSettingUpAccount &&
-              <div className={classes.reminder}>
-                <Typography className={classes.reminderText}>
-                  You haven't finished setting up your account. Go to 
-                  <Link onClick={this.preventDefault}
-                    className={classes.reminderLink}
-                  >
-                    Account Settings 
-                  </Link>
-                  to finish up.
-                </Typography>
-              </div>
-            }
             <div className={classes.countdown}>
               {
                 this.marketCountdownChooseComponent(classes)
