@@ -20,7 +20,7 @@ import Succeed from './pages/Login/Verification/Succeed';
 import Fail from './pages/Login/Verification/Fail';
 import LandingPage from './pages/Main/LandingPage';
 import AccountSummary from './pages/Main/AccountSummary';
-
+import Ranking from './pages/Main/Ranking';
 import Layout from './components/Layout/Layout';
 import { createTheme } from './theme/ThemeUtil';
 
@@ -141,6 +141,7 @@ class App extends React.Component {
                 <Route exact path="/" component={LandingPage} />
 
                 <Route path="/accountSummary" component={AccountSummary} />
+                <Route path="/ranking" component={Ranking} />
               </Layout>
             </Switch>
           }

@@ -218,7 +218,9 @@ class PersistentAppBar extends React.Component {
 
                                                 <MenuItem dense disabled>Explore</MenuItem>
                                                 <MenuItem dense>Charts</MenuItem>
-                                                <MenuItem dense>Ranking</MenuItem>
+                                                <MenuItem dense onClick={() => { redirectToPage('/ranking', this.props); }}>
+                                                    Ranking
+                                                </MenuItem>
                                             </MenuList>
                                         </ClickAwayListener>
                                     </Paper>
