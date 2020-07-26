@@ -6,6 +6,9 @@ import { isUndefined } from 'lodash';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
+import IconButton from '@material-ui/core/IconButton';
+
+import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 
 const styles = theme => ({
     reminder: {
@@ -19,7 +22,8 @@ const styles = theme => ({
         padding: '10px',
         backgroundColor: '#e23d3d',
         zIndex: 10,
-        top: '60px'
+        top: '60px',
+        transition: 'top 1s'
     },
     reminderText: {
         fontSize: 'small',
@@ -37,7 +41,19 @@ const styles = theme => ({
         textDecoration: 'underline'
     },
     hide: {
-        display: 'none'
+        top: '-40px',
+    },
+    closeButton: {
+        position: 'absolute',
+        right: '8px',
+        maxHeight: '20px',
+        maxWidth: '20px',
+        padding: '0px'
+    },
+    closeIcon: {
+        maxHeight: '20px',
+        maxWidth: '20px',
+        color: 'white'
     }
 });
 
@@ -63,6 +79,12 @@ class Reminder extends React.Component {
 
     preventDefault = (event) => event.preventDefault();
 
+    hideReminder = () => {
+        this.setState({
+            hide: true
+        });
+    }
+
     render() {
         const { 
             classes, 
@@ -78,6 +100,11 @@ class Reminder extends React.Component {
                     !isUndefined(isUserFinishedSettingUpAccount) && !isUserFinishedSettingUpAccount &&
                     settingAccountComponent(classes, this.preventDefault)
                 }
+                <IconButton className={classes.closeButton}
+                    onClick={this.hideReminder}
+                >
+                    <CloseRoundedIcon className={classes.closeIcon}/>
+                </IconButton>
             </div>
         );
     }
