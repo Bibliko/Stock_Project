@@ -1,6 +1,14 @@
 import theme from './themeObj';
 import { createMuiTheme } from '@material-ui/core/styles';
 
+import React from 'react';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+
+export const withMediaQuery = (...args) => Component => props => {
+  const mediaQuery = useMediaQuery(...args);
+  return <Component mediaQuery={mediaQuery} {...props} />;
+};
+
 var muiTheme = {};
 
 var prefersDarkMode = false;
@@ -61,5 +69,6 @@ export const toggleTheme = () => {
 
 export default {
     toggleTheme,
-    createTheme
+    createTheme,
+    withMediaQuery
 }

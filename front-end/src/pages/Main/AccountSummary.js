@@ -14,6 +14,7 @@ import {
 
 import HoldingsTableContainer from '../../components/Table/AccountSummaryTable/HoldingsTableContainer';
 import SummaryTableContainer from '../../components/Table/AccountSummaryTable/SummaryTableContainer';
+import AccountSummaryChart from '../../components/Chart/AccountSummaryChart';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -207,6 +208,7 @@ class AccountSummary extends React.Component {
                         <Typography className={clsx(classes.gridTitle, classes.portfolioChart)}>
                             Portfolio Chart
                         </Typography>
+                        <AccountSummaryChart />
                     </Grid>
                 </Grid>
             </Container>

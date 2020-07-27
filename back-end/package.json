@@ -21,7 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/cli": "^2.2.0",
+    "@prisma/cli": "^2.3.0",
     "@prisma/client": "^2.2.0",
     "@sendgrid/mail": "^7.2.1",
     "algoliasearch": "^4.3.0",
