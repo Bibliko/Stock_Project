@@ -24,18 +24,33 @@ class AccountSummaryChart extends React.Component {
                 sparkline: {
                     enabled: false
                 },
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: false,
+                        selection: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
+                },
                 type: 'area'
             },
             xaxis: {
                 labels: {
+                    show: true,
                     style: {
                         colors: 'white',
                     },
                 },
+                type: 'datetime',
                 categories: ["01 Jan", "02 Jan", "03 Jan", "04 Jan", "05 Jan", "06 Jan", "07 Jan", "08 Jan"],
             },
             yaxis: {
                 labels: {
+                    show: true,
                     style: {
                         colors: 'white',
                     },
@@ -48,19 +63,43 @@ class AccountSummaryChart extends React.Component {
                     }
                 },
             },
+            tooltip: {
+                x: {
+                  format: 'dd MMM yyyy'
+                }
+              },
             stroke: {
-                curve: 'straight'
+                curve: 'straight',
+            },
+            grid: {
+                show: false
             },
             fill: {
                 type: "gradient",
                 gradient: {
                     type: 'vertical',
                     shadeIntensity: 0.7,
-                    opacityFrom: 0.9,
-                    opacityTo: 0.7,
-                    stops: [0, 90, 100]
+                    opacityFrom: 0.8,
+                    opacityTo: 0.4,
+                    stops: [0, 100]
                 }
             },
+            title: {
+                text: '$100000',
+                style: {
+                  fontSize:  '18px',
+                  fontWeight: 600,
+                  color:  'white'
+                },
+            },
+            subtitle: {
+                text: 'Cash on hand',
+                margin: 20,
+                style: {
+                  fontSize:  '12px',
+                  color:  'white'
+                },
+            }
         },
 
         series: [{
@@ -72,37 +111,49 @@ class AccountSummaryChart extends React.Component {
 
     intervalCheckThemeBreakpoints;
 
+    setStateChart = (enableSparkline, showToolbar, showLabelsXaxis, showLabelsYaxis) => {
+        this.setState({
+            options: {
+                ...this.state.options,
+                chart: {
+                    ...this.state.options.chart,
+                    sparkline: {
+                        enabled: enableSparkline
+                    },
+                    toolbar: {
+                        ...this.state.options.chart.toolbar,
+                        show: showToolbar
+                    }
+                },
+                xaxis: {
+                    ...this.state.options.xaxis,
+                    labels: {
+                        ...this.state.options.xaxis.labels,
+                        show: showLabelsXaxis
+                    }
+                },
+                yaxis: {
+                    ...this.state.options.yaxis,
+                    labels: {
+                        ...this.state.options.yaxis.labels,
+                        show: showLabelsYaxis
+                    }
+                },
+            }
+        })
+    }
+
     checkThemeBreakpointsToChangeChart = () => {
         const { mediaQuery } = this.props;
 
+        const isScreenSmall = mediaQuery;
+
         // mediaQuery in this case check if theme breakpoints is below sm (600px)
-        if(!mediaQuery && this.state.options.chart.sparkline.enabled) {
-            console.log('hi1');
-            this.setState({
-                options: {
-                    ...this.state.options,
-                    chart: {
-                        ...this.state.options.chart,
-                        sparkline: {
-                            enabled: false
-                        }
-                    }
-                }
-            })
+        if(!isScreenSmall && this.state.options.chart.sparkline.enabled) {
+            this.setStateChart(false, true, true, true);
         }
-        if(mediaQuery && !this.state.options.chart.sparkline.enabled) {
-            console.log('hi2');
-            this.setState({
-                options: {
-                    ...this.state.options,
-                    chart: {
-                        ...this.state.options.chart,
-                        sparkline: {
-                            enabled: true
-                        }
-                    }
-                },
-            })
+        if(isScreenSmall && !this.state.options.chart.sparkline.enabled) {
+            this.setStateChart(true, false, false, false);
         }
     }
 
