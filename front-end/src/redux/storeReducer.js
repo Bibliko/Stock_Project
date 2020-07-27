@@ -1,6 +1,7 @@
 import actionTypes from './storeActions/actionTypes';
 
 import userReducer from './storeReducers/user.reducer';
+import marketReducer from './storeReducers/market.reducer';
 
 /** 
  * - variable action in addReducer will be obtained from 
@@ -18,7 +19,10 @@ const initializeStoreState = (initialState) => {
         switch(action.type) {
             case actionTypes.USER:
                 return userReducer(action, state);
-    
+
+            case actionTypes.MARKET:
+                return marketReducer(action, state);
+
             default:
                 return state;
         }

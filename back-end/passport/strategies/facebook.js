@@ -33,7 +33,8 @@ const facebookStrategy = new FacebookStrategy({
         else {
             return prisma.user.create({
                 data: {
-                    name: `${first_name} ${last_name}`,
+                    firstName: first_name,
+                    lastName: last_name,
                     email,
                     password: "",
                     avatarUrl: `https://graph.facebook.com/${id}/picture?type=normal`

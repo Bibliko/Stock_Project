@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 const loginStrategy = require("./strategies/login");
 const signupStrategy = require("./strategies/signup");
 const facebookStrategy = require("./strategies/facebook");

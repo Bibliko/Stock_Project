@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
@@ -145,21 +145,21 @@ class ForgotPassword extends React.Component {
 
     changeEmail = (event) => {
         this.email = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
 
     changeCode = (event) => {
         this.code = event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
 
     changePassword = (event) => {
         this.password=event.target.value;
-        if(!_.isEmpty(this.state.error)) {
+        if(!isEmpty(this.state.error)) {
             this.setState({ error: "" });
         }
     }
@@ -167,9 +167,9 @@ class ForgotPassword extends React.Component {
     changeConfirmPassword = (event) => {
         this.confirmPassword=event.target.value;
 
-        if(!_.isEqual(this.password, this.confirmPassword)) {
+        if(!isEqual(this.password, this.confirmPassword)) {
 
-            if(!_.isEqual(this.state.error, this.errorTypes[0])) {
+            if(!isEqual(this.state.error, this.errorTypes[0])) {
                 this.setState({ error: this.errorTypes[0] });
             }
 
@@ -180,7 +180,7 @@ class ForgotPassword extends React.Component {
     }
 
     sendCode = () => {
-        if(_.isEmpty(this.email)) {
+        if(isEmpty(this.email)) {
             this.setState({
                 error: this.errorTypes[1],
             })
@@ -202,7 +202,7 @@ class ForgotPassword extends React.Component {
 
     verifyCode = () => {
         this.setState({ success: "" });
-        if(_.isEmpty(this.code)) {
+        if(isEmpty(this.code)) {
             this.setState({
                 error: this.errorTypes[1],
             });
@@ -226,9 +226,9 @@ class ForgotPassword extends React.Component {
 
     submit = () => {
         if(
-            _.isEmpty(this.email) ||
-            _.isEmpty(this.password) ||
-            _.isEmpty(this.confirmPassword)
+            isEmpty(this.email) ||
+            isEmpty(this.password) ||
+            isEmpty(this.confirmPassword)
         ) {
             this.setState({ error: this.errorTypes[1] }); 
         }
@@ -365,7 +365,7 @@ class ForgotPassword extends React.Component {
                                 }
                             </Grid>
                             {
-                                !_.isEmpty(this.state.error) &&
+                                !isEmpty(this.state.error) &&
                                 <Grid item xs className={classes.center}>
                                     <Typography color="error" align="center"
                                         className={classes.announcementText}
@@ -375,7 +375,7 @@ class ForgotPassword extends React.Component {
                                 </Grid>
                             }
                             {
-                                !_.isEmpty(this.state.success) &&
+                                !isEmpty(this.state.success) &&
                                 <Grid item xs className={classes.center}>
                                     <Typography color="primary" align="center"
                                         className={classes.announcementText}

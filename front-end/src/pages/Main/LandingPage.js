@@ -1,15 +1,8 @@
 import React from 'react';
-//import _ from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
-// import {
-//     userAction,
-// } from '../../redux/storeActions/actions';
-import { socket } from '../../App';
-
-import { updateUserDataForSocket } from '../../utils/SocketUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -20,8 +13,9 @@ import { Typography } from '@material-ui/core';
 const styles = theme => ({
     root: { 
         position: 'absolute',
-        height: '100%',
+        height: '75%',
         width: '75%',
+        marginTop: '100px',
         [theme.breakpoints.down('xs')]: {
             width: '85%',
         },
@@ -40,7 +34,12 @@ const styles = theme => ({
     },
     fullHeightWidth: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        minHeight: '200px',
+        padding: '24px',
+        [theme.breakpoints.down('xs')]: {
+            padding: 0,
+        },
     },
     itemGrid: {
         display: 'flex',
@@ -75,10 +74,6 @@ const styles = theme => ({
 class LandingPage extends React.Component {
     componentDidMount() {
         console.log(this.props.userSession);
-    }
-
-    componentDidUpdate() {
-        updateUserDataForSocket(socket, this.props.userSession);
     }
 
     render() {

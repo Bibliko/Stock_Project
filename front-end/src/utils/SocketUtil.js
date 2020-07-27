@@ -1,86 +1,39 @@
-import axios from 'axios';
-import _ from 'lodash';
-import { 
-  changeUserData, 
-  calculateTotalSharesValue 
-} from './UserUtil';
+import { isEqual } from 'lodash';
 
-const {
-  REACT_APP_BACKEND_HOST: BACKEND_HOST
-} = process.env;
+export const checkMarketClosed = "checkMarketClosed";
 
-/** Usage setupUserInformation
- * Use to set up user information for back-end Socket
+/**
+ * classState is state of the class using this socket connection.
+ * state must include variable isMarketClosed (boolean)
  */
-export const setupUserInformation = "setupUserInformation";
+export const socketCheckMarketClosed = (socket, isMarketClosedInReduxStore, mutateMarket) => {
 
-/** Usage checkStockQuotesForUser
- * Use to check stock quotes of user
- */
-export const checkStockQuotesForUser = "checkStockQuotesForUser";
+  socket.on(checkMarketClosed, (ifClosed) => {
+    //console.log(ifClosed);
 
-export const updateUserDataForSocket = (socket, userSession) => {
-  if(userSession) {
-    socket.emit(setupUserInformation, userSession);
-    return;
-  }
+    if(!isEqual(ifClosed, isMarketClosedInReduxStore)) {
 
-  axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
-  .then(user => {
-    socket.emit(setupUserInformation, user.data);
-  })
-  .catch(e => {
-    console.log(e);
-  })
+      if(ifClosed) {
+        mutateMarket('closeMarket');
+      }
+
+      else {
+        mutateMarket('openMarket');
+      }
+    }
+  })  
 }
 
-/** Usage setupSocketToCheckStockQuotes
- * Set up Socket Check Stock Quotes for user
- * Use in front-end/src/pages/Main/AccountSummary
+/**
+ * options are listed at the beginning of front-end/src/utils/SocketUtil
+ * Off All Listeners 
  */
-export const setupSocketToCheckStockQuotes = (socket, userSession, setStateFn, mutateUser) => {
-
-  // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-  socket.on(checkStockQuotesForUser, (stockQuotesJSON) => {
-    calculateTotalSharesValue(stockQuotesJSON, userSession.email)
-    .then(totalSharesValue => {
-      // console.log(totalSharesValue);
-
-      const newTotalPortfolioValue = userSession.cash + totalSharesValue;
-      
-      // setState so that these variables can be used locally immediately.
-      setStateFn({
-        userTotalSharesValue: totalSharesValue,
-        userTotalPortfolioValue: newTotalPortfolioValue
-      });
-
-      /** 
-       * changeData so that when we reload page or go to other page, the data
-       * would be up-to-date.
-       */ 
-      const dataNeedChange = {
-        totalPortfolio: newTotalPortfolioValue
-      };
-
-      if(!_.isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
-        return changeUserData(dataNeedChange, userSession.email, mutateUser);
-      }
-      else {
-        return "No need to update user data.";
-      }
-    })
-    .then(log => {
-      //console.log(log);
-    })
-    .catch(err => {
-      console.log(err);
-    })
-  })
+export const offSocketListeners = (socket, option) => {
+  socket.off(option);
 }
 
 export default {
-  setupUserInformation,
-  checkStockQuotesForUser,
-  updateUserDataForSocket,
-  setupSocketToCheckStockQuotes
+  checkMarketClosed,
+  socketCheckMarketClosed,
+  offSocketListeners
 }
