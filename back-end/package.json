@@ -14,14 +14,14 @@
     "docker-stop-containers-ps": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./powershell-scripts/docker-stop-containers.ps1",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
-    "dev": "node checkChangesInSchemaPrisma.js && npm run update-db && nodemon index.js",
+    "dev": "node checkConfigFolder.js && node checkChangesInSchemaPrisma.js && npm run update-db && nodemon index.js",
     "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/cli": "^2.2.0",
+    "@prisma/cli": "^2.3.0",
     "@prisma/client": "^2.2.0",
     "@sendgrid/mail": "^7.2.1",
     "algoliasearch": "^4.3.0",
