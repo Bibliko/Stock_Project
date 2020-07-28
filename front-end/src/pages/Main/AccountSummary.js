@@ -8,9 +8,8 @@ import {
     userAction,
 } from '../../redux/storeActions/actions';
 
-import {
-    getUserData
-} from '../../utils/UserUtil';
+import { getUserData } from '../../utils/UserUtil';
+import { numberWithCommas } from '../../utils/NumberUtil';
 
 import HoldingsTableContainer from '../../components/Table/AccountSummaryTable/HoldingsTableContainer';
 import SummaryTableContainer from '../../components/Table/AccountSummaryTable/SummaryTableContainer';
@@ -91,6 +90,21 @@ const styles = theme => ({
           fontSize: 'medium'
         },
     },
+    titleChart: {
+        fontSize: 'x-large',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'medium'
+        },
+        color: 'white',
+        fontWeight: 'bold'
+    }, 
+    subtitleChart: {
+        fontSize: 'medium',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'small'
+        },
+        color: 'white',
+    }
 });
 
 class AccountSummary extends React.Component {
@@ -207,6 +221,12 @@ class AccountSummary extends React.Component {
                     <Grid item xs={12} className={classes.noteGrid}>
                         <Typography className={clsx(classes.gridTitle, classes.portfolioChart)}>
                             Portfolio Chart
+                        </Typography>
+                        <Typography className={classes.titleChart}>
+                            ${numberWithCommas(totalPortfolio)}
+                        </Typography>
+                        <Typography className={classes.subtitleChart}>
+                            Portfolio Now
                         </Typography>
                         <AccountSummaryChart />
                     </Grid>

@@ -7,7 +7,7 @@ const checkMarketClosedString = "checkMarketClosed";
 const checkMarketClosed = (socket, objVariables) => {
 
     if(!objVariables.isPrismaMarketHolidaysInitialized) {
-        console.log("SocketUtil, 70");
+        console.log("SocketUtil, 10");
         return;
     }
 

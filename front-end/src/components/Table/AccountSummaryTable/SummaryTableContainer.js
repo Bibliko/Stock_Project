@@ -4,6 +4,8 @@ import clsx from 'clsx';
 
 import { connect } from 'react-redux';
 
+import { numberWithCommas } from '../../../utils/NumberUtil';
+
 import { withStyles } from '@material-ui/core/styles';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
@@ -64,27 +66,27 @@ class SummaryTableContainer extends React.Component {
     chooseTableRowValue = (type) => {
         switch(type) {
             case 'Cash':
-                return `$${this.props.cash}`;
+                return `$${numberWithCommas(this.props.cash)}`;
 
             case 'Shares':
                 let shares = this.props.userSharesValue;
                 if(typeof shares === "number") {
                     shares = shares.toFixed(2);
-                    return `$${shares}`;
+                    return `$${numberWithCommas(shares)}`;
                 }
-                return `$${(this.props.totalPortfolio-this.props.cash).toFixed(2)}`;
+                return `$${numberWithCommas((this.props.totalPortfolio-this.props.cash).toFixed(2))}`;
 
             case 'Total Portfolio Value':
-                return `$${this.props.totalPortfolio}`;
+                return `$${numberWithCommas(this.props.totalPortfolio)}`;
 
             case 'Daily Change':
                 if(this.props.userDailyChange < 0) {
-                    return `-$${Math.abs(this.props.userDailyChange)}`;
+                    return `-$${numberWithCommas(Math.abs(this.props.userDailyChange))}`;
                 }
-                return `$${this.props.userDailyChange}`;
+                return `$${numberWithCommas(this.props.userDailyChange)}`;
 
             case 'Overall Rank':
-                return `${this.props.ranking}`;
+                return `${numberWithCommas(this.props.ranking)}`;
 
             default:
                 return;

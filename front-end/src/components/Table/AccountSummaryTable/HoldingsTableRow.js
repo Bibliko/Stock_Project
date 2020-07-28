@@ -4,21 +4,12 @@ import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
-import {
-    userAction,
-} from '../../../redux/storeActions/actions';
+import { userAction } from '../../../redux/storeActions/actions';
 
-import {
-    changeShareData,
-} from '../../../utils/ShareUtil';
-
-import {
-    getStockPriceFromFMP
-} from '../../../utils/FinancialModelingPrepUtil';
-
-import {  
-    oneSecond
-} from '../../../utils/DayTimeUtil';
+import { changeShareData } from '../../../utils/ShareUtil';
+import { getStockPriceFromFMP } from '../../../utils/FinancialModelingPrepUtil';
+import {  oneSecond } from '../../../utils/DayTimeUtil';
+import { numberWithCommas } from '../../../utils/NumberUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import TableRow from '@material-ui/core/TableRow';
@@ -114,19 +105,19 @@ class HoldingsTableRow extends React.Component {
                 return `${rowData.code}`;
 
             case "Holding":
-                return `${rowData.holding}`;
+                return `${numberWithCommas(rowData.holding)}`;
 
             case "Buy Price (Avg)":
-                return `$${rowData.buyPriceAvg.toFixed(2)}`;
+                return `$${numberWithCommas(rowData.buyPriceAvg.toFixed(2))}`;
 
             case "Last Price":
-                return `$${this.state.lastPrice}`;
+                return `$${numberWithCommas(this.state.lastPrice)}`;
 
             case "Profit/Loss":
                 if(parseFloat(this.state.profitOrLoss, 10) < 0) {
-                    return `-$${Math.abs(parseFloat(this.state.profitOrLoss, 10))}`;
+                    return `-$${numberWithCommas(Math.abs(parseFloat(this.state.profitOrLoss, 10)))}`;
                 }
-                return `$${this.state.profitOrLoss}`;
+                return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
             default: 
                 return;

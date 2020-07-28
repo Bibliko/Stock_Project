@@ -55,7 +55,10 @@ const styles = theme => ({
         minHeight: '60px'
     },
     logo: {
-        height: '55px',
+        height: '50px',
+        [theme.breakpoints.down('xs')]: {
+            height: '30px'
+        },
         '&:hover': {
             cursor: 'pointer'
         },

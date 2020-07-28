@@ -1,17 +1,44 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
+import { isEqual, isEmpty } from 'lodash';
 import { withRouter } from 'react-router';
 
-import { oneSecond } from '../../utils/DayTimeUtil';
+import { connect } from 'react-redux';
+
+import { oneSecond, convertToLocalTimeString } from '../../utils/DayTimeUtil';
+import { getUserData } from '../../utils/UserUtil';
 import { withMediaQuery } from '../../theme/ThemeUtil';
+import { browserName } from '../../utils/BrowserUtil';
 
 import { withStyles, withTheme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
+    mainDiv: {
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '10px',
+        marginBottom: '10px',
+        marginTop: '20px',
+    },
     chart: {
         height: '100%',
         width: '100%',
-        padding: '10px'
+        [theme.breakpoints.up('md')]: {
+            height: '80%',
+            width: '80%',
+        }
+    },
+    note: {
+        color: 'white',
+        fontSize: 'medium',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'small'
+        },
     }
 });
 
@@ -20,12 +47,12 @@ class AccountSummaryChart extends React.Component {
     state = {
         options: {
             chart: {
-                id: 'Testing',
+                id: 'AccountSummaryChart',
                 sparkline: {
                     enabled: false
                 },
                 toolbar: {
-                    show: true,
+                    show: isEqual(browserName(), 'chrome')? true:false,
                     tools: {
                         download: false,
                         selection: true,
@@ -36,7 +63,7 @@ class AccountSummaryChart extends React.Component {
                         reset: true
                     }
                 },
-                type: 'area'
+                type: 'area',
             },
             xaxis: {
                 labels: {
@@ -46,7 +73,8 @@ class AccountSummaryChart extends React.Component {
                     },
                 },
                 type: 'datetime',
-                categories: ["01 Jan", "02 Jan", "03 Jan", "04 Jan", "05 Jan", "06 Jan", "07 Jan", "08 Jan"],
+                tickAmount: 6,
+                min: new Date(new Date(this.props.userSession.createdAt).toLocaleString()).getTime(),
             },
             yaxis: {
                 labels: {
@@ -67,12 +95,15 @@ class AccountSummaryChart extends React.Component {
                 x: {
                   format: 'dd MMM yyyy'
                 }
-              },
+            },
+            dataLabels: {
+                enabled: false
+            },
             stroke: {
                 curve: 'straight',
             },
             grid: {
-                show: false
+                show: true
             },
             fill: {
                 type: "gradient",
@@ -84,29 +115,15 @@ class AccountSummaryChart extends React.Component {
                     stops: [0, 100]
                 }
             },
-            title: {
-                text: '$100000',
-                style: {
-                  fontSize:  '18px',
-                  fontWeight: 600,
-                  color:  'white'
-                },
-            },
-            subtitle: {
-                text: 'Cash on hand',
-                margin: 20,
-                style: {
-                  fontSize:  '12px',
-                  color:  'white'
-                },
-            }
         },
 
         series: [{
             name: 'Total Portfolio',
             type: 'area',
-            data: [30, 40, 45, 50, 49, 60, 70, 91]
-        }]
+            data: []
+        }],
+
+        isChartReady: false
     }
 
     intervalCheckThemeBreakpoints;
@@ -122,7 +139,7 @@ class AccountSummaryChart extends React.Component {
                     },
                     toolbar: {
                         ...this.state.options.chart.toolbar,
-                        show: showToolbar
+                        show: isEqual(browserName(), 'chrome')? showToolbar:false
                     }
                 },
                 xaxis: {
@@ -157,11 +174,41 @@ class AccountSummaryChart extends React.Component {
         }
     }
 
+    initializeChartSeries = () => {
+        const dataNeeded = {
+            accountSummaryChartInfo: true
+        }
+
+        getUserData(dataNeeded, this.props.userSession.email)
+        .then(chartInfo => {
+            const { accountSummaryChartInfo } = chartInfo;
+            let seriesData = [];
+            accountSummaryChartInfo.map(timestamp => {
+                return seriesData.push([
+                    convertToLocalTimeString(timestamp.UTCDateString),
+                    timestamp.portfolioValue
+                ]);
+            });
+            this.setState({
+                series: [{
+                    name: 'Total Portfolio',
+                    type: 'area',
+                    data: seriesData
+                }]
+            }, () => {
+                this.setState({
+                    isChartReady: true
+                });
+            })
+        })
+    }
+
     componentDidMount() {
         this.intervalCheckThemeBreakpoints = setInterval(
             () => this.checkThemeBreakpointsToChangeChart(),
             oneSecond
         );
+        this.initializeChartSeries();
     }
 
     componentWillUnmount() {
@@ -173,14 +220,41 @@ class AccountSummaryChart extends React.Component {
             classes, 
         } = this.props;
 
-        return(
-            <Chart 
-                options={this.state.options}
-                series={this.state.series} 
-                className={classes.chart}
-            />
-        );
+        const {
+            options,
+            series,
+            isChartReady
+        } = this.state;
+
+        return (
+            <div className={classes.mainDiv}>
+                {
+                    !isChartReady &&
+                    <CircularProgress/>
+                }
+                {
+                    isChartReady && !isEmpty(series[0].data) &&
+                    <Chart 
+                        options={options}
+                        series={series} 
+                        className={classes.chart}
+                    />
+                }
+                {
+                    isChartReady && isEmpty(series[0].data) &&
+                    <Typography className={classes.note}>    
+                        Chart is not updated yet. It's only updated whenever market is closed.
+                    </Typography>
+                }
+            </div>
+        )
     }
 }
 
-export default withStyles(styles)(withTheme(withRouter(withMediaQuery('(max-width:600px)')(AccountSummaryChart))));
+const mapStateToProps = (state) => ({
+    userSession: state.userSession,
+});
+
+export default connect(mapStateToProps, {})(
+    withStyles(styles)(withTheme(withRouter(withMediaQuery('(max-width:600px)')(AccountSummaryChart))))
+);
