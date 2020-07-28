@@ -12,24 +12,29 @@ import { browserName } from '../../utils/BrowserUtil';
 
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
+    mainDiv: {
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '10px',
+        marginBottom: '10px',
+        marginTop: '20px',
+    },
     chart: {
         height: '100%',
         width: '100%',
         [theme.breakpoints.up('md')]: {
             height: '80%',
             width: '80%',
-        },
-        padding: '10px',
-        marginBottom: '10px',
-        marginTop: '20px',
-        alignSelf: 'center'
+        }
     },
     note: {
-        alignSelf: 'center',
         color: 'white',
-        marginTop: '20px',
         fontSize: 'medium',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small'
@@ -69,7 +74,7 @@ class AccountSummaryChart extends React.Component {
                 },
                 type: 'datetime',
                 tickAmount: 6,
-                min: new Date(this.props.userSession.createdAt).getTime(),
+                min: new Date(new Date(this.props.userSession.createdAt).toLocaleString()).getTime(),
             },
             yaxis: {
                 labels: {
@@ -116,7 +121,9 @@ class AccountSummaryChart extends React.Component {
             name: 'Total Portfolio',
             type: 'area',
             data: []
-        }]
+        }],
+
+        isChartReady: false
     }
 
     intervalCheckThemeBreakpoints;
@@ -184,10 +191,15 @@ class AccountSummaryChart extends React.Component {
             });
             this.setState({
                 series: [{
-                    ...this.state.series[0],
+                    name: 'Total Portfolio',
+                    type: 'area',
                     data: seriesData
                 }]
-            });
+            }, () => {
+                this.setState({
+                    isChartReady: true
+                });
+            })
         })
     }
 
@@ -208,22 +220,34 @@ class AccountSummaryChart extends React.Component {
             classes, 
         } = this.props;
 
-        if(!isEmpty(this.state.series.data)) {
-            return(
-                <Chart 
-                    options={this.state.options}
-                    series={this.state.series} 
-                    className={classes.chart}
-                />
-            );
-        }
-        else {
-            return(
-                <Typography className={classes.note}>    
-                    Chart is not updated yet. It's only updated whenever market is closed.
-                </Typography>
-            )
-        }
+        const {
+            options,
+            series,
+            isChartReady
+        } = this.state;
+
+        return (
+            <div className={classes.mainDiv}>
+                {
+                    !isChartReady &&
+                    <CircularProgress/>
+                }
+                {
+                    isChartReady && !isEmpty(series[0].data) &&
+                    <Chart 
+                        options={options}
+                        series={series} 
+                        className={classes.chart}
+                    />
+                }
+                {
+                    isChartReady && isEmpty(series[0].data) &&
+                    <Typography className={classes.note}>    
+                        Chart is not updated yet. It's only updated whenever market is closed.
+                    </Typography>
+                }
+            </div>
+        )
     }
 }
 

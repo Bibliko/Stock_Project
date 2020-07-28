@@ -74,7 +74,6 @@ export const getSecondsUTCString = (UTCString) => {
 
 export const convertToLocalTimeString = (UTCString) => {
     var localTimeString = new Date(UTCString).toLocaleString();
-    console.log(localTimeString);
     return localTimeString;
 }
 
