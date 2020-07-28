@@ -173,15 +173,15 @@ class Layout extends React.Component {
       return;
     }
 
-    this.setStateIfUserFinishedSettingUpAccount();
-
-    this.setupIntervals();
-
     socketCheckMarketClosed(
       socket,
       this.props.isMarketClosed,
       this.props.mutateMarket
     );
+
+    this.setStateIfUserFinishedSettingUpAccount();
+
+    this.setupIntervals();
   }
 
   componentDidUpdate() {
@@ -190,6 +190,7 @@ class Layout extends React.Component {
     }
 
     if(!isEmpty(this.state.countdown) && this.props.isMarketClosed) {
+      clearInterval(this.marketCountdownInterval);
       this.setState({
         countdown: ''
       });

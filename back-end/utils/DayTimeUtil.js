@@ -95,6 +95,12 @@ const getSecondsUTCString = (UTCString) => {
     return parseInt(secondsString, 10);
 }
 
+const changeTimeUTCString = (UTCString, hourString, minuteString, secondString) => {
+    let alreadyChangedTime = '';
+    alreadyChangedTime = UTCString.substring(0, 16) + ' ' + `${hourString}:${minuteString}:${secondString}` + ' GMT';
+    return alreadyChangedTime;
+}
+
 const newDate = () => {
     var timeNow = new Date().toUTCString();
     return timeNow;
@@ -219,6 +225,7 @@ module.exports = {
     getHoursUTCString,
     getMinutesUTCString,
     getSecondsUTCString,
+    changeTimeUTCString,
     newDate,
     findIfTimeNowIsHoliday,
     findIfTimeNowIsOutOfRange,

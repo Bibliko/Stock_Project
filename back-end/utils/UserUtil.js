@@ -1,6 +1,8 @@
-const { isEqual } = require('lodash');
+const { isEqual, isUndefined } = require('lodash');
 const {
-    isMarketClosedCheck
+    isMarketClosedCheck,
+    newDate,
+    changeTimeUTCString
 } = require('./DayTimeUtil');
 
 const { PrismaClient } = require('@prisma/client');
@@ -22,12 +24,47 @@ const deleteExpiredVerification = () => {
     })
 }
 
+const createAccountSummaryChartTimestampIfNecessary = (user) => {
+    return new Promise((resolve, reject) => {
+        prisma.accountSummaryTimestamp.findOne({
+            where: {
+                UTCDateString_userID: {
+                    UTCDateString: changeTimeUTCString(newDate(), '20', '00', '00'),
+                    userID: user.id
+                }
+            }
+        })
+        .then(timestamp => {
+            if(isUndefined(timestamp)) {
+                return prisma.accountSummaryTimestamp.create({
+                    data: {
+                        UTCDateString: changeTimeUTCString(newDate(), '20', '00', '00'),
+                        portfolioValue: user.totalPortfolio,
+                        user: {
+                            connect: {
+                                id: user.id
+                            }
+                        }
+                    }
+                })
+            }
+        })
+        .then(() => {
+            console.log('find and create timestamp done');
+            resolve('find and create timestamp done');
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
 const updateAllUsers = () => {
     // update portfolioLastClosure and ranking for all users
 
     prisma.user.findMany({
         select: {
-            email: true,
+            id: true,
             totalPortfolio: true
         },
         orderBy: {
@@ -38,15 +75,18 @@ const updateAllUsers = () => {
         //console.log(usersArray);
 
         const updateAllUsersPromise = usersArray.map((user, index) => {
-            return prisma.user.update({
+            const updateRankingAndPortfolioLastClosure = prisma.user.update({
                 where: {
-                    email: user.email,
+                    id: user.id,
                 },
                 data: {
                     totalPortfolioLastClosure: user.totalPortfolio,
                     ranking: index + 1
                 },
-            })
+            });
+            const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(user);
+
+            return Promise.all([updateRankingAndPortfolioLastClosure, accountSummaryPromise]);
         });
         return Promise.all(updateAllUsersPromise);
     })
@@ -102,6 +142,7 @@ const checkAndUpdateAllUsers = (objVariables) => {
 
 module.exports = {
     deleteExpiredVerification,
+    createAccountSummaryChartTimestampIfNecessary,
     updateAllUsers,
     checkAndUpdateAllUsers
 }
