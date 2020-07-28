@@ -29,8 +29,8 @@ const styles = theme => ({
         height: '100%',
         width: '100%',
         [theme.breakpoints.up('md')]: {
-            height: '80%',
-            width: '80%',
+            height: '75%',
+            width: '75%',
         }
     },
     note: {
@@ -52,16 +52,17 @@ class AccountSummaryChart extends React.Component {
                     enabled: false
                 },
                 toolbar: {
-                    show: isEqual(browserName(), 'chrome')? true:false,
+                    show: isEqual(browserName(), "chrome")? true:false,
                     tools: {
                         download: false,
-                        selection: true,
+                        selection: false,
                         zoom: true,
                         zoomin: true,
                         zoomout: true,
                         pan: true,
                         reset: true
-                    }
+                    },
+                    autoSelected: 'selection' 
                 },
                 type: 'area',
             },
@@ -139,7 +140,7 @@ class AccountSummaryChart extends React.Component {
                     },
                     toolbar: {
                         ...this.state.options.chart.toolbar,
-                        show: isEqual(browserName(), 'chrome')? showToolbar:false
+                        show: isEqual(browserName(), "chrome")? showToolbar:false
                     }
                 },
                 xaxis: {

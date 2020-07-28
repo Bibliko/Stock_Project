@@ -1,4 +1,4 @@
-const { isEqual, isUndefined } = require('lodash');
+const { isEqual } = require('lodash');
 const {
     isMarketClosedCheck,
     newDate,
@@ -35,7 +35,7 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
             }
         })
         .then(timestamp => {
-            if(isUndefined(timestamp)) {
+            if(!timestamp) {
                 return prisma.accountSummaryTimestamp.create({
                     data: {
                         UTCDateString: changeTimeUTCString(newDate(), '20', '00', '00'),
