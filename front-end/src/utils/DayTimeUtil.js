@@ -82,7 +82,10 @@ export const newDate = () => {
     return timeNow;
 }
 
-export const marketCountdownUpdate = (setStateFn) => {
+export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
+    if(isMarketClosed) {
+        return;
+    }
 
     var timeNow = newDate();
     //console.log(timeNow);

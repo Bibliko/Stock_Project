@@ -25,7 +25,12 @@ import ArrowDropDownRoundedIcon from '@material-ui/icons/ArrowDropDownRounded';
 const styles = theme => ({
     tableCell: {
         color: 'white',
-        border: 'hidden',
+        borderLeftWidth: '1px',
+        borderRightWidth: '0px',
+        borderTopWidth: '1px',
+        borderBottomWidth: '0px',
+        borderColor: '#2D9CDB',
+        borderStyle: 'solid',
     },
     tableRow: {
         background: 'transparent',
@@ -77,6 +82,20 @@ const styles = theme => ({
     },
     marginLeftIfProfitOrLoss: {
         marginLeft: '12px',
+    },
+
+    // border section
+    lastLeftCell: {
+        borderBottomLeftRadius: '4px'
+    },
+    lastRightCell: {
+        borderBottomRightRadius: '4px'
+    },
+    lastRow: {
+        borderBottomWidth: '1px'
+    },
+    watchlistBorder: {
+        borderRightWidth: '1px'
     }
 });
 
@@ -124,12 +143,19 @@ class HoldingsTableRow extends React.Component {
         }
     }
 
+    isTableRowTheLast = () => {
+        const { rowIndex, rowsLength } = this.props;
+        return rowIndex === rowsLength - 1;
+    }
+
     chooseTableCell = (type, classes) => {
         return (
             <TableCell align="center" 
                 className={clsx(classes.tableCell, {
                     [classes.arrowUp]: this.checkIfProfitOrLoss(type)==="Profit",
-                    [classes.arrowDown]: this.checkIfProfitOrLoss(type)==="Loss"
+                    [classes.arrowDown]: this.checkIfProfitOrLoss(type)==="Loss",
+                    [classes.lastLeftCell]: this.isTableRowTheLast() && type==="Code",
+                    [classes.lastRow]: this.isTableRowTheLast()
                 })} 
             >
                 <div className={clsx(classes.cellDiv, {
@@ -233,7 +259,9 @@ class HoldingsTableRow extends React.Component {
                 { this.chooseTableCell("Profit/Loss", classes) }
 
                 <TableCell align="center" 
-                    className={classes.tableCell}
+                    className={clsx(classes.tableCell, {
+                        [classes.lastRow]: this.isTableRowTheLast()
+                    })}
                 >
                     <div className={classes.cellDiv}>
                         <Button className={classes.buyButton}>
@@ -246,7 +274,10 @@ class HoldingsTableRow extends React.Component {
                 </TableCell>
 
                 <TableCell align="center" 
-                    className={classes.tableCell}
+                    className={clsx(classes.tableCell, classes.watchlistBorder, {
+                        [classes.lastRightCell]: this.isTableRowTheLast(),
+                        [classes.lastRow]: this.isTableRowTheLast()
+                    })}
                 >
                     <div className={classes.cellDiv}>
                         <IconButton className={classes.watchlistButton}>

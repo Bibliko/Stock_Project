@@ -124,7 +124,7 @@ class Layout extends React.Component {
 
   setupIntervals = () => {
     this.marketCountdownInterval = setInterval( 
-      () => marketCountdownUpdate(this.setState.bind(this)),
+      () => marketCountdownUpdate(this.setState.bind(this), this.props.isMarketClosed),
       oneSecond
     );
 

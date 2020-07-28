@@ -15,7 +15,7 @@ import TableBody from '@material-ui/core/TableBody';
 const styles = theme => ({
     table: {
         width: '100%',
-        border: 'hidden'
+        borderCollapse: 'separate',
     },
     tableContainer: {
         borderRadius: '4px',
@@ -26,7 +26,9 @@ const styles = theme => ({
     },
     tableCell: {
         fontSize: '12px',
-        border: 'hidden',
+        borderWidth: '1px',
+        borderColor: '#9ED2EF',
+        borderStyle: 'solid'
     },
     cellDiv: {
         display: 'flex',
@@ -83,10 +85,12 @@ class HoldingsTableContainer extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody className={classes.tableBody}>
-                        {rows.map((row) => (
+                        {rows.map((row, index) => (
                             <HoldingsTableRow
                                 key={row.id}
                                 rowData={row}
+                                rowIndex={index}
+                                rowsLength={rows.length}
                             />
                         ))}
                     </TableBody>

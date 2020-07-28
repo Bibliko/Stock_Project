@@ -223,7 +223,7 @@ class AccountSummary extends React.Component {
                             Portfolio Chart
                         </Typography>
                         <Typography className={classes.titleChart}>
-                            ${numberWithCommas(totalPortfolio)}
+                            ${numberWithCommas(totalPortfolio.toFixed(2))}
                         </Typography>
                         <Typography className={classes.subtitleChart}>
                             Portfolio Now
