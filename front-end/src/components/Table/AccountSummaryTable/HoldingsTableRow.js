@@ -4,22 +4,11 @@ import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
-import {
-    userAction,
-} from '../../../redux/storeActions/actions';
+import { userAction } from '../../../redux/storeActions/actions';
 
-import {
-    changeShareData,
-} from '../../../utils/ShareUtil';
-
-import {
-    getStockPriceFromFMP
-} from '../../../utils/FinancialModelingPrepUtil';
-
-import {  
-    oneSecond
-} from '../../../utils/DayTimeUtil';
-
+import { changeShareData } from '../../../utils/ShareUtil';
+import { getStockPriceFromFMP } from '../../../utils/FinancialModelingPrepUtil';
+import {  oneSecond } from '../../../utils/DayTimeUtil';
 import { numberWithCommas } from '../../../utils/NumberUtil';
 
 import { withStyles } from '@material-ui/core/styles';
