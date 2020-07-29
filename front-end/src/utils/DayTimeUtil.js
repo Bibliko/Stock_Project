@@ -73,8 +73,8 @@ export const getSecondsUTCString = (UTCString) => {
 }
 
 export const convertToLocalTimeString = (UTCString) => {
-    var localTimeString = new Date(UTCString).toLocaleString();
-    return localTimeString;
+    var localTime = new Date(UTCString).toLocaleString();
+    return localTime;
 }
 
 export const newDate = () => {

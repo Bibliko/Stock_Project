@@ -72,6 +72,7 @@ class AccountSummaryChart extends React.Component {
                     style: {
                         colors: 'white',
                     },
+                    datetimeUTC: false,
                 },
                 type: 'datetime',
                 tickAmount: 6,

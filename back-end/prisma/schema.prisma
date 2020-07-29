@@ -34,11 +34,12 @@ model User {
 model AccountSummaryTimestamp {
   id                String    @default(cuid()) @id
   UTCDateString     String
+  UTCDateKey        String
   portfolioValue    Float
   user              User      @relation(fields: [userID], references: [id])
   userID            String
 
-  @@unique([UTCDateString, userID])
+  @@unique([UTCDateKey, userID])
 }
 
 model Share {

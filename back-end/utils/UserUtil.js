@@ -2,7 +2,7 @@ const { isEqual } = require('lodash');
 const {
     isMarketClosedCheck,
     newDate,
-    changeTimeUTCString
+    getFullDateUTCString
 } = require('./DayTimeUtil');
 
 const { PrismaClient } = require('@prisma/client');
@@ -28,8 +28,8 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
     return new Promise((resolve, reject) => {
         prisma.accountSummaryTimestamp.findOne({
             where: {
-                UTCDateString_userID: {
-                    UTCDateString: changeTimeUTCString(newDate(), '20', '00', '00'),
+                UTCDateKey_userID: {
+                    UTCDateKey: getFullDateUTCString(newDate()),
                     userID: user.id
                 }
             }
@@ -38,7 +38,8 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
             if(!timestamp) {
                 return prisma.accountSummaryTimestamp.create({
                     data: {
-                        UTCDateString: changeTimeUTCString(newDate(), '20', '00', '00'),
+                        UTCDateString: newDate(),
+                        UTCDateKey: getFullDateUTCString(newDate()),
                         portfolioValue: user.totalPortfolio,
                         user: {
                             connect: {

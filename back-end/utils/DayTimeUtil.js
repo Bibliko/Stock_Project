@@ -80,6 +80,11 @@ const getYearUTCString = (UTCString) => {
     return parseInt(yearString, 10);
 }
 
+const getFullDateUTCString = (UTCString) => {
+    var fullDateString = UTCString.substring(0, 16);
+    return fullDateString;
+}
+
 const getHoursUTCString = (UTCString) => {
     var hoursString = UTCString.substring(17, 19);
     return parseInt(hoursString, 10);
@@ -222,6 +227,7 @@ module.exports = {
     getDateUTCString,
     getMonthUTCString,
     getYearUTCString,
+    getFullDateUTCString,
     getHoursUTCString,
     getMinutesUTCString,
     getSecondsUTCString,

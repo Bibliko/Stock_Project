@@ -114,10 +114,17 @@ class Layout extends React.Component {
 
   setStateIfUserFinishedSettingUpAccount = () => {
     const { firstName, lastName, region, occupation } = this.props.userSession;
+    const { isUserFinishedSettingUpAccount } = this.state;
 
-    if( !firstName || !lastName || !region || !occupation ) {
+    if( (!firstName || !lastName || !region || !occupation) && isUserFinishedSettingUpAccount ) {
       this.setState({
         isUserFinishedSettingUpAccount: false
+      });
+    }
+
+    if( firstName && lastName && region && occupation && !isUserFinishedSettingUpAccount ) {
+      this.setState({
+        isUserFinishedSettingUpAccount: true
       });
     }
   }
@@ -195,6 +202,8 @@ class Layout extends React.Component {
         countdown: ''
       });
     }
+
+    this.setStateIfUserFinishedSettingUpAccount();
   }
 
   componentWillUnmount() {
