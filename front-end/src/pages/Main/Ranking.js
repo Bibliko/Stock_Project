@@ -55,9 +55,8 @@ const styles = theme => ({
     itemGrid: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'flex-start',
-        flexDirection: 'column',
-        minHeight: '125px',
+        alignItems: 'center',
+        //minHeight: '125px',
     },
     gridTitle: {
         fontSize: 'x-large',
@@ -75,7 +74,7 @@ const styles = theme => ({
     },
     textField: {
         height: 50,
-        width: 300,
+        width: '100%',
         margin: '8px',
         fontWeight: 'normal',
         "& label.Mui-focused": {
@@ -100,6 +99,10 @@ const styles = theme => ({
             backgroundColor: 'rgba(225,225,225,0)'
         }
     },
+    // chooseRankingLevel: {
+    //     padding: 0,
+
+    // },
 });
 
 const levels = [
@@ -122,14 +125,12 @@ class Ranking extends React.Component {
         const { classes } = this.props;
 
         const {
-            overallrank,
-            regionrank,
-            portfoliovalue,
-            previousweek,
-            PortfolioHigh,
+            overallRank,
+            regionRank,
+            portfolioValue,
+            previousWeek,
+            portfolioHigh,
             //PortfolioLow,
-
-
         } = this.props.userSession;
 
         return (
@@ -145,7 +146,7 @@ class Ranking extends React.Component {
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
                         <TextField
                             className={classes.textField}
-                            id='ranking'
+                            id='Ranking'
                             select
                             label='Ranking level'
                             //value
@@ -174,16 +175,16 @@ class Ranking extends React.Component {
                     </Grid>
                     <Grid item xs={12} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle,classes.statistic)}>
-                            My stats
+                            My Stats
                         </Typography>
                     </Grid>
                     <Grid item xs={12} className={classes.center}>
                         <MyStatsTable
-                            overallrank={overallrank}
-                            regionrank={regionrank}
-                            portfoliovalue={portfoliovalue}
-                            previousweek={previousweek}
-                            PortfolioHigh={PortfolioHigh}
+                            overallrank={overallRank}
+                            regionrank={regionRank}
+                            portfoliovalue={portfolioValue}
+                            previousweek={previousWeek}
+                            portfolioHigh={portfolioHigh}
                         />
                     </Grid>
                 </Grid>

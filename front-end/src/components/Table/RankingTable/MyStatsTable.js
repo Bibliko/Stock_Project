@@ -26,12 +26,16 @@ const styles = theme => ({
         boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCell: {
-        fontSize: '20px',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'small'
+        },
         border: 'hidden',
-        color:'#FFFFFF'
+        color: 'white'
     },
     tableCellCenter: {
-        //fontSize: '20px',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'small'
+        },
         border: 'hidden',
         display: 'flex',
         alignItems: 'center'
@@ -40,9 +44,9 @@ const styles = theme => ({
         backgroundColor: '#5893C9',
     },
     headtitle: {
-        fontSize: '25px',
+        fontSize: 'large',
         [theme.breakpoints.down('xs')]: {
-            fontSize: 'large'
+            fontSize: 'medium'
         },
         fontWeight: 'bold',
         //marginBottom: '1px'
@@ -79,7 +83,7 @@ class MyStatsTable extends React.Component {
                 return ``;
 
             case 'Portfolio high':
-                //return `${this.props.PortfolioHigh}`;
+                //return `${this.props.portfolioHigh}`;
                 return ``;
 
             default:
@@ -99,7 +103,7 @@ class MyStatsTable extends React.Component {
                 </TableCell>
                 <TableCell 
                     align="left"
-                    className={clsx(classes.tableCellCenter)} 
+                    className={classes.tableCellCenter} 
                 >
                     {
                         this.chooseTableRowValue(type)
@@ -120,18 +124,17 @@ class MyStatsTable extends React.Component {
                     <TableHead >
                         <TableRow className={classes.head}>
                             <TableCell 
-                                component="th" scope="row" align="left"
-                                //className={classes.tableCell}    
+                                align="left"
+                                className={classes.tableCell}    
                             >
                                 <Typography className={classes.headtitle}>
                                     Performance Summary
                                 </Typography>
                             </TableCell>
                             <TableCell 
-                                component="th" scope="row" align="left"
+                                align="left"
                                 className={classes.tableCell}    
-                            >
-                            </TableCell>
+                            />
                         </TableRow>
                     </TableHead>
                     <TableBody>
