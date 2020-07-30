@@ -7,30 +7,27 @@ import { connect } from 'react-redux';
 import {
    userAction,
 } from '../../redux/storeActions/actions';
-import { socket } from '../../App';
+//import { socket } from '../../App';
 
-import { updateUserDataForSocket } from '../../utils/SocketUtil';
+//import { updateUserDataForSocket } from '../../utils/SocketUtil';
+import MyStatsTable from '../../components/Table/RankingTable/MyStatsTable';
+import OverallTable from '../../components/Table/RankingTable/OverallTable';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+//import Paper from '@material-ui/core/Paper';
 import { Typography} from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 //import NormalTextField from '../../components/TextField/normalTextField';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 //import Paper from '@material-ui/core/Paper';
 const styles = theme => ({
     root: {
         position: 'absolute',
-        height: '100%',
+        height: '75%',
         width: '75%',
+        marginTop: '100px',
         [theme.breakpoints.down('xs')]: {
             width: '85%',
         },
@@ -49,7 +46,11 @@ const styles = theme => ({
     },
     fullHeightWidth: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        padding: '24px',
+        [theme.breakpoints.down('xs')]: {
+            padding: 0,
+        },
     },
     itemGrid: {
         display: 'flex',
@@ -57,7 +58,6 @@ const styles = theme => ({
         alignItems: 'flex-start',
         flexDirection: 'column',
         minHeight: '125px',
-        //maxHeight: '300px'
     },
     gridTitle: {
         fontSize: 'x-large',
@@ -65,13 +65,13 @@ const styles = theme => ({
             fontSize: 'large'
         },
         fontWeight: 'bold',
-        marginTop: '10px'
+        marginBottom: '1px'
     },
     TitleLabel: {
-        color: '#FF3747'
+        color: '#DC3D4A'
     },
     statistic: {
-        color: '#74E0EF'
+        color: '#619FD7'
     },
     textField: {
         height: 50,
@@ -100,12 +100,8 @@ const styles = theme => ({
             backgroundColor: 'rgba(225,225,225,0)'
         }
     },
-    table: {
-        color:'blue',
-        backgroundColor: '#74E0EF',
-        width: 550,
-    }
 });
+
 const levels = [
     {
         value: 'Overall',
@@ -117,33 +113,24 @@ const levels = [
     }
 ]
 
-function createData(name) {
-    return { name };
-  }
-
-const rows = [
-    createData('Overall ranking:'),
-    createData('Region ranking'),
-    createData('Portfolio value'),
-    createData('Change from previous week'),
-    createData('Portfolio high'),
-    createData('Portfolio low'),
-    createData('Overall rank syndicates'),
-    createData('Average syndicate value'),
-    createData('% of syndicates in profit')
-];
-
 class Ranking extends React.Component {
     componentDidMount() {
         console.log(this.props.userSession);
     }
 
-    componentDidUpdate() {
-        updateUserDataForSocket(socket, this.props.userSession);
-    }
-
     render() {
         const { classes } = this.props;
+
+        const {
+            overallrank,
+            regionrank,
+            portfoliovalue,
+            previousweek,
+            PortfolioHigh,
+            //PortfolioLow,
+
+
+        } = this.props.userSession;
 
         return (
             <Container className={classes.root} disableGutters>
@@ -151,8 +138,8 @@ class Ranking extends React.Component {
                     className={classes.fullHeightWidth}
                 >
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle,classes.TitleLabel)}>
-                            Choose a Ranking level:
+                        <Typography className={clsx(classes.gridTitle, classes.TitleLabel)}>
+                            Choose a ranking level
                         </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
@@ -175,39 +162,29 @@ class Ranking extends React.Component {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
+                    <Grid item xs={12} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle,classes.TitleLabel)}>
                             Overall Ranking
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
+                    <Grid item xs={12} className={classes.center}>
+                        <OverallTable
+                            
+                        />
                     </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
+                    <Grid item xs={12} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle,classes.statistic)}>
                             My stats
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                    </Grid>
-                    <Grid item xs={12} sm={6} className={classes.center}>
-                            <Table className={classes.table} >
-                                <TableHead>
-                                <TableRow>
-                                    <TableCell>Performance summary</TableCell>
-                                    <TableCell align="right"></TableCell>
-                                </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                {rows.map((row) => (
-                                    <TableRow key={row.name}>
-                                    <TableCell component="th" scope="row">
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    </TableRow>
-                                ))}
-                                </TableBody>
-                            </Table>
+                    <Grid item xs={12} className={classes.center}>
+                        <MyStatsTable
+                            overallrank={overallrank}
+                            regionrank={regionrank}
+                            portfoliovalue={portfoliovalue}
+                            previousweek={previousweek}
+                            PortfolioHigh={PortfolioHigh}
+                        />
                     </Grid>
                 </Grid>
             </Container>
