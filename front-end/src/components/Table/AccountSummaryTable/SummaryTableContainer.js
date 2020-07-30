@@ -2,8 +2,6 @@ import React from 'react';
 import { withRouter } from 'react-router';
 import clsx from 'clsx';
 
-import { connect } from 'react-redux';
-
 import { numberWithCommas } from '../../../utils/NumberUtil';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -72,11 +70,6 @@ class SummaryTableContainer extends React.Component {
                 return `$${numberWithCommas(this.props.cash)}`;
 
             case 'Shares':
-                let shares = this.props.userSharesValue;
-                if(typeof shares === "number") {
-                    shares = shares.toFixed(2);
-                    return `$${numberWithCommas(shares)}`;
-                }
                 return `$${numberWithCommas((this.props.totalPortfolio-this.props.cash).toFixed(2))}`;
 
             case 'Total Portfolio Value':
@@ -150,10 +143,4 @@ class SummaryTableContainer extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    userSharesValue: state.userSharesValue
-});
-
-export default connect(mapStateToProps, null)(
-    withStyles(styles)(withRouter(SummaryTableContainer))
-);
+export default withStyles(styles)(withRouter(SummaryTableContainer));

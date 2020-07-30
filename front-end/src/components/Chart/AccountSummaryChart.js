@@ -5,10 +5,13 @@ import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
 
-import { oneSecond, convertToLocalTimeString } from '../../utils/DayTimeUtil';
-import { getUserData } from '../../utils/UserUtil';
+import { oneSecond } from '../../utils/DayTimeUtil';
 import { withMediaQuery } from '../../theme/ThemeUtil';
 import { browserName } from '../../utils/BrowserUtil';
+import { 
+    getCachedAccountSummaryChartInfo, 
+    parseRedisAccountSummaryChartItem, 
+} from '../../utils/RedisUtil';
 
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -76,6 +79,11 @@ class AccountSummaryChart extends React.Component {
                 },
                 type: 'datetime',
                 tickAmount: 6,
+                tooltip: {
+                    formatter: function(val, opts) {
+                      return new Date(val);
+                    }
+                },
                 min: new Date(new Date(this.props.userSession.createdAt).toLocaleString()).getTime(),
             },
             yaxis: {
@@ -86,7 +94,7 @@ class AccountSummaryChart extends React.Component {
                     },
                 },
                 title: {
-                    text: 'Portfolio',
+                    text: 'Portfolio Value',
                     style: {
                         fontSize: '14px',
                         color: 'white'
@@ -129,8 +137,9 @@ class AccountSummaryChart extends React.Component {
     }
 
     intervalCheckThemeBreakpoints;
+    intervalUpdateChartSeries;
 
-    setStateChart = (enableSparkline, showToolbar, showLabelsXaxis, showLabelsYaxis) => {
+    setStateChart = (enableSparkline, showToolbar, showLabelsXaxis, showLabelsYaxis, showComplexXaxisTooltipFormatter) => {
         this.setState({
             options: {
                 ...this.state.options,
@@ -149,7 +158,14 @@ class AccountSummaryChart extends React.Component {
                     labels: {
                         ...this.state.options.xaxis.labels,
                         show: showLabelsXaxis
-                    }
+                    },
+                    tooltip: {
+                        formatter: showComplexXaxisTooltipFormatter? 
+                        function(val, opts) {
+                          return new Date(val);
+                        } :
+                        undefined
+                    },
                 },
                 yaxis: {
                     ...this.state.options.yaxis,
@@ -169,52 +185,59 @@ class AccountSummaryChart extends React.Component {
 
         // mediaQuery in this case check if theme breakpoints is below sm (600px)
         if(!isScreenSmall && this.state.options.chart.sparkline.enabled) {
-            this.setStateChart(false, true, true, true);
+            this.setStateChart(false, true, true, true, true);
         }
         if(isScreenSmall && !this.state.options.chart.sparkline.enabled) {
-            this.setStateChart(true, false, false, false);
+            this.setStateChart(true, false, false, false, false);
         }
     }
 
-    initializeChartSeries = () => {
-        const dataNeeded = {
-            accountSummaryChartInfo: true
-        }
+    initializeOrUpdateChartSeries = () => {
+        let seriesData = [];
 
-        getUserData(dataNeeded, this.props.userSession.email)
-        .then(chartInfo => {
-            const { accountSummaryChartInfo } = chartInfo;
-            let seriesData = [];
-            accountSummaryChartInfo.map(timestamp => {
-                return seriesData.push([
-                    convertToLocalTimeString(timestamp.UTCDateString),
-                    timestamp.portfolioValue
-                ]);
-            });
+        getCachedAccountSummaryChartInfo(this.props.userSession.email)
+        .then(cachedTimestamp => {
+            const { data } = cachedTimestamp;
+            if(data) {
+                data.map(timestamp => {
+                    return seriesData.push(parseRedisAccountSummaryChartItem(timestamp));
+                });
+            }
+            
             this.setState({
                 series: [{
-                    name: 'Total Portfolio',
-                    type: 'area',
+                    ...this.state.series[0],
                     data: seriesData
-                }]
+                }],
             }, () => {
-                this.setState({
-                    isChartReady: true
-                });
+                if(!this.state.isChartReady) {
+                    this.setState({
+                        isChartReady: true
+                    });
+                }
             })
+        })
+        .catch(err => {
+            console.log(err);
         })
     }
 
     componentDidMount() {
+        this.initializeOrUpdateChartSeries();
+
         this.intervalCheckThemeBreakpoints = setInterval(
             () => this.checkThemeBreakpointsToChangeChart(),
             oneSecond
         );
-        this.initializeChartSeries();
+        this.intervalUpdateChartSeries = setInterval(
+            () => this.initializeOrUpdateChartSeries(),
+            30 * oneSecond
+        );
     }
 
     componentWillUnmount() {
         clearInterval(this.intervalCheckThemeBreakpoints);
+        clearInterval(this.intervalUpdateChartSeries);
     }
 
     render() {
