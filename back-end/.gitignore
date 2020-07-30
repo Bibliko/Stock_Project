@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/flow-typed
 /prisma/migrations
 /db/*
 

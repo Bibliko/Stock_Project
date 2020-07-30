@@ -11,23 +11,35 @@ generator client {
 }
 
 model User {
-  id                        String    @default(cuid()) @id
-  email                     String?   @unique
-  password                  String?
-  firstName                 String?
-  lastName                  String?
-  avatarUrl                 String?
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @default(now()) @updatedAt
-  region                    String?
-  occupation                String?
-  ranking                   Int?
-  cash                      Float?    @default(100000)
-  totalPortfolio            Float?    @default(100000)
-  totalPortfolioLastClosure Float?    @default(100000)
-  watchlist                 String[]
-  transactions              UserTransaction[]
-  shares                    Share[]
+  id                          String    @default(cuid()) @id
+  email                       String?   @unique
+  password                    String?
+  firstName                   String?
+  lastName                    String?
+  avatarUrl                   String?
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @default(now()) @updatedAt
+  region                      String?
+  occupation                  String?
+  ranking                     Int?
+  cash                        Float?    @default(100000)
+  totalPortfolio              Float?    @default(100000)
+  totalPortfolioLastClosure   Float?    @default(100000)
+  watchlist                   String[]
+  transactions                UserTransaction[]
+  shares                      Share[]
+  accountSummaryChartInfo     AccountSummaryTimestamp[]
+}
+
+model AccountSummaryTimestamp {
+  id                String    @default(cuid()) @id
+  UTCDateString     String
+  UTCDateKey        String
+  portfolioValue    Float
+  user              User      @relation(fields: [userID], references: [id])
+  userID            String
+
+  @@unique([UTCDateKey, userID])
 }
 
 model Share {

@@ -1,74 +1,76 @@
-const express = require('express');
-const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
+import { Router } from "express";
+import { PrismaClient } from "@prisma/client";
+const router = Router();
 const prisma = new PrismaClient();
-//const { indices } = require('../algolia');
+// const { indices } = require('../algolia');
 
-router.put('/changeData', (req, res) => {
-    const { dataNeedChange, email } = req.body;
+router.put("/changeData", (req, res) => {
+  const { dataNeedChange, email } = req.body;
 
-    //const dataJSON = JSON.parse(dataNeedChange);
+  // const dataJSON = JSON.parse(dataNeedChange);
 
-    /**
-     * dataNeedChange in form: 
-     *  dataNeedChange: {
-     *      password: "...",
-     *      email: "...",
-     *      [...]
-     *  }
-     */
+  /**
+   * dataNeedChange in form:
+   *  dataNeedChange: {
+   *      password: "...",
+   *      email: "...",
+   *      [...]
+   *  }
+   */
 
-    prisma.user.update({
-        where: {
-            email,
-        },
-        data: dataNeedChange,
+  prisma.user
+    .update({
+      where: {
+        email
+      },
+      data: dataNeedChange
     })
-    .then(user => {
-        res.send(user);
+    .then((user) => {
+      res.send(user);
     })
-    .catch(err => {
-        console.log(err);
-        res.status(500).send("Change data of user fails.");
-    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Change data of user fails.");
+    });
 });
 
-router.get('/getData', (req, res) => {
-    const { email, dataNeeded } = req.query;
+router.get("/getData", (req, res) => {
+  const { email, dataNeeded } = req.query;
 
-    var dataJSON = JSON.parse(dataNeeded);
+  var dataJSON = JSON.parse(dataNeeded);
 
-    if(dataJSON.shares) {
-        dataJSON = {
-            shares: {
-                orderBy: {
-                    companyCode: "asc",
-                },
-            },
+  if (dataJSON.shares) {
+    dataJSON = {
+      shares: {
+        orderBy: {
+          companyCode: "asc"
         }
-    }
+      }
+    };
+  }
 
-    /** 
-     *  dataNeeded in form of:
-     *      dataNeeded: {
-     *          cash: true,
-     *          region: true,
-     *          ...
-     *      }
-     */
-    prisma.user.findOne({
-        where: {
-            email,
-        },
-        select: dataJSON
+  /**
+   *  dataNeeded in form of:
+   *      dataNeeded: {
+   *          cash: true,
+   *          region: true,
+   *          ...
+   *      }
+   */
+  prisma.user
+    .findOne({
+      where: {
+        email
+      },
+      select: dataJSON
     })
-    .then(data => {
-        res.send(data);
+    .then((data) => {
+      res.send(data);
     })
-    .catch(err => {
-        console.log(err);
-        res.status(500).send("Get data of user fails.");
-    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Get data of user fails.");
+    });
 });
 
-module.exports = router;
+export default router;

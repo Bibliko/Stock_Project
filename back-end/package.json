@@ -8,14 +8,17 @@
     "prisma-save": "prisma migrate save --experimental",
     "prisma-up": "prisma migrate up --experimental",
     "prisma-studio": "prisma studio --experimental",
-    "update-db": "npx prisma generate && npm run prisma-save && npm run prisma-up",
-    "update-db-ps": "npx prisma generate && npm run prisma-save && npm run prisma-up",
+    "prisma-generate": "npx prisma generate && babel-node ./bin/PrismaFlowTypedGenerator",
+    "update-db": "npm run prisma-generate && npm run prisma-save && npm run prisma-up",
+    "update-db-ps": "npm run prisma-generate && npm run prisma-save && npm run prisma-up",
     "docker-stop-containers": "docker stop $(docker ps -a -q)",
     "docker-stop-containers-ps": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./powershell-scripts/docker-stop-containers.ps1",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
-    "dev": "node checkChangesInSchemaPrisma.js && npm run update-db && nodemon index.js",
-    "start": "node index.js"
+    "dev": "node checkChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
+    "start": "node index.js",
+    "prettier": "prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
+    "fix": "npm run prettier && (flow & eslint . --fix)"
   },
   "keywords": [],
   "author": "",
@@ -43,5 +46,25 @@
     "random-key": "^0.3.2",
     "socket.io": "^2.3.0",
     "xhr2": "^0.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-flow": "^7.10.4",
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-flowtype": "^5.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "flow-bin": "^0.130.0",
+    "flow-typed": "^3.2.1",
+    "prettier": "^2.0.5"
   }
 }
