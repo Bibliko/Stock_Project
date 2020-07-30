@@ -3,6 +3,7 @@ import { isEmpty, isEqual } from 'lodash';
 
 import { getManyStockPricesFromFMP } from './FinancialModelingPrepUtil';
 import { getBackendHost } from './NetworkUtil';
+import { getParsedCachedSharesList } from './RedisUtil';
 
 const typeLoginUtil = ['facebook', 'google'];
 const BACKEND_HOST = getBackendHost();
@@ -194,85 +195,53 @@ export const getUserData = (dataNeeded, email) => {
 // User Calculations Related:
 
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
-export const calculateTotalSharesValue = (isMarketClosed, stockQuotesJSON, email) => {
-    return new Promise((resolve, reject) => {
-        if(isEmpty(stockQuotesJSON)) {
-            resolve(0);
-            return;
+export const calculateTotalSharesValue = (isMarketClosed, stockQuotesJSON, shares) => {
+    if(isEmpty(stockQuotesJSON)) {
+        return 0;
+    }
+
+    let totalValue = 0;
+
+    if(isMarketClosed) {
+
+        // if market closed, we will use lastPrice we saved in our database
+        for(let stockQuote of stockQuotesJSON) {
+            totalValue += stockQuote.lastPrice * stockQuote.quantity;
         }
+        return totalValue;
+    }
 
-        let totalValue = 0;
+    /**
+     * if market opened, we use prices of stockQuotesJSON to calculate total shares
+     * value
+     */
 
-        if(isMarketClosed) {
+    let hashSharesIndices = new Map();
+    shares.map((share, index) => {
+        return hashSharesIndices.set(share.companyCode, index);
+    });
 
-            // if market closed, we will use lastPrice we saved in our database
-            for(let stockQuote of stockQuotesJSON) {
-                totalValue += stockQuote.lastPrice * stockQuote.quantity;
-            }
+    for (let stockQuote of stockQuotesJSON) {
 
-            resolve(totalValue);
-            return;
-        }
+        let shareWithSameStockQuoteSymbol = shares[hashSharesIndices.get(stockQuote.symbol)];
 
-        /**
-         * if market opened, we use prices of stockQuotesJSON to calculate total shares
-         * value
-         */
+        // add into total value this stock value: stock price * stock quantity
+        totalValue += stockQuote.price * shareWithSameStockQuoteSymbol.quantity;
+    }   
 
-        let dataNeeded = {
-            shares: true
-        };
-
-        getUserData(dataNeeded, email)
-        .then(userShares => {
-            let { shares: sharesResult } = userShares;
-
-            for (let stockQuote of stockQuotesJSON) {
-
-                let quantityOfUserShareWithMatchedSymbol = 0;
-                
-                // filter shares of user having matched symbol with this stock quote
-                const arraySharesWithMatchedSymbol = sharesResult.filter(
-                    share => isEqual(share.companyCode, stockQuote.symbol)
-                );
-
-                // add quantities of all shares with matched symbol together
-                for (let shareWithMatchedSymbol of arraySharesWithMatchedSymbol) {
-                    quantityOfUserShareWithMatchedSymbol += shareWithMatchedSymbol.quantity;
-                }
-
-                // add into total value this stock value: stock price * stock quantity
-                totalValue += stockQuote.price * quantityOfUserShareWithMatchedSymbol;
-            }   
-        
-            resolve(totalValue);
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
+    return totalValue;
 }
 
+/**
+ * return [stockQuotesJSON, parsedCachedShares]
+ */
 export const checkStockQuotesForUser = (isMarketClosed, email) => {
 
     return new Promise((resolve, reject) => {
-        const dataNeeded = {
-            shares: true
-        };
-    
-        getUserData(dataNeeded, email)
-        .then(sharesData => {
-    
-            if( !sharesData ) {
-                resolve([]);
-                return null;
-            }
-    
-            const { shares } = sharesData;
-    
+        getParsedCachedSharesList(email)
+        .then(shares => {
             if(isEmpty(shares)) {
-                resolve([]);
-                return null;
+                return ([[], shares]);
             }
             else {
                 /** 
@@ -282,20 +251,15 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
                  */
 
                 if(!isMarketClosed) {
-                    //return getManyStockPricesFromFMP(shares);                 
+                    //return Promise.all([getManyStockPricesFromFMP(shares), shares]); 
                 }
                 else {
-                    return shares;
+                    return ([shares, shares]);
                 }
             }
         })
-        .then(stockQuotesJSON => {
-            
-            if(stockQuotesJSON) {
-                //console.log(stockQuotesJSON);
-                
-                resolve(stockQuotesJSON);
-            }
+        .then(([stockQuotesJSON, cachedShares]) => {
+            resolve([stockQuotesJSON, cachedShares]);
         })
         .catch(err => {
             reject(err);
@@ -307,19 +271,12 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
  * Set up Socket Check Stock Quotes for user
  * Use in front-end/src/pages/Main/AccountSummary
  */
-export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSession, userSharesValue, mutateUser, mutateUserSharesValue) => {
+export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSession, mutateUser) => {
 
     // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
     checkStockQuotesForUser(isMarketClosed, userSession.email)
-    .then(stockQuotesJSON => {
-        return calculateTotalSharesValue(isMarketClosed, stockQuotesJSON, userSession.email);
-    })
-    .then(totalSharesValue => {
-        //console.log(totalSharesValue);
-
-        if(!isEqual(userSharesValue, totalSharesValue)) {
-            mutateUserSharesValue(totalSharesValue);
-        }
+    .then(([stockQuotesJSON, cachedShares]) => {
+        const totalSharesValue = calculateTotalSharesValue(isMarketClosed, stockQuotesJSON, cachedShares);
 
         const newTotalPortfolioValue = userSession.cash + totalSharesValue;
 
@@ -332,14 +289,14 @@ export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSessi
         };
 
         if(!isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
-            changeUserData(dataNeedChange, userSession.email, mutateUser);
+            return changeUserData(dataNeedChange, userSession.email, mutateUser);
         }
         else {
             //console.log("No need to update user data.");
         }
     })
     .catch(err => {
-        console.log(err);
+        console.log(err, '\n This error can be caused as when market is opened, we have not enabled getManyStockPricesFromFMP in UserUtil.js checkStockQuotesForUser.');
     })
 }
 

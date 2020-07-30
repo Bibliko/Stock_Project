@@ -15,7 +15,7 @@
     "docker-stop-containers-ps": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./powershell-scripts/docker-stop-containers.ps1",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
-    "dev": "node checkChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
+    "dev": "node checkChangesInSchemaPrisma.js && node checkChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
     "start": "node index.js",
     "prettier": "prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
     "fix": "npm run prettier && (flow & eslint . --fix)"
@@ -24,7 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/cli": "^2.2.0",
+    "@prisma/cli": "^2.3.0",
     "@prisma/client": "^2.2.0",
     "@sendgrid/mail": "^7.2.1",
     "algoliasearch": "^4.3.0",
@@ -44,7 +44,9 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "random-key": "^0.3.2",
+    "redis": "^3.0.2",
     "socket.io": "^2.3.0",
+    "util": "^0.12.3",
     "xhr2": "^0.2.0"
   },
   "devDependencies": {

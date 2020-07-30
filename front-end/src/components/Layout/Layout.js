@@ -16,7 +16,10 @@ import {
 
 import { 
   marketCountdownUpdate, 
-  oneSecond
+  oneSecond,
+  oneMinute,
+  convertToLocalTimeString,
+  newDate
 } from '../../utils/DayTimeUtil';
 
 import {
@@ -26,8 +29,17 @@ import {
 } from '../../utils/SocketUtil';
 
 import {
-  checkStockQuotesToCalculateSharesValue
+  checkStockQuotesToCalculateSharesValue, 
+  getUserData
 } from '../../utils/UserUtil';
+
+import {
+  updateCachedSharesList, 
+  getCachedSharesList, 
+  getCachedAccountSummaryChartInfo, 
+  updateCachedAccountSummaryChartInfoWholeList,
+  updateCachedAccountSummaryChartInfoOneItem
+} from '../../utils/RedisUtil';
 
 
 import AppBar from './AppBar';
@@ -105,26 +117,41 @@ class Layout extends React.Component {
   state={
     countdown: '',
     isUserFinishedSettingUpAccount: true,
-    hideReminder: false
+    hideReminder: false,
   }
 
   marketCountdownInterval;
-
   checkStockQuotesInterval;
+  accountSummaryChartSeriesInterval;
+
+  updateCachedAccountSummaryChartSeries = () => {
+    const { email, totalPortfolio } = this.props.userSession;
+    updateCachedAccountSummaryChartInfoOneItem(email, convertToLocalTimeString(newDate()), totalPortfolio)
+    .catch(err => {
+        console.log(err);
+    });
+  }
 
   setStateIfUserFinishedSettingUpAccount = () => {
     const { firstName, lastName, region, occupation } = this.props.userSession;
+    const { isUserFinishedSettingUpAccount } = this.state;
 
-    if( !firstName || !lastName || !region || !occupation ) {
+    if( (!firstName || !lastName || !region || !occupation) && isUserFinishedSettingUpAccount ) {
       this.setState({
         isUserFinishedSettingUpAccount: false
+      });
+    }
+
+    if( firstName && lastName && region && occupation && !isUserFinishedSettingUpAccount ) {
+      this.setState({
+        isUserFinishedSettingUpAccount: true
       });
     }
   }
 
   setupIntervals = () => {
     this.marketCountdownInterval = setInterval( 
-      () => marketCountdownUpdate(this.setState.bind(this)),
+      () => marketCountdownUpdate(this.setState.bind(this), this.props.isMarketClosed),
       oneSecond
     );
 
@@ -132,13 +159,62 @@ class Layout extends React.Component {
       () => checkStockQuotesToCalculateSharesValue(
         this.props.isMarketClosed,
         this.props.userSession,
-        this.props.userSharesValue,
         this.props.mutateUser,
-        this.props.mutateUserSharesValue
       ),
       5 * oneSecond
       //20 * oneSecond
     );
+
+    this.accountSummaryChartSeriesInterval = setInterval(
+      () => this.updateCachedAccountSummaryChartSeries(),
+      oneMinute
+    );
+  }
+
+  setupSharesListForCaching = () => {
+    const { email } = this.props.userSession;
+    getCachedSharesList(email)
+    .then(res => {
+      const { data: cachedShares } = res;
+      if(isEmpty(cachedShares)) {
+        const dataNeeded = {
+          shares: true
+        }
+        return getUserData(dataNeeded, email);
+      }
+    })
+    .then(sharesData => {
+      if(sharesData && !isEmpty(sharesData)) {
+        const { shares } = sharesData;
+        return updateCachedSharesList(email, shares);
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    })
+  }
+  
+  setupAccountSummaryChartForCaching = () => {
+    const { email } = this.props.userSession;
+    getCachedAccountSummaryChartInfo(email)
+    .then(res => {
+      const { data: chartInfo } = res;
+      if(isEmpty(chartInfo)) {
+        const dataNeeded = {
+            accountSummaryChartInfo: true
+        }
+        return getUserData(dataNeeded, email);
+      }
+    })
+    .then(chartInfoFromDatabase => {
+      if(chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
+        const { accountSummaryChartInfo } = chartInfoFromDatabase;
+        return updateCachedAccountSummaryChartInfoWholeList(email, accountSummaryChartInfo);
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    })
   }
 
   marketCountdownChooseComponent = (classes) => {
@@ -167,21 +243,20 @@ class Layout extends React.Component {
 
   componentDidMount() {
     console.log(this.props.userSession);
-    
     if(shouldRedirectToLogin(this.props)) {
       redirectToPage('/login', this.props);
       return;
     }
-
-    this.setStateIfUserFinishedSettingUpAccount();
-
-    this.setupIntervals();
+    this.setupAccountSummaryChartForCaching();
+    this.setupSharesListForCaching();
 
     socketCheckMarketClosed(
       socket,
       this.props.isMarketClosed,
       this.props.mutateMarket
     );
+    this.setStateIfUserFinishedSettingUpAccount();
+    this.setupIntervals();
   }
 
   componentDidUpdate() {
@@ -190,15 +265,19 @@ class Layout extends React.Component {
     }
 
     if(!isEmpty(this.state.countdown) && this.props.isMarketClosed) {
+      clearInterval(this.marketCountdownInterval);
       this.setState({
         countdown: ''
       });
     }
+
+    this.setStateIfUserFinishedSettingUpAccount();
   }
 
   componentWillUnmount() {
     clearInterval(this.marketCountdownInterval);
     clearInterval(this.checkStockQuotesInterval);
+    clearInterval(this.accountSummaryChartSeriesInterval);
 
     offSocketListeners(socket, checkMarketClosed);
   }
@@ -238,7 +317,6 @@ class Layout extends React.Component {
 
 const mapStateToProps = (state) => ({
   userSession: state.userSession,
-  userSharesValue: state.userSharesValue,
   isMarketClosed: state.isMarketClosed,
 });
 
@@ -246,10 +324,6 @@ const mapDispatchToProps = (dispatch) => ({
   mutateUser: (userProps) => dispatch(userAction(
     'default',
     userProps
-  )),
-  mutateUserSharesValue: (userSharesValue) => dispatch(userAction(
-    'updateUserSharesValue',
-    userSharesValue
   )),
   mutateMarket: (method) => dispatch(marketAction(
     method

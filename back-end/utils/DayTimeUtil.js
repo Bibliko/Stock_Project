@@ -80,6 +80,11 @@ const getYearUTCString = (UTCString) => {
   return parseInt(yearString, 10);
 };
 
+const getFullDateUTCString = (UTCString) => {
+  var fullDateString = UTCString.substring(0, 16);
+  return fullDateString;
+};
+
 const getHoursUTCString = (UTCString) => {
   var hoursString = UTCString.substring(17, 19);
   return parseInt(hoursString, 10);
@@ -93,6 +98,21 @@ const getMinutesUTCString = (UTCString) => {
 const getSecondsUTCString = (UTCString) => {
   var secondsString = UTCString.substring(23, 25);
   return parseInt(secondsString, 10);
+};
+
+const changeTimeUTCString = (
+  UTCString,
+  hourString,
+  minuteString,
+  secondString
+) => {
+  let alreadyChangedTime = "";
+  alreadyChangedTime =
+    UTCString.substring(0, 16) +
+    " " +
+    `${hourString}:${minuteString}:${secondString}` +
+    " GMT";
+  return alreadyChangedTime;
 };
 
 const newDate = () => {
@@ -213,9 +233,11 @@ module.exports = {
   getDateUTCString,
   getMonthUTCString,
   getYearUTCString,
+  getFullDateUTCString,
   getHoursUTCString,
   getMinutesUTCString,
   getSecondsUTCString,
+  changeTimeUTCString,
   newDate,
   findIfTimeNowIsHoliday,
   findIfTimeNowIsOutOfRange,

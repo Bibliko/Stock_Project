@@ -56,7 +56,9 @@ const styles = theme => ({
     },
     logo: {
         height: '50px',
-        width: '50px',
+        [theme.breakpoints.down('xs')]: {
+            height: '30px'
+        },
         '&:hover': {
             cursor: 'pointer'
         },
@@ -177,7 +179,7 @@ class PersistentAppBar extends React.Component {
             >
                 <Toolbar className={classes.toolbar}>
                     <img 
-                        src="/bibOfficial.jpg"
+                        src="/bibliko.png"
                         alt="Bibliko"
                         className={classes.logo}
                         onClick={() => { redirectToPage('/', this.props) }}

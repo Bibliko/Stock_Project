@@ -4,7 +4,6 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import axios from 'axios';
 
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
@@ -12,7 +11,8 @@ import initializeStoreState from './redux/storeReducer';
 
 import socketIOClient from "socket.io-client";
 
-import { getBackendHost, getBackendHostForSocket } from './utils/NetworkUtil';
+import { getBackendHostForSocket } from './utils/NetworkUtil';
+import { getUser } from './utils/UserUtil';
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -30,7 +30,6 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 
 var socket;
 
-const BACKEND_HOST = getBackendHost();
 const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
 
 class App extends React.Component {
@@ -59,11 +58,10 @@ class App extends React.Component {
 
   // setupRedux
   setupReduxStoreState = () => {
-    axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
+    getUser()
     .then(user => {
       this.reduxStoreInitialState = {
         userSession: user.data,
-        userSharesValue: 'Updating',
         isMarketClosed: false,
       };
 

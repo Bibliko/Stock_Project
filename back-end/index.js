@@ -19,6 +19,7 @@ const express = require("express");
 const app = express();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { keysAsync, delAsync } = require("./redis/redis-client");
 
 const {
   getFrontendHost,
@@ -276,8 +277,19 @@ app.use("/user", (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  req.logout();
-  res.send("Successful");
+  keysAsync(`${req.user.email}*`)
+    .then((value) => {
+      console.log(value);
+      return delAsync(value);
+    })
+    .then((numberOfKeysDeleted) => {
+      console.log(numberOfKeysDeleted);
+      req.logout();
+      res.send("Successful");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 // verification APIs are listed below:
@@ -393,6 +405,7 @@ app.use("/verification/:tokenId", (req, res) => {
 app.use("/userData", require("./routes/user"));
 app.use("/marketHolidaysData", require("./routes/marketHolidays"));
 app.use("/shareData", require("./routes/share"));
+app.use("/redis", require("./routes/redis"));
 
 // set up socket.io server
 var intervalCheckMarketClosed;

@@ -4,21 +4,12 @@ import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
-import {
-    userAction,
-} from '../../../redux/storeActions/actions';
+import { userAction } from '../../../redux/storeActions/actions';
 
-import {
-    changeShareData,
-} from '../../../utils/ShareUtil';
-
-import {
-    getStockPriceFromFMP
-} from '../../../utils/FinancialModelingPrepUtil';
-
-import {  
-    oneSecond
-} from '../../../utils/DayTimeUtil';
+import { changeShareData } from '../../../utils/ShareUtil';
+import { getStockPriceFromFMP } from '../../../utils/FinancialModelingPrepUtil';
+import {  oneSecond } from '../../../utils/DayTimeUtil';
+import { numberWithCommas } from '../../../utils/NumberUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import TableRow from '@material-ui/core/TableRow';
@@ -34,7 +25,12 @@ import ArrowDropDownRoundedIcon from '@material-ui/icons/ArrowDropDownRounded';
 const styles = theme => ({
     tableCell: {
         color: 'white',
-        border: 'hidden',
+        borderLeftWidth: '1px',
+        borderRightWidth: '0px',
+        borderTopWidth: '1px',
+        borderBottomWidth: '0px',
+        borderColor: '#2D9CDB',
+        borderStyle: 'solid',
     },
     tableRow: {
         background: 'transparent',
@@ -86,6 +82,20 @@ const styles = theme => ({
     },
     marginLeftIfProfitOrLoss: {
         marginLeft: '12px',
+    },
+
+    // border section
+    lastLeftCell: {
+        borderBottomLeftRadius: '4px'
+    },
+    lastRightCell: {
+        borderBottomRightRadius: '4px'
+    },
+    lastRow: {
+        borderBottomWidth: '1px'
+    },
+    watchlistBorder: {
+        borderRightWidth: '1px'
     }
 });
 
@@ -114,23 +124,28 @@ class HoldingsTableRow extends React.Component {
                 return `${rowData.code}`;
 
             case "Holding":
-                return `${rowData.holding}`;
+                return `${numberWithCommas(rowData.holding)}`;
 
             case "Buy Price (Avg)":
-                return `$${rowData.buyPriceAvg.toFixed(2)}`;
+                return `$${numberWithCommas(rowData.buyPriceAvg.toFixed(2))}`;
 
             case "Last Price":
-                return `$${this.state.lastPrice}`;
+                return `$${numberWithCommas(this.state.lastPrice)}`;
 
             case "Profit/Loss":
                 if(parseFloat(this.state.profitOrLoss, 10) < 0) {
-                    return `-$${Math.abs(parseFloat(this.state.profitOrLoss, 10))}`;
+                    return `-$${numberWithCommas(Math.abs(parseFloat(this.state.profitOrLoss, 10)))}`;
                 }
-                return `$${this.state.profitOrLoss}`;
+                return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
             default: 
                 return;
         }
+    }
+
+    isTableRowTheLast = () => {
+        const { rowIndex, rowsLength } = this.props;
+        return rowIndex === rowsLength - 1;
     }
 
     chooseTableCell = (type, classes) => {
@@ -138,7 +153,9 @@ class HoldingsTableRow extends React.Component {
             <TableCell align="center" 
                 className={clsx(classes.tableCell, {
                     [classes.arrowUp]: this.checkIfProfitOrLoss(type)==="Profit",
-                    [classes.arrowDown]: this.checkIfProfitOrLoss(type)==="Loss"
+                    [classes.arrowDown]: this.checkIfProfitOrLoss(type)==="Loss",
+                    [classes.lastLeftCell]: this.isTableRowTheLast() && type==="Code",
+                    [classes.lastRow]: this.isTableRowTheLast()
                 })} 
             >
                 <div className={clsx(classes.cellDiv, {
@@ -199,16 +216,18 @@ class HoldingsTableRow extends React.Component {
             // .then(stockQuoteJSON => {
 
             //     const { price } = stockQuoteJSON;
-            //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
 
             //     const dataNeedChange = {
             //         lastPrice: price
-            //     }
-
-            //     if(!isEqual(lastPrice, price)) {
+            //     };
+            //     if(
+            //         !isEqual(this.state.lastPrice, 'Updating') && 
+            //         !isEqual(this.state.lastPrice, price)
+            //     ) {
             //         return changeShareData(dataNeedChange, id);
             //     }
 
+            //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
             // })
             // .catch(err => {
             //     console.log(err);
@@ -242,7 +261,9 @@ class HoldingsTableRow extends React.Component {
                 { this.chooseTableCell("Profit/Loss", classes) }
 
                 <TableCell align="center" 
-                    className={classes.tableCell}
+                    className={clsx(classes.tableCell, {
+                        [classes.lastRow]: this.isTableRowTheLast()
+                    })}
                 >
                     <div className={classes.cellDiv}>
                         <Button className={classes.buyButton}>
@@ -255,7 +276,10 @@ class HoldingsTableRow extends React.Component {
                 </TableCell>
 
                 <TableCell align="center" 
-                    className={classes.tableCell}
+                    className={clsx(classes.tableCell, classes.watchlistBorder, {
+                        [classes.lastRightCell]: this.isTableRowTheLast(),
+                        [classes.lastRow]: this.isTableRowTheLast()
+                    })}
                 >
                     <div className={classes.cellDiv}>
                         <IconButton className={classes.watchlistButton}>

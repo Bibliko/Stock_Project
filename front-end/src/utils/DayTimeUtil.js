@@ -72,31 +72,27 @@ export const getSecondsUTCString = (UTCString) => {
     return parseInt(secondsString, 10);
 }
 
+export const convertToLocalTimeString = (UTCString) => {
+    var localTime = new Date(UTCString).toLocaleString();
+    return localTime;
+}
+
 export const newDate = () => {
     var timeNow = new Date().toUTCString();
     return timeNow;
 }
 
-export const marketCountdownUpdate = (setStateFn) => {
+export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
+    if(isMarketClosed) {
+        return;
+    }
+
     var timeNow = newDate();
     //console.log(timeNow);
   
     var UTCHours = getHoursUTCString(timeNow);
     var UTCMinutes = getMinutesUTCString(timeNow);
     var UTCSeconds = getSecondsUTCString(timeNow);    
-    //console.log(UTCHours + ',' + UTCMinutes + ',' + UTCSeconds);
-
-    // (UTC -4) to (UTC 0) 1:30 p.m. to 8 p.m. -> 13:30 to 20:00
-    // if(
-    //     UTCHours < 13 || 
-    //     (UTCHours === 13 && UTCMinutes < 30) ||
-    //     (UTCHours >= 20 && UTCMinutes >= 0)
-    // ) {
-    //     setStateFn({
-    //         countdown: '00:00:00'
-    //     });
-    //     return;
-    // }
     
     var hours = 20 - 1 - UTCHours;
     var min = 60 - UTCMinutes;
@@ -134,6 +130,7 @@ export default {
     getHoursUTCString,
     getMinutesUTCString,
     getSecondsUTCString,
+    convertToLocalTimeString,
     newDate,
     marketCountdownUpdate,
 }

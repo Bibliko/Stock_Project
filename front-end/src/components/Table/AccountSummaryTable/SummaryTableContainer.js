@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router';
 import clsx from 'clsx';
 
-import { connect } from 'react-redux';
+import { numberWithCommas } from '../../../utils/NumberUtil';
 
 import { withStyles } from '@material-ui/core/styles';
 import TableRow from '@material-ui/core/TableRow';
@@ -24,7 +24,10 @@ const styles = theme => ({
         boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCell: {
-        border: 'hidden'
+        border: 'hidden',
+        borderRightWidth: '1px',
+        borderRightColor: '#DC3D4A',
+        borderRightStyle: 'solid',
     },
     tableCellCenter: {
         border: 'hidden',
@@ -64,27 +67,22 @@ class SummaryTableContainer extends React.Component {
     chooseTableRowValue = (type) => {
         switch(type) {
             case 'Cash':
-                return `$${this.props.cash}`;
+                return `$${numberWithCommas(this.props.cash)}`;
 
             case 'Shares':
-                let shares = this.props.userSharesValue;
-                if(typeof shares === "number") {
-                    shares = shares.toFixed(2);
-                    return `$${shares}`;
-                }
-                return `$${(this.props.totalPortfolio-this.props.cash).toFixed(2)}`;
+                return `$${numberWithCommas((this.props.totalPortfolio-this.props.cash).toFixed(2))}`;
 
             case 'Total Portfolio Value':
-                return `$${this.props.totalPortfolio}`;
+                return `$${numberWithCommas(this.props.totalPortfolio)}`;
 
             case 'Daily Change':
                 if(this.props.userDailyChange < 0) {
-                    return `-$${Math.abs(this.props.userDailyChange)}`;
+                    return `-$${numberWithCommas(Math.abs(this.props.userDailyChange))}`;
                 }
-                return `$${this.props.userDailyChange}`;
+                return `$${numberWithCommas(this.props.userDailyChange)}`;
 
             case 'Overall Rank':
-                return `${this.props.ranking}`;
+                return `${numberWithCommas(this.props.ranking)}`;
 
             default:
                 return;
@@ -145,10 +143,4 @@ class SummaryTableContainer extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    userSharesValue: state.userSharesValue
-});
-
-export default connect(mapStateToProps, null)(
-    withStyles(styles)(withRouter(SummaryTableContainer))
-);
+export default withStyles(styles)(withRouter(SummaryTableContainer));

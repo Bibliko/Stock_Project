@@ -8,12 +8,12 @@ import {
     userAction,
 } from '../../redux/storeActions/actions';
 
-import {
-    getUserData
-} from '../../utils/UserUtil';
+import { getParsedCachedSharesList } from '../../utils/RedisUtil';
+import { numberWithCommas } from '../../utils/NumberUtil';
 
 import HoldingsTableContainer from '../../components/Table/AccountSummaryTable/HoldingsTableContainer';
 import SummaryTableContainer from '../../components/Table/AccountSummaryTable/SummaryTableContainer';
+import AccountSummaryChart from '../../components/Chart/AccountSummaryChart';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -90,6 +90,21 @@ const styles = theme => ({
           fontSize: 'medium'
         },
     },
+    titleChart: {
+        fontSize: 'x-large',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'medium'
+        },
+        color: 'white',
+        fontWeight: 'bold'
+    }, 
+    subtitleChart: {
+        fontSize: 'medium',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: 'small'
+        },
+        color: 'white',
+    }
 });
 
 class AccountSummary extends React.Component {
@@ -127,15 +142,8 @@ class AccountSummary extends React.Component {
 
     componentDidMount() {
         console.log(this.props.userSession);
-
-        const dataNeeded = {
-            shares: true
-        }
-
-        getUserData(dataNeeded, this.props.userSession.email)
-        .then(sharesData => {
-            const { shares } = sharesData;
-
+        getParsedCachedSharesList(this.props.userSession.email)
+        .then(shares => {
             if(!isEqual(this.state.userShares, shares)) {
                 this.setState(
                     {
@@ -163,12 +171,6 @@ class AccountSummary extends React.Component {
         } = this.props.userSession;
 
         const userDailyChange = totalPortfolio-totalPortfolioLastClosure;
-
-        //console.log(`${cash}, ${totalPortfolio}, ${totalPortfolioLastClosure}, ${ranking}, ${userSharesValue}, ${userDailyChange}`);
-
-        //const { userShares, holdingsRows } = this.state;
-        // console.log(userShares);
-        // console.log(holdingsRows);
 
         return (
             <Container className={classes.root} disableGutters>
@@ -207,6 +209,13 @@ class AccountSummary extends React.Component {
                         <Typography className={clsx(classes.gridTitle, classes.portfolioChart)}>
                             Portfolio Chart
                         </Typography>
+                        <Typography className={classes.titleChart}>
+                            ${numberWithCommas(totalPortfolio.toFixed(2))}
+                        </Typography>
+                        <Typography className={classes.subtitleChart}>
+                            Portfolio Now
+                        </Typography>
+                        <AccountSummaryChart />
                     </Grid>
                 </Grid>
             </Container>

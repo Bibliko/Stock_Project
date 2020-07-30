@@ -20,5 +20,14 @@ services:
     ports:
       - 8080:8080
 
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass funstockmarket
+    volumes:
+      - redis:/data
+
 volumes:
   db:
+  redis:
