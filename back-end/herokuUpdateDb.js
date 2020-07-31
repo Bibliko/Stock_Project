@@ -136,17 +136,17 @@ const putFirebaseToLocal = () =>
             );
 
             const prefixPromiseList = entryList.prefixes.map((entry) => {
-              const README_promise = takeFirebaseFile(entry, "README.md");
-              const schema_promise = takeFirebaseFile(entry, "schema.prisma");
-              const steps_promise = takeFirebaseFile(entry, "steps.json");
+              const READMEPromise = takeFirebaseFile(entry, "README.md");
+              const schemaPromise = takeFirebaseFile(entry, "schema.prisma");
+              const stepsPromise = takeFirebaseFile(entry, "steps.json");
 
               // path_ in firebase: system/migrations/...
               const migrationName = entry.location.path_.substring(18);
 
               return Promise.all([
-                README_promise,
-                schema_promise,
-                steps_promise
+                READMEPromise,
+                schemaPromise,
+                stepsPromise
               ]).then(([README, schema, steps]) => {
                 return Promise.all([
                   fsWriteFilePrismaMigrations(
@@ -181,8 +181,9 @@ const putFirebaseToLocal = () =>
               });
           })
           .catch((error) => {
-            console.log("No migrations yet");
-            resolve("No migrations yet");
+            console.log(error);
+            console.log("Error: No migrations yet, herokuUpdateDb.js 185");
+            resolve(error);
           });
       })
       .catch((error) => {
@@ -200,6 +201,7 @@ const main = () => {
       firebaseSchema = firebaseSchemaResponse;
     })
     .catch((err) => {
+      console.log(err);
       firebaseSchema = "";
     })
     .finally(() => {

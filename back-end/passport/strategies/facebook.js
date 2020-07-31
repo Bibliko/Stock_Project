@@ -29,7 +29,7 @@ const facebookStrategy = new FacebookStrategy(
     const { id, email, first_name, last_name } = profile._json;
 
     if (!email) {
-      return done(err);
+      return done("Can't find email on Facebook");
     }
 
     prisma.user
