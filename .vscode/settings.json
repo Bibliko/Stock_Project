@@ -1,0 +1,7 @@
+{
+  "editor.formatOnSave": true,
+  "flow.useNPMPackagedFlow": true,
+  "javascript.validate.enable": false,
+  "javascript.format.enable": false,
+  "eslint.workingDirectories": ["./back-end", "./front-end"] // respect .eslintignore in the back-end
+}

@@ -1,64 +1,66 @@
-const express = require('express');
-const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
+const { Router } = require("express");
+const { PrismaClient } = require("@prisma/client");
+const router = Router();
 const prisma = new PrismaClient();
-//const { indices } = require('../algolia');
+// const { indices } = require('../algolia');
 
-router.put('/changeData', (req, res) => {
-    const { dataNeedChange, id } = req.body;
+router.put("/changeData", (req, res) => {
+  const { dataNeedChange, id } = req.body;
 
-    //const dataJSON = JSON.parse(dataNeedChange);
+  // const dataJSON = JSON.parse(dataNeedChange);
 
-    /**
-     * dataNeedChange in form: 
-     *  dataNeedChange: {
-     *      password: "...",
-     *      email: "...",
-     *      [...]
-     *  }
-     */
+  /**
+   * dataNeedChange in form:
+   *  dataNeedChange: {
+   *      password: "...",
+   *      email: "...",
+   *      [...]
+   *  }
+   */
 
-    prisma.share.update({
-        where: {
-            id,
-        },
-        data: dataNeedChange,
+  prisma.share
+    .update({
+      where: {
+        id
+      },
+      data: dataNeedChange
     })
-    .then(share => {
-        res.send(share);
+    .then((share) => {
+      res.send(share);
     })
-    .catch(err => {
-        console.log(err);
-        res.status(500).send("Change data of share fails.");
-    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Change data of share fails.");
+    });
 });
 
-router.get('/getData', (req, res) => {
-    const { id, dataNeeded } = req.query;
+router.get("/getData", (req, res) => {
+  const { id, dataNeeded } = req.query;
 
-    const dataJSON = JSON.parse(dataNeeded);
+  const dataJSON = JSON.parse(dataNeeded);
 
-    /** 
-     *  dataNeeded in form of:
-     *      dataNeeded: {
-     *          cash: true,
-     *          region: true,
-     *          ...
-     *      }
-     */
-    prisma.share.findOne({
-        where: {
-            id,
-        },
-        select: dataJSON
+  /**
+   *  dataNeeded in form of:
+   *      dataNeeded: {
+   *          cash: true,
+   *          region: true,
+   *          ...
+   *      }
+   */
+  prisma.share
+    .findOne({
+      where: {
+        id
+      },
+      select: dataJSON
     })
-    .then(data => {
-        res.send(data);
+    .then((data) => {
+      res.send(data);
     })
-    .catch(err => {
-        console.log(err);
-        res.status(500).send("Get data of share fails.");
-    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Get data of share fails.");
+    });
 });
 
 module.exports = router;

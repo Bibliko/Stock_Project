@@ -1,0 +1,18 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2020": true
+  },
+  "extends": ["standard", "plugin:flowtype/recommended", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": 11
+  },
+  "plugins": ["flowtype"],
+  "rules": {
+    "space-before-function-paren": "off",
+    "no-multi-str": "off",
+    "eol-last": "off"
+  },
+  "root": true
+}
