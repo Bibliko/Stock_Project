@@ -1,4 +1,4 @@
-var storage = require("./firebase/firebaseStorage.js");
+var storage = require("../../firebase/firebaseStorage.js");
 var storageRef = storage.ref();
 const { isEqual } = require("lodash");
 const fs = require("fs-extra");
