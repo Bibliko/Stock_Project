@@ -3,5 +3,5 @@
   "flow.useNPMPackagedFlow": true,
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
-  "eslint.workingDirectories": ["./back-end"] // respect .eslintignore in the back-end
+  "eslint.workingDirectories": ["./back-end", "./front-end"] // respect .eslintignore in the back-end
 }
