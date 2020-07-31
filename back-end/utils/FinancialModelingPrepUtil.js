@@ -3,7 +3,7 @@ const { isEmpty, isEqual } = require("lodash");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const { oneDay, newDate, getYearUTCString } = require("./DayTimeUtil");
+const { newDate, getYearUTCString } = require("./DayTimeUtil");
 
 const { updatePrismaMarketHolidays } = require("./MarketHolidaysUtil");
 

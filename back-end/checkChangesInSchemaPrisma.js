@@ -7,6 +7,8 @@ const consoleLog = (error, stdout, stderr) => {
   }
   console.log(`stdout: ${stdout}`);
   console.log(`stderr: ${stderr}`);
+
+  process.exit();
 };
 
 const chainCommands = (...cmds) => {
@@ -26,6 +28,9 @@ const checkAndPullSchemaPrismaFromOriginMaster = () => {
     "git diff --stat HEAD -- prisma/schema.prisma",
     (error, stdout, stderr) => {
       // consoleLog(error, stdout, stderr);
+      if (error) {
+        console.log(error);
+      }
 
       const isSchemaPrismaBeingWorkedOn = isEmpty(stdout);
 
