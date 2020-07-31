@@ -73,4 +73,4 @@ router.get("/getData", (req, res) => {
     });
 });
 
-export default router;
+module.exports = router;

@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
+const { Router } = require("express");
+const { PrismaClient } = require("@prisma/client");
 const router = Router();
 const prisma = new PrismaClient();
 // const { indices } = require('../algolia');
@@ -63,4 +63,4 @@ router.get("/getData", (req, res) => {
     });
 });
 
-export default router;
+module.exports = router;

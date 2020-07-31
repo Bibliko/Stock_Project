@@ -5,6 +5,7 @@
 /flow-typed
 /prisma/migrations
 /db/*
+/build
 
 # secrets
 /config/*

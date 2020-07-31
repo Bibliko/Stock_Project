@@ -16,11 +16,13 @@
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
     "dev": "node checkConfigFolder.js && npm run update-db && nodemon --exec babel-node index.js",
-    "start": "node index.js",
+    "start": "node ./build/index.js",
     "prettier": "prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
     "fix": "npm run prettier && (flow & eslint . --fix)",
     "deps": "npm install --save $npm_config_package && flow-typed install $npm_config_package",
-    "help": "babel-node displayNpmHelp.js"
+    "help": "babel-node displayNpmHelp.js",
+    "clean-build": "rm -rf ./build",
+    "build": "npm run clean-build && babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*'"
   },
   "keywords": [],
   "author": "",
