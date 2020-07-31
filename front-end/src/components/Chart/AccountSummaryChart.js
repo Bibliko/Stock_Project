@@ -1,13 +1,12 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
-import { isEqual, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import { withRouter } from 'react-router';
 
 import { connect } from 'react-redux';
 
 import { oneSecond } from '../../utils/DayTimeUtil';
 import { withMediaQuery } from '../../theme/ThemeUtil';
-import { browserName } from '../../utils/BrowserUtil';
 import { 
     getCachedAccountSummaryChartInfo, 
     parseRedisAccountSummaryChartItem, 
@@ -16,6 +15,7 @@ import {
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
+// import ImportExportRoundedIcon from '@material-ui/icons/ImportExportRounded';
 
 const styles = theme => ({
     mainDiv: {
@@ -54,16 +54,28 @@ class AccountSummaryChart extends React.Component {
                 sparkline: {
                     enabled: false
                 },
+                zoom: {
+                    enabled: false
+                },
                 toolbar: {
-                    show: isEqual(browserName(), "chrome")? true:false,
+                    show: true,
+                    offsetY: -50,
                     tools: {
-                        download: false,
+                        download: true,
                         selection: false,
-                        zoom: true,
-                        zoomin: true,
-                        zoomout: true,
-                        pan: true,
-                        reset: true
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false,
+                        customIcons: []
+                    },
+                    export: {
+                        csv: {
+                          dateFormatter(timestamp) {
+                            return new Date(timestamp).toLocaleString()
+                          }
+                        }
                     },
                     autoSelected: 'selection' 
                 },
@@ -84,7 +96,6 @@ class AccountSummaryChart extends React.Component {
                       return new Date(val);
                     }
                 },
-                min: new Date(new Date(this.props.userSession.createdAt).toLocaleString()).getTime(),
             },
             yaxis: {
                 labels: {
@@ -139,7 +150,7 @@ class AccountSummaryChart extends React.Component {
     intervalCheckThemeBreakpoints;
     intervalUpdateChartSeries;
 
-    setStateChart = (enableSparkline, showToolbar, showLabelsXaxis, showLabelsYaxis, showComplexXaxisTooltipFormatter) => {
+    setStateChart = (enableSparkline, showLabelsXaxis, showLabelsYaxis, showComplexXaxisTooltipFormatter) => {
         this.setState({
             options: {
                 ...this.state.options,
@@ -148,10 +159,6 @@ class AccountSummaryChart extends React.Component {
                     sparkline: {
                         enabled: enableSparkline
                     },
-                    toolbar: {
-                        ...this.state.options.chart.toolbar,
-                        show: isEqual(browserName(), "chrome")? showToolbar:false
-                    }
                 },
                 xaxis: {
                     ...this.state.options.xaxis,
@@ -185,10 +192,10 @@ class AccountSummaryChart extends React.Component {
 
         // mediaQuery in this case check if theme breakpoints is below sm (600px)
         if(!isScreenSmall && this.state.options.chart.sparkline.enabled) {
-            this.setStateChart(false, true, true, true, true);
+            this.setStateChart(false, true, true, true);
         }
         if(isScreenSmall && !this.state.options.chart.sparkline.enabled) {
-            this.setStateChart(true, false, false, false, false);
+            this.setStateChart(true, false, false, false);
         }
     }
 
