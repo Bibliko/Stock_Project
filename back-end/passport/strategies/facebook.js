@@ -26,10 +26,17 @@ const facebookStrategy = new FacebookStrategy(
     ]
   },
   function (accessToken, refreshToken, profile, done) {
-    const { id, email, first_name, last_name } = profile._json;
+    const {
+      id,
+      email,
+      first_name: firstName,
+      last_name: lastName
+    } = profile._json;
 
     if (!email) {
-      return done("Can't find email on Facebook");
+      return done(
+        "Can't find user email from Facebook. Check user Facebook profile to see if user already sets up email on Facebook."
+      );
     }
 
     prisma.user
@@ -45,8 +52,8 @@ const facebookStrategy = new FacebookStrategy(
         } else {
           return prisma.user.create({
             data: {
-              firstName: first_name,
-              lastName: last_name,
+              firstName,
+              lastName,
               email,
               password: "",
               avatarUrl: `https://graph.facebook.com/${id}/picture?type=normal`

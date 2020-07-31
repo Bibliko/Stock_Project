@@ -95,10 +95,6 @@ app.use(passport.session());
 setupPassport(passport);
 
 // important timers and intervals
-var intervalForDeleteVerification;
-var intervalForUpdateAllUsers;
-var intervalForUpdateMarketHolidays;
-var intervalForDeleteMarketHolidays;
 var timerForSendCodeVerifyingPassword;
 
 /**
@@ -111,25 +107,16 @@ var objVariables = {
   isPrismaMarketHolidaysInitialized: false
 };
 
-intervalForDeleteVerification = setInterval(deleteExpiredVerification, oneDay);
+setInterval(deleteExpiredVerification, oneDay);
 
 // This function to help initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(objVariables);
 
-intervalForUpdateMarketHolidays = setInterval(
-  updateMarketHolidaysFromFMP.bind(this, objVariables),
-  oneDay
-);
+setInterval(updateMarketHolidaysFromFMP.bind(this, objVariables), oneDay);
 
-intervalForDeleteMarketHolidays = setInterval(
-  deletePrismaMarketHolidays,
-  oneDay
-);
+setInterval(deletePrismaMarketHolidays, oneDay);
 
-intervalForUpdateAllUsers = setInterval(
-  checkAndUpdateAllUsers.bind(this, objVariables),
-  oneSecond
-);
+setInterval(checkAndUpdateAllUsers.bind(this, objVariables), oneSecond);
 
 // All app routes are written below this comment:
 
