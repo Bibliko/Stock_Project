@@ -5,7 +5,7 @@ import actionTypes from './actionTypes';
 export function userAction(method, whichPropsToChangeOrWhatDataForChanging) {
     return {
         type: actionTypes.USER,
-        method, // method: 'logout', 'default', 'updateUserSharesValue'
+        method, // method: 'logout', 'default', 'changeSettings', 'updateUserSharesValue'
         whichPropsToChangeOrWhatDataForChanging,
     };
 }
