@@ -96,7 +96,7 @@ class MyStatsTable extends React.Component {
         return (
             <StyledTableRow>
                 <TableCell 
-                    component="th" scope="row" align="left"
+                    align="left"
                     className={classes.tableCell}    
                 >
                     {type}
