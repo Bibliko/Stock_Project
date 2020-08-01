@@ -66,7 +66,7 @@ class SettingNormalTextField extends React.Component {
         this.state = {
             onHover: false,
             visibility: false,
-            invalid: false,
+            isInvalid: false,
         };
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
@@ -95,7 +95,7 @@ class SettingNormalTextField extends React.Component {
     }
 
     render() {
-        const { classes, name, invalid, helper, changeData } = this.props;
+        const { classes, name, isInvalid, helper, changeData } = this.props;
         const { onHover, visibility } = this.state;
 
         return (
@@ -110,8 +110,8 @@ class SettingNormalTextField extends React.Component {
                     name={name}
                     variant="outlined"
                     type={!visibility? "password":"text"}
-                    error={invalid}
-                    helperText={invalid && helper}
+                    error={isInvalid}
+                    helperText={isInvalid && helper}
                     className={classes.textField}
                     InputProps={{
                         className: classes.input,

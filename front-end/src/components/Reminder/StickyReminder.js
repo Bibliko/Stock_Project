@@ -20,7 +20,7 @@ class StickyReminder extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			visible: true;
+			visible: true,
 		}
 		this.closeReminder = this.closeReminder.bind(this);
 	}
