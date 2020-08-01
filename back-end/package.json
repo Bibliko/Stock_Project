@@ -15,25 +15,15 @@
     "docker-stop-containers:default": "docker stop $(docker ps -a -q)",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "start": "node ./build/index.js",
-<<<<<<< HEAD
     "dev": "node ./bin/etc/CheckConfigFolder.js && node ./bin/etc/CheckChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
     "prettier": "prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
     "fix": "npm run prettier && (flow & eslint . --fix)",
     "deps": "run-script-os",
     "deps:windows": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./bin/Deps/Deps.ps1",
     "deps:default": "sh ./bin/Deps/Deps.sh",
-    "help": "babel-node ./bin/Help/DisplayNpmHelp.js",
+    "help": "babel-node bin/Help",
     "clean": "rimraf ./build",
     "build": "npm run clean-build && babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*','bin/*'"
-=======
-    "dev": "node bin/etc/checkConfigFolder.js && node bin/etc/checkChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
-    "prettier": "prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
-    "fix": "npm run prettier && (flow & eslint . --fix)",
-    "deps": "npm install --save $npm_config_package && flow-typed install $npm_config_package",
-    "help": "babel-node bin/etc/displayNpmHelp.js",
-    "clean-build": "rm -rf ./build",
-    "build": "npm run clean-build && babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*'"
->>>>>>> master
   },
   "keywords": [],
   "author": "",
