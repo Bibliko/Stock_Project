@@ -216,16 +216,18 @@ class HoldingsTableRow extends React.Component {
             // .then(stockQuoteJSON => {
 
             //     const { price } = stockQuoteJSON;
-            //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
 
             //     const dataNeedChange = {
             //         lastPrice: price
-            //     }
-
-            //     if(!isEqual(lastPrice, price)) {
+            //     };
+            //     if(
+            //         !isEqual(this.state.lastPrice, 'Updating') && 
+            //         !isEqual(this.state.lastPrice, price)
+            //     ) {
             //         return changeShareData(dataNeedChange, id);
             //     }
 
+            //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
             // })
             // .catch(err => {
             //     console.log(err);

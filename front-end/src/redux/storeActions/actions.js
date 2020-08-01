@@ -5,15 +5,14 @@ import actionTypes from './actionTypes';
 export function userAction(method, whichPropsToChangeOrWhatDataForChanging) {
     return {
         type: actionTypes.USER,
-        method, // method: 'logout', 'default', 'changeSettings', 'updateUserSharesValue'
+        method, // method: 'logout', 'default'
         whichPropsToChangeOrWhatDataForChanging,
     };
 }
 
-export function marketAction(method, userSharesValue) {
+export function marketAction(method) {
     return {
         type: actionTypes.MARKET,
         method, // method: 'openMarket', 'closeMarket'
-        userSharesValue
     };
 }

@@ -1,0 +1,9 @@
+[ignore]
+.*/flow-typed/.*
+.*/node_modules/*
+
+[options]
+exact_by_default=true
+
+[lints]
+all=error

@@ -63,7 +63,6 @@ class App extends React.Component {
     .then(user => {
       this.reduxStoreInitialState = {
         userSession: user.data,
-        userSharesValue: 'Updating',
         isMarketClosed: false,
       };
 

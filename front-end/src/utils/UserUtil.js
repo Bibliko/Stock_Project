@@ -1,359 +1,335 @@
-import axios from 'axios';
-import { isEmpty, isEqual } from 'lodash';
+import axios from "axios";
+import { isEmpty, isEqual } from "lodash";
 
-import { getManyStockPricesFromFMP } from './FinancialModelingPrepUtil';
-import { getBackendHost } from './NetworkUtil';
+import { getManyStockPricesFromFMP } from "./FinancialModelingPrepUtil";
+import { getBackendHost } from "./NetworkUtil";
+import { getParsedCachedSharesList } from "./RedisUtil";
 
-const typeLoginUtil = ['facebook', 'google'];
+const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
 
 // User Authorization and Login Related:
 
 export const getUser = () => {
-    return new Promise((resolve, reject) => {
-        axios.get(`${BACKEND_HOST}/user`, {withCredentials: true})
-        .then(res => {
-            resolve(res);
-        })
-        .catch(e => {
-            console.log(e);
-            reject(e);
-        })
-    });
-}
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`${BACKEND_HOST}/user`, { withCredentials: true })
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log(e);
+        reject(e);
+      });
+  });
+};
 
 export const logoutUser = () => {
-    return new Promise ((resolve, reject) => {
-        axios.get(`${BACKEND_HOST}/logout`, {withCredentials: true})
-        .then(() => {
-            resolve("Successful");
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
-}
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`${BACKEND_HOST}/logout`, { withCredentials: true })
+      .then(() => {
+        resolve("Successful");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
 export const loginUser = (typeLogin, credentials) => {
-    return new Promise((resolve, reject) => {
-        if(typeLoginUtil.indexOf(typeLogin)>=0) {
-            window.location = `${BACKEND_HOST}/auth/${typeLogin}`;
-            resolve("Successful");
-        }
-        else {  //typeLogin==='local'
-            axios(`${BACKEND_HOST}/auth/login`, {
-                method: 'post',
-                data: credentials,
-                withCredentials: true
-            })
-            .then(() => {
-                resolve("Successful");
-            })
-            .catch(e => {
-                reject(e.response.data.message);
-            })
-        }
-    });
-}
+  return new Promise((resolve, reject) => {
+    if (typeLoginUtil.indexOf(typeLogin) >= 0) {
+      window.location = `${BACKEND_HOST}/auth/${typeLogin}`;
+      resolve("Successful");
+    } else {
+      //typeLogin==='local'
+      axios(`${BACKEND_HOST}/auth/login`, {
+        method: "post",
+        data: credentials,
+        withCredentials: true,
+      })
+        .then(() => {
+          resolve("Successful");
+        })
+        .catch((e) => {
+          reject(e.response.data.message);
+        });
+    }
+  });
+};
 
 export const signupUser = (credentials) => {
-    return new Promise((resolve, reject) => {
-        axios(`${BACKEND_HOST}/auth/signup`, {
-            method: 'post',
-            data: credentials,
-            withCredentials: true
-        })
-        .then(res => {
-            resolve(res.data.message);
-        })
-        .catch(e => {
-            reject(e.response.data.message);
-        })
-    });
-}
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/auth/signup`, {
+      method: "post",
+      data: credentials,
+      withCredentials: true,
+    })
+      .then((res) => {
+        resolve(res.data.message);
+      })
+      .catch((e) => {
+        reject(e.response.data.message);
+      });
+  });
+};
 
 // Forgot password process includes 3 functions below:
 
 export const sendPasswordVerificationCode = (email) => {
-    return new Promise((resolve, reject) => {
-        axios(`${BACKEND_HOST}/passwordVerification`, {
-            method: 'get',
-            params: {
-                email,  
-            },
-            withCredentials: true
-        })
-        .then(res => {
-            resolve(res.data.message);
-        })
-        .catch(err => {
-            reject(err.response.data);
-        })
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/passwordVerification`, {
+      method: "get",
+      params: {
+        email,
+      },
+      withCredentials: true,
     })
-}
+      .then((res) => {
+        resolve(res.data.message);
+      })
+      .catch((err) => {
+        reject(err.response.data);
+      });
+  });
+};
 
 export const checkVerificationCode = (code) => {
-    return new Promise((resolve, reject) => {
-        axios(`${BACKEND_HOST}/checkVerificationCode`, {
-            method: 'get',
-            params: {
-                code,  
-            },
-            withCredentials: true
-        })
-        .then(() => {
-            resolve("Successful");
-        })
-        .catch(err => {
-            reject(err.response.data);
-        })
-    });
-}
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/checkVerificationCode`, {
+      method: "get",
+      params: {
+        code,
+      },
+      withCredentials: true,
+    })
+      .then(() => {
+        resolve("Successful");
+      })
+      .catch((err) => {
+        reject(err.response.data);
+      });
+  });
+};
 
-export const changePassword = (password, email) => {    
-    return new Promise((resolve, reject) => {
-        axios(`${BACKEND_HOST}/userData/changeData`, {
-            method: 'put',
-            data: {
-                email,  
-                dataNeedChange: {
-                    password,
-                }
-            },
-            withCredentials: true
-        })
-        .then(() => {
-            resolve("Successfully change password");
-        })
-        .catch(err => {
-            console.log(err);
-            reject("Your email or credentials may be wrong.");
-        })
-    }); 
-}
+export const changePassword = (password, email) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/changeData`, {
+      method: "put",
+      data: {
+        email,
+        dataNeedChange: {
+          password,
+        },
+      },
+      withCredentials: true,
+    })
+      .then(() => {
+        resolve("Successfully change password");
+      })
+      .catch((err) => {
+        console.log(err);
+        reject("Your email or credentials may be wrong.");
+      });
+  });
+};
 
 // User Data Related:
 
 export const changeUserData = (dataNeedChange, email, mutateUser) => {
-    /**
-     * dataNeedChange in form: 
-     *  dataNeedChange: {
-     *      password: "...",
-     *      email: "...",
-     *      [...]
-     *  }
-     */
+  /**
+   * dataNeedChange in form:
+   *  dataNeedChange: {
+   *      password: "...",
+   *      email: "...",
+   *      [...]
+   *  }
+   */
 
-    return new Promise((resolve, reject) => {
-        axios(`${BACKEND_HOST}/userData/changeData`, {
-            method: 'put',
-            data: {
-                email, 
-                dataNeedChange
-            },
-            withCredentials: true
-        })
-        .then(userDataRes => {
-            mutateUser(userDataRes.data);
-            resolve("Successfully change data");
-        })
-        .catch(err => {
-            reject(err);
-        })
-    }); 
-}
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/changeData`, {
+      method: "put",
+      data: {
+        email,
+        dataNeedChange,
+      },
+      withCredentials: true,
+    })
+      .then((userDataRes) => {
+        mutateUser(userDataRes.data);
+        resolve("Successfully change data");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
 export const getUserData = (dataNeeded, email) => {
-    /** 
-     *  dataNeeded in form of:
-     *      dataNeeded: {
-     *          cash: true,
-     *          region: true,
-     *          ...
-     *      }
-     */
+  /**
+   *  dataNeeded in form of:
+   *      dataNeeded: {
+   *          cash: true,
+   *          region: true,
+   *          ...
+   *      }
+   */
 
-    return new Promise((resolve, reject) => {
-        axios(`${BACKEND_HOST}/userData/getData`, {
-            method: 'get',
-            params: {
-                email, 
-                dataNeeded
-            },
-            withCredentials: true
-        })
-        .then(userData => {
-            resolve(userData.data);
-        })
-        .catch(err => {
-            reject(err);
-        })
-    }); 
-}
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getData`, {
+      method: "get",
+      params: {
+        email,
+        dataNeeded,
+      },
+      withCredentials: true,
+    })
+      .then((userData) => {
+        resolve(userData.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
 // User Calculations Related:
 
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
-export const calculateTotalSharesValue = (isMarketClosed, stockQuotesJSON, email) => {
-    return new Promise((resolve, reject) => {
-        if(isEmpty(stockQuotesJSON)) {
-            resolve(0);
-            return;
-        }
+export const calculateTotalSharesValue = (
+  isMarketClosed,
+  stockQuotesJSON,
+  shares
+) => {
+  if (isEmpty(stockQuotesJSON)) {
+    return 0;
+  }
 
-        let totalValue = 0;
+  let totalValue = 0;
 
-        if(isMarketClosed) {
+  if (isMarketClosed) {
+    // if market closed, we will use lastPrice we saved in our database
+    for (let stockQuote of stockQuotesJSON) {
+      totalValue += stockQuote.lastPrice * stockQuote.quantity;
+    }
+    return totalValue;
+  }
 
-            // if market closed, we will use lastPrice we saved in our database
-            for(let stockQuote of stockQuotesJSON) {
-                totalValue += stockQuote.lastPrice * stockQuote.quantity;
-            }
+  /**
+   * if market opened, we use prices of stockQuotesJSON to calculate total shares
+   * value
+   */
 
-            resolve(totalValue);
-            return;
-        }
+  let hashSharesIndices = new Map();
+  shares.map((share, index) => {
+    return hashSharesIndices.set(share.companyCode, index);
+  });
 
-        /**
-         * if market opened, we use prices of stockQuotesJSON to calculate total shares
-         * value
-         */
+  for (let stockQuote of stockQuotesJSON) {
+    let shareWithSameStockQuoteSymbol =
+      shares[hashSharesIndices.get(stockQuote.symbol)];
 
-        let dataNeeded = {
-            shares: true
-        };
+    // add into total value this stock value: stock price * stock quantity
+    totalValue += stockQuote.price * shareWithSameStockQuoteSymbol.quantity;
+  }
 
-        getUserData(dataNeeded, email)
-        .then(userShares => {
-            let { shares: sharesResult } = userShares;
+  return totalValue;
+};
 
-            for (let stockQuote of stockQuotesJSON) {
-
-                let quantityOfUserShareWithMatchedSymbol = 0;
-                
-                // filter shares of user having matched symbol with this stock quote
-                const arraySharesWithMatchedSymbol = sharesResult.filter(
-                    share => isEqual(share.companyCode, stockQuote.symbol)
-                );
-
-                // add quantities of all shares with matched symbol together
-                for (let shareWithMatchedSymbol of arraySharesWithMatchedSymbol) {
-                    quantityOfUserShareWithMatchedSymbol += shareWithMatchedSymbol.quantity;
-                }
-
-                // add into total value this stock value: stock price * stock quantity
-                totalValue += stockQuote.price * quantityOfUserShareWithMatchedSymbol;
-            }   
-        
-            resolve(totalValue);
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
-}
-
+/**
+ * return [stockQuotesJSON, parsedCachedShares]
+ */
 export const checkStockQuotesForUser = (isMarketClosed, email) => {
+  return new Promise((resolve, reject) => {
+    getParsedCachedSharesList(email)
+      .then((shares) => {
+        if (isEmpty(shares)) {
+          return [[], shares];
+        } else {
+          /**
+           * Uncomment below line if in Production:
+           * - We are using Financial Modeling Prep free API key
+           * -> The amount of requests is limited. Use wisely when testing!
+           */
 
-    return new Promise((resolve, reject) => {
-        const dataNeeded = {
-            shares: true
-        };
-    
-        getUserData(dataNeeded, email)
-        .then(sharesData => {
-    
-            if( !sharesData ) {
-                resolve([]);
-                return null;
-            }
-    
-            const { shares } = sharesData;
-    
-            if(isEmpty(shares)) {
-                resolve([]);
-                return null;
-            }
-            else {
-                /** 
-                 * Uncomment below line if in Production:
-                 * - We are using Financial Modeling Prep free API key
-                 * -> The amount of requests is limited. Use wisely when testing!
-                 */
-
-                if(!isMarketClosed) {
-                    //return getManyStockPricesFromFMP(shares);                 
-                }
-                else {
-                    return shares;
-                }
-            }
-        })
-        .then(stockQuotesJSON => {
-            
-            if(stockQuotesJSON) {
-                //console.log(stockQuotesJSON);
-                
-                resolve(stockQuotesJSON);
-            }
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
+          if (!isMarketClosed) {
+            //return Promise.all([getManyStockPricesFromFMP(shares), shares]);
+          } else {
+            return [shares, shares];
+          }
+        }
+      })
+      .then((resultSharesList) => {
+        if (resultSharesList) {
+          resolve(resultSharesList);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 };
 
 /** Usage setupSocketToCheckStockQuotes
  * Set up Socket Check Stock Quotes for user
  * Use in front-end/src/pages/Main/AccountSummary
  */
-export const checkStockQuotesToCalculateSharesValue = (isMarketClosed, userSession, userSharesValue, mutateUser, mutateUserSharesValue) => {
+export const checkStockQuotesToCalculateSharesValue = (
+  isMarketClosed,
+  userSession,
+  mutateUser
+) => {
+  // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
+  checkStockQuotesForUser(isMarketClosed, userSession.email)
+    .then((resultStockQuotes) => {
+      if (resultStockQuotes) {
+        const stockQuotesJSON = resultStockQuotes[0];
+        const cachedShares = resultStockQuotes[1];
 
-    // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-    checkStockQuotesForUser(isMarketClosed, userSession.email)
-    .then(stockQuotesJSON => {
-        return calculateTotalSharesValue(isMarketClosed, stockQuotesJSON, userSession.email);
-    })
-    .then(totalSharesValue => {
-        //console.log(totalSharesValue);
-
-        if(!isEqual(userSharesValue, totalSharesValue)) {
-            mutateUserSharesValue(totalSharesValue);
-        }
+        const totalSharesValue = calculateTotalSharesValue(
+          isMarketClosed,
+          stockQuotesJSON,
+          cachedShares
+        );
 
         const newTotalPortfolioValue = userSession.cash + totalSharesValue;
 
-        /** 
+        /**
          * changeData so that when we reload page or go to other page, the data
          * would be up-to-date.
-         */ 
+         */
+
         const dataNeedChange = {
-            totalPortfolio: newTotalPortfolioValue
+          totalPortfolio: newTotalPortfolioValue,
         };
 
-        if(!isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
-            changeUserData(dataNeedChange, userSession.email, mutateUser);
+        if (!isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
+          return changeUserData(dataNeedChange, userSession.email, mutateUser);
+        } else {
+          //console.log("No need to update user data.");
         }
-        else {
-            //console.log("No need to update user data.");
-        }
+      }
     })
-    .catch(err => {
-        console.log(err);
-    })
-}
+    .catch((err) => {
+      console.log(
+        err,
+        "\n This error can be caused as when market is opened, we have not enabled getManyStockPricesFromFMP in UserUtil.js checkStockQuotesForUser."
+      );
+    });
+};
 
 export default {
-    getUser,
-    logoutUser,
-    loginUser,
-    signupUser,
-    sendPasswordVerificationCode,
-    checkVerificationCode,
-    changePassword,
-    changeUserData,
-    getUserData,
-    calculateTotalSharesValue,
-    checkStockQuotesForUser,
-    checkStockQuotesToCalculateSharesValue
-}
+  getUser,
+  logoutUser,
+  loginUser,
+  signupUser,
+  sendPasswordVerificationCode,
+  checkVerificationCode,
+  changePassword,
+  changeUserData,
+  getUserData,
+  calculateTotalSharesValue,
+  checkStockQuotesForUser,
+  checkStockQuotesToCalculateSharesValue,
+};
