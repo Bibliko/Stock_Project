@@ -262,8 +262,7 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
       })
       .then((resultSharesList) => {
         if (resultSharesList) {
-          const { stockQuotesJSON, cachedShares } = resultSharesList;
-          resolve([stockQuotesJSON, cachedShares]);
+          resolve(resultSharesList);
         }
       })
       .catch((err) => {
@@ -285,7 +284,8 @@ export const checkStockQuotesToCalculateSharesValue = (
   checkStockQuotesForUser(isMarketClosed, userSession.email)
     .then((resultStockQuotes) => {
       if (resultStockQuotes) {
-        const { stockQuotesJSON, cachedShares } = resultStockQuotes;
+        const stockQuotesJSON = resultStockQuotes[0];
+        const cachedShares = resultStockQuotes[1];
 
         const totalSharesValue = calculateTotalSharesValue(
           isMarketClosed,
