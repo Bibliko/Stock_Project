@@ -10,7 +10,10 @@
     "build": "bash build.sh",
     "start-backend": "cd back-end && npm run start",
     "start-frontend": "cd front-end && npm run start",
-    "start": "bash start.sh"
+    "start": "bash start.sh",
+    "setup-vscode": "npx run-script-os",
+    "setup-vscode:windows": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./bin/SetupDevEnviroment/Setup.ps1",
+    "setup-vscode:default": "sh bin/SetupDevEnviroment/Setup.sh"
   },
   "engines": {
     "node": "13.1.0",
