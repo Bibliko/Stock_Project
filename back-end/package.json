@@ -10,24 +10,27 @@
     "prisma-studio": "prisma studio --experimental",
     "prisma-generate": "npx prisma generate && babel-node ./bin/PrismaFlowTypedGenerator",
     "update-db": "npm run prisma-generate && npm run prisma-save && npm run prisma-up",
-    "update-db-ps": "npm run prisma-generate && npm run prisma-save && npm run prisma-up",
-    "docker-stop-containers": "docker stop $(docker ps -a -q)",
-    "docker-stop-containers-ps": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./powershell-scripts/docker-stop-containers.ps1",
+    "docker-stop-containers": "run-script-os",
+    "docker-stop-containers:windows": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./bin/DockerStopContainers/DockerStopContainers.ps1",
+    "docker-stop-containers:default": "docker stop $(docker ps -a -q)",
     "run-db": "npm run docker-stop-containers && docker-compose up",
-    "run-db-ps": "npm run docker-stop-containers-ps && docker-compose up",
     "start": "node ./build/index.js",
-    "dev": "node bin/etc/checkConfigFolder.js && node bin/etc/checkChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
+    "dev": "node ./bin/etc/CheckConfigFolder.js && node ./bin/etc/CheckChangesInSchemaPrisma.js && npm run update-db && nodemon --exec babel-node index.js",
     "prettier": "prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
     "fix": "npm run prettier && (flow & eslint . --fix)",
-    "deps": "npm install --save $npm_config_package && flow-typed install $npm_config_package",
-    "help": "babel-node bin/etc/displayNpmHelp.js",
-    "clean-build": "rm -rf ./build",
-    "build": "npm run clean-build && babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*'"
+    "deps": "run-script-os",
+    "deps:windows": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./bin/Deps/Deps.ps1",
+    "deps:default": "sh ./bin/Deps/Deps.sh",
+    "help": "babel-node bin/Help",
+    "clean": "rimraf ./build",
+    "build": "npm run clean-build && babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*','bin/*'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
     "@prisma/cli": "^2.3.0",
     "@prisma/client": "^2.3.0",
     "@sendgrid/mail": "^7.2.1",
@@ -43,7 +46,6 @@
     "ip": "^1.1.5",
     "lodash": "^4.17.19",
     "node-fetch": "^2.6.0",
-    "nodemon": "^2.0.4",
     "passport": "^0.4.1",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
@@ -55,8 +57,6 @@
     "xhr2": "^0.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.10.5",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-flow": "^7.10.4",
@@ -72,6 +72,9 @@
     "eslint-plugin-standard": "^4.0.1",
     "flow-bin": "^0.130.0",
     "flow-typed": "^3.2.1",
-    "prettier": "^2.0.5"
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "run-script-os": "^1.1.1"
   }
 }
