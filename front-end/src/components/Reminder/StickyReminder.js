@@ -2,9 +2,8 @@ import React from 'react';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import Fade from '@material-ui/core/Slide';
+import Fade from '@material-ui/core/Fade';
 import Alert from '@material-ui/lab/Alert';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 
 import CloseIcon from '@material-ui/icons/Close';
@@ -13,6 +12,8 @@ const styles = theme => ({
 	reminderBox: {
 		position: '-webkit-sticky', /* Safari */
 		position: 'sticky',
+		width: '90%',
+		margin: '5%',
 	},
 });
 
@@ -20,14 +21,14 @@ class StickyReminder extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			visible: true,
+			visible: this.props.visible,
 		}
-		this.closeReminder = this.closeReminder.bind(this);
+		this.toggleReminder = this.toggleReminder.bind(this);
 	}
 
-	closeReminder() {
+	toggleReminder() {
 		this.setState({
-			visible: false
+			visible: !this.state.visible
 		});
 	}
 
@@ -48,7 +49,7 @@ class StickyReminder extends React.Component {
 									aria-label="close"
 									color="inherit"
 									size="small"
-									onClick={ this.closeReminder }
+									onClick={ this.toggleReminder }
 								>
 									<CloseIcon/>
 								</IconButton>
