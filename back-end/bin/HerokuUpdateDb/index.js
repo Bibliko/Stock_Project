@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== "production") {
   process.exit();
 }
 
-var storage = require("./firebase/firebaseStorage.js");
+var storage = require("../../firebase/firebaseStorage.js");
 var migrationsFolder = storage.ref("/system/migrations");
 var schemaFolder = storage.ref("/system/schema");
 const fs = require("fs-extra");

@@ -1,0 +1,22 @@
+{
+  "deps": {
+    "description": [
+      "npm install --save packages with Flow support.",
+      "If you don't need Flow support, please use npm install as usual."
+    ],
+    "examples": [
+      ["Install all packages", "npm run deps"],
+      [
+        "Install specific packages",
+        "npm run deps PACKAGE_NAME_1 PACKAGE_NAME_2"
+      ]
+    ]
+  },
+  "fix": {
+    "description": [
+      "Beautify code and auto fix potential errors.",
+      "Errors that cannot be fixed automatically will be displayed in the console."
+    ],
+    "examples": [["Example use", "npm run fix"]]
+  }
+}
