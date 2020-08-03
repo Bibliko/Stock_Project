@@ -1,7 +1,7 @@
 // @flow
 
 import * as Prisma from "@prisma/client";
-import * as fs from "fs";
+import writeFileSyncRecursive from "./WriteFileSyncRecursive";
 import {
   extractTypeInfo,
   DefinitionNotFoundError
@@ -147,7 +147,7 @@ addDeclaration(
     }"
 );
 
-fs.writeFileSync(
+writeFileSyncRecursive(
   "./flow-typed/npm/@prisma/client_vx.x.x.js",
   mModuleDeclaration,
   "utf8"
