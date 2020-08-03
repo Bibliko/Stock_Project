@@ -48,6 +48,7 @@ import Reminder from '../Reminder/Reminder';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
+import Link from '@material-ui/core/Link';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({

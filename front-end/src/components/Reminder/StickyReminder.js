@@ -4,9 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 
 import Fade from '@material-ui/core/Fade';
 import Alert from '@material-ui/lab/Alert';
+import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 
-import CloseIcon from '@material-ui/icons/Close';
+import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 
 const styles = theme => ({
 	reminderBox: {
@@ -38,28 +39,30 @@ class StickyReminder extends React.Component {
 		const { visible } = this.state;
 
 		return (
-			<Fade in={visible} timeout={800} className={classes.reminderBox} style={style} mountOnEnter unmountOnExit>
-				<Alert severity="warning"
-					action={
-						<span>
-							{this.props.children}    {/* Custom button */}
-							{
-								collapsible &&
-								<IconButton
-									aria-label="close"
-									color="inherit"
-									size="small"
-									onClick={ this.toggleReminder }
-								>
-									<CloseIcon/>
-								</IconButton>
-							}
-						</span>
-					}
-				>
-					{message}
-				</Alert>
-			</Fade>
+			<Box component='div' m={1} className={classes.reminderBox} style={style}>
+				<Fade in={visible} timeout={800} mountOnEnter unmountOnExit>
+					<Alert severity="warning"
+						action={
+							<span>
+								{this.props.children}    {/* Custom button */}
+								{
+									collapsible &&
+									<IconButton
+										aria-label="close"
+										color="inherit"
+										size="small"
+										onClick={ this.toggleReminder }
+									>
+										<CloseRoundedIcon/>
+									</IconButton>
+								}
+							</span>
+						}
+					>
+						{message}
+					</Alert>
+				</Fade>
+			</Box>
 		);
 	}
 }

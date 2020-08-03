@@ -266,7 +266,11 @@ class PersistentAppBar extends React.Component {
                                     <Paper className={classes.menuPaper}>
                                         <ClickAwayListener onClickAway={this.handleClose}>
                                             <MenuList autoFocusItem={openAccountMenu} id="menu-list-grow" onKeyDown={this.handleListKeyDown}>
-                                                <MenuItem>Account Settings</MenuItem>
+                                                <MenuItem
+                                                    onClick={() => { redirectToPage('/setting', this.props); }}
+                                                >
+                                                    Account Settings
+                                                </MenuItem>
                                                 <MenuItem
                                                     onClick={() => { redirectToPage('/accountSummary', this.props); }}
                                                 >
