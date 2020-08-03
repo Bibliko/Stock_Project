@@ -55,8 +55,9 @@ const styles = theme => ({
     itemGrid: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        //minHeight: '125px',
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        minHeight: '125px',
     },
     gridTitle: {
         fontSize: 'x-large',
@@ -74,7 +75,7 @@ const styles = theme => ({
     },
     textField: {
         height: 50,
-        width: '100%',
+        width: '75%',
         margin: '8px',
         fontWeight: 'normal',
         "& label.Mui-focused": {
@@ -168,17 +169,15 @@ class Ranking extends React.Component {
                             Overall Ranking
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} className={classes.center}>
-                        <OverallTable
-                            
-                        />
+                    <Grid item xs={12} className={classes.itemGrid} align='center'>
+                        <OverallTable/>
                     </Grid>
                     <Grid item xs={12} className={classes.itemGrid}>
                         <Typography className={clsx(classes.gridTitle,classes.statistic)}>
                             My Stats
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} className={classes.center}>
+                    <Grid item xs={12} className={classes.itemGrid} align='center'>
                         <MyStatsTable
                             overallrank={overallRank}
                             regionrank={regionRank}

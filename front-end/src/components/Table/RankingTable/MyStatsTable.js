@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router';
-import clsx from 'clsx';
+//import clsx from 'clsx';
 
 import { connect } from 'react-redux';
 
@@ -17,7 +17,7 @@ import { Typography } from '@material-ui/core';
 
 const styles = theme => ({
     table: {
-        width: '550px',
+        width: '60%',
         border: 'hidden'
     },
     tableContainer: {
@@ -26,13 +26,16 @@ const styles = theme => ({
         boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCell: {
+        fontSize: '18px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small'
         },
+        fontWeight: '500',
         border: 'hidden',
         color: 'white'
     },
     tableCellCenter: {
+        fontSize: '18px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small'
         },
@@ -44,9 +47,9 @@ const styles = theme => ({
         backgroundColor: '#5893C9',
     },
     headtitle: {
-        fontSize: 'large',
+        fontSize: '25px',
         [theme.breakpoints.down('xs')]: {
-            fontSize: 'medium'
+            fontSize: 'large'
         },
         fontWeight: 'bold',
         //marginBottom: '1px'

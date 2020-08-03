@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router';
-import clsx from 'clsx';
+//import clsx from 'clsx';
 
 import { connect } from 'react-redux';
 
@@ -17,8 +17,8 @@ import { Typography } from '@material-ui/core';
 
 const styles = theme => ({
     table: {
-        width: '700px',
-        border: 'hidden'
+        width: '100%',
+        border: 'hidden',
     },
     tableContainer: {
 
@@ -27,17 +27,26 @@ const styles = theme => ({
     },
     tableCell: {
         fontSize: '20px',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: '12px'
+        },
+        fontWeight: 'bold',
         //border: 'hidden',
         color:'#FFFFFF',
         borderColor: '#DC3D4A',
         borderStyle: 'solid',
-        borderBottom: 'hidden'
+        borderBottom: 'hidden',
+        borderTop: 'none'
     },
     tableCellCenter: {
-        //fontSize: '20px',
-        border: 'hidden',
-        //display: 'flex',
+        fontSize: '20px',
+        border: 'none',
+        [theme.breakpoints.down('xs')]: {
+            fontSize: '12px'
+        },
+       //display: 'flex',
         alignItems: 'center'
+
     },
     headColor: {
         backgroundColor: '#EB5757',
@@ -45,12 +54,11 @@ const styles = theme => ({
     headtitle: {
         fontSize: '25px',
         [theme.breakpoints.down('xs')]: {
-            fontSize: 'large'
+            fontSize: '15px'
         },
         fontWeight: 'bold',
         //marginBottom: '1px'
         color: '#FFFFFF',
-        align: 'center'
     },
 
 });
@@ -70,17 +78,7 @@ class OverallTable extends React.Component {
     
     chooseTableRowValue = (type) => {
         switch(type) {
-            case '':
-                return ``;
-
-            case '':
-                return ``;
-
-            case '':
-                return ``;
-
-            case '':
-                return ``;
+            
 
             case '':
                 //return `${this.props.PortfolioHigh}`;
@@ -96,28 +94,28 @@ class OverallTable extends React.Component {
         return (
             <StyledTableRow>
                 <TableCell 
-                    component="th" scope="row" align="left"
+                    component="th" scope="row" align="center"
                     className={classes.tableCell}    
                 >
                     {type}
                 </TableCell>
                 <TableCell 
-                    component="th" scope="row" align="left"
+                    component="th" scope="row" align="center"
                     className={classes.tableCell}    
                 >
                     
                 </TableCell>
                 <TableCell 
-                    component="th" scope="row" align="left"
+                    component="th" scope="row" align="center"
                     className={classes.tableCell}    
                 >
                     
                 </TableCell>
                 <TableCell 
-                    component="th" scope="row" align="left"
+                    component="th" scope="row" align="center"
                     className={classes.tableCell}    
                 >
-                    
+
                 </TableCell>
             </StyledTableRow>
         );
@@ -134,39 +132,33 @@ class OverallTable extends React.Component {
                     <TableHead >
                         <TableRow className={classes.headColor}>
                             <TableCell 
-                                component="th" scope="row" align="left"
+                                component="th" scope="row" align="center"
                                 className={classes.tableCellCenter}
-                                align='center'   
                             >
                                 <Typography className={classes.headtitle}>
                                     #
                                 </Typography>
                             </TableCell>
                             <TableCell 
-                                component="th" scope="row" align="left"
-                                //className={classes.tableCell}
+                                component="th" scope="row" align="center"
                                 className={classes.tableCellCenter}
-                                align='center'
                             >
                                 <Typography className={classes.headtitle}>
                                     Username
                                 </Typography>
                             </TableCell>
                             <TableCell 
-                                component="th" scope="row" align="left"
-                                //lassName={classes.tableCell}
+                                component="th" scope="row" align="center"
                                 className={classes.tableCellCenter}
-                                align='center'
+                                
                             >
                                 <Typography className={classes.headtitle}>
                                     Portfolio
                                 </Typography>
                             </TableCell>
                             <TableCell 
-                                component="th" scope="row" align="left"
-                                //className={classes.tableCell}   
+                                component="th" scope="row" align="center"   
                                 className={classes.tableCellCenter}
-                                align='center'
                             >
                                 <Typography className={classes.headtitle}>
                                     Region
