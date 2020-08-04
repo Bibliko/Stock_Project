@@ -37,14 +37,14 @@ const styles = theme => ({
     },
     input: {
         color: 'black',
-        backgroundColor: 'rgba(225,225,225,0.65)',
+        backgroundColor: 'rgba(225,225,225,0.6)',
         '&:hover': {
-            backgroundColor: 'rgba(225,225,225,0.5)'
+            backgroundColor: 'rgba(225,225,225,0.8)'
         },
         '& input': {
             backgroundColor: 'rgba(225,225,225,0)'
         },
-        fontSize: 'medium',
+        fontSize: '18px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small',
             height: '40px'

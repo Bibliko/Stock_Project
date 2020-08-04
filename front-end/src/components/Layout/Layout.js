@@ -48,7 +48,6 @@ import Reminder from '../Reminder/Reminder';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
-import Link from '@material-ui/core/Link';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
@@ -117,7 +116,7 @@ const styles = theme => ({
 class Layout extends React.Component {
   state={
     countdown: '',
-    isUserFinishedSettingUpAccount: true,
+    hasUserFinishedSettingUpAccount: true,
     hideReminder: false,
   }
 
@@ -135,17 +134,12 @@ class Layout extends React.Component {
 
   setStateIfUserFinishedSettingUpAccount = () => {
     const { firstName, lastName, region, occupation } = this.props.userSession;
-    const { isUserFinishedSettingUpAccount } = this.state;
+    const { hasUserFinishedSettingUpAccount } = this.state;
+    const hasFinished = !(!firstName || !lastName || !region || !occupation)
 
-    if( (!firstName || !lastName || !region || !occupation) && isUserFinishedSettingUpAccount ) {
+    if(hasUserFinishedSettingUpAccount !== hasFinished) {
       this.setState({
-        isUserFinishedSettingUpAccount: false
-      });
-    }
-
-    if( firstName && lastName && region && occupation && !isUserFinishedSettingUpAccount ) {
-      this.setState({
-        isUserFinishedSettingUpAccount: true
+        hasUserFinishedSettingUpAccount: hasFinished
       });
     }
   }
@@ -295,7 +289,7 @@ class Layout extends React.Component {
         <CssBaseline />
         <AppBar />
         <Reminder 
-          isUserFinishedSettingUpAccount = {this.state.isUserFinishedSettingUpAccount}
+          hasUserFinishedSettingUpAccount = {this.state.hasUserFinishedSettingUpAccount}
         />
         <main>
           <div className={classes.contentHeader}/>
@@ -334,4 +328,3 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(mapStateToProps, mapDispatchToProps)(
   withStyles(styles)(withRouter(Layout))
 );
-

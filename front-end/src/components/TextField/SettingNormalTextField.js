@@ -30,18 +30,18 @@ const styles = theme => ({
             '&.Mui-focused': {
                 backgroundColor: 'rgba(225,225,225,0.5)'
             }
-        }
+        },
     },
     input: {
         color: 'black',
-        backgroundColor: 'rgba(225,225,225,0.65)',
+        backgroundColor: 'rgba(225,225,225,0.6)',
         '&:hover': {
-            backgroundColor: 'rgba(225,225,225,0.5)'
+            backgroundColor: 'rgba(225,225,225,0.8)'
         },
         '& input': {
             backgroundColor: 'rgba(225,225,225,0)'
         },
-        fontSize: 'medium',
+        fontSize: '18px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small',
             height: '40px'
@@ -64,6 +64,7 @@ class SettingNormalTextField extends React.Component {
         this.state = {
             onHover: false,
             text: this.props.value,
+            isInvalid: this.props.isInvalid || false,
         };
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
@@ -71,6 +72,7 @@ class SettingNormalTextField extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
+            isInvalid: nextProps.isInvalid,
             text: nextProps.value,
         });
     }
@@ -88,8 +90,8 @@ class SettingNormalTextField extends React.Component {
     }
 
     render() {
-        const { classes, name, onChange } = this.props;
-        const { onHover, text } = this.state;
+        const { classes, name, helper, onChange } = this.props;
+        const { onHover, isInvalid, text } = this.state;
 
         return (
             <Container className={classes.textFieldContainer}>
@@ -104,6 +106,8 @@ class SettingNormalTextField extends React.Component {
                     id={name}
                     name={name}
                     variant='outlined'
+                    error={isInvalid}
+                    helperText={isInvalid && helper}
                     className={classes.textField}
                     InputProps={{
                         className: classes.input,
