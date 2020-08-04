@@ -66,7 +66,7 @@ const styles = theme => ({
         fontWeight: 'bold',
         marginBottom: '1px'
     },
-    TitleLabel: {
+    titleLabel: {
         color: '#DC3D4A'
     },
     statistic: {
@@ -135,7 +135,7 @@ class Ranking extends React.Component {
                     className={classes.fullHeightWidth}
                 >
                     <Grid item xs={12} sm={6} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle, classes.TitleLabel)}>
+                        <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
                             Choose a ranking level
                         </Typography>
                     </Grid>
@@ -160,7 +160,7 @@ class Ranking extends React.Component {
                         </TextField>
                     </Grid>
                     <Grid item xs={12} className={classes.itemGrid}>
-                        <Typography className={clsx(classes.gridTitle,classes.TitleLabel)}>
+                        <Typography className={clsx(classes.gridTitle,classes.titleLabel)}>
                             Overall Ranking
                         </Typography>
                     </Grid>
