@@ -57,7 +57,6 @@ const styles = theme => ({
         justifyContent: 'center',
         alignItems: 'flex-start',
         flexDirection: 'column',
-        minHeight: '125px',
     },
     gridTitle: {
         fontSize: 'x-large',
@@ -100,10 +99,6 @@ const styles = theme => ({
             backgroundColor: 'rgba(225,225,225,0)'
         }
     },
-    // chooseRankingLevel: {
-    //     padding: 0,
-
-    // },
 });
 
 const levels = [

@@ -21,30 +21,28 @@ const styles = theme => ({
         border: 'hidden',
     },
     tableContainer: {
-
+        width: '80%',
+        [theme.breakpoints.down('xs')]: {
+            width: '100%'
+        },
+        alignSelf: 'center',
         borderRadius: '4px',
         boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCell: {
-        fontSize: '20px',
+        fontSize: 'medium',
         [theme.breakpoints.down('xs')]: {
-            fontSize: '12px'
+            fontSize: 'small'
         },
-        fontWeight: 'bold',
-        //border: 'hidden',
-        color:'#FFFFFF',
+        color:'white',
         borderColor: '#DC3D4A',
+        borderWidth: '2px',
         borderStyle: 'solid',
         borderBottom: 'hidden',
-        borderTop: 'none'
+        borderTop: 'hidden'
     },
     tableCellCenter: {
-        fontSize: '20px',
         border: 'none',
-        [theme.breakpoints.down('xs')]: {
-            fontSize: '12px'
-        },
-       //display: 'flex',
         alignItems: 'center'
 
     },
@@ -52,13 +50,12 @@ const styles = theme => ({
         backgroundColor: '#EB5757',
     },
     headtitle: {
-        fontSize: '25px',
+        fontSize: 'large',
         [theme.breakpoints.down('xs')]: {
-            fontSize: '15px'
+            fontSize: 'medium'
         },
         fontWeight: 'bold',
-        //marginBottom: '1px'
-        color: '#FFFFFF',
+        color: 'white',
     },
 
 });
@@ -81,7 +78,6 @@ class OverallTable extends React.Component {
             
 
             case '':
-                //return `${this.props.PortfolioHigh}`;
                 return ``;
 
             default:

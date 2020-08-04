@@ -17,43 +17,36 @@ import { Typography } from '@material-ui/core';
 
 const styles = theme => ({
     table: {
-        width: '60%',
-        border: 'hidden'
+        width: '100%',
+        border: 'hidden',
     },
     tableContainer: {
-
+        width: '80%',
+        [theme.breakpoints.down('xs')]: {
+            width: '100%'
+        },
+        alignSelf: 'center',
         borderRadius: '4px',
         boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)'
     },
     tableCell: {
-        fontSize: '18px',
+        fontSize: 'medium',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small'
         },
-        fontWeight: '500',
         border: 'hidden',
         color: 'white'
-    },
-    tableCellCenter: {
-        fontSize: '18px',
-        [theme.breakpoints.down('xs')]: {
-            fontSize: 'small'
-        },
-        border: 'hidden',
-        display: 'flex',
-        alignItems: 'center'
     },
     head: {
         backgroundColor: '#5893C9',
     },
     headtitle: {
-        fontSize: '25px',
+        fontSize: 'large',
         [theme.breakpoints.down('xs')]: {
-            fontSize: 'large'
+            fontSize: 'medium'
         },
         fontWeight: 'bold',
-        //marginBottom: '1px'
-        color: '#FFFFFF',
+        color: 'white',
     },
 
 });
@@ -106,7 +99,7 @@ class MyStatsTable extends React.Component {
                 </TableCell>
                 <TableCell 
                     align="left"
-                    className={classes.tableCellCenter} 
+                    className={classes.tableCell} 
                 >
                     {
                         this.chooseTableRowValue(type)
