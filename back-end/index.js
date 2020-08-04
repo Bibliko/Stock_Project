@@ -337,6 +337,23 @@ app.get("/checkVerificationCode", (req, res) => {
   }
 });
 
+app.get("/ranking", async (_req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      orderBy: { totalPortfolio: "desc" },
+      select: {
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+        totalPortfolio: true
+      }
+    });
+    res.json(users);
+  } catch(err) {
+    console.log(err);
+  }
+});
+
 app.use("/verification/:tokenId", (req, res) => {
   const tokenId = req.params.tokenId;
   prisma.userVerification
