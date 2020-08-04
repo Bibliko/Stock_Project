@@ -174,10 +174,10 @@ class Ranking extends React.Component {
                     </Grid>
                     <Grid item xs={12} className={classes.itemGrid} align='center'>
                         <MyStatsTable
-                            overallrank={overallRank}
-                            regionrank={regionRank}
-                            portfoliovalue={portfolioValue}
-                            previousweek={previousWeek}
+                            overallRank={overallRank}
+                            regionRank={regionRank}
+                            portfolioValue={portfolioValue}
+                            previousWeek={previousWeek}
                             portfolioHigh={portfolioHigh}
                         />
                     </Grid>
