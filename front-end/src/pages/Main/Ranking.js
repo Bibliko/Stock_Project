@@ -41,8 +41,8 @@ const styles = theme => ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 'auto',
-        flexBasis: 'unset',
+        //margin: 'auto',
+        //flexBasis: 'unset',
     },
     fullHeightWidth: {
         height: '100%',
@@ -107,8 +107,8 @@ const levels = [
         label: 'Overall Ranking',   
     },
     {
-        value: '',
-        label: 'None',
+        value: 'Regional',
+        label: 'Regional Ranking',
     }
 ]
 
@@ -139,7 +139,7 @@ class Ranking extends React.Component {
                             Choose a ranking level
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} sm={6} className={classes.itemGrid}>
+                    <Grid item xs={12} sm={6} className={classes.center} align= 'left'>
                         <TextField
                             className={classes.textField}
                             id='Ranking'
