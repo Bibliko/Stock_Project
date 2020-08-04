@@ -1,5 +1,5 @@
 import React from 'react';
-//import _ from 'lodash';
+import { isEqual } from 'lodash';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
@@ -7,21 +7,17 @@ import { connect } from 'react-redux';
 import {
    userAction,
 } from '../../redux/storeActions/actions';
-//import { socket } from '../../App';
 
-//import { updateUserDataForSocket } from '../../utils/SocketUtil';
 import MyStatsTable from '../../components/Table/RankingTable/MyStatsTable';
 import OverallTable from '../../components/Table/RankingTable/OverallTable';
 
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-//import Paper from '@material-ui/core/Paper';
 import { Typography} from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
-//import NormalTextField from '../../components/TextField/normalTextField';
-//import Paper from '@material-ui/core/Paper';
+
 const styles = theme => ({
     root: {
         position: 'absolute',
@@ -41,8 +37,6 @@ const styles = theme => ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        //margin: 'auto',
-        //flexBasis: 'unset',
     },
     fullHeightWidth: {
         height: '100%',
@@ -73,8 +67,8 @@ const styles = theme => ({
         color: '#619FD7'
     },
     textField: {
-        height: 50,
-        width: '75%',
+        height: '50px',
+        width: '100%',
         margin: '8px',
         fontWeight: 'normal',
         "& label.Mui-focused": {
@@ -113,6 +107,18 @@ const levels = [
 ]
 
 class Ranking extends React.Component {
+    state = {
+        rankingLevel: 'Overall'
+    }
+
+    changeRankingLevel = (event) => {
+        if(!isEqual(this.state.rankingLevel, event.target.value)) {
+            this.setState({
+                rankingLevel: event.target.value
+            });
+        }
+    }   
+
     componentDidMount() {
         console.log(this.props.userSession);
     }
@@ -120,13 +126,14 @@ class Ranking extends React.Component {
     render() {
         const { classes } = this.props;
 
+        const { rankingLevel } = this.state;
+
         const {
             overallRank,
             regionRank,
             portfolioValue,
             previousWeek,
             portfolioHigh,
-            //PortfolioLow,
         } = this.props.userSession;
 
         return (
@@ -145,8 +152,8 @@ class Ranking extends React.Component {
                             id='Ranking'
                             select
                             label='Ranking level'
-                            //value
-                            //onChange
+                            value={rankingLevel}
+                            onChange={this.changeRankingLevel}
                             variant='filled'
                             SelectProps={{
                                 className: classes.select,
