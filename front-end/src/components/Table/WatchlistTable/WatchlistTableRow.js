@@ -142,7 +142,7 @@ class WatchlistTableRow extends React.Component {
         return `$${numberWithCommas(this.state.volume.toFixed(2))}`;
 
       case "Change %":
-        if (parseFloat(this.state.profitOrLoss, 10) < 0) {
+        if (this.state.changePercent < 0) {
           return `-$${numberWithCommas(
             Math.abs(this.state.changePercent).toFixed(2)
           )}`;
