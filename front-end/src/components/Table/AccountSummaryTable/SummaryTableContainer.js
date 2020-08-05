@@ -137,7 +137,7 @@ class SummaryTableContainer extends React.Component {
                         { this.chooseTableRow('Shares', classes) }
                         { this.chooseTableRow('Total Portfolio Value', classes) }
                         { this.chooseTableRow('Daily Change', classes) }
-                        { this.chooseTableRow('Overal Rank', classes) }
+                        { this.chooseTableRow('Overall Rank', classes) }
                     </TableBody>
                 </Table>
             </TableContainer>
