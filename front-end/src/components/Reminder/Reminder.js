@@ -85,8 +85,6 @@ class Reminder extends React.Component {
   render() {
     const { classes, hasUserFinishedSettingUpAccount } = this.props;
 
-    console.log(hasUserFinishedSettingUpAccount);
-
     return (
       <div
         className={clsx(classes.reminder, {
