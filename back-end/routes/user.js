@@ -73,7 +73,7 @@ router.get("/getData", (req, res) => {
     });
 });
 
-router.get("/getOverallRanking", async (_req, res) => {
+router.get("/getOverallRanking", (_req, res) => {
   prisma.user
     .findMany({
       orderBy: { totalPortfolio: "desc" },
@@ -91,7 +91,7 @@ router.get("/getOverallRanking", async (_req, res) => {
     });
 });
 
-router.get("/getRegionalRanking", async (req, res) => {
+router.get("/getRegionalRanking", (req, res) => {
   const { region } = req.query;
   
   prisma.user
