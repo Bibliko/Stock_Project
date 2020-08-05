@@ -5,7 +5,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import WatchlistTableContainer from "../../components/Table/WatchlistTable/WatchlistTableContainer";
-import InputTextFieldWithDeleteButton from "../../components/TextField/inputTextFieldWithDeleteButton";
+import InputTextFieldWithDeleteButton from "../../components/TextField/Watchlist/inputTextFieldWithDeleteButton";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";

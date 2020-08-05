@@ -114,11 +114,11 @@ class WatchlistTableRow extends React.Component {
   };
 
   chooseTableCellValue = (type) => {
-    const { rowData } = this.props;
+    const { companyCode } = this.props;
 
     switch (type) {
       case "Code":
-        return `${rowData.code}`;
+        return `${companyCode}`;
 
       case "Bid":
         return `${numberWithCommas(this.state.bid)}`;
@@ -189,7 +189,7 @@ class WatchlistTableRow extends React.Component {
     );
   };
 
-  updateHoldingInformation = () => {
+  updateWatchlistRowInformation = () => {
     // getStockPriceFromFMP(code)
     // .then(stockQuoteJSON => {
     //     const { price } = stockQuoteJSON;

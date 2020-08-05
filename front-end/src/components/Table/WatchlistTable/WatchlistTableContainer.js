@@ -21,6 +21,7 @@ const styles = (theme) => ({
     borderRadius: "4px",
     boxShadow:
       "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    marginTop: "24px",
   },
   tableCellChangePercent: {
     minWidth: "120px",
@@ -81,7 +82,7 @@ class WatchlistTableContainer extends React.Component {
           <TableBody className={classes.tableBody}>
             {rows.map((row, index) => (
               <WatchlistTableRow
-                key={row.id}
+                key={index}
                 companyCode={row}
                 rowIndex={index}
                 rowsLength={rows.length}

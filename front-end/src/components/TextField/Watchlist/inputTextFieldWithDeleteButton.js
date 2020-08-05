@@ -1,5 +1,6 @@
 import React from "react";
-import { ComponentWithForwardedRef } from "../../utils/ComponentUtil";
+import clsx from "clsx";
+import { ComponentWithForwardedRef } from "../../../utils/ComponentUtil";
 
 import TextField from "@material-ui/core/TextField";
 import { withStyles } from "@material-ui/core/styles";
@@ -7,10 +8,14 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
+import { isEmpty } from "lodash";
 
 const styles = (theme) => ({
   textField: {
-    height: 50,
+    width: "50%",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+    },
     margin: "8px",
     fontWeight: "normal",
     color: "white",
@@ -44,6 +49,9 @@ const styles = (theme) => ({
   },
   iconButton: {
     color: "rgba(255, 255, 255, 0.8)",
+  },
+  hide: {
+    display: "none",
   },
 });
 
@@ -84,7 +92,6 @@ class InputTextFieldWithDeleteButton extends React.Component {
         autoComplete="off"
         variant="outlined"
         margin="normal"
-        required
         className={classes.textField}
         InputProps={{
           className: classes.input,
@@ -92,7 +99,9 @@ class InputTextFieldWithDeleteButton extends React.Component {
             <InputAdornment position="end">
               <IconButton
                 edge="end"
-                className={classes.iconButton}
+                className={clsx(classes.iconButton, {
+                  [classes.hide]: isEmpty(this.state.value),
+                })}
                 onClick={() => {
                   clearData();
                   this.clearInput();
