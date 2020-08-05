@@ -73,7 +73,7 @@ router.get("/getData", (req, res) => {
     });
 });
 
-router.get("/getOverallRanking", (_req, res) => {
+router.get("/getOverallRanking", (req, res) => {
   prisma.user
     .findMany({
       orderBy: { totalPortfolio: "desc" },
@@ -84,7 +84,7 @@ router.get("/getOverallRanking", (_req, res) => {
         region: true
       }
     })
-    .then(users => res.json(users))
+    .then(users => res.send(users))
     .catch(err => {
       console.log(err);
       res.status(500).send("Get overall ranking fails.");
@@ -105,7 +105,7 @@ router.get("/getRegionalRanking", (req, res) => {
         region: true
       }
     })
-    .then(users => res.json(users))
+    .then(users => res.send(users))
     .catch(err => {
       console.log(err);
       res.status(500).send("Get regional ranking fails.");
