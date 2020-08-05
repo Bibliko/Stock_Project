@@ -664,16 +664,14 @@ class AccountSetting extends React.Component {
  }
 
 const mapStateToProps = (state) => ({
-	userSession: state.userSession,
+  userSession: state.userSession,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	mutateUser: (userProps) => dispatch(userAction(
-		'default',
-		userProps
-	)),
+  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-	withStyles(styles)(withRouter(AccountSetting))
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(withRouter(AccountSetting)));
