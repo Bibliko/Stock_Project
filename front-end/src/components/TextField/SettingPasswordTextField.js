@@ -45,6 +45,7 @@ const styles = theme => ({
             backgroundColor: 'rgba(225,225,225,0)'
         },
         fontSize: '18px',
+        height: '50px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small',
             height: '40px'

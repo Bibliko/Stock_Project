@@ -42,6 +42,7 @@ const styles = theme => ({
             backgroundColor: 'rgba(225,225,225,0)'
         },
         fontSize: '18px',
+        height: '50px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small',
             height: '40px'
@@ -90,7 +91,7 @@ class SettingNormalTextField extends React.Component {
     }
 
     render() {
-        const { classes, name, helper, onChange } = this.props;
+        const { classes, name, helper, onChange, disabled } = this.props;
         const { onHover, isInvalid, text } = this.state;
 
         return (
@@ -100,6 +101,7 @@ class SettingNormalTextField extends React.Component {
                 </Typography>
                 <TextField
                     fullWidth
+                    disabled={disabled}
                     value={text}
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.onMouseOut}
