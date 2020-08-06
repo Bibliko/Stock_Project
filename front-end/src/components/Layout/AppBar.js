@@ -1,4 +1,5 @@
 import React, { createRef } from "react";
+import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
@@ -7,13 +8,16 @@ import { userAction } from "../../redux/storeActions/actions";
 import { redirectToPage } from "../../utils/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
 
+import { withMediaQuery } from "../../theme/ThemeUtil";
+
+import SearchField from "../TextField/SearchFieldLayout";
+
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles, withTheme } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Grow from "@material-ui/core/Grow";
 import Paper from "@material-ui/core/Paper";
@@ -22,6 +26,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
 
 import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
+import VideogameAssetRoundedIcon from "@material-ui/icons/VideogameAssetRounded";
+import MenuBookRoundedIcon from "@material-ui/icons/MenuBookRounded";
+import InfoRoundedIcon from "@material-ui/icons/InfoRounded";
+import SearchRoundedIcon from "@material-ui/icons/SearchRounded";
 
 const styles = (theme) => ({
   appBar: {
@@ -36,14 +44,26 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
+    margin: 4,
+  },
+  secondaryMenuButton: {
+    height: "fit-content",
+    width: "fit-content",
+    [theme.breakpoints.down("xs")]: {
+      padding: "6px",
+    },
+    "& .MuiIconButton-colorPrimary": {
+      color: "white",
+    },
   },
   avatarIcon: {
-    height: "40px",
-    width: "40px",
+    height: "35px",
+    width: "35px",
     [theme.breakpoints.down("xs")]: {
-      height: "30px",
-      width: "30px",
+      height: "25px",
+      width: "25px",
     },
+    color: "white",
   },
   toolbar: {
     display: "flex",
@@ -51,6 +71,7 @@ const styles = (theme) => ({
     alignItems: "center",
     height: "60px",
     minHeight: "60px",
+    paddingRight: 0,
   },
   logo: {
     height: "50px",
@@ -61,15 +82,12 @@ const styles = (theme) => ({
       cursor: "pointer",
     },
   },
-  navbarButton: {
-    color: "white",
-    fontSize: "small",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "smaller",
-    },
-    textTransform: "none",
-  },
   leftNavbarGrid: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  rightNavbarGrid: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
@@ -81,6 +99,9 @@ const styles = (theme) => ({
   },
   endMenuItem: {
     marginBottom: "5px",
+  },
+  searchIconButton: {
+    color: "rgba(156, 140, 249, 1)",
   },
 });
 
@@ -138,6 +159,12 @@ class PersistentAppBar extends React.Component {
       });
   };
 
+  isScreenSmall = () => {
+    const { mediaQuery } = this.props;
+    const isScreenSmall = mediaQuery;
+    return isScreenSmall;
+  };
+
   reFocusWhenTransitionMenu = () => {
     if (this.prevOpenAccountMenu && !this.state.openAccountMenu) {
       this.accountAnchorRef.current.focus();
@@ -167,24 +194,37 @@ class PersistentAppBar extends React.Component {
     return (
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
-          <img
-            src="/bibliko.png"
-            alt="Bibliko"
-            className={classes.logo}
-            onClick={() => {
-              redirectToPage("/", this.props);
-            }}
-          />
           <Grid className={classes.leftNavbarGrid}>
-            <Button
-              className={classes.navbarButton}
+            <img
+              src="/bibliko.png"
+              alt="Bibliko"
+              className={classes.logo}
+              onClick={() => {
+                redirectToPage("/", this.props);
+              }}
+            />
+          </Grid>
+
+          {!this.isScreenSmall() && <SearchField />}
+
+          <Grid className={classes.rightNavbarGrid}>
+            {this.isScreenSmall() && (
+              <IconButton className={classes.secondaryMenuButton}>
+                <SearchRoundedIcon
+                  className={clsx(classes.avatarIcon, classes.searchIconButton)}
+                />
+              </IconButton>
+            )}
+            <IconButton
+              title="Game"
+              className={classes.secondaryMenuButton}
               ref={this.gameAnchorRef}
               aria-controls={openGameMenu ? "menu-list-grow" : undefined}
               aria-haspopup="true"
               onClick={this.toggleGameMenu}
             >
-              Game
-            </Button>
+              <VideogameAssetRoundedIcon className={classes.avatarIcon} />
+            </IconButton>
             <Popper
               open={openGameMenu}
               anchorEl={this.gameAnchorRef.current}
@@ -242,8 +282,18 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
-            <Button className={classes.navbarButton}>Education</Button>
-            <Button className={classes.navbarButton}>About Us</Button>
+            <IconButton
+              title="Education"
+              className={classes.secondaryMenuButton}
+            >
+              <MenuBookRoundedIcon className={classes.avatarIcon} />
+            </IconButton>
+            <IconButton
+              title="About Us"
+              className={classes.secondaryMenuButton}
+            >
+              <InfoRoundedIcon className={classes.avatarIcon} />
+            </IconButton>
             <IconButton
               color="inherit"
               component="span"
@@ -320,4 +370,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(PersistentAppBar)));
+)(
+  withStyles(styles)(
+    withTheme(withRouter(withMediaQuery("(max-width:600px)")(PersistentAppBar)))
+  )
+);
