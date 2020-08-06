@@ -175,7 +175,6 @@ export const searchCompanyTickers = (searchQuery) => {
 };
 
 export const shortenCompanyNameToFourWords = (companyName) => {
-  console.log(companyName);
   let resultName = "";
   let numberOfSpaces = 0;
   for (let i = 0; i < companyName.length; i++) {
@@ -187,7 +186,6 @@ export const shortenCompanyNameToFourWords = (companyName) => {
     }
     resultName += companyName.charAt(i);
   }
-  console.log(resultName);
   return resultName;
 };
 

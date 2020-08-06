@@ -79,14 +79,14 @@ const styles = (theme) => ({
     padding: 0,
     width: "30%",
     [theme.breakpoints.down("md")]: {
-      width: "40%",
+      width: "50%",
     },
     transition: "width 0.75s",
   },
   extendWidthSearchField: {
     width: "40%",
     [theme.breakpoints.down("md")]: {
-      width: "50%",
+      width: "60%",
     },
   },
   menuPaper: {

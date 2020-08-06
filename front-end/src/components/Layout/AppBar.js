@@ -86,12 +86,12 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
+    flexGrow: 1,
   },
   rightNavbarGrid: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    flexGrow: 1,
   },
   menuPaper: {
     backgroundColor: theme.palette.menuBackground.main,
@@ -204,8 +204,6 @@ class PersistentAppBar extends React.Component {
                 redirectToPage("/", this.props);
               }}
             />
-          </Grid>
-          <Grid className={classes.rightNavbarGrid}>
             {!this.isScreenSmall() && <SearchField />}
             {this.isScreenSmall() && (
               <IconButton className={classes.secondaryMenuButton}>
@@ -214,6 +212,8 @@ class PersistentAppBar extends React.Component {
                 />
               </IconButton>
             )}
+          </Grid>
+          <Grid className={classes.rightNavbarGrid}>
             <IconButton
               title="Game"
               className={classes.secondaryMenuButton}
