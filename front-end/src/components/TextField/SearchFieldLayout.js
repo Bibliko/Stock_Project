@@ -10,7 +10,6 @@ import TextField from "@material-ui/core/TextField";
 import { withStyles } from "@material-ui/core/styles";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
-import Container from "@material-ui/core/Container";
 import Popper from "@material-ui/core/Popper";
 import Grow from "@material-ui/core/Grow";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
@@ -25,10 +24,7 @@ import SearchRoundedIcon from "@material-ui/icons/SearchRounded";
 
 const styles = (theme) => ({
   textField: {
-    width: "80%",
-    [theme.breakpoints.up("md")]: {
-      width: "60%",
-    },
+    width: "100%",
     margin: "8px",
     fontWeight: "normal",
     color: "white",
@@ -37,7 +33,7 @@ const styles = (theme) => ({
       borderRadius: "20px",
     },
     "& .MuiInputLabel-outlined": {
-      transform: "translate(14px, 12px) scale(1)",
+      transform: "translate(14px, 11px) scale(1)",
     },
     "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
       transform: "translate(14px, -6px) scale(0.75)",
@@ -75,15 +71,26 @@ const styles = (theme) => ({
   searchFieldContainer: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    padding: "5px",
+    justifyContent: "flex-end",
+    padding: 0,
+    width: "30%",
+    [theme.breakpoints.down("md")]: {
+      width: "40%",
+    },
+    transition: "width 0.75s",
+  },
+  extendWidthSearchField: {
+    width: "40%",
+    [theme.breakpoints.down("md")]: {
+      width: "50%",
+    },
   },
   menuPaper: {
     backgroundColor: theme.palette.menuBackground.main,
     color: "white",
   },
   popperSearch: {
-    minWidth: "50%",
+    minWidth: "40%",
     maxWidth: "100%",
     maxHeight: "50%",
     zIndex: theme.zIndex.searchMenu,
@@ -141,6 +148,8 @@ class SearchFieldLayout extends React.Component {
     searchCompany: "",
     companiesNYSE: [],
     companiesNASDAQ: [],
+
+    isExtendingSearchMenu: false,
   };
 
   searchAnchorRef = createRef(null);
@@ -194,9 +203,14 @@ class SearchFieldLayout extends React.Component {
   };
 
   clearSearchCompany = () => {
-    this.setState({
-      searchCompany: "",
-    });
+    this.setState(
+      {
+        searchCompany: "",
+      },
+      () => {
+        this.shrinkSearchMenu();
+      }
+    );
   };
 
   handleClose = (event) => {
@@ -222,6 +236,22 @@ class SearchFieldLayout extends React.Component {
     });
   };
 
+  extendSearchMenu = (event) => {
+    if (!this.state.isExtendingSearchMenu) {
+      this.setState({
+        isExtendingSearchMenu: true,
+      });
+    }
+  };
+
+  shrinkSearchMenu = (event) => {
+    if (isEmpty(this.state.searchCompany)) {
+      this.setState({
+        isExtendingSearchMenu: false,
+      });
+    }
+  };
+
   showResultTickers = (company) => {
     const { symbol, name, currency, exchangeShortName } = company;
     return (
@@ -244,10 +274,19 @@ class SearchFieldLayout extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { openSearchMenu, companiesNYSE, companiesNASDAQ } = this.state;
+    const {
+      openSearchMenu,
+      companiesNYSE,
+      companiesNASDAQ,
+      isExtendingSearchMenu,
+    } = this.state;
 
     return (
-      <Container className={classes.searchFieldContainer}>
+      <div
+        className={clsx(classes.searchFieldContainer, {
+          [classes.extendWidthSearchField]: isExtendingSearchMenu,
+        })}
+      >
         <TextField
           id="Search"
           ref={this.searchAnchorRef}
@@ -257,6 +296,9 @@ class SearchFieldLayout extends React.Component {
           variant="outlined"
           margin="normal"
           className={classes.textField}
+          onChange={this.changeSearchCompany}
+          onClick={this.extendSearchMenu}
+          onBlur={this.shrinkSearchMenu}
           InputProps={{
             className: classes.input,
             endAdornment: (
@@ -278,12 +320,11 @@ class SearchFieldLayout extends React.Component {
               </InputAdornment>
             ),
           }}
-          onChange={this.changeSearchCompany}
         />
         <Popper
           open={openSearchMenu}
           anchorEl={this.searchAnchorRef.current}
-          placement="bottom"
+          placement="bottom-start"
           className={classes.popperSearch}
           transition
           modifiers={{
@@ -319,7 +360,7 @@ class SearchFieldLayout extends React.Component {
             </Grow>
           )}
         </Popper>
-      </Container>
+      </div>
     );
   }
 }

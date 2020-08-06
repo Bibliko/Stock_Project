@@ -91,6 +91,7 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
+    flexGrow: 1,
   },
   menuPaper: {
     backgroundColor: theme.palette.menuBackground.main,
@@ -204,10 +205,8 @@ class PersistentAppBar extends React.Component {
               }}
             />
           </Grid>
-
-          {!this.isScreenSmall() && <SearchField />}
-
           <Grid className={classes.rightNavbarGrid}>
+            {!this.isScreenSmall() && <SearchField />}
             {this.isScreenSmall() && (
               <IconButton className={classes.secondaryMenuButton}>
                 <SearchRoundedIcon
