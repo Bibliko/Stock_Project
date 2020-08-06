@@ -77,16 +77,16 @@ const styles = (theme) => ({
     alignItems: "center",
     justifyContent: "flex-end",
     padding: 0,
-    width: "30%",
+    width: "20%",
     [theme.breakpoints.down("md")]: {
-      width: "50%",
+      width: "60%",
     },
     transition: "width 0.75s",
   },
   extendWidthSearchField: {
-    width: "40%",
+    width: "30%",
     [theme.breakpoints.down("md")]: {
-      width: "60%",
+      width: "70%",
     },
   },
   menuPaper: {
