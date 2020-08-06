@@ -50,9 +50,9 @@ const styles = (theme) => ({
     //maxHeight: '300px'
   },
   gridTitle: {
-    fontSize: "25px",
-    [theme.breakpoints.down("md")]: {
-      fontSize: "15px",
+    fontSize: "large",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "small",
     },
     fontWeight: "bold",
     marginBottom: "5px",

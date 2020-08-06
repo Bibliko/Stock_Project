@@ -4,7 +4,10 @@ import { isEmpty } from "lodash";
 
 import { ComponentWithForwardedRef } from "../../utils/ComponentUtil";
 import { oneSecond } from "../../utils/DayTimeUtil";
-import { searchCompanyTickers } from "../../utils/FinancialModelingPrepUtil";
+import {
+  searchCompanyTickers,
+  shortenCompanyNameToFourWords,
+} from "../../utils/FinancialModelingPrepUtil";
 
 import TextField from "@material-ui/core/TextField";
 import { withStyles } from "@material-ui/core/styles";
@@ -17,7 +20,8 @@ import Paper from "@material-ui/core/Paper";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import Grid from "@material-ui/core/Grid";
-import { CircularProgress } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 import SearchRoundedIcon from "@material-ui/icons/SearchRounded";
@@ -33,10 +37,10 @@ const styles = (theme) => ({
       borderRadius: "20px",
     },
     "& .MuiInputLabel-outlined": {
-      transform: "translate(14px, 12px) scale(1)",
+      transform: "translate(14px, 13px) scale(1)",
     },
     "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
-      transform: "translate(14px, -6px) scale(0.75)",
+      transform: "translate(18px, -4px) scale(0.75)",
     },
     "& .MuiOutlinedInput-underline:after": {
       borderBottom: "2px solid #000000",
@@ -51,7 +55,7 @@ const styles = (theme) => ({
       borderColor: "rgba(156, 140, 249, 1)",
     },
     "& .MuiFormLabel-root": {
-      fontSize: "medium",
+      fontSize: "small",
       color: "rgba(156, 140, 249, 0.7)",
       "&.Mui-focused": {
         color: "rgba(156, 140, 249, 1)",
@@ -90,13 +94,21 @@ const styles = (theme) => ({
     color: "white",
   },
   popperSearch: {
-    minWidth: "40%",
+    minWidth: "450px",
+    width: "40%",
     maxWidth: "100%",
     maxHeight: "50%",
     zIndex: theme.zIndex.searchMenu,
   },
   searchIcon: {
     color: "rgba(156, 140, 249, 0.7)",
+  },
+  searchItem: {
+    fontSize: "small",
+  },
+  searchNote: {
+    fontSize: "small",
+    padding: "16px",
   },
 });
 
@@ -136,7 +148,8 @@ const NASDAQ = [
   },
   {
     symbol: "asdf",
-    name: "asdf",
+    name:
+      "LightInTheBox Holding Co. Ltd. American Depositary Shares each representing 2",
     currency: "USD",
     exchangeShortName: "asdf",
   },
@@ -148,6 +161,7 @@ class SearchFieldLayout extends React.Component {
     searchCompany: "",
     companiesNYSE: [],
     companiesNASDAQ: [],
+    note: "",
 
     isExtendingSearchMenu: false,
   };
@@ -169,22 +183,30 @@ class SearchFieldLayout extends React.Component {
       this.turnOffSearchMenu();
     }
 
-    if (!isEmpty(this.state.searchCompany) && !this.state.openSearchMenu) {
-      this.turnOnSearchMenu();
-      //   searchCompanyTickers(this.state.searchCompany)
-      //     .then((resultTickers) => {
-      //       this.setState({
-      //         companiesNYSE: resultTickers[0],
-      //         companiesNASDAQ: resultTickers[1],
-      //       });
-      //     })
-      //     .catch((err) => {
-      //       console.log(err);
-      //     });
+    if (!isEmpty(this.state.searchCompany)) {
+      if (!this.state.openSearchMenu) {
+        this.turnOnSearchMenu();
+      }
       this.setState({
         companiesNYSE: NYSE,
         companiesNASDAQ: NASDAQ,
+        note: "",
       });
+      // searchCompanyTickers(this.state.searchCompany)
+      //   .then((resultTickers) => {
+      //     console.log(resultTickers);
+      //     this.setState({
+      //       companiesNYSE: resultTickers[0],
+      //       companiesNASDAQ: resultTickers[1],
+      //       note:
+      //         isEmpty(resultTickers[0]) && isEmpty(resultTickers[1])
+      //           ? "No Stocks Found..."
+      //           : "",
+      //     });
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
     }
   };
 
@@ -195,9 +217,9 @@ class SearchFieldLayout extends React.Component {
 
     this.setState({
       searchCompany: event.target.value,
+      companiesNASDAQ: [],
+      companiesNYSE: [],
     });
-
-    this.turnOffSearchMenu();
 
     this.setTimeoutForSearch();
   };
@@ -233,6 +255,8 @@ class SearchFieldLayout extends React.Component {
   turnOffSearchMenu = () => {
     this.setState({
       openSearchMenu: false,
+      companiesNASDAQ: [],
+      companiesNYSE: [],
     });
   };
 
@@ -252,24 +276,29 @@ class SearchFieldLayout extends React.Component {
     }
   };
 
-  showResultTickers = (company) => {
-    const { symbol, name, currency, exchangeShortName } = company;
+  showResultTickers = (company, classes) => {
+    const { symbol, name } = company;
     return (
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          {symbol}
+      <Grid container>
+        <Grid item xs={3}>
+          <Typography className={classes.searchItem}>{symbol}</Typography>
         </Grid>
-        <Grid item xs={6}>
-          {name}
-        </Grid>
-        <Grid item xs={6}>
-          {currency}
-        </Grid>
-        <Grid item xs={6}>
-          {exchangeShortName}
+        <Grid item xs={9}>
+          <Typography className={classes.searchItem}>
+            {shortenCompanyNameToFourWords(name)}
+          </Typography>
         </Grid>
       </Grid>
     );
+  };
+
+  showLinearProgressBar = () => {
+    const { companiesNASDAQ, companiesNYSE, note } = this.state;
+    if (isEmpty(companiesNASDAQ) && isEmpty(companiesNYSE) && isEmpty(note)) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   render() {
@@ -278,6 +307,7 @@ class SearchFieldLayout extends React.Component {
       openSearchMenu,
       companiesNYSE,
       companiesNASDAQ,
+      note,
       isExtendingSearchMenu,
     } = this.state;
 
@@ -341,17 +371,23 @@ class SearchFieldLayout extends React.Component {
                     id="menu-list-grow"
                     onKeyDown={this.handleListKeyDown}
                   >
-                    {isEmpty(companiesNASDAQ) && isEmpty(companiesNYSE) && (
-                      <CircularProgress />
+                    <MenuItem dense disabled>
+                      Stocks
+                    </MenuItem>
+                    {this.showLinearProgressBar() && <LinearProgress />}
+                    {!isEmpty(note) && (
+                      <Typography className={classes.searchNote}>
+                        {note}
+                      </Typography>
                     )}
                     {companiesNYSE.map((company, index) => (
-                      <MenuItem key={index}>
-                        {this.showResultTickers(company)}
+                      <MenuItem dense key={index}>
+                        {this.showResultTickers(company, classes)}
                       </MenuItem>
                     ))}
                     {companiesNASDAQ.map((company, index) => (
-                      <MenuItem key={index}>
-                        {this.showResultTickers(company)}
+                      <MenuItem dense key={index}>
+                        {this.showResultTickers(company, classes)}
                       </MenuItem>
                     ))}
                   </MenuList>

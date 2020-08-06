@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 
 const {
   REACT_APP_FINANCIAL_MODELING_PREP_API_KEY: FINANCIAL_MODELING_PREP_API_KEY,
@@ -174,6 +174,23 @@ export const searchCompanyTickers = (searchQuery) => {
   });
 };
 
+export const shortenCompanyNameToFourWords = (companyName) => {
+  console.log(companyName);
+  let resultName = "";
+  let numberOfSpaces = 0;
+  for (let i = 0; i < companyName.length; i++) {
+    if (numberOfSpaces >= 4) {
+      break;
+    }
+    if (isEqual(companyName.charAt(i), " ")) {
+      numberOfSpaces++;
+    }
+    resultName += companyName.charAt(i);
+  }
+  console.log(resultName);
+  return resultName;
+};
+
 export default {
   getManyStockPricesFromFMP,
   getStockPriceFromFMP,
@@ -181,4 +198,5 @@ export default {
   searchNYSETickers,
   searchNASDAQTickers,
   searchCompanyTickers,
+  shortenCompanyNameToFourWords,
 };
