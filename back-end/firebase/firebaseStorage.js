@@ -7,7 +7,7 @@ try {
 global.XMLHttpRequest = require("xhr2");
 var firebase = require("firebase");
 
-// // Add the Firebase products that you want to use
+// Add the Firebase products that you want to use
 require("firebase/auth");
 require("firebase/storage");
 
