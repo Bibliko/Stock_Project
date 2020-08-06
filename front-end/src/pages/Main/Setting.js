@@ -2,12 +2,10 @@ import React from 'react';
 import clsx from 'clsx';
 import { withRouter } from 'react-router';
 
-import { isEqual, pick, extend } from 'lodash'
+import { pick, extend } from 'lodash'
 
 import { connect } from 'react-redux';
-import {
-	userAction,
-} from '../../redux/storeActions/actions';
+import { userAction } from '../../redux/storeActions/actions';
 
 import { changeUserData } from '../../utils/UserUtil'
 
@@ -101,7 +99,15 @@ const styles = theme => ({
 		},
 		backgroundColor: 'rgba(255, 255, 255, 0.85)',
 		color: theme.palette.appBarBlue.main,
-	}
+	},
+	reminderButton: {
+		marginLeft: '5px',
+		marginRight: '5px',
+		[theme.breakpoints.down('xs')]: {
+			fontSize: '10px',
+			margin: '0px',
+		},
+	},
 });
 
 const PasswordAccordion = withStyles((theme) => ({
@@ -149,19 +155,12 @@ class SensitiveSection extends React.Component {
 				confirmedPassword: '',
 			}
 		};
-		this.initialState = JSON.parse(JSON.stringify(this.state));
 		this.newPassword = this.props.oldPassword;
 		this.hasError = false;
 		this.checkOldPassword = this.checkOldPassword.bind(this);
 		this.recordNewPassword = this.recordNewPassword.bind(this);
 		this.recordConfirmedPassword = this.recordConfirmedPassword.bind(this);
 		this.toggle = this.toggle.bind(this);
-	}
-
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			oldPassword: nextProps.oldPassword,
-		});
 	}
 
 	toggle() {
@@ -176,7 +175,18 @@ class SensitiveSection extends React.Component {
 	reset() {
 		this.newPassword = this.props.oldPassword;
 		this.hasError = false;
-		this.setState(this.initialState);
+		this.setState({
+			wrongPassword: false,
+			invalidPassword: false,
+			unmatchedPassword: false,
+			show: false,
+			input: {
+				email: this.props.email,
+				oldPassword: '',
+				newPassword: '',
+				confirmedPassword: '',
+			}
+		});
 	}
 
 	createChangeLog() {
@@ -320,23 +330,17 @@ class NameSection extends React.Component {
 			}
 		};
 		this.hasError = false;
-		this.initialState = JSON.parse(JSON.stringify(this.state));
 		this.recordFirstName = this.recordFirstName.bind(this);
 		this.recordLastName = this.recordLastName.bind(this);
 	}
 
-	componentWillReceiveProps(nextProps) {
-		const input = {
-			firstName: nextProps.firstName,
-			lastName: nextProps.lastName,
-		};
-		this.setState({
-			input: input
-		});
-	}
-
 	reset() {
-		this.setState(this.initialState);
+		this.setState({
+			input: {
+				firstName: this.props.firstName,
+				lastName: this.props.lastName,
+			}
+		});
 	}
 
 	createChangeLog(firstName, lastName) {
@@ -401,23 +405,17 @@ class SelectSection extends React.Component {
 				occupation: this.props.occupation,
 			}
 		};
-		this.initialState = JSON.parse(JSON.stringify(this.state));
 		this.recordRegion = this.recordRegion.bind(this);
 		this.recordOccupation = this.recordOccupation.bind(this);
 	}
 
-	componentWillReceiveProps(nextProps) {
-		const input = {
-			region: nextProps.region,
-			occupation: nextProps.occupation,
-		};
-		this.setState({
-			input: input
-		});
-	}
-
 	reset() {
-		this.setState(this.initialState);
+		this.setState({
+			input: {
+				region: this.props.region,
+				occupation: this.props.occupation,
+			}
+		});
 	}
 
 	createChangeLog(region, occupation) {
@@ -522,7 +520,8 @@ class AccountSetting extends React.Component {
 		super(props);
 		this.error = false;
 		this.hasChanges = false;
-		this.userSession = pick(this.props.userSession, [
+
+		this.changes = pick(this.props.userSession, [
 			'password',
 			'firstName',
 			'lastName',
@@ -530,11 +529,6 @@ class AccountSetting extends React.Component {
 			'region',
 			'occupation'
 		]);
-
-		this.userSession.firstName = this.userSession.firstName || '';
-		this.userSession.lastName = this.userSession.lastName || '';
-
-		this.changes = JSON.parse(JSON.stringify(this.userSession));
 
 		this.recordChanges = this.recordChanges.bind(this);
 		this.updateReminder = this.updateReminder.bind(this);
@@ -548,6 +542,10 @@ class AccountSetting extends React.Component {
 		this.errorDialogRef = React.createRef();
 	}
 
+	compareChanges() {
+		return !!(Object.keys(this.changes).filter(key => this.changes[key] !== this.props.userSession[key]).length);
+	}
+
 	recordChanges(newChanges={}) {
 		extend(this.changes, newChanges);
 		this.error = this.nameSectionRef.current.hasError || this.sensitiveSectionRef.current.hasError;
@@ -555,14 +553,24 @@ class AccountSetting extends React.Component {
 	}
 
 	updateReminder() {
-		if(this.hasChanges !== !isEqual(this.userSession, this.changes)) {
+		if(this.hasChanges !== this.compareChanges()) {
 			this.reminderRef.current.toggleReminder();
-			this.hasChanges = !isEqual(this.userSession, this.changes);
+			this.hasChanges = this.compareChanges();
 		}
 	}
 
 	reset() {
-		this.recordChanges(this.userSession, false);
+		this.changes = pick(this.props.userSession, [
+			'password',
+			'firstName',
+			'lastName',
+			'avatarUrl',
+			'region',
+			'occupation'
+		]);
+		this.error = false;
+		this.updateReminder();
+
 		this.sensitiveSectionRef.current.reset();
 		this.nameSectionRef.current.reset();
 		this.selectSectionRef.current.reset();
@@ -575,14 +583,15 @@ class AccountSetting extends React.Component {
 				this.props.userSession.email,
 				this.props.mutateUser
 			)
+			.then(() => {
+				this.updateReminder();
+				this.sensitiveSectionRef.current.reset();
+			})
 			.catch(err => {
 					console.log(err);
 					this.errorDialogRef.current.toggleDialog();
 				}	
 			);
-			this.userSession = JSON.parse(JSON.stringify(this.changes));
-			this.updateReminder();
-			this.sensitiveSectionRef.current.reset();
 		} else {
 			this.errorDialogRef.current.toggleDialog();
 		}
@@ -642,7 +651,8 @@ class AccountSetting extends React.Component {
 						color='inherit'
 						size='small'
 						onClick={this.reset}
-						style={{textDecoration: 'underline', marginRight: '10px'}}
+						className={classes.reminderButton}
+						style={{textDecoration: 'underline'}}
 					>
 						Reset
 					</Button>
@@ -652,6 +662,7 @@ class AccountSetting extends React.Component {
 						size='small'
 						variant='contained'
 						disableElevation
+						className={classes.reminderButton}
 						onClick={this.submit}
 					>
 						Save
@@ -664,14 +675,14 @@ class AccountSetting extends React.Component {
  }
 
 const mapStateToProps = (state) => ({
-  userSession: state.userSession,
+	userSession: state.userSession,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+	mutateUser: (userProps) => dispatch(userAction("default", userProps)),
 });
 
 export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+	mapStateToProps,
+	mapDispatchToProps
 )(withStyles(styles)(withRouter(AccountSetting)));

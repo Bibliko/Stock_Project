@@ -11,11 +11,18 @@ import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 
 const styles = theme => ({
 	reminderBox: {
+		// eslint-disable-next-line
 		position: '-webkit-sticky', /* Safari */
+		// eslint-disable-next-line
 		position: 'sticky',
 		width: '90%',
 		margin: '5%',
 	},
+	alert: {
+		[theme.breakpoints.down('xs')]: {
+			fontSize: '12px',
+		},
+	}
 });
 
 class StickyReminder extends React.Component {
@@ -42,6 +49,7 @@ class StickyReminder extends React.Component {
 			<Box component='div' m={1} className={classes.reminderBox} style={style}>
 				<Fade in={visible} timeout={800} mountOnEnter unmountOnExit>
 					<Alert severity="warning"
+						className={classes.alert}
 						action={
 							<span>
 								{this.props.children}    {/* Custom button */}

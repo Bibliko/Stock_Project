@@ -68,18 +68,9 @@ class SettingPasswordTextField extends React.Component {
         this.state = {
             onHover: false,
             visibility: false,
-            isInvalid: this.props.isInvalid,
-            text: this.props.value,
         };
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            isInvalid: nextProps.isInvalid,
-            text: nextProps.value,
-        });
     }
 
     onMouseOver() {
@@ -105,8 +96,8 @@ class SettingPasswordTextField extends React.Component {
     }
 
     render() {
-        const { classes, name, helper, onChange } = this.props;
-        const { onHover, visibility, isInvalid, text } = this.state;
+        const { classes, name, value, isInvalid, helper, onChange } = this.props;
+        const { onHover, visibility } = this.state;
 
         return (
             <Container className={classes.textFieldContainer}>
@@ -115,7 +106,7 @@ class SettingPasswordTextField extends React.Component {
                 </Typography>
                 <TextField
                     fullWidth
-                    value={text}
+                    value={value}
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.onMouseOut}
                     id={name}

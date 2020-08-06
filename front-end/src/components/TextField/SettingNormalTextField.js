@@ -64,18 +64,9 @@ class SettingNormalTextField extends React.Component {
         super(props);
         this.state = {
             onHover: false,
-            text: this.props.value,
-            isInvalid: this.props.isInvalid || false,
         };
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            isInvalid: nextProps.isInvalid,
-            text: nextProps.value,
-        });
     }
 
     onMouseOver() {
@@ -91,8 +82,8 @@ class SettingNormalTextField extends React.Component {
     }
 
     render() {
-        const { classes, name, helper, onChange, disabled } = this.props;
-        const { onHover, isInvalid, text } = this.state;
+        const { classes, name, value, isInvalid, helper, onChange, disabled } = this.props;
+        const { onHover } = this.state;
 
         return (
             <Container className={classes.textFieldContainer}>
@@ -102,7 +93,7 @@ class SettingNormalTextField extends React.Component {
                 <TextField
                     fullWidth
                     disabled={disabled}
-                    value={text}
+                    value={value}
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.onMouseOut}
                     id={name}
