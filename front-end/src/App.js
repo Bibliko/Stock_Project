@@ -22,7 +22,7 @@ import Fail from './pages/Login/Verification/Fail';
 import LandingPage from './pages/Main/LandingPage';
 import AccountSummary from './pages/Main/AccountSummary';
 import Setting from './pages/Main/Setting';
-
+import Ranking from './pages/Main/Ranking';
 import Layout from './components/Layout/Layout';
 import { createTheme } from './theme/ThemeUtil';
 
@@ -141,8 +141,10 @@ class App extends React.Component {
                 <Route exact path="/" component={LandingPage} />
 
                 <Route path="/accountSummary" component={AccountSummary} />
-
+                  
                 <Route path="/setting" component={Setting} />
+                  
+                <Route path="/ranking" component={Ranking} />
               </Layout>
             </Switch>
           }
