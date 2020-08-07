@@ -16,9 +16,10 @@ const styles = (theme) => ({
     position: "absolute",
     height: "75%",
     width: "75%",
-    marginTop: theme.margin.topLayout,
+    marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
       width: "85%",
+      marginTop: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
     display: "flex",

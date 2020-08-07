@@ -21,8 +21,11 @@ const styles = (theme) => ({
     height: "40px",
     padding: "10px",
     backgroundColor: "#e23d3d",
-    zIndex: theme.zIndex.reminder,
-    top: "60px",
+    zIndex: theme.customZIndex.reminder,
+    top: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      top: theme.customHeight.appBarHeightSmall,
+    },
     transition: "top 1s",
   },
   reminderText: {

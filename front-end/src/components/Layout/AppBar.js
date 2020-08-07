@@ -1,5 +1,4 @@
 import React, { createRef } from "react";
-import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
@@ -8,14 +7,12 @@ import { userAction } from "../../redux/storeActions/actions";
 import { redirectToPage } from "../../utils/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
 
-import { withMediaQuery } from "../../theme/ThemeUtil";
-
-import SearchField from "../TextField/SearchFieldLayout";
+import SearchFieldLayout from "../Search/SearchFieldLayout";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-import { withStyles, withTheme } from "@material-ui/core/styles";
+import { withStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Grid from "@material-ui/core/Grid";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
@@ -29,7 +26,6 @@ import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
 import VideogameAssetRoundedIcon from "@material-ui/icons/VideogameAssetRounded";
 import MenuBookRoundedIcon from "@material-ui/icons/MenuBookRounded";
 import InfoRoundedIcon from "@material-ui/icons/InfoRounded";
-import SearchRoundedIcon from "@material-ui/icons/SearchRounded";
 
 const styles = (theme) => ({
   appBar: {
@@ -38,7 +34,10 @@ const styles = (theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     backgroundColor: theme.palette.appBarBlue.main,
-    height: "60px",
+    height: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      height: theme.customHeight.appBarHeightSmall,
+    },
   },
   menuButton: {
     height: "fit-content",
@@ -69,18 +68,13 @@ const styles = (theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    height: "60px",
-    minHeight: "60px",
-    paddingRight: 0,
-  },
-  logo: {
-    height: "50px",
+    height: theme.customHeight.appBarHeight,
+    minHeight: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
-      height: "30px",
+      height: theme.customHeight.appBarHeightSmall,
+      minHeight: theme.customHeight.appBarHeightSmall,
     },
-    "&:hover": {
-      cursor: "pointer",
-    },
+    padding: 0,
   },
   leftNavbarGrid: {
     display: "flex",
@@ -100,9 +94,6 @@ const styles = (theme) => ({
   },
   endMenuItem: {
     marginBottom: "5px",
-  },
-  searchIconButton: {
-    color: "rgba(156, 140, 249, 1)",
   },
 });
 
@@ -160,12 +151,6 @@ class PersistentAppBar extends React.Component {
       });
   };
 
-  isScreenSmall = () => {
-    const { mediaQuery } = this.props;
-    const isScreenSmall = mediaQuery;
-    return isScreenSmall;
-  };
-
   reFocusWhenTransitionMenu = () => {
     if (this.prevOpenAccountMenu && !this.state.openAccountMenu) {
       this.accountAnchorRef.current.focus();
@@ -196,22 +181,7 @@ class PersistentAppBar extends React.Component {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Grid className={classes.leftNavbarGrid}>
-            <img
-              src="/bibliko.png"
-              alt="Bibliko"
-              className={classes.logo}
-              onClick={() => {
-                redirectToPage("/", this.props);
-              }}
-            />
-            {!this.isScreenSmall() && <SearchField />}
-            {this.isScreenSmall() && (
-              <IconButton className={classes.secondaryMenuButton}>
-                <SearchRoundedIcon
-                  className={clsx(classes.avatarIcon, classes.searchIconButton)}
-                />
-              </IconButton>
-            )}
+            <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
             <IconButton
@@ -369,8 +339,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(
-  withStyles(styles)(
-    withTheme(withRouter(withMediaQuery("(max-width:600px)")(PersistentAppBar)))
-  )
-);
+)(withStyles(styles)(withRouter(PersistentAppBar)));

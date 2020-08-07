@@ -1,8 +1,20 @@
 const theme = {
-  margin: {
-    topLayout: "100px",
+  customWidth: {
+    maxSearchFieldWithLogo: "360px",
+    maxSearchFieldWidth: "235px",
   },
-  zIndex: {
+  customHeight: {
+    appBarHeight: "60px",
+    appBarHeightSmall: "50px",
+  },
+  customMargin: {
+    topLayout: "100px",
+    topLayoutSmall: "90px",
+
+    topCountdown: "65px",
+    topCountdownSmall: "55px",
+  },
+  customZIndex: {
     reminder: 10,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchMenu: 1200,

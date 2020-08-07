@@ -51,19 +51,26 @@ const styles = (theme) => ({
     display: "flex",
   },
   //content. Write new CSS above this comment
+  main: {
+    position: "static",
+    width: "100vw",
+  },
   mainContent: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
     flexDirection: "column",
     height: "100vh",
-    width: "100vw",
+    width: "100%",
   },
   contentHeader: {
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(0, 1),
-    minHeight: "60px",
+    minHeight: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      minHeight: theme.customHeight.appBarHeightSmall,
+    },
     justifyContent: "flex-start",
   },
   mainBackground: {
@@ -73,7 +80,7 @@ const styles = (theme) => ({
     },
     backgroundSize: "cover",
     height: "100vh",
-    width: "100vw",
+    width: "100%",
     position: "fixed",
   },
   secondBackground: {
@@ -98,7 +105,10 @@ const styles = (theme) => ({
   },
   countdown: {
     position: "absolute",
-    marginTop: "65px",
+    marginTop: theme.customMargin.topCountdown,
+    [theme.breakpoints.down("xs")]: {
+      marginTop: theme.customMargin.topCountdownSmall,
+    },
   },
   countdownText: {
     color: "white",
@@ -309,7 +319,7 @@ class Layout extends React.Component {
             this.state.isUserFinishedSettingUpAccount
           }
         />
-        <main>
+        <main className={classes.main}>
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
             <div className={classes.mainBackground} />
