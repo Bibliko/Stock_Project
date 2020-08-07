@@ -9,6 +9,8 @@ import { userAction } from '../../redux/storeActions/actions';
 
 import { changeUserData } from '../../utils/UserUtil'
 
+// import storage from '../../../firebase'
+
 import SettingNormalTextField from '../../components/TextField/SettingNormalTextField';
 import SettingPasswordTextField from '../../components/TextField/SettingPasswordTextField';
 import StickyReminder from '../../components/Reminder/StickyReminder';
@@ -16,18 +18,22 @@ import SelectBox from '../../components/SelectBox/SelectBox';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import { Divider, Typography } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import Container from '@material-ui/core/Container';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import Avatar from '@material-ui/core/Avatar';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
+import {
+	Divider,
+	Typography,
+	Button,
+	IconButton,
+	Grid,
+	Container,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogContentText,
+	Avatar,
+	Accordion,
+	AccordionSummary,
+	AccordionDetails,
+} from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -128,12 +134,6 @@ const styles = theme => ({
 const PasswordAccordion = withStyles((theme) => ({
 	root: {
 		width: '100%',
-		// marginLeft: '25px',
-		// marginRight: '20px',
-		// [theme.breakpoints.down('xs')]: {
-		// 	marginLeft: '17px',
-		// 	marginRight: '15px',
-		// },
 		backgroundColor: 'transparent',
 		boxShadow: 'none',
 	},
@@ -146,9 +146,6 @@ const PasswordAccordionSummary = withStyles((theme) => ({
 		'&:hover': {
 			backgroundColor: 'rgba(225,225,225,0.7)'
 		},
-		// width: '100%',
-		// marginLeft: '5px',
-		// marginRight: '5px',
 	},
 	expanded: {},
 }))(AccordionSummary);
@@ -531,6 +528,76 @@ class ErrorDialog extends React.Component {
 	}
 }
 
+class AvatarSection extends React.Component {
+	state = {
+		show: false
+	};
+
+	toggle = () => {
+		this.setState({
+			show: !this.state.show
+		});
+	}
+
+	handleFile(e) {
+		// const fileReader = new FileReader();
+		// fileReader.readAsDataURL(e.target.files[0]);
+		// console.log(fileReader);
+	}
+
+	render() {
+		const { classes, avatarUrl } = this.props;
+
+		return(
+			<React.Fragment>
+				<IconButton
+					onClick={this.toggle}
+				>
+					<Avatar
+						src={avatarUrl}
+						variant = 'rounded'
+						className={classes.avatar}
+					/>
+				</IconButton>
+				<Dialog
+					open={this.state.show}
+					onClose={this.toggle}
+					aria-labelledby='upload-dialog-title'
+				>
+					<DialogTitle id='upload-dialog-title'> Upload your avatar </DialogTitle>
+					<DialogContent>
+						<input
+							accept="image/*"
+							// className={classes.input}
+							style={{ display: 'none' }}
+							id="raised-button-file"
+							multiple
+							type="file"
+							onChange={this.handleFile}
+						/>
+						<label htmlFor="raised-button-file">
+							<Button variant="raised" component="span">
+								Upload
+							</Button>
+						</label>
+						<Button
+							aria-label='save file'
+							color='primary'
+							size='medium'
+							variant='contained'
+							disableElevation
+							className={classes.reminderButton}
+							// onClick={this.submit}
+						>
+							Save
+						</Button>
+					</DialogContent>
+				</Dialog>
+			</React.Fragment>
+		);
+	}
+}
+
 class AccountSetting extends React.Component {
 	constructor(props) {
 		super(props);
@@ -618,11 +685,7 @@ class AccountSetting extends React.Component {
 
 		return(
 			<Container className={classes.root} disableGutters>
-				<Avatar
-					src={userSession.avatarUrl}
-					variant = 'rounded'
-					className={classes.avatar}
-				/>
+				<AvatarSection avatarUrl={userSession.avatarUrl} classes={classes}/>
 
 				<NameSection
 					id='name-section'
