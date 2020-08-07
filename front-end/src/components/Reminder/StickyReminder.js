@@ -17,6 +17,7 @@ const styles = theme => ({
 		position: 'sticky',
 		width: '90%',
 		margin: '5%',
+		minWidth: '190px',
 	},
 	alert: {
 		[theme.breakpoints.down('xs')]: {

@@ -10,6 +10,7 @@ import Select from '@material-ui/core/Select';
 
 const styles = theme => ({
 	selectBoxContainer: {
+		maxWidth: 'none',
 		minWidth: '150px',
 		marginLeft: '10px',
 		marginRight: '10px',

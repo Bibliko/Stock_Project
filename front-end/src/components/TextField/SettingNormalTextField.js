@@ -12,6 +12,7 @@ import EditRoundedIcon from '@material-ui/icons/EditRounded';
 
 const styles = theme => ({
     textFieldContainer: {
+        maxWidth: 'none',
         minWidth: '150px',
         marginLeft: '10px',
         marginRight: '10px',

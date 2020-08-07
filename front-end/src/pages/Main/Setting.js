@@ -69,13 +69,28 @@ const styles = theme => ({
 		flexDirection: 'column',
 		minWidth: '150px',
 	},
+	passwordGridContainer: {
+		marginTop: '20px',
+		[theme.breakpoints.down('xs')]: {
+			marginTop: '10px',
+		},	
+	},
+	passwordGridItem: {
+		paddingLeft: '40px !important',
+		paddingRight: '20px !important',
+		[theme.breakpoints.down('xs')]: {
+			paddingLeft: '30px !important',
+			paddingRight: '10px !important',
+		},
+	},
 	passwordTitle: {
 		color: 'white',
 		fontSize: '20px',
-		marginLeft: '40px',
+		marginLeft: '5px',
+		marginBottom: '3px',
 		[theme.breakpoints.down('xs')]: {
 			fontSize: '15px',
-			marginLeft: '30px',
+			marginLeft: '8px',
 		},
 		fontWeight: 'bold',
 	},
@@ -112,16 +127,13 @@ const styles = theme => ({
 
 const PasswordAccordion = withStyles((theme) => ({
 	root: {
-		marginLeft: '30px',
-		marginRight: '30px',
-		marginBottom: '30px',
-		marginTop: '20px',
-		[theme.breakpoints.down('xs')]: {
-			marginBottom: '15px',
-			marginTop: '10px',
-			marginLeft: '17px',
-			marginRight: '15px',
-		},
+		width: '100%',
+		// marginLeft: '25px',
+		// marginRight: '20px',
+		// [theme.breakpoints.down('xs')]: {
+		// 	marginLeft: '17px',
+		// 	marginRight: '15px',
+		// },
 		backgroundColor: 'transparent',
 		boxShadow: 'none',
 	},
@@ -134,8 +146,9 @@ const PasswordAccordionSummary = withStyles((theme) => ({
 		'&:hover': {
 			backgroundColor: 'rgba(225,225,225,0.7)'
 		},
-		marginLeft: '5px',
-		marginRight: '5px',
+		// width: '100%',
+		// marginLeft: '5px',
+		// marginRight: '5px',
 	},
 	expanded: {},
 }))(AccordionSummary);
@@ -273,48 +286,51 @@ class SensitiveSection extends React.Component {
 							// onChange={}
 						/>
 					</Grid>
-				</Grid>
-				<Typography className={classes.passwordTitle}>
-					Password
-				</Typography>
-				<PasswordAccordion expanded={show} onChange={this.toggle}>
-					<PasswordAccordionSummary expandIcon={<ExpandMoreIcon/>} id="password-section">
-						<Typography className={classes.text}>
-							Change Password
+				
+					<Grid item xs={12} className={clsx(classes.itemGrid, classes.passwordGridItem)}>
+						<Typography className={classes.passwordTitle}>
+							Password
 						</Typography>
-					</PasswordAccordionSummary>
-					<AccordionDetails>
-						<Grid container spacing={2} direction='row' className={clsx(classes.fullHeightWidth, classes.gridContainer)}>
-							<Grid item xs={12} className={classes.itemGrid}>
-								<SettingPasswordTextField
-									value={input.oldPassword}
-									name='Current Password'
-									isInvalid={wrongPassword}
-									helper='Incorrect password'
-									onChange={this.checkOldPassword}
-								/>
-							</Grid>
-							<Grid item xs={12} className={classes.itemGrid}>
-								<SettingPasswordTextField
-									value={input.newPassword}
-									name='New Password'
-									isInvalid={invalidPassword}
-									helper='Password must contain at least 8 characters'
-									onChange={this.recordNewPassword}
-								/>
-							</Grid>
-							<Grid item xs={12} className={classes.itemGrid}>
-								<SettingPasswordTextField 
-									value={input.confirmedPassword}
-									name='Confirm New Password'
-									isInvalid={unmatchedPassword}
-									helper="Password doesn't match"
-									onChange={this.recordConfirmedPassword}
-								/>
-							</Grid>
-						</Grid>
-					</AccordionDetails>
-				</PasswordAccordion>
+						<PasswordAccordion expanded={show} onChange={this.toggle}>
+							<PasswordAccordionSummary expandIcon={<ExpandMoreIcon/>} id="password-section">
+								<Typography className={classes.text}>
+									Change Password
+								</Typography>
+							</PasswordAccordionSummary>
+							<AccordionDetails>
+								<Grid container spacing={2} direction='row' className={clsx(classes.fullHeightWidth, classes.passwordGridContainer)}>
+									<Grid item xs={12} className={classes.itemGrid}>
+										<SettingPasswordTextField
+											value={input.oldPassword}
+											name='Current Password'
+											isInvalid={wrongPassword}
+											helper='Incorrect password'
+											onChange={this.checkOldPassword}
+										/>
+									</Grid>
+									<Grid item xs={12} className={classes.itemGrid}>
+										<SettingPasswordTextField
+											value={input.newPassword}
+											name='New Password'
+											isInvalid={invalidPassword}
+											helper='Password must contain at least 8 characters'
+											onChange={this.recordNewPassword}
+										/>
+									</Grid>
+									<Grid item xs={12} className={classes.itemGrid}>
+										<SettingPasswordTextField 
+											value={input.confirmedPassword}
+											name='Confirm New Password'
+											isInvalid={unmatchedPassword}
+											helper="Password doesn't match"
+											onChange={this.recordConfirmedPassword}
+										/>
+									</Grid>
+								</Grid>
+							</AccordionDetails>
+						</PasswordAccordion>
+					</Grid>
+				</Grid>
 			</div>
 		);
 	}

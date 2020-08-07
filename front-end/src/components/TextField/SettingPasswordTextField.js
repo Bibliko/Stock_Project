@@ -15,6 +15,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 const styles = theme => ({
     textFieldContainer: {
+        maxWidth: 'none',
         minWidth: '150px',
         marginLeft: '10px',
         marginRight: '10px',
