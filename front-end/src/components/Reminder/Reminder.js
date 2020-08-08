@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { withRouter } from "react-router";
 import { isUndefined } from "lodash";
 
+import { redirectToPage } from "../../utils/PageRedirectUtil";
+
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
@@ -65,7 +67,10 @@ class Reminder extends React.Component {
     hide: false,
   };
 
-  preventDefault = (event) => event.preventDefault();
+  clickAccountSettings = (event) => {
+    event.preventDefault();
+    redirectToPage("/setting", this.props);
+  };
 
   hideReminder = () => {
     this.setState({
@@ -77,7 +82,10 @@ class Reminder extends React.Component {
     return (
       <Typography className={classes.reminderText}>
         You haven't finished setting up your account. Get started now!
-        <Link onClick={preventDefault} className={classes.reminderLink}>
+        <Link
+          onClick={this.clickAccountSettings}
+          className={classes.reminderLink}
+        >
           Account Settings
         </Link>
       </Typography>

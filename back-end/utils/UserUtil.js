@@ -79,7 +79,9 @@ const updateAllUsers = () => {
       }
     })
     .then((usersArray) => {
-      // console.log(usersArray);
+      console.log(
+        `Updated ${usersArray.length} user(s): ranking and portfolioLastClosure`
+      );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
         const updateRankingAndPortfolioLastClosure = prisma.user.update({
