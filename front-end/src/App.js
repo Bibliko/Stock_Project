@@ -10,17 +10,18 @@ import socketIOClient from "socket.io-client";
 import { getBackendHostForSocket } from "./utils/NetworkUtil";
 import { getUser } from "./utils/UserUtil";
 
-import Login from './pages/Login/Login';
-import Signup from './pages/Login/Signup';
-import ForgotPassword from './pages/Login/ForgotPassword';
-import Succeed from './pages/Login/Verification/Succeed';
-import Fail from './pages/Login/Verification/Fail';
-import LandingPage from './pages/Main/LandingPage';
-import AccountSummary from './pages/Main/AccountSummary';
-import Ranking from './pages/Main/Ranking';
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Login/Signup";
+import ForgotPassword from "./pages/Login/ForgotPassword";
+import Succeed from "./pages/Login/Verification/Succeed";
+import Fail from "./pages/Login/Verification/Fail";
+import LandingPage from "./pages/Main/LandingPage";
+import AccountSummary from "./pages/Main/AccountSummary";
+import Watchlist from "./pages/Main/Watchlist";
+import Ranking from "./pages/Main/Ranking";
 
-import Layout from './components/Layout/Layout';
-import { createTheme } from './theme/ThemeUtil';
+import Layout from "./components/Layout/Layout";
+import { createTheme } from "./theme/ThemeUtil";
 
 import { ThemeProvider } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
