@@ -1,124 +1,130 @@
-import React from 'react';
-import { withRouter } from 'react-router';
-import { isEmpty } from 'lodash';
-import { connect } from 'react-redux';
+import React from "react";
+import { withRouter } from "react-router";
+import { isEmpty } from "lodash";
+import { connect } from "react-redux";
+import { userAction, marketAction } from "../../redux/storeActions/actions";
+
+import { socket } from "../../App";
+
 import {
-  userAction, 
-  marketAction,
-} from '../../redux/storeActions/actions';
+  shouldRedirectToLogin,
+  redirectToPage,
+} from "../../utils/PageRedirectUtil";
 
-import { socket } from '../../App';
-
-import { 
-  shouldRedirectToLogin, 
-  redirectToPage 
-} from '../../utils/PageRedirectUtil';
-
-import { 
-  marketCountdownUpdate, 
+import {
+  marketCountdownUpdate,
   oneSecond,
   oneMinute,
   convertToLocalTimeString,
-  newDate
-} from '../../utils/DayTimeUtil';
+  newDate,
+} from "../../utils/DayTimeUtil";
 
 import {
   checkMarketClosed,
-  socketCheckMarketClosed, 
-  offSocketListeners
-} from '../../utils/SocketUtil';
+  socketCheckMarketClosed,
+  offSocketListeners,
+} from "../../utils/SocketUtil";
 
 import {
-  checkStockQuotesToCalculateSharesValue, 
-  getUserData
-} from '../../utils/UserUtil';
+  checkStockQuotesToCalculateSharesValue,
+  getUserData,
+} from "../../utils/UserUtil";
 
 import {
-  updateCachedSharesList, 
-  getCachedSharesList, 
-  getCachedAccountSummaryChartInfo, 
+  updateCachedSharesList,
+  getCachedSharesList,
+  getCachedAccountSummaryChartInfo,
   updateCachedAccountSummaryChartInfoWholeList,
-  updateCachedAccountSummaryChartInfoOneItem
-} from '../../utils/RedisUtil';
+  updateCachedAccountSummaryChartInfoOneItem,
+} from "../../utils/RedisUtil";
 
+import AppBar from "./AppBar";
+import Reminder from "../Reminder/Reminder";
 
-import AppBar from './AppBar';
-import Reminder from '../Reminder/Reminder';
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { withStyles } from "@material-ui/core/styles";
+import { Typography } from "@material-ui/core";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { withStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
-    display: 'flex',
+    display: "flex",
   },
   //content. Write new CSS above this comment
+  main: {
+    position: "static",
+    width: "100vw",
+  },
   mainContent: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    flexDirection: 'column',
-    height: '100vh',
-    width: '100vw'
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
+    height: "100vh",
+    width: "100%",
   },
   contentHeader: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     padding: theme.spacing(0, 1),
-    minHeight: '60px',
-    justifyContent: 'flex-start',
+    minHeight: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      minHeight: theme.customHeight.appBarHeightSmall,
+    },
+    justifyContent: "flex-start",
   },
   mainBackground: {
     backgroundColor: theme.palette.backgroundBlue.main,
-    [theme.breakpoints.down('xs')]: {
-      background: theme.palette.paperBackground.gradient
+    [theme.breakpoints.down("xs")]: {
+      background: theme.palette.paperBackground.gradient,
     },
-    backgroundSize: 'cover',
-    height: '100vh',
-    width: '100vw',
-    position: 'fixed'
+    backgroundSize: "cover",
+    height: "100vh",
+    width: "100%",
+    position: "fixed",
   },
   secondBackground: {
-    background: '#180B66',
-    [theme.breakpoints.down('xs')]: {
-      display: 'none'
+    background: "#180B66",
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
     },
-    backgroundSize: 'cover',
-    height: '100vh',
-    width: '75%',
-    position: 'fixed'
+    backgroundSize: "cover",
+    height: "100vh",
+    width: "75%",
+    position: "fixed",
   },
   thirdBackground: {
     background: theme.palette.paperBackground.gradient,
-    [theme.breakpoints.down('xs')]: {
-      display: 'none'
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
     },
-    backgroundSize: 'cover',
-    height: '100vh',
-    width: '75%',
-    position: 'fixed'
+    backgroundSize: "cover",
+    height: "100vh",
+    width: "75%",
+    position: "fixed",
   },
   countdown: {
-    position: 'absolute',
-    marginTop: '65px',
+    position: "absolute",
+    marginTop: theme.customMargin.topCountdown,
+    [theme.breakpoints.down("xs")]: {
+      marginTop: theme.customMargin.topCountdownSmall,
+    },
   },
   countdownText: {
-    color: 'white',
-    fontSize: 'x-large',
-    [theme.breakpoints.down('xs')]: {
-      fontSize: 'large'
+    color: "white",
+    fontSize: "x-large",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "large",
     },
   },
 });
 
 class Layout extends React.Component {
-  state={
-    countdown: '',
+  state = {
+    countdown: "",
     isUserFinishedSettingUpAccount: true,
     hideReminder: false,
-  }
+  };
 
   marketCountdownInterval;
   checkStockQuotesInterval;
@@ -126,41 +132,58 @@ class Layout extends React.Component {
 
   updateCachedAccountSummaryChartSeries = () => {
     const { email, totalPortfolio } = this.props.userSession;
-    updateCachedAccountSummaryChartInfoOneItem(email, convertToLocalTimeString(newDate()), totalPortfolio)
-    .catch(err => {
-        console.log(err);
+    updateCachedAccountSummaryChartInfoOneItem(
+      email,
+      convertToLocalTimeString(newDate()),
+      totalPortfolio
+    ).catch((err) => {
+      console.log(err);
     });
-  }
+  };
 
   setStateIfUserFinishedSettingUpAccount = () => {
     const { firstName, lastName, region, occupation } = this.props.userSession;
     const { isUserFinishedSettingUpAccount } = this.state;
 
-    if( (!firstName || !lastName || !region || !occupation) && isUserFinishedSettingUpAccount ) {
+    if (
+      (!firstName || !lastName || !region || !occupation) &&
+      isUserFinishedSettingUpAccount
+    ) {
       this.setState({
-        isUserFinishedSettingUpAccount: false
+        isUserFinishedSettingUpAccount: false,
       });
     }
 
-    if( firstName && lastName && region && occupation && !isUserFinishedSettingUpAccount ) {
+    if (
+      firstName &&
+      lastName &&
+      region &&
+      occupation &&
+      !isUserFinishedSettingUpAccount
+    ) {
       this.setState({
-        isUserFinishedSettingUpAccount: true
+        isUserFinishedSettingUpAccount: true,
       });
     }
-  }
+  };
 
   setupIntervals = () => {
-    this.marketCountdownInterval = setInterval( 
-      () => marketCountdownUpdate(this.setState.bind(this), this.props.isMarketClosed),
+    this.marketCountdownInterval = setInterval(
+      () =>
+        marketCountdownUpdate(
+          this.setState.bind(this),
+          this.props.isMarketClosed
+        ),
       oneSecond
     );
 
     this.checkStockQuotesInterval = setInterval(
-      () => checkStockQuotesToCalculateSharesValue(
-        this.props.isMarketClosed,
-        this.props.userSession,
-        this.props.mutateUser,
-      ),
+      () =>
+        checkStockQuotesToCalculateSharesValue(
+          this.props.isMarketClosed,
+          this.props.userSession,
+          this.props.mutateUser
+        ),
       5 * oneSecond
       //20 * oneSecond
     );
@@ -169,69 +192,66 @@ class Layout extends React.Component {
       () => this.updateCachedAccountSummaryChartSeries(),
       oneMinute
     );
-  }
+  };
 
   setupSharesListForCaching = () => {
     const { email } = this.props.userSession;
     getCachedSharesList(email)
-    .then(res => {
-      const { data: cachedShares } = res;
-      if(isEmpty(cachedShares)) {
-        const dataNeeded = {
-          shares: true
+      .then((res) => {
+        const { data: cachedShares } = res;
+        if (isEmpty(cachedShares)) {
+          const dataNeeded = {
+            shares: true,
+          };
+          return getUserData(dataNeeded, email);
         }
-        return getUserData(dataNeeded, email);
-      }
-    })
-    .then(sharesData => {
-      if(sharesData && !isEmpty(sharesData)) {
-        const { shares } = sharesData;
-        return updateCachedSharesList(email, shares);
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    })
-  }
-  
+      })
+      .then((sharesData) => {
+        if (sharesData && !isEmpty(sharesData)) {
+          const { shares } = sharesData;
+          return updateCachedSharesList(email, shares);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   setupAccountSummaryChartForCaching = () => {
     const { email } = this.props.userSession;
     getCachedAccountSummaryChartInfo(email)
-    .then(res => {
-      const { data: chartInfo } = res;
-      if(isEmpty(chartInfo)) {
-        const dataNeeded = {
-            accountSummaryChartInfo: true
+      .then((res) => {
+        const { data: chartInfo } = res;
+        if (isEmpty(chartInfo)) {
+          const dataNeeded = {
+            accountSummaryChartInfo: true,
+          };
+          return getUserData(dataNeeded, email);
         }
-        return getUserData(dataNeeded, email);
-      }
-    })
-    .then(chartInfoFromDatabase => {
-      if(chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
-        const { accountSummaryChartInfo } = chartInfoFromDatabase;
-        return updateCachedAccountSummaryChartInfoWholeList(email, accountSummaryChartInfo);
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    })
-  }
+      })
+      .then((chartInfoFromDatabase) => {
+        if (chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
+          const { accountSummaryChartInfo } = chartInfoFromDatabase;
+          return updateCachedAccountSummaryChartInfoWholeList(
+            email,
+            accountSummaryChartInfo
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   marketCountdownChooseComponent = (classes) => {
-    if(this.props.isMarketClosed) {
+    if (this.props.isMarketClosed) {
       return (
-        <Typography className={classes.countdownText}>
-          Market Closed
-        </Typography>
+        <Typography className={classes.countdownText}>Market Closed</Typography>
       );
-    }
-    else {
-      if(isEmpty(this.state.countdown)) {
-        return ( 
-          <CircularProgress/>
-        );
-      }
-      else {
+    } else {
+      if (isEmpty(this.state.countdown)) {
+        return <CircularProgress />;
+      } else {
         return (
           <Typography className={classes.countdownText}>
             Until Market Close {this.state.countdown}
@@ -239,12 +259,12 @@ class Layout extends React.Component {
         );
       }
     }
-  }
+  };
 
   componentDidMount() {
     console.log(this.props.userSession);
-    if(shouldRedirectToLogin(this.props)) {
-      redirectToPage('/login', this.props);
+    if (shouldRedirectToLogin(this.props)) {
+      redirectToPage("/login", this.props);
       return;
     }
     this.setupAccountSummaryChartForCaching();
@@ -253,21 +273,22 @@ class Layout extends React.Component {
     socketCheckMarketClosed(
       socket,
       this.props.isMarketClosed,
-      this.props.mutateMarket
+      this.props.mutateMarket,
+      this.state.countdown
     );
     this.setStateIfUserFinishedSettingUpAccount();
     this.setupIntervals();
   }
 
   componentDidUpdate() {
-    if(shouldRedirectToLogin(this.props)) {
-      redirectToPage('/login', this.props);
+    if (shouldRedirectToLogin(this.props)) {
+      redirectToPage("/login", this.props);
     }
 
-    if(!isEmpty(this.state.countdown) && this.props.isMarketClosed) {
+    if (!isEmpty(this.state.countdown) && this.props.isMarketClosed) {
       clearInterval(this.marketCountdownInterval);
       this.setState({
-        countdown: ''
+        countdown: "",
       });
     }
 
@@ -293,19 +314,19 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar />
-        <Reminder 
-          isUserFinishedSettingUpAccount = {this.state.isUserFinishedSettingUpAccount}
+        <Reminder
+          isUserFinishedSettingUpAccount={
+            this.state.isUserFinishedSettingUpAccount
+          }
         />
-        <main>
-          <div className={classes.contentHeader}/>
+        <main className={classes.main}>
+          <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
-            <div className={classes.mainBackground}/>
-            <div className={classes.secondBackground}/>
-            <div className={classes.thirdBackground}/>
+            <div className={classes.mainBackground} />
+            <div className={classes.secondBackground} />
+            <div className={classes.thirdBackground} />
             <div className={classes.countdown}>
-              {
-                this.marketCountdownChooseComponent(classes)
-              }
+              {this.marketCountdownChooseComponent(classes)}
             </div>
             {this.props.children}
           </div>
@@ -321,16 +342,11 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  mutateUser: (userProps) => dispatch(userAction(
-    'default',
-    userProps
-  )),
-  mutateMarket: (method) => dispatch(marketAction(
-    method
-  ))
+  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+  mutateMarket: (method) => dispatch(marketAction(method)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withStyles(styles)(withRouter(Layout))
-);
-
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(withRouter(Layout)));

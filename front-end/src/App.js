@@ -1,18 +1,14 @@
-import React from 'react';
-import {
-  withRouter,
-  Switch,
-  Route,
-} from "react-router-dom";
+import React from "react";
+import { withRouter, Switch, Route } from "react-router-dom";
 
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import initializeStoreState from './redux/storeReducer';
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import initializeStoreState from "./redux/storeReducer";
 
 import socketIOClient from "socket.io-client";
 
-import { getBackendHostForSocket } from './utils/NetworkUtil';
-import { getUser } from './utils/UserUtil';
+import { getBackendHostForSocket } from "./utils/NetworkUtil";
+import { getUser } from "./utils/UserUtil";
 
 import Login from './pages/Login/Login';
 import Signup from './pages/Login/Signup';
@@ -22,18 +18,18 @@ import Fail from './pages/Login/Verification/Fail';
 import LandingPage from './pages/Main/LandingPage';
 import AccountSummary from './pages/Main/AccountSummary';
 import Ranking from './pages/Main/Ranking';
+
 import Layout from './components/Layout/Layout';
 import { createTheme } from './theme/ThemeUtil';
 
-import { ThemeProvider } from '@material-ui/core/styles';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import { ThemeProvider } from "@material-ui/core/styles";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 var socket;
 
 const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
 
 class App extends React.Component {
-
   constructor(props) {
     super(props);
     socket = socketIOClient(BACKEND_HOST_FOR_SOCKET);
@@ -41,38 +37,38 @@ class App extends React.Component {
 
   // variables
   specialLinks = [
-    '/login', 
-    '/signup', 
-    '/forgotpassword',
-    '/verificationSucceed',
-    '/verificationFail'
-  ]
+    "/login",
+    "/signup",
+    "/forgotpassword",
+    "/verificationSucceed",
+    "/verificationFail",
+  ];
 
   state = {
     path: "",
-    isAppReady: false
-  }
+    isAppReady: false,
+  };
 
-  reduxStore_USE_THE_ACCESSOR = undefined
-  reduxStoreInitialState = undefined
+  reduxStore_USE_THE_ACCESSOR = undefined;
+  reduxStoreInitialState = undefined;
 
   // setupRedux
   setupReduxStoreState = () => {
     getUser()
-    .then(user => {
-      this.reduxStoreInitialState = {
-        userSession: user.data,
-        isMarketClosed: false,
-      };
+      .then((user) => {
+        this.reduxStoreInitialState = {
+          userSession: user.data,
+          isMarketClosed: false,
+        };
 
-      this.setState({
-        isAppReady: true
+        this.setState({
+          isAppReady: true,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
       });
-    })
-    .catch(e => {
-      console.log(e);
-    })
-  }
+  };
 
   getReduxStore = () => {
     if (this.reduxStore_USE_THE_ACCESSOR === undefined) {
@@ -82,22 +78,22 @@ class App extends React.Component {
     }
     //console.log(this.reduxStoreInitialState);
     return this.reduxStore_USE_THE_ACCESSOR;
-  }
-  
+  };
+
   // componentDid... related
   changePath = () => {
     const { pathname } = this.props.location;
     if (pathname !== this.state.path) {
-      this.setState({ 
-        path: pathname 
+      this.setState({
+        path: pathname,
       });
     }
-  }
+  };
 
   componentDidMount() {
     this.changePath();
     this.setupReduxStoreState();
-  } 
+  }
 
   componentDidUpdate() {
     this.changePath();
@@ -106,44 +102,29 @@ class App extends React.Component {
   render() {
     const { isAppReady } = this.state;
 
-    if(!isAppReady) {
-      return <LinearProgress />
+    if (!isAppReady) {
+      return <LinearProgress />;
     }
 
     return (
       <ThemeProvider theme={createTheme()}>
         <Provider store={this.getReduxStore()}>
-          {
-            this.state.path==="/login" &&
-            <Login/>
-          }
-          {
-            this.state.path==="/signup" &&
-            <Signup/>
-          }
-          {
-            this.state.path==="/forgotpassword" &&
-            <ForgotPassword/>
-          }
-          {
-            this.state.path==="/verificationSucceed" &&
-            <Succeed/>
-          }
-          {
-            this.state.path==="/verificationFail" &&
-            <Fail/>
-          }
-          {
-            !this.specialLinks.includes(this.state.path) &&
+          {this.state.path === "/login" && <Login />}
+          {this.state.path === "/signup" && <Signup />}
+          {this.state.path === "/forgotpassword" && <ForgotPassword />}
+          {this.state.path === "/verificationSucceed" && <Succeed />}
+          {this.state.path === "/verificationFail" && <Fail />}
+          {!this.specialLinks.includes(this.state.path) && (
             <Switch>
               <Layout toggleTheme={this.toggleTheme}>
                 <Route exact path="/" component={LandingPage} />
 
                 <Route path="/accountSummary" component={AccountSummary} />
+                <Route path="/watchlist" component={Watchlist} />
                 <Route path="/ranking" component={Ranking} />
               </Layout>
             </Switch>
-          }
+          )}
         </Provider>
       </ThemeProvider>
     );
