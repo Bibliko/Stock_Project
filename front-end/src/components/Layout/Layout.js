@@ -122,7 +122,6 @@ const styles = (theme) => ({
 class Layout extends React.Component {
   state = {
     countdown: "",
-    isUserFinishedSettingUpAccount: true,
     hideReminder: false,
   };
 
@@ -141,32 +140,6 @@ class Layout extends React.Component {
     });
   };
 
-  setStateIfUserFinishedSettingUpAccount = () => {
-    const { firstName, lastName, region, occupation } = this.props.userSession;
-    const { isUserFinishedSettingUpAccount } = this.state;
-
-    if (
-      (!firstName || !lastName || !region || !occupation) &&
-      isUserFinishedSettingUpAccount
-    ) {
-      this.setState({
-        isUserFinishedSettingUpAccount: false,
-      });
-    }
-
-    if (
-      firstName &&
-      lastName &&
-      region &&
-      occupation &&
-      !isUserFinishedSettingUpAccount
-    ) {
-      this.setState({
-        isUserFinishedSettingUpAccount: true,
-      });
-    }
-  };
-
   setupIntervals = () => {
     this.marketCountdownInterval = setInterval(
       () =>
@@ -177,21 +150,23 @@ class Layout extends React.Component {
       oneSecond
     );
 
-    this.checkStockQuotesInterval = setInterval(
-      () =>
-        checkStockQuotesToCalculateSharesValue(
-          this.props.isMarketClosed,
-          this.props.userSession,
-          this.props.mutateUser
-        ),
-      5 * oneSecond
-      //20 * oneSecond
-    );
+    if (this.props.userSession.hasFinishedSettingUp) {
+      this.checkStockQuotesInterval = setInterval(
+        () =>
+          checkStockQuotesToCalculateSharesValue(
+            this.props.isMarketClosed,
+            this.props.userSession,
+            this.props.mutateUser
+          ),
+        5 * oneSecond
+        //20 * oneSecond
+      );
 
-    this.accountSummaryChartSeriesInterval = setInterval(
-      () => this.updateCachedAccountSummaryChartSeries(),
-      oneMinute
-    );
+      this.accountSummaryChartSeriesInterval = setInterval(
+        () => this.updateCachedAccountSummaryChartSeries(),
+        oneMinute
+      );
+    }
   };
 
   setupSharesListForCaching = () => {
@@ -267,8 +242,11 @@ class Layout extends React.Component {
       redirectToPage("/login", this.props);
       return;
     }
-    this.setupAccountSummaryChartForCaching();
-    this.setupSharesListForCaching();
+
+    if (this.props.userSession.hasFinishedSettingUp) {
+      this.setupAccountSummaryChartForCaching();
+      this.setupSharesListForCaching();
+    }
 
     socketCheckMarketClosed(
       socket,
@@ -276,7 +254,7 @@ class Layout extends React.Component {
       this.props.mutateMarket,
       this.state.countdown
     );
-    this.setStateIfUserFinishedSettingUpAccount();
+
     this.setupIntervals();
   }
 
@@ -291,8 +269,6 @@ class Layout extends React.Component {
         countdown: "",
       });
     }
-
-    this.setStateIfUserFinishedSettingUpAccount();
   }
 
   componentWillUnmount() {
@@ -315,8 +291,8 @@ class Layout extends React.Component {
         <CssBaseline />
         <AppBar />
         <Reminder
-          isUserFinishedSettingUpAccount={
-            this.state.isUserFinishedSettingUpAccount
+          hasUserFinishedSettingUpAccount={
+            this.props.userSession.hasFinishedSettingUp
           }
         />
         <main className={classes.main}>

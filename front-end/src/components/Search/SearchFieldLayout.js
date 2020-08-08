@@ -59,7 +59,7 @@ const styles = (theme) => ({
     width: "40px",
     borderRadius: "50%",
     opacity: 1,
-    transition: "left 0.25s, opacity 0.25s ease-in",
+    transition: "left 0.75s ease-in-out, opacity 0.25s ease-in",
   },
   logo: {
     left: "10px",
@@ -79,7 +79,7 @@ const styles = (theme) => ({
   },
   hideFadeIcon: {
     opacity: 0,
-    left: "80px",
+    left: "-100%",
   },
   hideSearchBar: {
     width: "0%",

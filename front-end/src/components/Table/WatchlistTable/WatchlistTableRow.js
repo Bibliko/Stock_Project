@@ -38,28 +38,6 @@ const styles = (theme) => ({
   cellDivName: {
     justifyContent: "flex-start",
   },
-  // buyButton: {
-  //   backgroundColor: "#27AE60",
-  //   "&:hover": {
-  //     backgroundColor: "rgba(39, 174, 96, 0.8)",
-  //   },
-  //   margin: "2px",
-  //   borderRadius: "10px",
-  //   fontSize: "smaller",
-  //   fontWeight: "bold",
-  //   padding: "4px",
-  // },
-  // sellButton: {
-  //   backgroundColor: "#EB5757",
-  //   "&:hover": {
-  //     backgroundColor: "rgba(235, 87, 87, 0.8)",
-  //   },
-  //   margin: "2px",
-  //   borderRadius: "10px",
-  //   fontSize: "smaller",
-  //   fontWeight: "bold",
-  //   padding: "4px",
-  // },
   watchlistButton: {
     color: "#619FD7",
     "&:hover": {
@@ -161,6 +139,9 @@ class WatchlistTableRow extends React.Component {
       case "Code":
         return `${companyCode}`;
 
+      case "Price":
+        return `$${numberWithCommas(this.state.price.toFixed(2))}`;
+
       case "Volume":
         return `$${numberWithCommas(this.state.volume.toFixed(2))}`;
 
@@ -220,6 +201,7 @@ class WatchlistTableRow extends React.Component {
       <TableRow className={classes.tableRow}>
         {this.chooseTableCell("Name", classes)}
         {this.chooseTableCell("Code", classes)}
+        {this.chooseTableCell("Price", classes)}
         {this.chooseTableCell("Volume", classes)}
         {this.chooseTableCell("Change %", classes)}
         {this.chooseTableCell("Market Cap", classes)}

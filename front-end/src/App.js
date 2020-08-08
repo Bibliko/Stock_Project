@@ -19,6 +19,7 @@ import LandingPage from "./pages/Main/LandingPage";
 import AccountSummary from "./pages/Main/AccountSummary";
 import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
+import Setting from "./pages/Main/Setting";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
@@ -122,6 +123,7 @@ class App extends React.Component {
 
                 <Route path="/accountSummary" component={AccountSummary} />
                 <Route path="/watchlist" component={Watchlist} />
+                <Route path="/setting" component={Setting} />
                 <Route path="/ranking" component={Ranking} />
               </Layout>
             </Switch>

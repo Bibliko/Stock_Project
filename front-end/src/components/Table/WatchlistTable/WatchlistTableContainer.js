@@ -79,6 +79,7 @@ class WatchlistTableContainer extends React.Component {
             <TableRow>
               {this.chooseTableCell("Name", classes)}
               {this.chooseTableCell("Code", classes)}
+              {this.chooseTableCell("Price", classes)}
               {this.chooseTableCell("Volume", classes)}
               {this.chooseTableCell("Change %", classes)}
               {this.chooseTableCell("Market Cap", classes)}

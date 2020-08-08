@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { withRouter } from "react-router";
 import { isUndefined } from "lodash";
 
+import { redirectToPage } from "../../utils/PageRedirectUtil";
+
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
@@ -60,24 +62,15 @@ const styles = (theme) => ({
   },
 });
 
-const settingAccountComponent = (classes, preventDefault) => {
-  return (
-    <Typography className={classes.reminderText}>
-      You haven't finished setting up your account. Go to
-      <Link onClick={preventDefault} className={classes.reminderLink}>
-        Account Settings
-      </Link>
-      to finish up.
-    </Typography>
-  );
-};
-
 class Reminder extends React.Component {
   state = {
     hide: false,
   };
 
-  preventDefault = (event) => event.preventDefault();
+  clickAccountSettings = (event) => {
+    event.preventDefault();
+    redirectToPage("/setting", this.props);
+  };
 
   hideReminder = () => {
     this.setState({
@@ -85,19 +78,32 @@ class Reminder extends React.Component {
     });
   };
 
+  settingAccountComponent = (classes, preventDefault) => {
+    return (
+      <Typography className={classes.reminderText}>
+        You haven't finished setting up your account. Get started now!
+        <Link
+          onClick={this.clickAccountSettings}
+          className={classes.reminderLink}
+        >
+          Account Settings
+        </Link>
+      </Typography>
+    );
+  };
+
   render() {
-    const { classes, isUserFinishedSettingUpAccount } = this.props;
+    const { classes, hasUserFinishedSettingUpAccount } = this.props;
 
     return (
       <div
         className={clsx(classes.reminder, {
-          [classes.hide]: isUserFinishedSettingUpAccount,
-          [classes.hide]: this.state.hide,
+          [classes.hide]: hasUserFinishedSettingUpAccount || this.state.hide,
         })}
       >
-        {!isUndefined(isUserFinishedSettingUpAccount) &&
-          !isUserFinishedSettingUpAccount &&
-          settingAccountComponent(classes, this.preventDefault)}
+        {!isUndefined(hasUserFinishedSettingUpAccount) &&
+          !hasUserFinishedSettingUpAccount &&
+          this.settingAccountComponent(classes, this.preventDefault)}
         <IconButton className={classes.closeButton} onClick={this.hideReminder}>
           <CloseRoundedIcon className={classes.closeIcon} />
         </IconButton>

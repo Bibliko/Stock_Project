@@ -66,7 +66,8 @@ const styles = (theme) => ({
     },
     color: "white",
     "&:hover": {
-      color: "rgba(115, 210, 230, 1)",
+      background: theme.palette.paperBackground.gradient,
+      borderRadius: "50%",
     },
   },
   toolbar: {
@@ -156,6 +157,10 @@ class PersistentAppBar extends React.Component {
       });
   };
 
+  disableIfHasNotFinishedSettingUpAccount = () => {
+    return !this.props.userSession.hasFinishedSettingUp;
+  };
+
   reFocusWhenTransitionMenu = () => {
     if (this.prevOpenAccountMenu && !this.state.openAccountMenu) {
       this.accountAnchorRef.current.focus();
@@ -222,18 +227,28 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
-                        <MenuItem dense disabled>
-                          Transactions
+                        <MenuItem disabled>Transactions</MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                        >
+                          Buy Stocks
                         </MenuItem>
-                        <MenuItem dense>Buy Stocks</MenuItem>
-                        <MenuItem dense>Trading History</MenuItem>
-                        <MenuItem dense className={classes.endMenuItem}>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                        >
+                          Trading History
+                        </MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          className={classes.endMenuItem}
+                        >
                           Pending Orders
                         </MenuItem>
 
-                        <MenuItem dense disabled>
-                          List
-                        </MenuItem>
+                        <MenuItem disabled>List</MenuItem>
                         <MenuItem
                           dense
                           onClick={() => {
@@ -244,15 +259,14 @@ class PersistentAppBar extends React.Component {
                         </MenuItem>
                         <MenuItem dense>Companies</MenuItem>
 
-                        <MenuItem dense disabled>
-                          Explore
-                        </MenuItem>
+                        <MenuItem disabled>Explore</MenuItem>
                         <MenuItem dense>Charts</MenuItem>
                         <MenuItem
                           dense
                           onClick={() => {
                             redirectToPage("/ranking", this.props);
                           }}
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
                         >
                           Ranking
                         </MenuItem>
@@ -316,11 +330,18 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
-                        <MenuItem>Account Settings</MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            redirectToPage("/setting", this.props);
+                          }}
+                        >
+                          Account Settings
+                        </MenuItem>
                         <MenuItem
                           onClick={() => {
                             redirectToPage("/accountSummary", this.props);
                           }}
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
                         >
                           Portfolio
                         </MenuItem>
