@@ -58,6 +58,7 @@ function SelectBox(props) {
 					onChange={onChange}
 					className={classes.input}
 				>
+					{value || <MenuItem aria-label="None" value=""> </MenuItem>}
 				{
 					items.map((item) =>(
 							<MenuItem key={item} value={item}>
