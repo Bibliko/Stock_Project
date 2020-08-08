@@ -330,7 +330,13 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
-                        <MenuItem>Account Settings</MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            redirectToPage("/setting", this.props);
+                          }}
+                        >
+                          Account Settings
+                        </MenuItem>
                         <MenuItem
                           onClick={() => {
                             redirectToPage("/accountSummary", this.props);

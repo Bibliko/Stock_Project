@@ -85,17 +85,16 @@ class Reminder extends React.Component {
   };
 
   render() {
-    const { classes, isUserFinishedSettingUpAccount } = this.props;
+    const { classes, hasUserFinishedSettingUpAccount } = this.props;
 
     return (
       <div
         className={clsx(classes.reminder, {
-          [classes.hide]: isUserFinishedSettingUpAccount,
-          [classes.hide]: this.state.hide,
+          [classes.hide]: hasUserFinishedSettingUpAccount || this.state.hide,
         })}
       >
-        {!isUndefined(isUserFinishedSettingUpAccount) &&
-          !isUserFinishedSettingUpAccount &&
+        {!isUndefined(hasUserFinishedSettingUpAccount) &&
+          !hasUserFinishedSettingUpAccount &&
           this.settingAccountComponent(classes, this.preventDefault)}
         <IconButton className={classes.closeButton} onClick={this.hideReminder}>
           <CloseRoundedIcon className={classes.closeIcon} />

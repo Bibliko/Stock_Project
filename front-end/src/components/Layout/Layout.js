@@ -291,7 +291,7 @@ class Layout extends React.Component {
         <CssBaseline />
         <AppBar />
         <Reminder
-          isUserFinishedSettingUpAccount={
+          hasUserFinishedSettingUpAccount={
             this.props.userSession.hasFinishedSettingUp
           }
         />
