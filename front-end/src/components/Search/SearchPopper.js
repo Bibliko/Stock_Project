@@ -87,7 +87,10 @@ class SearchPopper extends React.Component {
         }}
       >
         {({ TransitionProps, placement }) => (
-          <Fade timeout={oneSecond / 4} {...TransitionProps}>
+          <Fade
+            timeout={{ enter: oneSecond / 3, exit: oneSecond }}
+            {...TransitionProps}
+          >
             <Paper className={classes.menuPaper}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>

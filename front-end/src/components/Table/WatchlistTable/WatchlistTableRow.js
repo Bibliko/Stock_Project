@@ -6,19 +6,20 @@ import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 import { numberWithCommas } from "../../../utils/NumberUtil";
+import { getFullStockQuoteFromFMP } from "../../../utils/FinancialModelingPrepUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import Button from "@material-ui/core/Button";
 
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
+import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 
 const styles = (theme) => ({
   tableCell: {
     color: "white",
-    borderLeftWidth: "1px",
+    borderLeftWidth: "0px",
     borderRightWidth: "0px",
     borderTopWidth: "1px",
     borderBottomWidth: "0px",
@@ -34,28 +35,31 @@ const styles = (theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  buyButton: {
-    backgroundColor: "#27AE60",
-    "&:hover": {
-      backgroundColor: "rgba(39, 174, 96, 0.8)",
-    },
-    margin: "2px",
-    borderRadius: "10px",
-    fontSize: "smaller",
-    fontWeight: "bold",
-    padding: "4px",
+  cellDivName: {
+    justifyContent: "flex-start",
   },
-  sellButton: {
-    backgroundColor: "#EB5757",
-    "&:hover": {
-      backgroundColor: "rgba(235, 87, 87, 0.8)",
-    },
-    margin: "2px",
-    borderRadius: "10px",
-    fontSize: "smaller",
-    fontWeight: "bold",
-    padding: "4px",
-  },
+  // buyButton: {
+  //   backgroundColor: "#27AE60",
+  //   "&:hover": {
+  //     backgroundColor: "rgba(39, 174, 96, 0.8)",
+  //   },
+  //   margin: "2px",
+  //   borderRadius: "10px",
+  //   fontSize: "smaller",
+  //   fontWeight: "bold",
+  //   padding: "4px",
+  // },
+  // sellButton: {
+  //   backgroundColor: "#EB5757",
+  //   "&:hover": {
+  //     backgroundColor: "rgba(235, 87, 87, 0.8)",
+  //   },
+  //   margin: "2px",
+  //   borderRadius: "10px",
+  //   fontSize: "smaller",
+  //   fontWeight: "bold",
+  //   padding: "4px",
+  // },
   watchlistButton: {
     color: "#619FD7",
     "&:hover": {
@@ -76,6 +80,15 @@ const styles = (theme) => ({
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",
   },
+  iconInsideIconButton: {
+    height: "22px",
+    width: "22px",
+    color: "white",
+    "&:hover": {
+      color: "#e23d3d",
+      cursor: "pointer",
+    },
+  },
 
   // border section
   lastLeftCell: {
@@ -87,76 +100,24 @@ const styles = (theme) => ({
   lastRow: {
     borderBottomWidth: "1px",
   },
-  watchlistBorder: {
-    borderRightWidth: "1px",
-  },
 });
 
 class WatchlistTableRow extends React.Component {
   state = {
-    bid: 0,
-    offer: 0,
-    last: 0,
-    open: 0,
-    high: 0,
-    low: 0,
+    name: "",
+    price: 0,
     volume: 0,
-    changePercent: 0,
+    changesPercentage: 0,
+    marketCap: 0,
   };
 
   checkIfChangeIncreaseOrDecrease = (type) => {
-    if (type === "Change %" && this.state.changePercent >= 0) {
+    if (type === "Change %" && this.state.changesPercentage >= 0) {
       return "Increase";
     }
-    if (type === "Change %" && this.state.changePercent < 0) {
+    if (type === "Change %" && this.state.changesPercentage < 0) {
       return "Decrease";
     }
-  };
-
-  chooseTableCellValue = (type) => {
-    const { companyCode } = this.props;
-
-    switch (type) {
-      case "Code":
-        return `${companyCode}`;
-
-      case "Bid":
-        return `${numberWithCommas(this.state.bid)}`;
-
-      case "Offer":
-        return `$${numberWithCommas(this.state.offer)}`;
-
-      case "Last":
-        return `$${numberWithCommas(this.state.last.toFixed(2))}`;
-
-      case "Open":
-        return `$${numberWithCommas(this.state.open.toFixed(2))}`;
-
-      case "High":
-        return `$${numberWithCommas(this.state.high.toFixed(2))}`;
-
-      case "Low":
-        return `$${numberWithCommas(this.state.low.toFixed(2))}`;
-
-      case "Volume":
-        return `$${numberWithCommas(this.state.volume.toFixed(2))}`;
-
-      case "Change %":
-        if (this.state.changePercent < 0) {
-          return `-$${numberWithCommas(
-            Math.abs(this.state.changePercent).toFixed(2)
-          )}`;
-        }
-        return `$${numberWithCommas(this.state.changePercent.toFixed(2))}`;
-
-      default:
-        return;
-    }
-  };
-
-  isTableRowTheLast = () => {
-    const { rowIndex, rowsLength } = this.props;
-    return rowIndex === rowsLength - 1;
   };
 
   chooseTableCell = (type, classes) => {
@@ -168,13 +129,14 @@ class WatchlistTableRow extends React.Component {
             this.checkIfChangeIncreaseOrDecrease(type) === "Increase",
           [classes.arrowDown]:
             this.checkIfChangeIncreaseOrDecrease(type) === "Decrease",
-          [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
+          [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Name",
           [classes.lastRow]: this.isTableRowTheLast(),
         })}
       >
         <div
           className={clsx(classes.cellDiv, {
             [classes.marginLeftIfProfitOrLoss]: type === "Change %",
+            [classes.cellDivName]: type === "Name",
           })}
         >
           {this.chooseTableCellValue(type)}
@@ -189,24 +151,62 @@ class WatchlistTableRow extends React.Component {
     );
   };
 
+  chooseTableCellValue = (type) => {
+    const { companyCode } = this.props;
+
+    switch (type) {
+      case "Name":
+        return `${this.state.name}`;
+
+      case "Code":
+        return `${companyCode}`;
+
+      case "Volume":
+        return `$${numberWithCommas(this.state.volume.toFixed(2))}`;
+
+      case "Change %":
+        if (this.state.changesPercentage < 0) {
+          return `-$${numberWithCommas(
+            Math.abs(this.state.changesPercentage).toFixed(2)
+          )}`;
+        }
+        return `$${numberWithCommas(this.state.changesPercentage.toFixed(2))}`;
+
+      case "Market Cap":
+        return `${this.state.marketCap}`;
+
+      default:
+        return;
+    }
+  };
+
+  isTableRowTheLast = () => {
+    const { rowIndex, rowsLength } = this.props;
+    return rowIndex === rowsLength - 1;
+  };
+
   updateWatchlistRowInformation = () => {
-    // getStockPriceFromFMP(code)
-    // .then(stockQuoteJSON => {
-    //     const { price } = stockQuoteJSON;
-    //     const dataNeedChange = {
-    //         lastPrice: price
-    //     };
-    //     if(
-    //         !isEqual(this.state.lastPrice, 'Updating') &&
-    //         !isEqual(this.state.lastPrice, price)
-    //     ) {
-    //         return changeShareData(dataNeedChange, id);
-    //     }
-    //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
-    // })
-    // .catch(err => {
+    // const { companyCode } = this.props;
+    // getFullStockQuoteFromFMP(companyCode)
+    //   .then((stockQuoteJSON) => {
+    //     const {
+    //       name,
+    //       price,
+    //       volume,
+    //       changesPercentage,
+    //       marketCap,
+    //     } = stockQuoteJSON;
+    //     this.setState({
+    //       name: name,
+    //       price: price,
+    //       volume: volume,
+    //       changesPercentage: changesPercentage,
+    //       marketCap: marketCap,
+    //     });
+    //   })
+    //   .catch((err) => {
     //     console.log(err);
-    // })
+    //   });
   };
 
   componentDidMount() {}
@@ -218,26 +218,23 @@ class WatchlistTableRow extends React.Component {
 
     return (
       <TableRow className={classes.tableRow}>
+        {this.chooseTableCell("Name", classes)}
         {this.chooseTableCell("Code", classes)}
-        {this.chooseTableCell("Bid", classes)}
-        {this.chooseTableCell("Offer", classes)}
-        {this.chooseTableCell("Last", classes)}
-        {this.chooseTableCell("Open", classes)}
-        {this.chooseTableCell("High", classes)}
-        {this.chooseTableCell("Low", classes)}
         {this.chooseTableCell("Volume", classes)}
         {this.chooseTableCell("Change %", classes)}
+        {this.chooseTableCell("Market Cap", classes)}
 
         <TableCell
           align="center"
-          className={clsx(classes.tableCell, classes.watchlistBorder, {
+          className={clsx(classes.tableCell, {
             [classes.lastRow]: this.isTableRowTheLast(),
             [classes.lastRightCell]: this.isTableRowTheLast(),
           })}
         >
           <div className={classes.cellDiv}>
-            <Button className={classes.buyButton}>Buy</Button>
-            <Button className={classes.sellButton}>Sell</Button>
+            <DeleteForeverRoundedIcon
+              className={classes.iconInsideIconButton}
+            />
           </div>
         </TableCell>
       </TableRow>
