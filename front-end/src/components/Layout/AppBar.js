@@ -233,6 +233,34 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/watchlist", this.props);
                           }}
+                                                <MenuItem dense disabled>Explore</MenuItem>
+                                                <MenuItem dense>Charts</MenuItem>
+                                                <MenuItem dense onClick={() => { redirectToPage('/ranking', this.props); }}>
+                                                    Ranking
+                                                </MenuItem>
+                                            </MenuList>
+                                        </ClickAwayListener>
+                                    </Paper>
+                                </Grow>
+                            )}
+                        </Popper>
+                        <Button className={classes.navbarButton}>
+                            Education
+                        </Button>
+                        <Button className={classes.navbarButton}>
+                            About Us
+                        </Button>
+                        <IconButton
+                            color="inherit"
+                            component="span"
+                            edge="end"
+                            className={classes.menuButton}
+                            ref={this.accountAnchorRef}
+                            aria-label="Account Menu"
+                            aria-controls={openAccountMenu ? 'menu-list-grow' : undefined}
+                            aria-haspopup="true"
+                            onClick={this.toggleAccountMenu}
+                            disableRipple
                         >
                           Watchlist
                         </MenuItem>
