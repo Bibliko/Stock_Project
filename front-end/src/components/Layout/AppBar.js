@@ -43,14 +43,16 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: 4,
+    marginRight: "6px",
+    "& .MuiIconButton-colorPrimary": {
+      color: "white",
+    },
   },
   secondaryMenuButton: {
     height: "fit-content",
     width: "fit-content",
-    [theme.breakpoints.down("xs")]: {
-      padding: "6px",
-    },
+    padding: 0,
+    margin: "6px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
     },
@@ -63,6 +65,9 @@ const styles = (theme) => ({
       width: "25px",
     },
     color: "white",
+    "&:hover": {
+      color: "rgba(115, 210, 230, 1)",
+    },
   },
   toolbar: {
     display: "flex",
@@ -191,6 +196,7 @@ class PersistentAppBar extends React.Component {
               aria-controls={openGameMenu ? "menu-list-grow" : undefined}
               aria-haspopup="true"
               onClick={this.toggleGameMenu}
+              disableRipple
             >
               <VideogameAssetRoundedIcon className={classes.avatarIcon} />
             </IconButton>
@@ -233,46 +239,23 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/watchlist", this.props);
                           }}
-                                                <MenuItem dense disabled>Explore</MenuItem>
-                                                <MenuItem dense>Charts</MenuItem>
-                                                <MenuItem dense onClick={() => { redirectToPage('/ranking', this.props); }}>
-                                                    Ranking
-                                                </MenuItem>
-                                            </MenuList>
-                                        </ClickAwayListener>
-                                    </Paper>
-                                </Grow>
-                            )}
-                        </Popper>
-                        <Button className={classes.navbarButton}>
-                            Education
-                        </Button>
-                        <Button className={classes.navbarButton}>
-                            About Us
-                        </Button>
-                        <IconButton
-                            color="inherit"
-                            component="span"
-                            edge="end"
-                            className={classes.menuButton}
-                            ref={this.accountAnchorRef}
-                            aria-label="Account Menu"
-                            aria-controls={openAccountMenu ? 'menu-list-grow' : undefined}
-                            aria-haspopup="true"
-                            onClick={this.toggleAccountMenu}
-                            disableRipple
                         >
                           Watchlist
                         </MenuItem>
-                        <MenuItem dense className={classes.endMenuItem}>
-                          Companies
-                        </MenuItem>
+                        <MenuItem dense>Companies</MenuItem>
 
                         <MenuItem dense disabled>
                           Explore
                         </MenuItem>
                         <MenuItem dense>Charts</MenuItem>
-                        <MenuItem dense>Ranking</MenuItem>
+                        <MenuItem
+                          dense
+                          onClick={() => {
+                            redirectToPage("/ranking", this.props);
+                          }}
+                        >
+                          Ranking
+                        </MenuItem>
                       </MenuList>
                     </ClickAwayListener>
                   </Paper>
@@ -282,19 +265,18 @@ class PersistentAppBar extends React.Component {
             <IconButton
               title="Education"
               className={classes.secondaryMenuButton}
+              disableRipple
             >
               <MenuBookRoundedIcon className={classes.avatarIcon} />
             </IconButton>
             <IconButton
               title="About Us"
               className={classes.secondaryMenuButton}
+              disableRipple
             >
               <InfoRoundedIcon className={classes.avatarIcon} />
             </IconButton>
             <IconButton
-              color="inherit"
-              component="span"
-              edge="end"
               className={classes.menuButton}
               ref={this.accountAnchorRef}
               aria-label="Account Menu"
