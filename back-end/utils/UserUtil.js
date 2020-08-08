@@ -67,6 +67,9 @@ const updateAllUsers = () => {
 
   prisma.user
     .findMany({
+      where: {
+        hasFinishedSettingUp: true
+      },
       select: {
         id: true,
         totalPortfolio: true

@@ -11,83 +11,84 @@ generator client {
 }
 
 model User {
-  id                          String    @default(cuid()) @id
-  email                       String?   @unique
-  password                    String?
-  firstName                   String?
-  lastName                    String?
-  avatarUrl                   String?
-  createdAt                   DateTime  @default(now())
-  updatedAt                   DateTime  @default(now()) @updatedAt
-  region                      String?
-  occupation                  String?
-  ranking                     Int?
-  cash                        Float?    @default(100000)
-  totalPortfolio              Float?    @default(100000)
-  totalPortfolioLastClosure   Float?    @default(100000)
-  watchlist                   String[]
-  transactions                UserTransaction[]
-  shares                      Share[]
-  accountSummaryChartInfo     AccountSummaryTimestamp[]
+  id                        String                    @default(cuid()) @id
+  email                     String?                   @unique
+  password                  String?
+  firstName                 String?
+  lastName                  String?
+  hasFinishedSettingUp      Boolean                   @default(false)
+  avatarUrl                 String?
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @default(now()) @updatedAt
+  region                    String?
+  occupation                String?
+  ranking                   Int?                      @default(0)
+  cash                      Float?                    @default(100000)
+  totalPortfolio            Float?                    @default(100000)
+  totalPortfolioLastClosure Float?                    @default(100000)
+  watchlist                 String[]
+  transactions              UserTransaction[]
+  shares                    Share[]
+  accountSummaryChartInfo   AccountSummaryTimestamp[]
 }
 
 model AccountSummaryTimestamp {
-  id                String    @default(cuid()) @id
-  UTCDateString     String
-  UTCDateKey        String
-  portfolioValue    Float
-  user              User      @relation(fields: [userID], references: [id])
-  userID            String
+  id             String @default(cuid()) @id
+  UTCDateString  String
+  UTCDateKey     String
+  portfolioValue Float
+  user           User   @relation(fields: [userID], references: [id])
+  userID         String
 
   @@unique([UTCDateKey, userID])
 }
 
 model Share {
-  id              String    @default(cuid()) @id
-  companyCode     String?
-  quantity        Int?
-  buyPriceAvg     Float?   
-  lastPrice       Float?    
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @default(now()) @updatedAt
-  user            User      @relation(fields: [userID], references: [id])
-  userID          String
+  id          String   @default(cuid()) @id
+  companyCode String?
+  quantity    Int?
+  buyPriceAvg Float?
+  lastPrice   Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  user        User     @relation(fields: [userID], references: [id])
+  userID      String
 }
 
 model UserTransaction {
-  id              String    @default(cuid()) @id
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @default(now()) @updatedAt
-  companyCode     String?
-  quantity        Int?
-  instantPrice    Float?
-  limitPrice      Float?
-  brokerage       Float?
-  filled          Int?
-  status          String?
-  cancelDate      DateTime?
-  type            String?
-  note            String?
-  user            User      @relation(fields: [userID], references: [id])
-  userID          String
+  id           String    @default(cuid()) @id
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+  companyCode  String?
+  quantity     Int?
+  instantPrice Float?
+  limitPrice   Float?
+  brokerage    Float?
+  filled       Int?
+  status       String?
+  cancelDate   DateTime?
+  type         String?
+  note         String?
+  user         User      @relation(fields: [userID], references: [id])
+  userID       String
 }
 
 model MarketHolidays {
-  id                      String    @default(cuid())  @id
-  year                    Int?      @unique
-  newYearsDay             String?
-  martinLutherKingJrDay   String?
-  washingtonBirthday      String?
-  goodFriday              String?
-  memorialDay             String?
-  independenceDay         String?
-  laborDay                String?
-  thanksgivingDay         String?
-  christmas               String?
+  id                    String  @default(cuid()) @id
+  year                  Int?    @unique
+  newYearsDay           String?
+  martinLutherKingJrDay String?
+  washingtonBirthday    String?
+  goodFriday            String?
+  memorialDay           String?
+  independenceDay       String?
+  laborDay              String?
+  thanksgivingDay       String?
+  christmas             String?
 }
 
 model UserVerification {
-  id        String    @default(cuid()) @id
+  id        String  @default(cuid()) @id
   email     String?
   password  String?
   expiredAt String? //handle specially -> don't need to use DateTime type

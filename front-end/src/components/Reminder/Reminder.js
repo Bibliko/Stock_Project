@@ -60,18 +60,6 @@ const styles = (theme) => ({
   },
 });
 
-const settingAccountComponent = (classes, preventDefault) => {
-  return (
-    <Typography className={classes.reminderText}>
-      You haven't finished setting up your account. Go to
-      <Link onClick={preventDefault} className={classes.reminderLink}>
-        Account Settings
-      </Link>
-      to finish up.
-    </Typography>
-  );
-};
-
 class Reminder extends React.Component {
   state = {
     hide: false,
@@ -83,6 +71,17 @@ class Reminder extends React.Component {
     this.setState({
       hide: true,
     });
+  };
+
+  settingAccountComponent = (classes, preventDefault) => {
+    return (
+      <Typography className={classes.reminderText}>
+        You haven't finished setting up your account. Get started now!
+        <Link onClick={preventDefault} className={classes.reminderLink}>
+          Account Settings
+        </Link>
+      </Typography>
+    );
   };
 
   render() {
@@ -97,7 +96,7 @@ class Reminder extends React.Component {
       >
         {!isUndefined(isUserFinishedSettingUpAccount) &&
           !isUserFinishedSettingUpAccount &&
-          settingAccountComponent(classes, this.preventDefault)}
+          this.settingAccountComponent(classes, this.preventDefault)}
         <IconButton className={classes.closeButton} onClick={this.hideReminder}>
           <CloseRoundedIcon className={classes.closeIcon} />
         </IconButton>
