@@ -6,8 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
-import MyStatsTable from "../../components/Table/RankingTable/MyStatsTable";
-import OverallTable from "../../components/Table/RankingTable/OverallTable";
+import SharePriceTableContainer from "../../components/Table/SharePriceTable/SharePriceTableContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -89,6 +88,10 @@ class Companies extends React.Component {
               Share price
             </Typography>
           </Grid>
+          <Grid item xs={12} className={classes.itemGrid}>
+            <SharePriceTableContainer />
+          </Grid>
+
           <Grid item xs={12} className={classes.itemGrid}>
             <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
               Price history chart
