@@ -36,7 +36,8 @@ const styles = (theme) => ({
     padding: 0,
     width: theme.customWidth.maxSearchFieldWidth,
     opacity: 1,
-    transition: "width 1s, opacity 0.25s ease-in 0.1s",
+    transition: "width 0.3s, opacity 0.25s ease-in 0.1s",
+    zIndex: theme.customZIndex.searchFieldContainer,
   },
   extendWidthSearchField: {
     width: "100%",
@@ -59,7 +60,7 @@ const styles = (theme) => ({
     width: "40px",
     borderRadius: "50%",
     opacity: 1,
-    transition: "left 0.75s ease-in-out, opacity 0.25s ease-in",
+    transition: "left 0.2s ease-in-out, opacity 0.25s ease-in",
   },
   logo: {
     left: "10px",
@@ -72,14 +73,14 @@ const styles = (theme) => ({
       cursor: "pointer",
     },
     opacity: 1,
-    transition: "opacity 0.25s ease-in 0.1s",
+    transition: "opacity 0.2s ease-in",
   },
   hideFade: {
     opacity: 0,
   },
   hideFadeIcon: {
     opacity: 0,
-    left: "-100%",
+    left: "5px",
   },
   hideSearchBar: {
     width: "0%",
@@ -87,6 +88,9 @@ const styles = (theme) => ({
     padding: 0,
     position: "absolute",
     left: "-100%",
+  },
+  hideCompletely: {
+    display: "none",
   },
 });
 
@@ -296,7 +300,8 @@ class SearchFieldLayout extends React.Component {
         />
         <IconButton
           className={clsx(classes.iconButton, {
-            [classes.hideFadeIcon]: isExtendingSearchMenu || !isScreenSmall,
+            [classes.hideFadeIcon]: isExtendingSearchMenu,
+            [classes.hideCompletely]: !isScreenSmall,
           })}
           onClick={this.extendSearchMenu}
         >

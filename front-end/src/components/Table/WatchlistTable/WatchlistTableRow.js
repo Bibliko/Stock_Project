@@ -1,12 +1,19 @@
 import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
+import { isEqual, pick } from "lodash";
 
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 import { numberWithCommas } from "../../../utils/NumberUtil";
 import { getFullStockQuoteFromFMP } from "../../../utils/FinancialModelingPrepUtil";
+import {
+  getParsedCachedShareInfo,
+  updateCachedShareInfo,
+} from "../../../utils/RedisUtil";
+import { oneSecond } from "../../../utils/DayTimeUtil";
+import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
@@ -89,6 +96,8 @@ class WatchlistTableRow extends React.Component {
     marketCap: 0,
   };
 
+  intervalForUpdateShareInfo;
+
   checkIfChangeIncreaseOrDecrease = (type) => {
     if (type === "Change %" && this.state.changesPercentage >= 0) {
       return "Increase";
@@ -166,33 +175,107 @@ class WatchlistTableRow extends React.Component {
     return rowIndex === rowsLength - 1;
   };
 
-  updateWatchlistRowInformation = () => {
+  removeFromWatchlist = () => {
+    const { companyCode } = this.props;
+    const { watchlist, email } = this.props.userSession;
+
+    let newWatchlist = [];
+    watchlist.map((companyCodeString) => {
+      if (!isEqual(companyCodeString, companyCode)) {
+        newWatchlist.push(companyCodeString);
+      }
+      return "dummy value";
+    });
+
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser)
+      .then((res) => {
+        this.props.openSnackbar(companyCode);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  setStateStockQuote = (stockQuoteJSON) => {
+    const neededAttribute = [
+      "name",
+      "price",
+      "volume",
+      "changesPercentage",
+      "marketCap",
+    ];
+    const necessaryInfo = pick(stockQuoteJSON, neededAttribute);
+    const infoFromState = pick(this.state, neededAttribute);
+    if (!isEqual(infoFromState, necessaryInfo)) {
+      this.setState({
+        ...this.state,
+        ...necessaryInfo,
+      });
+    }
+  };
+
+  updateRowAndCachedUsingFMP = () => {
     // const { companyCode } = this.props;
     // getFullStockQuoteFromFMP(companyCode)
     //   .then((stockQuoteJSON) => {
-    //     const {
-    //       name,
-    //       price,
-    //       volume,
-    //       changesPercentage,
-    //       marketCap,
-    //     } = stockQuoteJSON;
-    //     this.setState({
-    //       name: name,
-    //       price: price,
-    //       volume: volume,
-    //       changesPercentage: changesPercentage,
-    //       marketCap: marketCap,
-    //     });
+    //     this.setStateStockQuote(stockQuoteJSON);
+    //     return updateCachedShareInfo(stockQuoteJSON);
     //   })
     //   .catch((err) => {
     //     console.log(err);
     //   });
   };
 
-  componentDidMount() {}
+  setStateShareInfoWhenMarketClosed = () => {
+    const { companyCode } = this.props;
 
-  componentWillUnmount() {}
+    getParsedCachedShareInfo(companyCode)
+      .then((stockQuoteJSON) => {
+        if (!stockQuoteJSON) {
+          this.updateRowAndCachedUsingFMP();
+        } else {
+          this.setStateStockQuote(stockQuoteJSON);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  setupAndUpdateWatchlistComponent = () => {
+    const { isMarketClosed } = this.props;
+
+    if (!isMarketClosed) {
+      if (!this.intervalForUpdateShareInfo) {
+        this.updateRowAndCachedUsingFMP();
+
+        this.intervalForUpdateShareInfo = setInterval(
+          this.updateRowAndCachedUsingFMP,
+          5 * oneSecond
+        );
+      }
+    } else {
+      clearInterval(this.intervalForUpdateShareInfo);
+      this.setStateShareInfoWhenMarketClosed();
+    }
+  };
+
+  componentDidMount() {
+    this.setupAndUpdateWatchlistComponent();
+  }
+
+  componentDidUpdate() {
+    this.setupAndUpdateWatchlistComponent();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalForUpdateShareInfo);
+  }
 
   render() {
     const { classes } = this.props;
@@ -216,6 +299,7 @@ class WatchlistTableRow extends React.Component {
           <div className={classes.cellDiv}>
             <DeleteForeverRoundedIcon
               className={classes.iconInsideIconButton}
+              onClick={this.removeFromWatchlist}
             />
           </div>
         </TableCell>
@@ -226,6 +310,7 @@ class WatchlistTableRow extends React.Component {
 
 const mapStateToProps = (state) => ({
   isMarketClosed: state.isMarketClosed,
+  userSession: state.userSession,
 });
 
 const mapDispatchToProps = (dispatch) => ({

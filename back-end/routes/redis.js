@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { listPushAsync, listRangeAsync } = require("../redis/redis-client");
+const {
+  getAsync,
+  setAsync,
+  listPushAsync,
+  listRangeAsync
+} = require("../redis/redis-client");
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
@@ -121,6 +126,69 @@ router.get("/getSharesList", (req, res) => {
   listRangeAsync(redisKey, 0, -1)
     .then((sharesList) => {
       res.send(sharesList);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+/**
+ * 'cachedShares|AAPL': 'name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
+ */
+router.get("/getCachedShareInfo", (req, res) => {
+  const { companyCode } = req.query;
+
+  const redisKey = `cachedShares|${companyCode}`;
+
+  getAsync(redisKey)
+    .then((quote) => {
+      res.send(quote);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+router.put("/updateCachedShareInfo", (req, res) => {
+  const { stockQuoteJSON } = req.body;
+  if (!stockQuoteJSON) {
+    res.send("stockQuoteJSON is empty, redis.js 156");
+    return;
+  }
+
+  const {
+    symbol,
+    name,
+    price,
+    changesPercentage,
+    change,
+    dayLow,
+    dayHigh,
+    yearHigh,
+    yearLow,
+    marketCap,
+    priceAvg50,
+    priceAvg200,
+    volume,
+    avgVolume,
+    exchange,
+    open,
+    previousClose,
+    eps,
+    pe,
+    earningsAnnouncement,
+    sharesOutstanding,
+    timestamp
+  } = stockQuoteJSON;
+
+  const redisKey = `cachedShares|${symbol}`;
+
+  const valueString = `${name}|${price}|${changesPercentage}|${change}|${dayLow}|${dayHigh}|${yearHigh}|${yearLow}|${marketCap}|${priceAvg50}|${priceAvg200}|${volume}|${avgVolume}|${exchange}|${open}|${previousClose}|${eps}|${pe}|${earningsAnnouncement}|${sharesOutstanding}|${timestamp}`;
+
+  setAsync(redisKey, valueString)
+    .then((quote) => {
+      res.sendStatus(200);
     })
     .catch((err) => {
       console.log(err);
