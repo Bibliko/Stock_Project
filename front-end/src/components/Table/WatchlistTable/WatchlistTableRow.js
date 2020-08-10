@@ -18,6 +18,7 @@ import { changeUserData } from "../../../utils/UserUtil";
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import Typography from "@material-ui/core/Typography";
 
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
@@ -79,6 +80,12 @@ const styles = (theme) => ({
     position: "sticky",
     left: 0,
   },
+  watchlistRowItem: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+  },
 
   // border section
   lastLeftCell: {
@@ -94,7 +101,7 @@ const styles = (theme) => ({
 
 class WatchlistTableRow extends React.Component {
   state = {
-    name: "",
+    name: this.props.companyCode,
     price: 0,
     volume: 0,
     changesPercentage: 0,
@@ -132,7 +139,9 @@ class WatchlistTableRow extends React.Component {
             [classes.cellDivName]: type === "Name",
           })}
         >
-          {this.chooseTableCellValue(type)}
+          <Typography className={classes.watchlistRowItem} noWrap>
+            {this.chooseTableCellValue(type)}
+          </Typography>
           {this.checkIfChangeIncreaseOrDecrease(type) === "Increase" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -262,7 +271,7 @@ class WatchlistTableRow extends React.Component {
 
         this.intervalForUpdateShareInfo = setInterval(
           this.updateRowAndCachedUsingFMP,
-          5 * oneSecond
+          30 * oneSecond
         );
       }
     } else {

@@ -15,6 +15,7 @@ import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
 
 import AddBoxRoundedIcon from "@material-ui/icons/AddBoxRounded";
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
@@ -83,6 +84,12 @@ const styles = (theme) => ({
   stickyCell: {
     position: "sticky",
     left: 0,
+  },
+  holdingsTableItem: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
   },
 
   // border section
@@ -166,7 +173,9 @@ class HoldingsTableRow extends React.Component {
               type === "Profit/Loss" && this.state.profitOrLoss !== "Updating",
           })}
         >
-          {this.chooseTableCellValue(type)}
+          <Typography className={classes.holdingsTableItem}>
+            {this.chooseTableCellValue(type)}
+          </Typography>
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -233,10 +242,10 @@ class HoldingsTableRow extends React.Component {
   };
 
   componentDidMount() {
+    this.updateHoldingInformation();
     this.checkStockPriceInterval = setInterval(
       () => this.updateHoldingInformation(),
-      5 * oneSecond
-      // 20 * oneSecond
+      30 * oneSecond
     );
   }
 

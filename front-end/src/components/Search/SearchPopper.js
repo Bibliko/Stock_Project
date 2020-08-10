@@ -1,7 +1,6 @@
 import React from "react";
 import { isEmpty } from "lodash";
 
-import { shortenCompanyNameToFourWords } from "../../utils/FinancialModelingPrepUtil";
 import { oneSecond } from "../../utils/DayTimeUtil";
 
 import Popper from "@material-ui/core/Popper";
@@ -44,8 +43,8 @@ class SearchPopper extends React.Component {
           <Typography className={classes.searchItem}>{symbol}</Typography>
         </Grid>
         <Grid item xs={9}>
-          <Typography className={classes.searchItem}>
-            {shortenCompanyNameToFourWords(name)}
+          <Typography className={classes.searchItem} noWrap>
+            {name}
           </Typography>
         </Grid>
       </Grid>

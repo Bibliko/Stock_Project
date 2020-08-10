@@ -151,6 +151,11 @@ class Layout extends React.Component {
     );
 
     if (this.props.userSession.hasFinishedSettingUp) {
+      checkStockQuotesToCalculateSharesValue(
+        this.props.isMarketClosed,
+        this.props.userSession,
+        this.props.mutateUser
+      );
       this.checkStockQuotesInterval = setInterval(
         () =>
           checkStockQuotesToCalculateSharesValue(
@@ -158,8 +163,7 @@ class Layout extends React.Component {
             this.props.userSession,
             this.props.mutateUser
           ),
-        5 * oneSecond
-        //20 * oneSecond
+        30 * oneSecond
       );
 
       this.accountSummaryChartSeriesInterval = setInterval(
