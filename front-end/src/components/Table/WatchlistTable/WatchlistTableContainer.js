@@ -55,11 +55,14 @@ const styles = (theme) => ({
     color: "white",
     fontSize: "large",
     padding: 10,
-    backgroundColor: theme.palette.paperBackground.onPage,
   },
   watchlistContainerDiv: {
     width: "100%",
     marginTop: "24px",
+  },
+  stickyCell: {
+    position: "sticky",
+    left: 0,
   },
 });
 
@@ -101,6 +104,7 @@ class WatchlistTableContainer extends React.Component {
         align="center"
         className={clsx(classes.tableCell, {
           [classes.tableCellName]: type === "Name",
+          [classes.stickyCell]: type === "Code",
         })}
       >
         <div

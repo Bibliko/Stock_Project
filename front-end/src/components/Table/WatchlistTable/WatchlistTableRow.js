@@ -32,6 +32,7 @@ const styles = (theme) => ({
     borderBottomWidth: "0px",
     borderColor: "#2D9CDB",
     borderStyle: "solid",
+    backgroundColor: theme.palette.paperBackground.deepBlueTable,
   },
   tableRow: {
     background: "transparent",
@@ -73,6 +74,10 @@ const styles = (theme) => ({
       color: "#e23d3d",
       cursor: "pointer",
     },
+  },
+  stickyCell: {
+    position: "sticky",
+    left: 0,
   },
 
   // border section
@@ -118,6 +123,7 @@ class WatchlistTableRow extends React.Component {
             this.checkIfChangeIncreaseOrDecrease(type) === "Decrease",
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Name",
           [classes.lastRow]: this.isTableRowTheLast(),
+          [classes.stickyCell]: type === "Code",
         })}
       >
         <div
