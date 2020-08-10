@@ -1,5 +1,4 @@
 import React from "react";
-import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -9,7 +8,6 @@ import WatchlistTableContainer from "../../components/Table/WatchlistTable/Watch
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import { Typography } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -68,14 +66,7 @@ class WatchlistPage extends React.Component {
       <Container className={classes.root} disableGutters>
         <Grid container spacing={4} className={classes.fullWidth}>
           <Grid item xs={12} className={classes.itemGrid}>
-            {isEmpty(userSession.watchlist) && (
-              <Typography className={classes.watchlistStartingText}>
-                Start by adding companies to your watchlist!
-              </Typography>
-            )}
-            {!isEmpty(userSession.watchlist) && (
-              <WatchlistTableContainer rows={userSession.watchlist} />
-            )}
+            <WatchlistTableContainer rows={userSession.watchlist} />
           </Grid>
         </Grid>
       </Container>

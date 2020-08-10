@@ -88,7 +88,7 @@ class SearchPopper extends React.Component {
       >
         {({ TransitionProps, placement }) => (
           <Fade
-            timeout={{ enter: oneSecond / 3, exit: oneSecond }}
+            timeout={{ enter: (2 / 10) * oneSecond, exit: (1 / 2) * oneSecond }}
             {...TransitionProps}
           >
             <Paper className={classes.menuPaper}>
