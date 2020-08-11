@@ -43,7 +43,8 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    marginRight: "6px",
+    margin: "8px",
+    marginRight: "16px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
     },
@@ -52,7 +53,7 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: "6px",
+    margin: "8px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
     },
