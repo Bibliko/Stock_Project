@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
-import { isUndefined } from "lodash";
+import { isUndefined, isEqual } from "lodash";
 import { connect } from "react-redux";
 
 import { redirectToPage } from "../../utils/PageRedirectUtil";
@@ -79,14 +79,6 @@ class Reminder extends React.Component {
     });
   };
 
-  componentDidMount() {
-    // console.log("mountReminder");
-  }
-
-  componentDidUpdate() {
-    // console.log("updateReminder");
-  }
-
   settingAccountComponent = (classes, preventDefault) => {
     return (
       <Typography className={classes.reminderText}>
@@ -100,6 +92,16 @@ class Reminder extends React.Component {
       </Typography>
     );
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextState.hide, this.state.hide)
+    ) {
+      return true;
+    }
+    return false;
+  }
 
   render() {
     const { classes, userSession } = this.props;

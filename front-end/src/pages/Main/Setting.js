@@ -14,7 +14,7 @@ import StickyReminder from "../../components/Reminder/StickyReminder";
 import SensitiveSection from "../../components/Setting/SensitiveSection";
 import NameSection from "../../components/Setting/NameSection";
 import SelectSection from "../../components/Setting/SelectSection";
-import ErrorDialog from "../../components/Setting/ErrorDialog";
+import TextDialog from "../../components/Dialog/TextDialog";
 import AvatarSection from "../../components/Setting/AvatarSection";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -106,7 +106,6 @@ class AccountSetting extends React.Component {
       "password",
       "firstName",
       "lastName",
-      "avatarUrl",
       "region",
       "occupation",
     ]);
@@ -150,7 +149,7 @@ class AccountSetting extends React.Component {
 
     return (
       <Container className={classes.root} disableGutters>
-        <AvatarSection avatarUrl={userSession.avatarUrl} />
+        <AvatarSection userId={userSession.id}/>
 
         <NameSection
           id="name-section"
@@ -209,7 +208,11 @@ class AccountSetting extends React.Component {
             Save
           </Button>
         </StickyReminder>
-        <ErrorDialog ref={this.errorDialogRef} />
+        <TextDialog
+          ref={this.errorDialogRef}
+          title='Failed to save changes'
+          content={'Please check your information and try again'}
+        />
       </Container>
     );
   }

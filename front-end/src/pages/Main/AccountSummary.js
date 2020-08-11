@@ -159,6 +159,16 @@ class AccountSummary extends React.Component {
       });
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextState, this.state)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   render() {
     const { classes } = this.props;
 

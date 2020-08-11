@@ -1,4 +1,5 @@
 import React from "react";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -57,6 +58,16 @@ class WatchlistPage extends React.Component {
 
   componentDidMount() {
     console.log(this.props.userSession);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextState, this.state)
+    ) {
+      return true;
+    }
+    return false;
   }
 
   render() {

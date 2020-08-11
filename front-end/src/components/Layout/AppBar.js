@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -190,6 +190,16 @@ class PersistentAppBar extends React.Component {
   componentDidUpdate() {
     // console.log("updateAppBar");
     this.reFocusWhenTransitionMenu();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextState, this.state)
+    ) {
+      return true;
+    }
+    return false;
   }
 
   render() {
