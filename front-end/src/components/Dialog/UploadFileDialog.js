@@ -70,126 +70,85 @@ const styles = (theme) => ({
     width: '10rem'}
 });
 
-class UploadFileDialog extends React.Component {       
-  state = {
-    show: false,
-    fileName: null,
-  };
+function UploadFileDialog (props) {
+  const {
+    classes,
+    inputType,
+    show,
+    handleClose,
+    handleFile,
+    handleUpload,
+    loading,
+    success,
+    fail,
+    fileName
+  } = props;
+  const buttonClassname = clsx({
+    [classes.buttonSuccess]: success,
+    [classes.buttonFail]: fail,
+  });
 
-  toggleOn = () => {
-    this.setState({
-      show: true,
-    });
-  };
-
-  toggleOff = () => {
-    this.setState({
-      show: false,
-      fileName: null,
-      loading: false,
-      success: false,
-      fail: false,
-    });
-  };
-
-  updateFile = (fileName) => {
-    this.setState({
-      fileName: fileName
-    });
-  }
-
-  loading = () => {
-    this.setState({
-      loading: true,
-    })
-  };
-
-  fail = () => {
-    this.setState({
-      success: false,
-      fail: true,
-      loading: false,
-    });
-  };
-
-  success = () => {
-    this.setState({
-      success: true,
-      fail: false,
-      loading: false,
-    });
-  };
-
-  render() {
-    const { classes, inputType, handleFile, handleUpload } = this.props;
-    const { loading, success, fail, fileName } = this.state;
-    const buttonClassname = clsx({
-      [classes.buttonSuccess]: success,
-      [classes.buttonFail]: fail,
-    });
-
-    return (
-      <Dialog
-        open={this.state.show}
-        onClose={this.toggleOff}
-        aria-labelledby='upload-dialog-title'
-        aria-describedby='upload-content'
-        fullWidth={true}
-        maxWidth={'md'}
-        classes={{paper: classes.paper}}
-      >
-        <DialogTitle id='upload-dialog-title' className={classes.dialogTitle}>
-          Upload your avatar
-        </DialogTitle>
-        <DialogContent id='upload-content' className={classes.dialogContent}>
-          <Grid container spacing={1} direction='row' className={classes.fullHeightWidth}>
-            <Grid item xs={2} sytle={{alignItems: 'flex-end'}} className={classes.itemGrid}>
-              <span>
-                <input
-                  accept={inputType}
-                  style={{ display: 'none' }}
-                  id='raised-button-file'
-                  multiple
-                  type='file'
-                  onChange={handleFile}
-                />
-                <label htmlFor='raised-button-file'>
-                  <IconButton variant='raised' component='span'>
-                    <CloudUploadIcon />
-                  </IconButton>
-                </label>
-              </span>
-            </Grid>
-            <Grid item xs={6} className={classes.itemGrid}>
-              <div className={classes.fileNameWrapper}>
-                <Typography noWrap component='span'>
-                  {fileName || 'No file chosen'}
-                </Typography>
-              </div>
-            </Grid>
-            <Grid item xs={4} className={classes.itemGrid}>
-              <div className={clsx(classes.buttonWrapper, classes.fullHeigthWidth)}>
-                <Button
-                  fullWidth
-                  aria-label='save file'
-                  color='primary'
-                  size='medium'
-                  variant='contained'
-                  disableElevation
-                  disabled={loading}
-                  className={buttonClassname}
-                  onClick={handleUpload}
-                >
-                  Save
-                </Button>
-                {loading && <CircularProgress size={24} className={classes.progress}/>}
-              </div>
-            </Grid>
+  return (
+    <Dialog
+      open={show}
+      onClose={handleClose}
+      aria-labelledby='upload-dialog-title'
+      aria-describedby='upload-content'
+      fullWidth={true}
+      maxWidth={'md'}
+      classes={{paper: classes.paper}}
+    >
+      <DialogTitle id='upload-dialog-title' className={classes.dialogTitle}>
+        Upload your avatar
+      </DialogTitle>
+      <DialogContent id='upload-content' className={classes.dialogContent}>
+        <Grid container spacing={1} direction='row' className={classes.fullHeightWidth}>
+          <Grid item xs={2} sytle={{alignItems: 'flex-end'}} className={classes.itemGrid}>
+            <span>
+              <input
+                accept={inputType}
+                style={{ display: 'none' }}
+                id='raised-button-file'
+                multiple
+                type='file'
+                onChange={handleFile}
+              />
+              <label htmlFor='raised-button-file'>
+                <IconButton variant='raised' component='span'>
+                  <CloudUploadIcon />
+                </IconButton>
+              </label>
+            </span>
           </Grid>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+          <Grid item xs={6} className={classes.itemGrid}>
+            <div className={classes.fileNameWrapper}>
+              <Typography noWrap component='span'>
+                {fileName || 'No file chosen'}
+              </Typography>
+            </div>
+          </Grid>
+          <Grid item xs={4} className={classes.itemGrid}>
+            <div className={clsx(classes.buttonWrapper, classes.fullHeigthWidth)}>
+              <Button
+                fullWidth
+                aria-label='save file'
+                color='primary'
+                size='medium'
+                variant='contained'
+                disableElevation
+                disabled={loading}
+                className={buttonClassname}
+                onClick={handleUpload}
+              >
+                Save
+              </Button>
+              {loading && <CircularProgress size={24} className={classes.progress}/>}
+            </div>
+          </Grid>
+        </Grid>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default withStyles(styles)(UploadFileDialog);

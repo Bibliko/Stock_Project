@@ -67,7 +67,13 @@ class Avatar extends React.Component {
 	            onMouseLeave={this.hoverOff}
 	            className={classes.avatar}
 	          />
-	          {hover && <EditRoundedIcon className={classes.editIcon}/>}
+	          {hover && 
+	          	<EditRoundedIcon
+	          		className={classes.editIcon}
+		            onMouseEnter={this.hoverOn}
+		            onMouseLeave={this.hoverOff}
+	          	/>
+	          }
 	        </IconButton>
 		);
 	}

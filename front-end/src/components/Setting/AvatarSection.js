@@ -15,91 +15,81 @@ class AvatarSection extends React.Component {
     super(props);
     this.state = {
       file: null,
+      showDialog: false,
     };
-    this.dialogRef = React.createRef();
   }
+
+  toggleDialogOn = () => {
+    this.setState({
+      showDialog: true,
+    });
+  };
+
+  toggleDialogOff = () => {
+    this.setState({
+      showDialog: false,
+      file: null,
+      loading: false,
+      success: false,
+      fail: false,
+    });
+  };
+
+  setLoading = () => {
+    this.setState({
+      loading: true,
+    })
+  };
+
+  setFail = () => {
+    this.setState({
+      success: false,
+      fail: true,
+      loading: false,
+    });
+  };
+
+  setSuccess = () => {
+    this.setState({
+      success: true,
+      fail: false,
+      loading: false,
+    });
+  };
 
   handleFile = (event) => {
     this.setState({
       file: event.target.files[0],
     });
-    this.dialogRef.current.updateFile(event.target.files[0].name);
-  };
-
-  openDialog = () => {
-    this.dialogRef.current.toggleOn();
   };
 
   upload = () => {
-    if (this.state.file && this.dialogRef.current.state.fileName) {
+    if (this.state.file) {
       const { file } = this.state;
       const extension = file.type.split("/").pop();
       const storageRef = storage.ref();
       const avatarRef = storageRef.child(
         `/userData/${this.props.userId}/avatar.${extension}`
       );
-      console.log(avatarRef);
-      this.dialogRef.current.loading();
+      this.setLoading();
       avatarRef.put(file)
-      .then((snapshot) => {
-        snapshot.ref.getDownloadURL()
+        .then(() => {
+          return avatarRef.getDownloadURL();
+        })
         .then((downloadURL) => {
-          console.log(downloadURL);
-          changeUserData(
+          return changeUserData(
             { avatarUrl: downloadURL },
             this.props.userSession.email,
             this.props.mutateUser
-          )
-          .then(() => {
-            this.dialogRef.current.success();
-          })
-          .catch((err) => {
-            this.dialogRef.current.fail();
-            console.log(err);
-          });
+          );
+        })
+        .then(() => {
+          this.setSuccess();
         })
         .catch((err) => {
-          this.dialogRef.current.fail();
+          this.setFail();
           console.log(err);
         });
-      })
-      .catch((err) => {
-        this.dialogRef.current.fail();
-        console.log(err);
-      });
-
-      // upload
-      //   .on(
-      //     "state_changed",
-      //     () => {},
-
-      //     function error() {
-      //       this.dialogRef.current.fail();
-      //     }.bind(this),
-
-      //     function complete() {
-      //       this.dialogRef.current.success();
-      //       const thumbnailRef = storageRef.child(
-      //         `/userData/${this.props.userId}/avatar_200x200.${extension}`
-      //       );
-      //       const downloadURL = thumbnailRef.getDownloadURL()
-      //         .then(
-      //           function (downloadURL) {
-      //             changeUserData(
-      //               { avatarUrl: downloadURL },
-      //               this.props.userSession.email,
-      //               this.props.mutateUser
-      //             ).catch((err) => {
-      //               console.log(err);
-      //             });
-      //           }.bind(this)
-      //         )
-      //         .catch((err) => {
-      //           console.log(err);
-      //         });
-      //     }.bind(this)
-      //   )
-      //   .bind(this);
     } else {
       this.dialogRef.current.fail();
     }
@@ -107,19 +97,30 @@ class AvatarSection extends React.Component {
 
   render() {
     const { userSession } = this.props;
+    const {
+      showDialog,
+      loading,
+      fail,
+      success,
+      file,
+    } = this.state;
 
     return (
       <React.Fragment>
         <Avatar
           avatarUrl={userSession.avatarUrl}
-          handleClick={this.openDialog}
+          handleClick={this.toggleDialogOn}
         />
         <UploadFileDialog
-          ref={this.dialogRef}
           inputType="image/*"
+          show={showDialog}
+          handleClose={this.toggleDialogOff}
           handleFile={this.handleFile}
           handleUpload={this.upload}
-          fileName={this.state.file && this.state.file.name}
+          loading={loading}
+          fail={fail}
+          success={success}
+          fileName={file && file.name}
         />
       </React.Fragment>
     );
