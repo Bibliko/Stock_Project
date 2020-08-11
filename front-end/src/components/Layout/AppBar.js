@@ -43,7 +43,8 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    marginRight: "6px",
+    margin: "8px",
+    marginRight: "16px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
     },
@@ -52,7 +53,7 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: "6px",
+    margin: "8px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
     },
@@ -100,6 +101,13 @@ const styles = (theme) => ({
   },
   endMenuItem: {
     marginBottom: "5px",
+  },
+  accountMenuItem: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "0.875rem",
+      minHeight: "40px",
+    },
   },
 });
 
@@ -175,10 +183,12 @@ class PersistentAppBar extends React.Component {
   };
 
   componentDidMount() {
+    // console.log("mountAppBar");
     this.reFocusWhenTransitionMenu();
   }
 
   componentDidUpdate() {
+    // console.log("updateAppBar");
     this.reFocusWhenTransitionMenu();
   }
 
@@ -331,6 +341,7 @@ class PersistentAppBar extends React.Component {
                         onKeyDown={this.handleListKeyDown}
                       >
                         <MenuItem
+                          className={classes.accountMenuItem}
                           onClick={() => {
                             redirectToPage("/setting", this.props);
                           }}
@@ -338,6 +349,7 @@ class PersistentAppBar extends React.Component {
                           Account Settings
                         </MenuItem>
                         <MenuItem
+                          className={classes.accountMenuItem}
                           onClick={() => {
                             redirectToPage("/accountSummary", this.props);
                           }}
@@ -345,7 +357,12 @@ class PersistentAppBar extends React.Component {
                         >
                           Portfolio
                         </MenuItem>
-                        <MenuItem onClick={this.logout}>Log Out</MenuItem>
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={this.logout}
+                        >
+                          Log Out
+                        </MenuItem>
                       </MenuList>
                     </ClickAwayListener>
                   </Paper>

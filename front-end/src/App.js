@@ -21,6 +21,8 @@ import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
 import Setting from "./pages/Main/Setting";
 
+import Test from "./pages/Main/Test";
+
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
 
@@ -60,7 +62,7 @@ class App extends React.Component {
       .then((user) => {
         this.reduxStoreInitialState = {
           userSession: user.data,
-          isMarketClosed: false,
+          isMarketClosed: "",
         };
 
         this.setState({
@@ -125,6 +127,7 @@ class App extends React.Component {
                 <Route path="/watchlist" component={Watchlist} />
                 <Route path="/setting" component={Setting} />
                 <Route path="/ranking" component={Ranking} />
+                <Route path="/test" component={Test} />
               </Layout>
             </Switch>
           )}

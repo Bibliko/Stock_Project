@@ -1,16 +1,24 @@
 import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
+import { isEqual, pick } from "lodash";
 
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 import { numberWithCommas } from "../../../utils/NumberUtil";
 import { getFullStockQuoteFromFMP } from "../../../utils/FinancialModelingPrepUtil";
+import {
+  getParsedCachedShareInfo,
+  updateCachedShareInfo,
+} from "../../../utils/RedisUtil";
+import { oneSecond } from "../../../utils/DayTimeUtil";
+import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import Typography from "@material-ui/core/Typography";
 
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
@@ -25,6 +33,7 @@ const styles = (theme) => ({
     borderBottomWidth: "0px",
     borderColor: "#2D9CDB",
     borderStyle: "solid",
+    backgroundColor: theme.palette.paperBackground.deepBlueTable,
   },
   tableRow: {
     background: "transparent",
@@ -67,6 +76,16 @@ const styles = (theme) => ({
       cursor: "pointer",
     },
   },
+  stickyCell: {
+    position: "sticky",
+    left: 0,
+  },
+  watchlistRowItem: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+  },
 
   // border section
   lastLeftCell: {
@@ -82,12 +101,14 @@ const styles = (theme) => ({
 
 class WatchlistTableRow extends React.Component {
   state = {
-    name: "",
+    name: this.props.companyCode,
     price: 0,
     volume: 0,
     changesPercentage: 0,
     marketCap: 0,
   };
+
+  intervalForUpdateShareInfo;
 
   checkIfChangeIncreaseOrDecrease = (type) => {
     if (type === "Change %" && this.state.changesPercentage >= 0) {
@@ -109,6 +130,7 @@ class WatchlistTableRow extends React.Component {
             this.checkIfChangeIncreaseOrDecrease(type) === "Decrease",
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Name",
           [classes.lastRow]: this.isTableRowTheLast(),
+          [classes.stickyCell]: type === "Code",
         })}
       >
         <div
@@ -117,7 +139,9 @@ class WatchlistTableRow extends React.Component {
             [classes.cellDivName]: type === "Name",
           })}
         >
-          {this.chooseTableCellValue(type)}
+          <Typography className={classes.watchlistRowItem} noWrap>
+            {this.chooseTableCellValue(type)}
+          </Typography>
           {this.checkIfChangeIncreaseOrDecrease(type) === "Increase" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -166,33 +190,107 @@ class WatchlistTableRow extends React.Component {
     return rowIndex === rowsLength - 1;
   };
 
-  updateWatchlistRowInformation = () => {
+  removeFromWatchlist = () => {
+    const { companyCode } = this.props;
+    const { watchlist, email } = this.props.userSession;
+
+    let newWatchlist = [];
+    watchlist.map((companyCodeString) => {
+      if (!isEqual(companyCodeString, companyCode)) {
+        newWatchlist.push(companyCodeString);
+      }
+      return "dummy value";
+    });
+
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser)
+      .then((res) => {
+        this.props.openSnackbar(companyCode);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  setStateStockQuote = (stockQuoteJSON) => {
+    const neededAttribute = [
+      "name",
+      "price",
+      "volume",
+      "changesPercentage",
+      "marketCap",
+    ];
+    const necessaryInfo = pick(stockQuoteJSON, neededAttribute);
+    const infoFromState = pick(this.state, neededAttribute);
+    if (!isEqual(infoFromState, necessaryInfo)) {
+      this.setState({
+        ...this.state,
+        ...necessaryInfo,
+      });
+    }
+  };
+
+  updateRowAndCachedUsingFMP = () => {
     // const { companyCode } = this.props;
     // getFullStockQuoteFromFMP(companyCode)
     //   .then((stockQuoteJSON) => {
-    //     const {
-    //       name,
-    //       price,
-    //       volume,
-    //       changesPercentage,
-    //       marketCap,
-    //     } = stockQuoteJSON;
-    //     this.setState({
-    //       name: name,
-    //       price: price,
-    //       volume: volume,
-    //       changesPercentage: changesPercentage,
-    //       marketCap: marketCap,
-    //     });
+    //     this.setStateStockQuote(stockQuoteJSON);
+    //     return updateCachedShareInfo(stockQuoteJSON);
     //   })
     //   .catch((err) => {
     //     console.log(err);
     //   });
   };
 
-  componentDidMount() {}
+  setStateShareInfoWhenMarketClosed = () => {
+    const { companyCode } = this.props;
 
-  componentWillUnmount() {}
+    getParsedCachedShareInfo(companyCode)
+      .then((stockQuoteJSON) => {
+        if (!stockQuoteJSON) {
+          this.updateRowAndCachedUsingFMP();
+        } else {
+          this.setStateStockQuote(stockQuoteJSON);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  setupAndUpdateWatchlistComponent = () => {
+    const { isMarketClosed } = this.props;
+
+    if (!isMarketClosed) {
+      if (!this.intervalForUpdateShareInfo) {
+        this.updateRowAndCachedUsingFMP();
+
+        this.intervalForUpdateShareInfo = setInterval(
+          this.updateRowAndCachedUsingFMP,
+          30 * oneSecond
+        );
+      }
+    } else {
+      clearInterval(this.intervalForUpdateShareInfo);
+      this.setStateShareInfoWhenMarketClosed();
+    }
+  };
+
+  componentDidMount() {
+    this.setupAndUpdateWatchlistComponent();
+  }
+
+  componentDidUpdate() {
+    this.setupAndUpdateWatchlistComponent();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalForUpdateShareInfo);
+  }
 
   render() {
     const { classes } = this.props;
@@ -216,6 +314,7 @@ class WatchlistTableRow extends React.Component {
           <div className={classes.cellDiv}>
             <DeleteForeverRoundedIcon
               className={classes.iconInsideIconButton}
+              onClick={this.removeFromWatchlist}
             />
           </div>
         </TableCell>
@@ -226,6 +325,7 @@ class WatchlistTableRow extends React.Component {
 
 const mapStateToProps = (state) => ({
   isMarketClosed: state.isMarketClosed,
+  userSession: state.userSession,
 });
 
 const mapDispatchToProps = (dispatch) => ({

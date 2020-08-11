@@ -17,6 +17,7 @@ const theme = {
   customZIndex: {
     reminder: 10,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
+    searchFieldContainer: 1000,
     searchMenu: 1200,
   },
   palette: {
@@ -30,6 +31,8 @@ const theme = {
 
     paperBackground: {
       main: "#1E1E1E",
+      onPage: "rgba(46, 44, 48, 1)",
+      deepBlueTable: "rgba(26,22,75,1)",
       gradient: "linear-gradient(180deg, #1E1E1E 0%, #180B66 100%)",
     },
 
