@@ -123,6 +123,8 @@ class Layout extends React.Component {
   state = {
     countdown: "",
     hideReminder: false,
+
+    test: "",
   };
 
   marketCountdownInterval;
@@ -260,6 +262,11 @@ class Layout extends React.Component {
     );
 
     this.setupIntervals();
+
+    // setInterval(() => {
+    //   this.setState({ test: "hello" });
+    //   console.log("layout");
+    // }, 2000);
   }
 
   componentDidUpdate() {
@@ -294,11 +301,7 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar />
-        <Reminder
-          hasUserFinishedSettingUpAccount={
-            this.props.userSession.hasFinishedSettingUp
-          }
-        />
+        <Reminder />
         <main className={classes.main}>
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>

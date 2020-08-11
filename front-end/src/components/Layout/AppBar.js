@@ -183,10 +183,12 @@ class PersistentAppBar extends React.Component {
   };
 
   componentDidMount() {
+    // console.log("mountAppBar");
     this.reFocusWhenTransitionMenu();
   }
 
   componentDidUpdate() {
+    // console.log("updateAppBar");
     this.reFocusWhenTransitionMenu();
   }
 
