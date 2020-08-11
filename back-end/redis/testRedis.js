@@ -13,25 +13,36 @@ const redisClient = require("./redis-client");
 //     return res.json(JSON.parse(rawData));
 // });
 
-const test = () => {
-  Promise.all([
-    redisClient.setAsync("testKey", "testValue"),
-    redisClient.setAsync("testKey1", "testValue1"),
-    redisClient.setAsync("troll", "testValue")
-  ])
-    .then((value) => {
-      return redisClient.keysAsync("test*");
-    })
+// const test = () => {
+//   Promise.all([
+//     redisClient.setAsync("testKey", "testValue"),
+//     redisClient.setAsync("testKey1", "testValue1"),
+//     redisClient.setAsync("troll", "testValue")
+//   ])
+//     .then((value) => {
+//       return redisClient.keysAsync("test*");
+//     })
+//     .then((value) => {
+//       console.log(value);
+//       return redisClient.delAsync(value);
+//     })
+//     .then((value) => {
+//       console.log(value); // null
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+const test2 = () => {
+  redisClient
+    .getAsync("TestKeyWithoutPriorSetup") // -> return null if no key found
     .then((value) => {
       console.log(value);
-      return redisClient.delAsync(value);
-    })
-    .then((value) => {
-      console.log(value); // null
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-test();
+test2();

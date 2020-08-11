@@ -7,6 +7,7 @@ const {
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { setAsync } = require("../redis/redis-client");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -60,6 +61,59 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
         reject(err);
       });
   });
+};
+
+const updateRankingList = () => {
+  prisma.user
+    .findMany({
+      where: {
+        hasFinishedSettingUp: true
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        totalPortfolio: true,
+        region: true
+      },
+      orderBy: {
+        totalPortfolio: "desc"
+      }
+    })
+    .then((usersArray) => {
+      console.log(
+        `Updated ${usersArray.length} user(s) ranking`
+      );
+
+      const updateAllUsersRanking = usersArray.map((user, index) => {
+        const updateRankingAndPortfolioLastClosure = prisma.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            totalPortfolioLastClosure: user.totalPortfolio,
+            ranking: index + 1
+          }
+        });
+
+        const key = index + 1;
+        const value = `${user.firstName}&${user.lastName}&${user.totalPortfolio}&${user.region}`;
+        const redisUpdateRankingList = setAsync(`RANKING${key.toString()}`, value);
+
+        return Promise.all([
+          updateRankingAndPortfolioLastClosure,
+          redisUpdateRankingList
+        ]);
+      });
+
+      return Promise.all(updateAllUsersRanking);
+    })
+    .then(() => {
+      console.log("Update all users successfully.");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 const updateAllUsers = () => {
@@ -158,5 +212,6 @@ module.exports = {
   deleteExpiredVerification,
   createAccountSummaryChartTimestampIfNecessary,
   updateAllUsers,
-  checkAndUpdateAllUsers
+  checkAndUpdateAllUsers,
+  updateRankingList 
 };

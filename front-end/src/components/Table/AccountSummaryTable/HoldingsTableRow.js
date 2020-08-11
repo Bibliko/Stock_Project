@@ -15,6 +15,7 @@ import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
 
 import AddBoxRoundedIcon from "@material-ui/icons/AddBoxRounded";
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
@@ -31,10 +32,7 @@ const styles = (theme) => ({
     borderBottomWidth: "0px",
     borderColor: "#2D9CDB",
     borderStyle: "solid",
-  },
-  tableRow: {
-    background: "transparent",
-    backgroundColor: "transparent",
+    backgroundColor: theme.palette.paperBackground.deepBlueTable,
   },
   cellDiv: {
     display: "flex",
@@ -82,6 +80,16 @@ const styles = (theme) => ({
   },
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",
+  },
+  stickyCell: {
+    position: "sticky",
+    left: 0,
+  },
+  holdingsTableItem: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
   },
 
   // border section
@@ -156,6 +164,7 @@ class HoldingsTableRow extends React.Component {
           [classes.arrowDown]: this.checkIfProfitOrLoss(type) === "Loss",
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
+          [classes.stickyCell]: type === "Code",
         })}
       >
         <div
@@ -164,7 +173,9 @@ class HoldingsTableRow extends React.Component {
               type === "Profit/Loss" && this.state.profitOrLoss !== "Updating",
           })}
         >
-          {this.chooseTableCellValue(type)}
+          <Typography className={classes.holdingsTableItem}>
+            {this.chooseTableCellValue(type)}
+          </Typography>
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -231,10 +242,10 @@ class HoldingsTableRow extends React.Component {
   };
 
   componentDidMount() {
+    this.updateHoldingInformation();
     this.checkStockPriceInterval = setInterval(
       () => this.updateHoldingInformation(),
-      5 * oneSecond
-      // 20 * oneSecond
+      30 * oneSecond
     );
   }
 
@@ -246,7 +257,7 @@ class HoldingsTableRow extends React.Component {
     const { classes } = this.props;
 
     return (
-      <TableRow className={classes.tableRow}>
+      <TableRow>
         {this.chooseTableCell("Code", classes)}
         {this.chooseTableCell("Holding", classes)}
         {this.chooseTableCell("Buy Price (Avg)", classes)}
