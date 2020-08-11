@@ -36,45 +36,70 @@ class AvatarSection extends React.Component {
       const extension = file.type.split("/").pop();
       const storageRef = storage.ref();
       const avatarRef = storageRef.child(
-        `/userData/${this.props.userId}/avatar_200x200.${extension}`
+        `/userData/${this.props.userId}/avatar.${extension}`
       );
       console.log(avatarRef);
       this.dialogRef.current.loading();
-      const upload = avatarRef.put(file);
-
-      upload
-        .on(
-          "state_changed",
-          () => {},
-
-          function error() {
-            this.dialogRef.current.fail();
-          }.bind(this),
-
-          function complete() {
+      avatarRef.put(file)
+      .then((snapshot) => {
+        snapshot.ref.getDownloadURL()
+        .then((downloadURL) => {
+          console.log(downloadURL);
+          changeUserData(
+            { avatarUrl: downloadURL },
+            this.props.userSession.email,
+            this.props.mutateUser
+          )
+          .then(() => {
             this.dialogRef.current.success();
-            const thumbnailRef = storageRef.child(
-              `/userData/${this.props.userId}/avatar_200x200.${extension}`
-            );
-            thumbnailRef
-              .getDownloadURL()
-              .then(
-                function (downloadURL) {
-                  changeUserData(
-                    { avatarUrl: downloadURL },
-                    this.props.userSession.email,
-                    this.props.mutateUser
-                  ).catch((err) => {
-                    console.log(err);
-                  });
-                }.bind(this)
-              )
-              .catch((err) => {
-                console.log(err);
-              });
-          }.bind(this)
-        )
-        .bind(this);
+          })
+          .catch((err) => {
+            this.dialogRef.current.fail();
+            console.log(err);
+          });
+        })
+        .catch((err) => {
+          this.dialogRef.current.fail();
+          console.log(err);
+        });
+      })
+      .catch((err) => {
+        this.dialogRef.current.fail();
+        console.log(err);
+      });
+
+      // upload
+      //   .on(
+      //     "state_changed",
+      //     () => {},
+
+      //     function error() {
+      //       this.dialogRef.current.fail();
+      //     }.bind(this),
+
+      //     function complete() {
+      //       this.dialogRef.current.success();
+      //       const thumbnailRef = storageRef.child(
+      //         `/userData/${this.props.userId}/avatar_200x200.${extension}`
+      //       );
+      //       const downloadURL = thumbnailRef.getDownloadURL()
+      //         .then(
+      //           function (downloadURL) {
+      //             changeUserData(
+      //               { avatarUrl: downloadURL },
+      //               this.props.userSession.email,
+      //               this.props.mutateUser
+      //             ).catch((err) => {
+      //               console.log(err);
+      //             });
+      //           }.bind(this)
+      //         )
+      //         .catch((err) => {
+      //           console.log(err);
+      //         });
+      //     }.bind(this)
+      //   )
+      //   .bind(this);
     } else {
       this.dialogRef.current.fail();
     }
