@@ -1,14 +1,14 @@
-import React from 'react';
+import React from "react";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
 import { changeUserData } from "../../utils/UserUtil";
 
-import UploadFileDialog from '../Dialog/UploadFileDialog';
-import Avatar from './Avatar';
+import UploadFileDialog from "../Dialog/UploadFileDialog";
+import Avatar from "./Avatar";
 
-var storage = require('../../firebase/firebaseStorage.js');
+var storage = require("../../firebase/firebaseStorage.js");
 
 class AvatarSection extends React.Component {
   constructor(props) {
@@ -21,56 +21,64 @@ class AvatarSection extends React.Component {
 
   handleFile = (event) => {
     this.setState({
-      file: event.target.files[0]
+      file: event.target.files[0],
     });
     this.dialogRef.current.updateFile(event.target.files[0].name);
-  }
+  };
 
   openDialog = () => {
     this.dialogRef.current.toggleOn();
-  }
+  };
 
   upload = () => {
     if (this.state.file && this.dialogRef.current.state.fileName) {
       const { file } = this.state;
-      const extension = file.type.split('/').pop();
+      const extension = file.type.split("/").pop();
       const storageRef = storage.ref();
-      const avatarRef = storageRef.child(`userData/${this.props.userId}/avatar.${extension}`);
+      const avatarRef = storageRef.child(
+        `/userData/${this.props.userId}/avatar_200x200.${extension}`
+      );
       console.log(avatarRef);
       this.dialogRef.current.loading();
       const upload = avatarRef.put(file);
 
-      upload.on(
-        'state_changed',
-        () => {},
+      upload
+        .on(
+          "state_changed",
+          () => {},
 
-        function error() {
-          this.dialogRef.current.fail();
-        }.bind(this),
+          function error() {
+            this.dialogRef.current.fail();
+          }.bind(this),
 
-        function complete() {
-          this.dialogRef.current.success();
-          const thumbnailRef= storageRef.child(`userData/${this.props.userId}/avatar_200x200.${extension}`);
-          thumbnailRef.getDownloadURL()
-          .then(function(downloadURL) {
-            changeUserData(
-              { avatarUrl: downloadURL },
-              this.props.userSession.email,
-              this.props.mutateUser
-            )
-            .catch((err) => {
-              console.log(err);
-            });
-          }.bind(this))
-          .catch((err) => {
-            console.log(err);
-          });
-        }.bind(this)
-      ).bind(this);
+          function complete() {
+            this.dialogRef.current.success();
+            const thumbnailRef = storageRef.child(
+              `/userData/${this.props.userId}/avatar_200x200.${extension}`
+            );
+            thumbnailRef
+              .getDownloadURL()
+              .then(
+                function (downloadURL) {
+                  changeUserData(
+                    { avatarUrl: downloadURL },
+                    this.props.userSession.email,
+                    this.props.mutateUser
+                  ).catch((err) => {
+                    console.log(err);
+                  });
+                }.bind(this)
+              )
+              .catch((err) => {
+                console.log(err);
+              });
+          }.bind(this)
+        )
+        .bind(this);
     } else {
       this.dialogRef.current.fail();
     }
-  }
+  };
 
   render() {
     const { userSession } = this.props;
@@ -83,7 +91,7 @@ class AvatarSection extends React.Component {
         />
         <UploadFileDialog
           ref={this.dialogRef}
-          inputType='image/*'
+          inputType="image/*"
           handleFile={this.handleFile}
           handleUpload={this.upload}
           fileName={this.state.file && this.state.file.name}
@@ -101,7 +109,4 @@ const mapDispatchToProps = (dispatch) => ({
   mutateUser: (userProps) => dispatch(userAction("default", userProps)),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AvatarSection);
+export default connect(mapStateToProps, mapDispatchToProps)(AvatarSection);
