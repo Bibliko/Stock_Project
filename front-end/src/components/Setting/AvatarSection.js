@@ -1,97 +1,107 @@
 import React from 'react';
 
-import { withStyles } from '@material-ui/core/styles';
+import { connect } from "react-redux";
+import { userAction } from "../../redux/storeActions/actions";
 
-import {
-  Button,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Avatar,
-} from "@material-ui/core";
+import { changeUserData } from "../../utils/UserUtil";
 
-const styles = (theme) => ({
-  avatar: {
-    height: "200px",
-    width: "200px",
-    [theme.breakpoints.down("md")]: {
-      height: "128px",
-      width: "128px",
-    },
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
-    color: theme.palette.appBarBlue.main,
-  },
-});
+import UploadFileDialog from '../Dialog/UploadFileDialog';
+import Avatar from './Avatar';
+
+var storage = require('../../firebase/firebaseStorage.js');
 
 class AvatarSection extends React.Component {
-  state = {
-    show: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      file: null,
+    };
+    this.dialogRef = React.createRef();
+  }
 
-  toggle = () => {
+  handleFile = (event) => {
     this.setState({
-      show: !this.state.show,
+      file: event.target.files[0]
     });
-  };
+    this.dialogRef.current.updateFile(event.target.files[0].name);
+  }
 
-  handleFile(e) {
-    // const fileReader = new FileReader();
-    // fileReader.readAsDataURL(e.target.files[0]);
-    // console.log(fileReader);
+  openDialog = () => {
+    this.dialogRef.current.toggleOn();
+  }
+
+  upload = () => {
+    if (this.state.file && this.dialogRef.current.state.fileName) {
+      const { file } = this.state;
+      const extension = file.type.split('/').pop();
+      const storageRef = storage.ref();
+      const avatarRef = storageRef.child(`userData/${this.props.userId}/avatar.${extension}`);
+      console.log(avatarRef);
+      this.dialogRef.current.loading();
+      const upload = avatarRef.put(file);
+
+      upload.on(
+        'state_changed',
+        () => {},
+
+        function error() {
+          this.dialogRef.current.fail();
+        }.bind(this),
+
+        function complete() {
+          this.dialogRef.current.success();
+          const thumbnailRef= storageRef.child(`userData/${this.props.userId}/avatar_200x200.${extension}`);
+          thumbnailRef.getDownloadURL()
+          .then(function(downloadURL) {
+            changeUserData(
+              { avatarUrl: downloadURL },
+              this.props.userSession.email,
+              this.props.mutateUser
+            )
+            .catch((err) => {
+              console.log(err);
+            });
+          }.bind(this))
+          .catch((err) => {
+            console.log(err);
+          });
+        }.bind(this)
+      ).bind(this);
+    } else {
+      this.dialogRef.current.fail();
+    }
   }
 
   render() {
-    const { classes, avatarUrl } = this.props;
+    const { userSession } = this.props;
 
     return (
       <React.Fragment>
-        <IconButton onClick={this.toggle}>
-          <Avatar
-            src={avatarUrl}
-            className={classes.avatar}
-          />
-        </IconButton>
-        <Dialog
-          open={this.state.show}
-          onClose={this.toggle}
-          aria-labelledby="upload-dialog-title"
-        >
-          <DialogTitle id="upload-dialog-title">
-            {" "}
-            Upload your avatar{" "}
-          </DialogTitle>
-          <DialogContent>
-            <input
-              accept="image/*"
-              // className={classes.input}
-              style={{ display: "none" }}
-              id="raised-button-file"
-              multiple
-              type="file"
-              onChange={this.handleFile}
-            />
-            <label htmlFor="raised-button-file">
-              <Button variant="raised" component="span">
-                Upload
-              </Button>
-            </label>
-            <Button
-              aria-label="save file"
-              color="primary"
-              size="medium"
-              variant="contained"
-              disableElevation
-              className={classes.reminderButton}
-              // onClick={this.submit}
-            >
-              Save
-            </Button>
-          </DialogContent>
-        </Dialog>
+        <Avatar
+          avatarUrl={userSession.avatarUrl}
+          handleClick={this.openDialog}
+        />
+        <UploadFileDialog
+          ref={this.dialogRef}
+          inputType='image/*'
+          handleFile={this.handleFile}
+          handleUpload={this.upload}
+          fileName={this.state.file && this.state.file.name}
+        />
       </React.Fragment>
     );
   }
 }
 
-export default withStyles(styles)(AvatarSection);
+const mapStateToProps = (state) => ({
+  userSession: state.userSession,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AvatarSection);
