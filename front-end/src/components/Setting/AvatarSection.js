@@ -1,4 +1,5 @@
 import React from "react";
+import storage from "../../firebase/firebaseStorage.js";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -7,8 +8,6 @@ import { changeUserData } from "../../utils/UserUtil";
 
 import UploadFileDialog from "../Dialog/UploadFileDialog";
 import Avatar from "./Avatar";
-
-var storage = require("../../firebase/firebaseStorage.js");
 
 class AvatarSection extends React.Component {
   constructor(props) {
@@ -38,7 +37,7 @@ class AvatarSection extends React.Component {
   setLoading = () => {
     this.setState({
       loading: true,
-    })
+    });
   };
 
   setFail = () => {
@@ -72,7 +71,8 @@ class AvatarSection extends React.Component {
         `/userData/${this.props.userId}/avatar.${extension}`
       );
       this.setLoading();
-      avatarRef.put(file)
+      avatarRef
+        .put(file)
         .then(() => {
           return avatarRef.getDownloadURL();
         })
@@ -97,16 +97,10 @@ class AvatarSection extends React.Component {
 
   render() {
     const { userSession } = this.props;
-    const {
-      showDialog,
-      loading,
-      fail,
-      success,
-      file,
-    } = this.state;
+    const { showDialog, loading, fail, success, file } = this.state;
 
     return (
-      <React.Fragment>
+      <div>
         <Avatar
           avatarUrl={userSession.avatarUrl}
           handleClick={this.toggleDialogOn}
@@ -122,7 +116,7 @@ class AvatarSection extends React.Component {
           success={success}
           fileName={file && file.name}
         />
-      </React.Fragment>
+      </div>
     );
   }
 }

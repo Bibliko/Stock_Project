@@ -13,6 +13,7 @@ import Paper from "@material-ui/core/Paper";
 import { Typography } from "@material-ui/core";
 
 import SettingsRoundedIcon from "@material-ui/icons/SettingsRounded";
+import { isEqual } from "lodash";
 
 const styles = (theme) => ({
   root: {
@@ -127,6 +128,16 @@ class LandingPage extends React.Component {
 
   componentDidMount() {
     console.log(this.props.userSession);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextState, this.state)
+    ) {
+      return true;
+    }
+    return false;
   }
 
   render() {

@@ -121,6 +121,16 @@ class Ranking extends React.Component {
     console.log(this.props.userSession);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextState, this.state)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   render() {
     const { classes } = this.props;
 
