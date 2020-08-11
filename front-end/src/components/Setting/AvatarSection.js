@@ -40,33 +40,36 @@ class AvatarSection extends React.Component {
       );
       console.log(avatarRef);
       this.dialogRef.current.loading();
-      avatarRef.put(file)
-      .then((snapshot) => {
-        snapshot.ref.getDownloadURL()
-        .then((downloadURL) => {
-          console.log(downloadURL);
-          changeUserData(
-            { avatarUrl: downloadURL },
-            this.props.userSession.email,
-            this.props.mutateUser
-          )
-          .then(() => {
-            this.dialogRef.current.success();
-          })
-          .catch((err) => {
-            this.dialogRef.current.fail();
-            console.log(err);
-          });
+      avatarRef
+        .put(file)
+        .then((snapshot) => {
+          console.log(snapshot);
+          snapshot.ref
+            .getDownloadURL()
+            .then((downloadURL) => {
+              console.log(downloadURL);
+              changeUserData(
+                { avatarUrl: downloadURL },
+                this.props.userSession.email,
+                this.props.mutateUser
+              )
+                .then(() => {
+                  this.dialogRef.current.success();
+                })
+                .catch((err) => {
+                  this.dialogRef.current.fail();
+                  console.log(err);
+                });
+            })
+            .catch((err) => {
+              this.dialogRef.current.fail();
+              console.log(err);
+            });
         })
         .catch((err) => {
           this.dialogRef.current.fail();
           console.log(err);
         });
-      })
-      .catch((err) => {
-        this.dialogRef.current.fail();
-        console.log(err);
-      });
 
       // upload
       //   .on(
