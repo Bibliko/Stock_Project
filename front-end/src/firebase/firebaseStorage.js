@@ -2,7 +2,7 @@ require("dotenv").config();
 const { isUndefined } = require("lodash");
 
 global.XMLHttpRequest = require("xhr2");
-var firebase = require("firebase");
+var firebase = require("firebase/app");
 
 // Add the Firebase products that you want to use
 require("firebase/auth");

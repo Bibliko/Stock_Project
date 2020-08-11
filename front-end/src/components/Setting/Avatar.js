@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -18,9 +19,6 @@ const styles = (theme) => ({
     },
     backgroundColor: "rgba(255, 255, 255, 0.85)",
     color: theme.palette.appBarBlue.main,
-    "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.5)",
-    },
   },
   avatarButton: {
     position: "relative",
@@ -33,6 +31,9 @@ const styles = (theme) => ({
     left: "50%",
     marginTop: -12,
     marginLeft: -12,
+  },
+  hoverAvatarColor: {
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
 });
 
@@ -54,7 +55,10 @@ class Avatar extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (!isEqual(nextState.hover, this.state.hover)) {
+    if (
+      !isEqual(nextState.hover, this.state.hover) ||
+      !isEqual(nextProps.avatarUrl, this.props.avatarUrl)
+    ) {
       return true;
     }
     return false;
@@ -65,20 +69,19 @@ class Avatar extends React.Component {
     const { hover } = this.state;
 
     return (
-      <IconButton onClick={handleClick} className={classes.avatarButton}>
+      <IconButton
+        onClick={handleClick}
+        onMouseEnter={this.hoverOn}
+        onMouseLeave={this.hoverOff}
+        className={classes.avatarButton}
+      >
         <MuiAvatar
           src={avatarUrl}
-          onMouseEnter={this.hoverOn}
-          onMouseLeave={this.hoverOff}
-          className={classes.avatar}
+          className={clsx(classes.avatar, {
+            [classes.hoverAvatarColor]: hover,
+          })}
         />
-        {hover && (
-          <EditRoundedIcon
-            className={classes.editIcon}
-            onMouseEnter={this.hoverOn}
-            onMouseLeave={this.hoverOff}
-          />
-        )}
+        {hover && <EditRoundedIcon className={classes.editIcon} />}
       </IconButton>
     );
   }
