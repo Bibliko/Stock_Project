@@ -266,7 +266,7 @@ class Layout extends React.Component {
     // setInterval(() => {
     //   this.setState({ test: "hello" });
     //   console.log("layout");
-    // }, 2000);
+    // }, 1000);
   }
 
   componentDidUpdate() {
