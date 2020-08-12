@@ -54,8 +54,8 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
         }
       })
       .then(() => {
-        console.log("find and create timestamp done");
-        resolve("find and create timestamp done");
+        console.log("Finished finding and creating timestamp");
+        resolve("Finished finding and creating timestamp");
       })
       .catch((err) => {
         reject(err);
@@ -109,7 +109,7 @@ const updateRankingList = () => {
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
-      console.log("Update all users successfully.");
+      console.log("Successfully updated ranking for all users");
     })
     .catch((err) => {
       console.log(err);
@@ -158,7 +158,7 @@ const updateAllUsers = () => {
       return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
-      console.log("Update all users successfully.");
+      console.log("Successfully updated all users");
     })
     .catch((err) => {
       console.log(err);
