@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import HoldingsTableRow from "./HoldingsTableRow";
@@ -72,6 +73,10 @@ class HoldingsTableContainer extends React.Component {
       </StyledTableCell>
     );
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(nextProps, this.props);
+  }
 
   render() {
     const { classes, rows } = this.props;

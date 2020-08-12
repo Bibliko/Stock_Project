@@ -14,6 +14,7 @@ import Typography from "@material-ui/core/Typography";
 
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
+import { isEqual } from "lodash";
 
 const styles = (theme) => ({
   table: {
@@ -130,6 +131,10 @@ class SummaryTableContainer extends React.Component {
       </StyledTableRow>
     );
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(nextProps, this.props);
+  }
 
   render() {
     const { classes } = this.props;

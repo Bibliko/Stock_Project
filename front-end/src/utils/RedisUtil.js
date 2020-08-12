@@ -1,114 +1,55 @@
 import axios from "axios";
 import { getBackendHost } from "./NetworkUtil";
-import { isEqual, includes } from "lodash";
 
 const BACKEND_HOST = getBackendHost();
 
 // redisString: "timestamp1|value1"
 export const parseRedisAccountSummaryChartItem = (redisString) => {
-  const indexOfVerticalLine = redisString.indexOf("|");
-  return [
-    redisString.substring(0, indexOfVerticalLine),
-    redisString.substring(indexOfVerticalLine + 1),
-  ];
+  const valuesArray = redisString.split("|");
+  return valuesArray;
 };
 
 // redisString: "id1|companyCode1|quantity1|buyPriceAvg1|lastPrice1|userID1"
 export const parseRedisSharesListItem = (redisString) => {
-  const indicesOfVerticalLine = [redisString.indexOf("|")];
-  for (let i = 1; i < 5; i++) {
-    indicesOfVerticalLine.push(
-      redisString.indexOf("|", indicesOfVerticalLine[i - 1] + 1)
-    );
-  }
+  const valuesArray = redisString.split("|");
 
-  const resultObj = {};
-  const keys = [
-    "id",
-    "companyCode",
-    "quantity",
-    "buyPriceAvg",
-    "lastPrice",
-    "userID",
-  ];
-  resultObj["id"] = redisString.substring(0, indicesOfVerticalLine[0]);
-  resultObj["userID"] = redisString.substring(indicesOfVerticalLine[4] + 1);
-
-  for (let i = 1; i < 5; i++) {
-    const key = keys[i];
-    const valueInsideRedisString = redisString.substring(
-      indicesOfVerticalLine[i - 1] + 1,
-      indicesOfVerticalLine[i]
-    );
-    if (isEqual(key, "companyCode")) {
-      resultObj[key] = valueInsideRedisString;
-    } else if (isEqual(key, "quantity")) {
-      resultObj[key] = parseInt(valueInsideRedisString, 10);
-    } else {
-      resultObj[key] = parseFloat(valueInsideRedisString);
-    }
-  }
-
-  return resultObj;
+  return {
+    id: valuesArray[0],
+    companyCode: valuesArray[1],
+    quantity: parseInt(valuesArray[2], 10),
+    buyPriceAvg: parseFloat(valuesArray[3]),
+    lastPrice: parseFloat(valuesArray[4]),
+    userID: valuesArray[5],
+  };
 };
 
 // redisString: "name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp"
 export const parseRedisShareInfo = (redisString) => {
-  const indicesOfVerticalLine = [redisString.indexOf("|")];
-  for (let i = 1; i < 20; i++) {
-    indicesOfVerticalLine.push(
-      redisString.indexOf("|", indicesOfVerticalLine[i - 1] + 1)
-    );
-  }
+  const valuesArray = redisString.split("|");
 
-  const resultObj = {};
-  const keys = [
-    "name",
-    "price",
-    "changesPercentage",
-    "change",
-    "dayLow",
-    "dayHigh",
-    "yearHigh",
-    "yearLow",
-    "marketCap",
-    "priceAvg50",
-    "priceAvg200",
-    "volume",
-    "avgVolume",
-    "exchange",
-    "open",
-    "previousClose",
-    "eps",
-    "pe",
-    "earningsAnnouncement",
-    "sharesOutstanding",
-    "timestamp",
-  ];
-  const itemsNeedParseInt = ["volume", "sharesOutstanding"];
-  const itemsNeedPureString = ["exchange", "earningsAnnouncement"];
-  resultObj["name"] = redisString.substring(0, indicesOfVerticalLine[0]);
-  resultObj["timestamp"] = parseInt(
-    redisString.substring(indicesOfVerticalLine[19] + 1),
-    10
-  );
-
-  for (let i = 1; i < 20; i++) {
-    const key = keys[i];
-    const valueInsideRedisString = redisString.substring(
-      indicesOfVerticalLine[i - 1] + 1,
-      indicesOfVerticalLine[i]
-    );
-    if (includes(itemsNeedPureString, key)) {
-      resultObj[key] = valueInsideRedisString;
-    } else if (includes(itemsNeedParseInt, key)) {
-      resultObj[key] = parseInt(valueInsideRedisString, 10);
-    } else {
-      resultObj[key] = parseFloat(valueInsideRedisString);
-    }
-  }
-
-  return resultObj;
+  return {
+    name: valuesArray[0],
+    price: parseFloat(valuesArray[1]),
+    changesPercentage: parseFloat(valuesArray[2]),
+    change: parseFloat(valuesArray[3]),
+    dayLow: parseFloat(valuesArray[4]),
+    dayHigh: parseFloat(valuesArray[5]),
+    yearHigh: parseFloat(valuesArray[6]),
+    yearLow: parseFloat(valuesArray[7]),
+    marketCap: parseFloat(valuesArray[8]),
+    priceAvg50: parseFloat(valuesArray[9]),
+    priceAvg200: parseFloat(valuesArray[10]),
+    volume: parseInt(valuesArray[11], 10),
+    avgVolume: parseInt(valuesArray[12], 10),
+    exchange: valuesArray[13],
+    open: parseFloat(valuesArray[14]),
+    previousClose: parseFloat(valuesArray[15]),
+    eps: parseFloat(valuesArray[16]),
+    pe: parseFloat(valuesArray[17]),
+    earningsAnnouncement: valuesArray[18],
+    sharesOutstanding: parseInt(valuesArray[19], 10),
+    timestamp: parseInt(valuesArray[20], 10),
+  };
 };
 
 export const getCachedAccountSummaryChartInfo = (email) => {

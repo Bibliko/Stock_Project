@@ -7,7 +7,6 @@ import IconButton from "@material-ui/core/IconButton";
 import MuiAvatar from "@material-ui/core/Avatar";
 
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import { isEqual } from "lodash";
 
 const styles = (theme) => ({
   avatar: {

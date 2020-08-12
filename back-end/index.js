@@ -270,7 +270,10 @@ app.get("/logout", (req, res) => {
       return delAsync(value);
     })
     .then((numberOfKeysDeleted) => {
-      console.log(numberOfKeysDeleted);
+      console.log(
+        numberOfKeysDeleted,
+        "User Logout - Delete Redis Relating Keys"
+      );
       req.logout();
       res.send("Successful");
     })
