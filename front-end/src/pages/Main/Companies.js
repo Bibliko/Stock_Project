@@ -12,8 +12,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-import MenuItem from "@material-ui/core/MenuItem";
+import DatePickerHistory from "../../components/DatePicker/DatePickerHistory";
 
 const styles = (theme) => ({
   root: {
@@ -48,6 +47,12 @@ const styles = (theme) => ({
     justifyContent: "center",
     alignItems: "flex-start",
     flexDirection: "column",
+  },
+  datePickerGrid: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    //flexDirection: "colmun",
   },
   gridTitle: {
     fontSize: "x-large",
@@ -91,11 +96,18 @@ class Companies extends React.Component {
           <Grid item xs={12} className={classes.itemGrid}>
             <SharePriceTableContainer />
           </Grid>
-
           <Grid item xs={12} className={classes.itemGrid}>
             <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
               Price history chart
             </Typography>
+          </Grid>
+          <Grid item xs={12} className={classes.datePickerGrid}>
+            <DatePickerHistory
+              name="FROM" //onChange={this.handleChange}
+            />
+            <DatePickerHistory
+              name="TO" //onChange={this.handleChange}
+            />
           </Grid>
         </Grid>
       </Container>
