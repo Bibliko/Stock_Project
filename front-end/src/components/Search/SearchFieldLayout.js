@@ -275,6 +275,13 @@ class SearchFieldLayout extends React.Component {
     this.setScreenSizeState();
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      !isEqual(nextProps.mediaQuery, this.props.mediaQuery) ||
+      !isEqual(nextState, this.state)
+    );
+  }
+
   render() {
     const { classes } = this.props;
     const {

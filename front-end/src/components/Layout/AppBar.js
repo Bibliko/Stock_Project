@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -193,13 +193,13 @@ class PersistentAppBar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
+    const compareKeys = ["avatarUrl", "hasFinishedSettingUp"];
+    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
+    const propsCompare = pick(this.props.userSession, compareKeys);
+    return (
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
-    ) {
-      return true;
-    }
-    return false;
+    );
   }
 
   render() {

@@ -94,13 +94,12 @@ class Reminder extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
-      !isEqual(nextState.hide, this.state.hide)
-    ) {
-      return true;
-    }
-    return false;
+    return (
+      !isEqual(
+        nextProps.userSession.hasFinishedSettingUp,
+        this.props.userSession.hasFinishedSettingUp
+      ) || !isEqual(nextState.hide, this.state.hide)
+    );
   }
 
   render() {

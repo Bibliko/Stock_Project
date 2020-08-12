@@ -7,7 +7,6 @@ import IconButton from "@material-ui/core/IconButton";
 import MuiAvatar from "@material-ui/core/Avatar";
 
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import { isEqual } from "lodash";
 
 const styles = (theme) => ({
   avatar: {
@@ -53,16 +52,6 @@ class Avatar extends React.Component {
       hover: false,
     });
   };
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (
-      !isEqual(nextState.hover, this.state.hover) ||
-      !isEqual(nextProps.avatarUrl, this.props.avatarUrl)
-    ) {
-      return true;
-    }
-    return false;
-  }
 
   render() {
     const { classes, avatarUrl, handleClick } = this.props;

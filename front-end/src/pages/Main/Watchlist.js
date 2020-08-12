@@ -52,22 +52,15 @@ const styles = (theme) => ({
 });
 
 class WatchlistPage extends React.Component {
-  state = {
-    searchCompany: "",
-  };
-
   componentDidMount() {
     console.log(this.props.userSession);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
-      !isEqual(nextState, this.state)
-    ) {
-      return true;
-    }
-    return false;
+    return !isEqual(
+      nextProps.userSession.watchlist,
+      this.props.userSession.watchlist
+    );
   }
 
   render() {

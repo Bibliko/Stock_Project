@@ -108,7 +108,6 @@ const styles = (theme) => ({
 
 class AccountSummary extends React.Component {
   state = {
-    error: "",
     userShares: [],
     holdingsRows: [],
   };
@@ -143,30 +142,29 @@ class AccountSummary extends React.Component {
     console.log(this.props.userSession);
     getParsedCachedSharesList(this.props.userSession.email)
       .then((shares) => {
-        if (!isEqual(this.state.userShares, shares)) {
-          this.setState(
-            {
-              userShares: shares,
-            },
-            () => {
-              this.updateHoldingsTable();
-            }
-          );
-        }
+        this.setState(
+          {
+            userShares: shares,
+          },
+          () => {
+            this.updateHoldingsTable();
+          }
+        );
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
+  componentDidUpdate() {
+    // console.log("updateAccountSummary");
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
-    if (
+    return (
       !isEqual(nextProps.userSession, this.props.userSession) ||
       !isEqual(nextState, this.state)
-    ) {
-      return true;
-    }
-    return false;
+    );
   }
 
   render() {
@@ -177,6 +175,7 @@ class AccountSummary extends React.Component {
       totalPortfolio,
       totalPortfolioLastClosure,
       ranking,
+      email,
     } = this.props.userSession;
 
     const userDailyChange = totalPortfolio - totalPortfolioLastClosure;
@@ -225,7 +224,7 @@ class AccountSummary extends React.Component {
             <Typography className={classes.subtitleChart}>
               Portfolio Now
             </Typography>
-            <AccountSummaryChart />
+            <AccountSummaryChart email={email} />
           </Grid>
         </Grid>
       </Container>
