@@ -54,16 +54,6 @@ class Avatar extends React.Component {
     });
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (
-      !isEqual(nextState.hover, this.state.hover) ||
-      !isEqual(nextProps.avatarUrl, this.props.avatarUrl)
-    ) {
-      return true;
-    }
-    return false;
-  }
-
   render() {
     const { classes, avatarUrl, handleClick } = this.props;
     const { hover } = this.state;
