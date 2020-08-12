@@ -80,18 +80,20 @@ class SharePriceTableContainer extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
-            {this.chooseTableCell("", classes)}
+            <TableRow>
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+              {this.chooseTableCell("", classes)}
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
