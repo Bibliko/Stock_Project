@@ -32,7 +32,7 @@ router.put("/changeData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Change data of user fails.");
+      res.status(500).send("Failed to change user's data");
     });
 });
 
@@ -71,7 +71,7 @@ router.get("/getData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get data of user fails.");
+      res.status(500).send("Failed to get user's data");
     });
 });
 
@@ -98,7 +98,7 @@ router.get("/getOverallRanking", async (_, res) => {
     res.send(usersRankingList);
   } catch (err) {
     console.log(err);
-    res.status(500).send("Get overall ranking fails.");
+    res.status(500).send("Failed to get overall ranking");
   }
 });
 
@@ -129,7 +129,7 @@ router.get("/getRegionalRanking", async (req, res) => {
     res.send(usersRankingList.filter((user) => user !== null));
   } catch (err) {
     console.log(err);
-    res.status(500).send("Get overall ranking fails.");
+    res.status(500).send("Failed to get regional ranking");
   }
 });
 
