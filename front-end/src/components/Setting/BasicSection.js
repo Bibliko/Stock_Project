@@ -3,17 +3,12 @@ import React from "react";
 import clsx from "clsx";
 
 import SettingNormalTextField from "../TextField/SettingNormalTextField";
-import DatePickerTextField from '../TextField/DatePickerTextField';
+import DatePickerTextField from "../TextField/DatePickerTextField";
 import SelectBox from "../SelectBox/SelectBox";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import {
-  TextField,
-  Grid,
-  Container,
-  Typography,
-} from '@material-ui/core';
+import { Grid, Container, Typography } from "@material-ui/core";
 
 import { MobileDatePicker } from "@material-ui/pickers";
 
@@ -41,19 +36,19 @@ const styles = (theme) => ({
     minWidth: "150px",
   },
   textFieldContainer: {
-    maxWidth: 'none',
-    minWidth: '150px',
-    marginLeft: '10px',
-    marginRight: '10px',
+    maxWidth: "none",
+    minWidth: "150px",
+    marginLeft: "10px",
+    marginRight: "10px",
   },
   title: {
-    color: 'white',
-    fontSize: '20px',
-    [theme.breakpoints.down('xs')]: {
-      fontSize: '15px'
+    color: "white",
+    fontSize: "20px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
     },
-    paddingLeft: '5px',
-    fontWeight: 'bold',
+    paddingLeft: "5px",
+    fontWeight: "bold",
   },
 });
 
@@ -64,7 +59,7 @@ class BasicSection extends React.Component {
       input: {
         firstName: this.props.firstName || "",
         lastName: this.props.lastName || "",
-        dateOfBirth: this.props.dateOfBirth || (new Date("1 1 1970")),
+        dateOfBirth: this.props.dateOfBirth || new Date("1 1 1970"),
         gender: this.props.gender || "",
       },
     };
@@ -77,7 +72,7 @@ class BasicSection extends React.Component {
       input: {
         firstName: this.props.firstName || "",
         lastName: this.props.lastName || "",
-        dateOfBirth: this.props.dateOfBirth || (new Date("1 1 1970")),
+        dateOfBirth: this.props.dateOfBirth || new Date("1 1 1970"),
         gender: this.props.gender || "",
       },
     });
@@ -98,10 +93,10 @@ class BasicSection extends React.Component {
         event.target.value,
         this.state.input.lastName,
         this.state.input.dateOfBirth,
-        this.state.input.gender,
+        this.state.input.gender
       )
     );
-  }
+  };
 
   recordLastName = (event) => {
     const input = { ...this.state.input, lastName: event.target.value };
@@ -114,10 +109,10 @@ class BasicSection extends React.Component {
         this.state.input.firstName,
         event.target.value,
         this.state.input.dateOfBirth,
-        this.state.input.gender,
+        this.state.input.gender
       )
     );
-  }
+  };
 
   recordDateOfBirth = (newDate) => {
     const input = { ...this.state.input, dateOfBirth: newDate };
@@ -129,10 +124,10 @@ class BasicSection extends React.Component {
         this.state.input.firstName,
         this.state.input.lastName,
         newDate,
-        this.state.input.gender,
+        this.state.input.gender
       )
     );
-  }
+  };
 
   recordGender = (event) => {
     const input = { ...this.state.input, gender: event.target.value };
@@ -144,28 +139,23 @@ class BasicSection extends React.Component {
         this.state.input.firstName,
         this.state.input.lastName,
         this.state.input.dateOfBirth,
-        event.target.value,
+        event.target.value
       )
     );
-  }
+  };
 
   handleDateError = () => {
     this.hasError = true;
-  }
+  };
 
   handleDateAccept = () => {
     this.hasError = false;
-  }
+  };
 
   render() {
     const { input } = this.state;
     const { classes } = this.props;
-    const genders = [
-      "Female",
-      "Male",
-      "Other",
-      "Prefer not to say",
-    ]
+    const genders = ["Female", "Male", "Other", "Prefer not to say"];
 
     return (
       <div className={classes.fullWidth}>
@@ -195,9 +185,7 @@ class BasicSection extends React.Component {
           </Grid>
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}>
-                  Date of birth
-              </Typography>
+              <Typography className={classes.title}>Date of birth</Typography>
               <MobileDatePicker
                 disableFuture
                 allowKeyboardControl={true}
@@ -210,7 +198,7 @@ class BasicSection extends React.Component {
                 onChange={this.recordDateOfBirth}
                 onError={this.handleDateError}
                 onAccept={this.handleDateAccept}
-                renderInput={props => <DatePickerTextField {...props} />}
+                renderInput={(props) => <DatePickerTextField {...props} />}
               />
             </Container>
           </Grid>
