@@ -42,8 +42,6 @@ class SelectSection extends React.Component {
         occupation: this.props.occupation || "",
       },
     };
-    this.recordRegion = this.recordRegion.bind(this);
-    this.recordOccupation = this.recordOccupation.bind(this);
   }
 
   reset() {
@@ -59,23 +57,23 @@ class SelectSection extends React.Component {
     return { region, occupation };
   }
 
-  recordRegion(e) {
-    const input = { ...this.state.input, region: e.target.value };
+  recordRegion = (event) => {
+    const input = { ...this.state.input, region: event.target.value };
     this.setState({
       input: input,
     });
     this.props.recordChanges(
-      this.createChangeLog(e.target.value, this.state.input.occupation)
+      this.createChangeLog(event.target.value, this.state.input.occupation)
     );
   }
 
-  recordOccupation(e) {
-    const input = { ...this.state.input, occupation: e.target.value };
+  recordOccupation = (event) => {
+    const input = { ...this.state.input, occupation: event.target.value };
     this.setState({
       input: input,
     });
     this.props.recordChanges(
-      this.createChangeLog(this.state.input.region, e.target.value)
+      this.createChangeLog(this.state.input.region, event.target.value)
     );
   }
 

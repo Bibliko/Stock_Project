@@ -12,7 +12,7 @@ import { changeUserData } from "../../utils/UserUtil";
 
 import StickyReminder from "../../components/Reminder/StickyReminder";
 import SensitiveSection from "../../components/Setting/SensitiveSection";
-import NameSection from "../../components/Setting/NameSection";
+import BasicSection from "../../components/Setting/BasicSection";
 import SelectSection from "../../components/Setting/SelectSection";
 import TextDialog from "../../components/Dialog/TextDialog";
 import AvatarSection from "../../components/Setting/AvatarSection";
@@ -60,10 +60,12 @@ class AccountSetting extends React.Component {
     this.hasChanges = false;
 
     this.changes = pick(this.props.userSession, [
+      "email",
       "password",
       "firstName",
       "lastName",
-      "avatarUrl",
+      "dateOfBirth",
+      "gender",
       "region",
       "occupation",
     ]);
@@ -103,9 +105,12 @@ class AccountSetting extends React.Component {
 
   reset() {
     this.changes = pick(this.props.userSession, [
+      "email",
       "password",
       "firstName",
       "lastName",
+      "dateOfBirth",
+      "gender",
       "region",
       "occupation",
     ]);
@@ -149,6 +154,8 @@ class AccountSetting extends React.Component {
       "email",
       "firstName",
       "lastName",
+      "dateOfBirth",
+      "gender",
       "password",
       "region",
       "occupation",
@@ -165,11 +172,13 @@ class AccountSetting extends React.Component {
       <Container className={classes.root} disableGutters>
         <AvatarSection userId={userSession.id} />
 
-        <NameSection
-          id="name-section"
+        <BasicSection
+          id="basic-section"
           ref={this.nameSectionRef}
           firstName={userSession.firstName}
           lastName={userSession.lastName}
+          dateOfBirth={userSession.dateOfBirth}
+          gender={userSession.gender}
           recordChanges={this.recordChanges}
         />
 
