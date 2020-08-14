@@ -265,14 +265,13 @@ app.use("/user", (req, res) => {
 
 app.get("/logout", (req, res) => {
   keysAsync(`${req.user.email}*`)
-    .then((value) => {
-      console.log(value);
-      return delAsync(value);
+    .then((values) => {
+      console.log(values);
+      return delAsync(values);
     })
     .then((numberOfKeysDeleted) => {
       console.log(
-        numberOfKeysDeleted,
-        "User Logout - Delete Redis Relating Keys"
+        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys`
       );
       req.logout();
       res.send("Successful");
