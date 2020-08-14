@@ -16,6 +16,7 @@ const theme = {
   },
   customZIndex: {
     reminder: 10,
+    countdown: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchFieldContainer: 1000,
     searchMenu: 1200,

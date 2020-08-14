@@ -58,7 +58,7 @@ const styles = (theme) => ({
       color: "white",
     },
   },
-  avatarIcon: {
+  normalIcon: {
     height: "35px",
     width: "35px",
     [theme.breakpoints.down("xs")]: {
@@ -68,6 +68,19 @@ const styles = (theme) => ({
     color: "white",
     "&:hover": {
       background: theme.palette.paperBackground.gradient,
+      borderRadius: "50%",
+    },
+  },
+  avatarIcon: {
+    height: "35px",
+    width: "35px",
+    [theme.breakpoints.down("xs")]: {
+      height: "25px",
+      width: "25px",
+    },
+    color: "white",
+    "&:hover": {
+      background: "rgba(255, 255, 255, 0.8)",
       borderRadius: "50%",
     },
   },
@@ -223,7 +236,7 @@ class PersistentAppBar extends React.Component {
               onClick={this.toggleGameMenu}
               disableRipple
             >
-              <VideogameAssetRoundedIcon className={classes.avatarIcon} />
+              <VideogameAssetRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <Popper
               open={openGameMenu}
@@ -301,14 +314,14 @@ class PersistentAppBar extends React.Component {
               className={classes.secondaryMenuButton}
               disableRipple
             >
-              <MenuBookRoundedIcon className={classes.avatarIcon} />
+              <MenuBookRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
               title="About Us"
               className={classes.secondaryMenuButton}
               disableRipple
             >
-              <InfoRoundedIcon className={classes.avatarIcon} />
+              <InfoRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
               className={classes.menuButton}

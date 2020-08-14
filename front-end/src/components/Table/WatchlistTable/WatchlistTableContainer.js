@@ -55,6 +55,7 @@ const styles = (theme) => ({
     color: "white",
     fontSize: "large",
     padding: 10,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   watchlistContainerDiv: {
     width: "100%",
@@ -160,17 +161,17 @@ class WatchlistTableContainer extends React.Component {
                 )}
               </TableBody>
             </Table>
-            <Snackbar
-              open={openSnackbar}
-              autoHideDuration={6 * oneSecond}
-              onClose={this.handleCloseSnackbar}
-            >
-              <Alert onClose={this.handleCloseSnackbar} severity="success">
-                {`Removed ${companyCodeRemoved} from watchlist successfully!`}
-              </Alert>
-            </Snackbar>
           </TableContainer>
         )}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6 * oneSecond}
+          onClose={this.handleCloseSnackbar}
+        >
+          <Alert onClose={this.handleCloseSnackbar} severity="success">
+            {`Removed ${companyCodeRemoved} from watchlist successfully!`}
+          </Alert>
+        </Snackbar>
       </div>
     );
   }

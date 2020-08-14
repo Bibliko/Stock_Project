@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
+import { oneSecond } from "../../../utils/DayTimeUtil";
+
 import HoldingsTableRow from "./HoldingsTableRow";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -12,6 +14,9 @@ import TableContainer from "@material-ui/core/TableContainer";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
+import Snackbar from "@material-ui/core/Snackbar";
+
+import MuiAlert from "@material-ui/lab/Alert";
 
 const styles = (theme) => ({
   table: {
@@ -52,7 +57,13 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 class HoldingsTableContainer extends React.Component {
+  state = { openSnackbar: false, companyCodeOnAction: "" };
+
   chooseTableCell = (type, classes) => {
     return (
       <StyledTableCell
@@ -74,12 +85,30 @@ class HoldingsTableContainer extends React.Component {
     );
   };
 
+  handleOpenSnackbar = (companyCode, AddedOrRemoved) => {
+    this.setState({
+      openSnackbar: true,
+      companyCodeOnAction: `${AddedOrRemoved} ${companyCode}`,
+    });
+  };
+
+  handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    this.setState({
+      openSnackbar: false,
+      companyCodeOnAction: "",
+    });
+  };
+
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextProps, this.props);
+    return !isEqual(nextProps, this.props) || !isEqual(nextState, this.state);
   }
 
   render() {
     const { classes, rows } = this.props;
+    const { openSnackbar, companyCodeOnAction } = this.state;
 
     return (
       <TableContainer className={classes.tableContainer}>
@@ -102,10 +131,20 @@ class HoldingsTableContainer extends React.Component {
                 rowData={row}
                 rowIndex={index}
                 rowsLength={rows.length}
+                openSnackbar={this.handleOpenSnackbar}
               />
             ))}
           </TableBody>
         </Table>
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6 * oneSecond}
+          onClose={this.handleCloseSnackbar}
+        >
+          <Alert onClose={this.handleCloseSnackbar} severity="success">
+            {`${companyCodeOnAction} from watchlist successfully!`}
+          </Alert>
+        </Snackbar>
       </TableContainer>
     );
   }

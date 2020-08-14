@@ -234,12 +234,15 @@ export default {
   parseRedisAccountSummaryChartItem,
   parseRedisSharesListItem,
   parseRedisShareInfo,
+
   getCachedAccountSummaryChartInfo,
   getLatestCachedAccountSummaryChartInfoItem,
   updateCachedAccountSummaryChartInfoOneItem,
+
   getCachedSharesList,
   getParsedCachedSharesList,
   updateCachedSharesList,
+
   getParsedCachedShareInfo,
   updateCachedShareInfo,
 };
