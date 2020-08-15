@@ -82,9 +82,7 @@ const updateRankingList = () => {
       }
     })
     .then((usersArray) => {
-      console.log(
-        `Updated ${usersArray.length} user(s) ranking`
-      );
+      console.log(`Updating ${usersArray.length} user(s): ranking`);
 
       const updateAllUsersRanking = usersArray.map((user, index) => {
         const updateRankingAndPortfolioLastClosure = prisma.user.update({
@@ -92,11 +90,20 @@ const updateRankingList = () => {
             id: user.id
           },
           data: {
-            totalPortfolioLastClosure: user.totalPortfolio,
             ranking: index + 1
           }
         });
 
+<<<<<<< HEAD
+=======
+        const key = index + 1;
+        const value = `${user.firstName}&${user.lastName}&${user.totalPortfolio}&${user.region}`;
+        const redisUpdateRankingList = setAsync(
+          `RANKING${key.toString()}`,
+          value
+        );
+
+>>>>>>> af4295c79bb08dd73bc9b34a71d31b2973f8b1ca
         return Promise.all([
           updateRankingAndPortfolioLastClosure,
           redisUpdateRankingList(user, index + 1)
@@ -131,7 +138,7 @@ const updateAllUsers = () => {
     })
     .then((usersArray) => {
       console.log(
-        `Updated ${usersArray.length} user(s): ranking and portfolioLastClosure`
+        `Updating ${usersArray.length} user(s): portfolioLastClosure`
       );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
@@ -140,8 +147,7 @@ const updateAllUsers = () => {
             id: user.id
           },
           data: {
-            totalPortfolioLastClosure: user.totalPortfolio,
-            ranking: index + 1
+            totalPortfolioLastClosure: user.totalPortfolio
           }
         });
         const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
@@ -210,5 +216,5 @@ module.exports = {
   createAccountSummaryChartTimestampIfNecessary,
   updateAllUsers,
   checkAndUpdateAllUsers,
-  updateRankingList 
+  updateRankingList
 };
