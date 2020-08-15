@@ -8,6 +8,7 @@ const {
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const { setAsync } = require("../redis/redis-client");
+const redisUpdateRankingList = require("./RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -96,13 +97,9 @@ const updateRankingList = () => {
           }
         });
 
-        const key = index + 1;
-        const value = `${user.firstName}&${user.lastName}&${user.totalPortfolio}&${user.region}`;
-        const redisUpdateRankingList = setAsync(`RANKING${key.toString()}`, value);
-
         return Promise.all([
           updateRankingAndPortfolioLastClosure,
-          redisUpdateRankingList
+          redisUpdateRankingList(user, index + 1)
         ]);
       });
 
