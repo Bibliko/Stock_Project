@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -43,7 +43,8 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    marginRight: "6px",
+    margin: "8px",
+    marginRight: "16px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
     },
@@ -52,9 +53,22 @@ const styles = (theme) => ({
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: "6px",
+    margin: "8px",
     "& .MuiIconButton-colorPrimary": {
       color: "white",
+    },
+  },
+  normalIcon: {
+    height: "35px",
+    width: "35px",
+    [theme.breakpoints.down("xs")]: {
+      height: "25px",
+      width: "25px",
+    },
+    color: "white",
+    "&:hover": {
+      background: theme.palette.appBarButtonBackground.gradient,
+      borderRadius: "50%",
     },
   },
   avatarIcon: {
@@ -66,7 +80,7 @@ const styles = (theme) => ({
     },
     color: "white",
     "&:hover": {
-      background: theme.palette.paperBackground.gradient,
+      background: "rgba(255, 255, 255, 0.8)",
       borderRadius: "50%",
     },
   },
@@ -182,11 +196,23 @@ class PersistentAppBar extends React.Component {
   };
 
   componentDidMount() {
+    // console.log("mountAppBar");
     this.reFocusWhenTransitionMenu();
   }
 
   componentDidUpdate() {
+    // console.log("updateAppBar");
     this.reFocusWhenTransitionMenu();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["avatarUrl", "hasFinishedSettingUp"];
+    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
+    const propsCompare = pick(this.props.userSession, compareKeys);
+    return (
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
+    );
   }
 
   render() {
@@ -210,7 +236,7 @@ class PersistentAppBar extends React.Component {
               onClick={this.toggleGameMenu}
               disableRipple
             >
-              <VideogameAssetRoundedIcon className={classes.avatarIcon} />
+              <VideogameAssetRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <Popper
               open={openGameMenu}
@@ -288,14 +314,14 @@ class PersistentAppBar extends React.Component {
               className={classes.secondaryMenuButton}
               disableRipple
             >
-              <MenuBookRoundedIcon className={classes.avatarIcon} />
+              <MenuBookRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
               title="About Us"
               className={classes.secondaryMenuButton}
               disableRipple
             >
-              <InfoRoundedIcon className={classes.avatarIcon} />
+              <InfoRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
               className={classes.menuButton}

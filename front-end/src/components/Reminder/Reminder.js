@@ -1,7 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
-import { isUndefined } from "lodash";
+import { isUndefined, isEqual } from "lodash";
+import { connect } from "react-redux";
 
 import { redirectToPage } from "../../utils/PageRedirectUtil";
 
@@ -92,17 +93,26 @@ class Reminder extends React.Component {
     );
   };
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      !isEqual(
+        nextProps.userSession.hasFinishedSettingUp,
+        this.props.userSession.hasFinishedSettingUp
+      ) || !isEqual(nextState.hide, this.state.hide)
+    );
+  }
+
   render() {
-    const { classes, hasUserFinishedSettingUpAccount } = this.props;
+    const { classes, userSession } = this.props;
 
     return (
       <div
         className={clsx(classes.reminder, {
-          [classes.hide]: hasUserFinishedSettingUpAccount || this.state.hide,
+          [classes.hide]: userSession.hasFinishedSettingUp || this.state.hide,
         })}
       >
-        {!isUndefined(hasUserFinishedSettingUpAccount) &&
-          !hasUserFinishedSettingUpAccount &&
+        {!isUndefined(userSession.hasFinishedSettingUp) &&
+          !userSession.hasFinishedSettingUp &&
           this.settingAccountComponent(classes, this.preventDefault)}
         <IconButton className={classes.closeButton} onClick={this.hideReminder}>
           <CloseRoundedIcon className={classes.closeIcon} />
@@ -112,4 +122,11 @@ class Reminder extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(Reminder));
+const mapStateToProps = (state) => ({
+  userSession: state.userSession,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(withStyles(styles)(withRouter(Reminder)));

@@ -1,4 +1,5 @@
 import React from "react";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -51,12 +52,15 @@ const styles = (theme) => ({
 });
 
 class WatchlistPage extends React.Component {
-  state = {
-    searchCompany: "",
-  };
-
   componentDidMount() {
     console.log(this.props.userSession);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(
+      nextProps.userSession.watchlist,
+      this.props.userSession.watchlist
+    );
   }
 
   render() {

@@ -1,7 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router";
 
-import { pick, extend } from "lodash";
+import { isEqual, pick, extend } from "lodash";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -14,7 +14,7 @@ import StickyReminder from "../../components/Reminder/StickyReminder";
 import SensitiveSection from "../../components/Setting/SensitiveSection";
 import NameSection from "../../components/Setting/NameSection";
 import SelectSection from "../../components/Setting/SelectSection";
-import ErrorDialog from "../../components/Setting/ErrorDialog";
+import TextDialog from "../../components/Dialog/TextDialog";
 import AvatarSection from "../../components/Setting/AvatarSection";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -106,7 +106,6 @@ class AccountSetting extends React.Component {
       "password",
       "firstName",
       "lastName",
-      "avatarUrl",
       "region",
       "occupation",
     ]);
@@ -145,12 +144,26 @@ class AccountSetting extends React.Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    const keysCompare = [
+      "email",
+      "firstName",
+      "lastName",
+      "password",
+      "region",
+      "occupation",
+    ];
+    const nextPropsCompare = pick(nextProps.userSession, keysCompare);
+    const propsCompare = pick(this.props.userSession, keysCompare);
+    return !isEqual(nextPropsCompare, propsCompare);
+  }
+
   render() {
     const { classes, userSession } = this.props;
 
     return (
       <Container className={classes.root} disableGutters>
-        <AvatarSection avatarUrl={userSession.avatarUrl} />
+        <AvatarSection userId={userSession.id} />
 
         <NameSection
           id="name-section"
@@ -209,7 +222,11 @@ class AccountSetting extends React.Component {
             Save
           </Button>
         </StickyReminder>
-        <ErrorDialog ref={this.errorDialogRef} />
+        <TextDialog
+          ref={this.errorDialogRef}
+          title="Failed to save changes"
+          content={"Please check your information and try again"}
+        />
       </Container>
     );
   }

@@ -34,15 +34,26 @@ const redisClient = require("./redis-client");
 //     });
 // };
 
-const test2 = () => {
+// const test2 = () => {
+//   redisClient
+//     .getAsync("TestKeyWithoutPriorSetup") // -> return null if no key found
+//     .then((value) => {
+//       console.log(value);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+const test3 = () => {
   redisClient
-    .getAsync("TestKeyWithoutPriorSetup") // -> return null if no key found
-    .then((value) => {
-      console.log(value);
+    .keysAsync("test*") // -> return [] if no key found
+    .then((values) => {
+      console.log(values);
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-test2();
+test3();

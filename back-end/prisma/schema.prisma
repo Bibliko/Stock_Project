@@ -61,13 +61,13 @@ model UserTransaction {
   updatedAt    DateTime  @default(now()) @updatedAt
   companyCode  String?
   quantity     Int?
-  instantPrice Float?
+  instantPrice Float? // price at the moment transactions are made
   limitPrice   Float?
   brokerage    Float?
   filled       Int?
-  status       String?
+  isFinished   Boolean?
   cancelDate   DateTime?
-  type         String?
+  isTypeBuy    Boolean?
   note         String?
   user         User      @relation(fields: [userID], references: [id])
   userID       String

@@ -1,9 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
-
-import { connect } from "react-redux";
 
 import { oneSecond } from "../../utils/DayTimeUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
@@ -210,7 +208,7 @@ class AccountSummaryChart extends React.Component {
   initializeOrUpdateChartSeries = () => {
     let seriesData = [];
 
-    getCachedAccountSummaryChartInfo(this.props.userSession.email)
+    getCachedAccountSummaryChartInfo(this.props.email)
       .then((cachedTimestamp) => {
         const { data } = cachedTimestamp;
         if (data) {
@@ -262,6 +260,13 @@ class AccountSummaryChart extends React.Component {
     clearInterval(this.intervalUpdateChartSeries);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      !isEqual(nextProps.email, this.props.email) ||
+      !isEqual(nextState, this.state)
+    );
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -284,17 +289,8 @@ class AccountSummaryChart extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  userSession: state.userSession,
-});
-
-export default connect(
-  mapStateToProps,
-  {}
-)(
-  withStyles(styles)(
-    withTheme(
-      withRouter(withMediaQuery("(max-width:600px)")(AccountSummaryChart))
-    )
+export default withStyles(styles)(
+  withTheme(
+    withRouter(withMediaQuery("(max-width:600px)")(AccountSummaryChart))
   )
 );
