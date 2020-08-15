@@ -64,10 +64,12 @@ class BasicSection extends React.Component {
       },
     };
     this.hasError = false;
+    this.isInvalidDate = false;
   }
 
   reset() {
     this.hasError = false;
+    this.isInvalidDate = false;
     this.setState({
       input: {
         firstName: this.props.firstName || "",
@@ -82,18 +84,22 @@ class BasicSection extends React.Component {
     return { firstName, lastName, dateOfBirth, gender };
   }
 
+  checkForError(firstName, lastName) {
+    this.hasError = !firstName || !lastName || this.isInvalidDate;
+  }
+
   recordFirstName = (event) => {
     const input = { ...this.state.input, firstName: event.target.value };
     this.setState({
       input: input,
     });
-    this.hasError = !event.target.value || !this.state.input.lastName;
+    this.checkForError(event.target.value, input.lastName);
     this.props.recordChanges(
       this.createChangeLog(
         event.target.value,
-        this.state.input.lastName,
-        this.state.input.dateOfBirth,
-        this.state.input.gender
+        input.lastName,
+        input.dateOfBirth,
+        input.gender
       )
     );
   };
@@ -103,13 +109,13 @@ class BasicSection extends React.Component {
     this.setState({
       input: input,
     });
-    this.hasError = !this.state.input.firstName || !event.target.value;
+    this.checkForError(input.firstName, event.target.value);
     this.props.recordChanges(
       this.createChangeLog(
-        this.state.input.firstName,
+        input.firstName,
         event.target.value,
-        this.state.input.dateOfBirth,
-        this.state.input.gender
+        input.dateOfBirth,
+        input.gender
       )
     );
   };
@@ -144,12 +150,9 @@ class BasicSection extends React.Component {
     );
   };
 
-  handleDateError = () => {
-    this.hasError = true;
-  };
-
-  handleDateAccept = () => {
-    this.hasError = false;
+  handleDateError = (error) => {
+    this.isInvalidDate = !!error;
+    this.checkForError(this.state.input.firstName,this.state.input.lastName);
   };
 
   render() {

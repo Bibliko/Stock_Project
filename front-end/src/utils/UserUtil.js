@@ -14,8 +14,9 @@ export const getUser = () => {
   return new Promise((resolve, reject) => {
     axios
       .get(`${BACKEND_HOST}/user`, { withCredentials: true })
-      .then((res) => {
-        resolve(res);
+      .then((user) => {
+        user.data.dateOfBirth = new Date(user.data.dateOfBirth);
+        resolve(user);
       })
       .catch((e) => {
         console.log(e);
@@ -126,7 +127,7 @@ export const changePassword = (password, email) => {
       withCredentials: true,
     })
       .then(() => {
-        resolve("Successfully change password");
+        resolve("Successfully changed password");
       })
       .catch((err) => {
         console.log(err);
@@ -157,8 +158,9 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
       withCredentials: true,
     })
       .then((userDataRes) => {
+        userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
         mutateUser(userDataRes.data);
-        resolve("Successfully change data");
+        resolve("Successfully changed data");
       })
       .catch((err) => {
         reject(err);
@@ -186,6 +188,7 @@ export const getUserData = (dataNeeded, email) => {
       withCredentials: true,
     })
       .then((userData) => {
+        userData.data.dateOfBirth = new Date(userData.data.dateOfBirth);
         resolve(userData.data);
       })
       .catch((err) => {

@@ -70,13 +70,8 @@ class AccountSetting extends React.Component {
       "occupation",
     ]);
 
-    this.recordChanges = this.recordChanges.bind(this);
-    this.updateReminder = this.updateReminder.bind(this);
-    this.reset = this.reset.bind(this);
-    this.submit = this.submit.bind(this);
-
     this.reminderRef = React.createRef();
-    this.nameSectionRef = React.createRef();
+    this.basicSectionRef = React.createRef();
     this.sensitiveSectionRef = React.createRef();
     this.selectSectionRef = React.createRef();
     this.errorDialogRef = React.createRef();
@@ -84,26 +79,32 @@ class AccountSetting extends React.Component {
 
   compareChanges() {
     return !!Object.keys(this.changes).filter(
-      (key) => this.changes[key] !== this.props.userSession[key]
+      (key) => {
+        return (
+          typeof(this.changes[key]) === "object" ?
+          !isEqual(this.changes[key], this.props.userSession[key]) :
+          this.changes[key] != this.props.userSession[key]
+        );
+      }
     ).length;
   }
 
-  recordChanges(newChanges = {}) {
+  recordChanges = (newChanges = {}) => {
     extend(this.changes, newChanges);
     this.error =
-      this.nameSectionRef.current.hasError ||
+      this.basicSectionRef.current.hasError ||
       this.sensitiveSectionRef.current.hasError;
     this.updateReminder();
   }
 
-  updateReminder() {
+  updateReminder = () => {
     if (this.hasChanges !== this.compareChanges()) {
       this.reminderRef.current.toggleReminder();
       this.hasChanges = this.compareChanges();
     }
   }
 
-  reset() {
+  reset = () => {
     this.changes = pick(this.props.userSession, [
       "email",
       "password",
@@ -118,15 +119,15 @@ class AccountSetting extends React.Component {
     this.updateReminder();
 
     this.sensitiveSectionRef.current.reset();
-    this.nameSectionRef.current.reset();
+    this.basicSectionRef.current.reset();
     this.selectSectionRef.current.reset();
   }
 
-  submit() {
+  submit = () => {
     if (!this.error) {
-      const { firstName, lastName, region, occupation } = this.changes;
+      const { firstName, lastName, dateOfBirth, gender, region, occupation } = this.changes;
       let hasFinishedSettingUpAccount = false;
-      if (firstName && lastName && region && occupation) {
+      if (firstName && lastName && dateOfBirth && gender && region && occupation) {
         hasFinishedSettingUpAccount = true;
       }
       this.changes.hasFinishedSettingUp = hasFinishedSettingUpAccount;
@@ -174,7 +175,7 @@ class AccountSetting extends React.Component {
 
         <BasicSection
           id="basic-section"
-          ref={this.nameSectionRef}
+          ref={this.basicSectionRef}
           firstName={userSession.firstName}
           lastName={userSession.lastName}
           dateOfBirth={userSession.dateOfBirth}
