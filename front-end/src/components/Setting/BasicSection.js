@@ -200,7 +200,6 @@ class BasicSection extends React.Component {
                 value={input.dateOfBirth}
                 onChange={this.recordDateOfBirth}
                 onError={this.handleDateError}
-                onAccept={this.handleDateAccept}
                 renderInput={(props) => <DatePickerTextField {...props} />}
               />
             </Container>
