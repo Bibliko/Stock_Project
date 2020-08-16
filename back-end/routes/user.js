@@ -78,17 +78,22 @@ router.get("/getData", (req, res) => {
 router.get("/getOverallRanking", (_, res) => {
   keysAsync("RANKING|*")
     .then((keysList) => {
-      let usersRankingList = keysList.map((key) => {
-        return getAsync(key)
-          .then((user) => {
-            const getUser = user.split("|");
-            return {
-              firstName: getUser[0],
-              lastName: getUser[1],
-              totalPortfolio: parseInt(getUser[2]),
-              region: getUser[3]
-            };
-          });
+      const usersRankingList = keysList.map((key) => {
+        return new Promise((resolve, reject) => {
+          getAsync(key)
+            .then((user) => {
+              const getUser = user.split("|");
+              resolve({
+                firstName: getUser[0],
+                lastName: getUser[1],
+                totalPortfolio: parseInt(getUser[2], 10),
+                region: getUser[3]
+              });
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
       });
       return Promise.all(usersRankingList);
     })
@@ -98,38 +103,44 @@ router.get("/getOverallRanking", (_, res) => {
     .catch((err) => {
       console.log(err);
       res.status(500).send("Get overall ranking fails.");
-    })
+    });
 });
 
 router.get("/getRegionalRanking", (req, res) => {
-  const {region} = req.query;
+  const { region } = req.query;
 
   keysAsync("RANKING|*")
     .then((keysList) => {
-      let usersRankingList = keysList.map((key) => {
-        return getAsync(key)
-          .then((user) => {
-            const getUser = user.split("|");
-            if (getUser[3] === region) {
-              return {
-                firstName: getUser[0],
-                lastName: getUser[1],
-                totalPortfolio: parseInt(getUser[2]),
-                region: getUser[3]
-              };
-            }
-            return 0;
-          });
+      const usersRankingList = keysList.map((key) => {
+        return new Promise((resolve, reject) => {
+          getAsync(key)
+            .then((user) => {
+              const getUser = user.split("|");
+              if (getUser[3] === region) {
+                resolve({
+                  firstName: getUser[0],
+                  lastName: getUser[1],
+                  totalPortfolio: parseInt(getUser[2]),
+                  region: getUser[3]
+                });
+              } else {
+                resolve(0);
+              }
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
       });
       return Promise.all(usersRankingList);
     })
     .then((usersList) => {
-      res.send(usersList.filter(user => user !== 0));
+      res.send(usersList.filter((user) => user !== 0));
     })
     .catch((err) => {
       console.log(err);
       res.status(500).send("Get overall ranking fails.");
-    })
+    });
 });
 
 module.exports = router;

@@ -56,4 +56,21 @@ const test3 = () => {
     });
 };
 
-test3();
+const testList = () => {
+  const redisKey = `test`;
+
+  redisClient
+    .listRangeAsync(redisKey, 0, -1)
+    .then((testValue) => {
+      console.log(testValue);
+      return redisClient.listPushAsync(redisKey, "hello");
+    })
+    .then((finishedUpdating) => {
+      console.log(finishedUpdating);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+testList();
