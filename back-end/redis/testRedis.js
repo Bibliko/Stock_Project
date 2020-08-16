@@ -56,4 +56,15 @@ const test3 = () => {
     });
 };
 
-test3();
+const test4 = () => {
+  redisClient
+    .delAsync("cachedShares|AAPL") // -> return [] if no key found
+    .then((values) => {
+      console.log(values);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+test4();

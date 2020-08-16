@@ -152,20 +152,15 @@ class Layout extends React.Component {
     );
 
     if (this.props.userSession.hasFinishedSettingUp) {
-      checkStockQuotesToCalculateSharesValue(
-        this.props.isMarketClosed,
-        this.props.userSession,
-        this.props.mutateUser
-      );
-      this.checkStockQuotesInterval = setInterval(
-        () =>
-          checkStockQuotesToCalculateSharesValue(
-            this.props.isMarketClosed,
-            this.props.userSession,
-            this.props.mutateUser
-          ),
-        30 * oneSecond
-      );
+      // this.checkStockQuotesInterval = setInterval(
+      //   () =>
+      //     checkStockQuotesToCalculateSharesValue(
+      //       this.props.isMarketClosed,
+      //       this.props.userSession,
+      //       this.props.mutateUser
+      //     ),
+      //   30 * oneSecond
+      // );
 
       this.accountSummaryChartSeriesInterval = setInterval(
         () => this.updateCachedAccountSummaryChartSeries(),
@@ -191,6 +186,13 @@ class Layout extends React.Component {
           const { shares } = sharesData;
           return updateCachedSharesList(email, shares);
         }
+      })
+      .then((afterUpdatingCachedSharesList) => {
+        // checkStockQuotesToCalculateSharesValue(
+        //   this.props.isMarketClosed,
+        //   this.props.userSession,
+        //   this.props.mutateUser
+        // );
       })
       .catch((err) => {
         console.log(err);

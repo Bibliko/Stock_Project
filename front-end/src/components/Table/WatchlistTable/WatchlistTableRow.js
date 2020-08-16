@@ -6,12 +6,8 @@ import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { numberWithCommas } from "../../../utils/NumberUtil";
-import { getFullStockQuoteFromFMP } from "../../../utils/FinancialModelingPrepUtil";
-import {
-  getParsedCachedShareInfo,
-  updateCachedShareInfo,
-} from "../../../utils/RedisUtil";
+import { numberWithCommas, shortenNumber } from "../../../utils/NumberUtil";
+import { getFullStockQuote } from "../../../utils/FinancialModelingPrepUtil";
 import { oneSecond } from "../../../utils/DayTimeUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
@@ -167,18 +163,18 @@ class WatchlistTableRow extends React.Component {
         return `$${numberWithCommas(this.state.price.toFixed(2))}`;
 
       case "Volume":
-        return `$${numberWithCommas(this.state.volume.toFixed(2))}`;
+        return `${shortenNumber(this.state.volume.toFixed(2))}`;
 
       case "Change %":
         if (this.state.changesPercentage < 0) {
-          return `-$${numberWithCommas(
+          return `-${numberWithCommas(
             Math.abs(this.state.changesPercentage).toFixed(2)
-          )}`;
+          )}%`;
         }
-        return `$${numberWithCommas(this.state.changesPercentage.toFixed(2))}`;
+        return `${numberWithCommas(this.state.changesPercentage.toFixed(2))}%`;
 
       case "Market Cap":
-        return `${this.state.marketCap}`;
+        return `${shortenNumber(this.state.marketCap)}`;
 
       default:
         return;
@@ -234,57 +230,36 @@ class WatchlistTableRow extends React.Component {
     }
   };
 
-  updateRowAndCachedUsingFMP = () => {
+  setStateShareInfo = () => {
     // const { companyCode } = this.props;
-    // getFullStockQuoteFromFMP(companyCode)
+    // getFullStockQuote(companyCode)
     //   .then((stockQuoteJSON) => {
+    //     console.log(stockQuoteJSON);
     //     this.setStateStockQuote(stockQuoteJSON);
-    //     return updateCachedShareInfo(stockQuoteJSON);
     //   })
     //   .catch((err) => {
     //     console.log(err);
     //   });
   };
 
-  setStateShareInfoWhenMarketClosed = () => {
-    const { companyCode } = this.props;
-
-    getParsedCachedShareInfo(companyCode)
-      .then((stockQuoteJSON) => {
-        if (!stockQuoteJSON) {
-          this.updateRowAndCachedUsingFMP();
-        } else {
-          this.setStateStockQuote(stockQuoteJSON);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   setupAndUpdateWatchlistComponent = () => {
     const { isMarketClosed } = this.props;
 
+    this.setStateShareInfo();
+
     if (!isMarketClosed) {
       if (!this.intervalForUpdateShareInfo) {
-        this.updateRowAndCachedUsingFMP();
-
         this.intervalForUpdateShareInfo = setInterval(
-          this.updateRowAndCachedUsingFMP,
+          this.setStateShareInfo,
           30 * oneSecond
         );
       }
     } else {
       clearInterval(this.intervalForUpdateShareInfo);
-      this.setStateShareInfoWhenMarketClosed();
     }
   };
 
   componentDidMount() {
-    this.setupAndUpdateWatchlistComponent();
-  }
-
-  componentDidUpdate() {
     this.setupAndUpdateWatchlistComponent();
   }
 

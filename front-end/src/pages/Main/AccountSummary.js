@@ -112,8 +112,8 @@ class AccountSummary extends React.Component {
     holdingsRows: [],
   };
 
-  createHoldingData = (id, code, holding, buyPriceAvg, lastPrice) => {
-    return { id, code, holding, buyPriceAvg, lastPrice };
+  createHoldingData = (id, code, holding, buyPriceAvg) => {
+    return { id, code, holding, buyPriceAvg };
   };
 
   updateHoldingsTable = () => {
@@ -125,8 +125,7 @@ class AccountSummary extends React.Component {
           share.id,
           share.companyCode,
           share.quantity,
-          share.buyPriceAvg,
-          share.lastPrice
+          share.buyPriceAvg
         )
       );
     }
