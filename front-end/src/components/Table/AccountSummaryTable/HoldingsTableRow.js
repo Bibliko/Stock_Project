@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import clsx from "clsx";
 import { withRouter } from "react-router";
 
@@ -10,6 +10,7 @@ import { changeShareData } from "../../../utils/ShareUtil";
 import { getStockPriceFromFMP } from "../../../utils/FinancialModelingPrepUtil";
 import { oneSecond } from "../../../utils/DayTimeUtil";
 import { numberWithCommas } from "../../../utils/NumberUtil";
+import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
@@ -22,6 +23,7 @@ import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
 import AddShoppingCartRoundedIcon from "@material-ui/icons/AddShoppingCartRounded";
 import AttachMoneyRoundedIcon from "@material-ui/icons/AttachMoneyRounded";
+import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 
 const styles = (theme) => ({
   tableCell: {
@@ -61,16 +63,27 @@ const styles = (theme) => ({
     fontWeight: "bold",
     padding: "4px",
   },
-  watchlistButton: {
+  addWatchlistButton: {
     color: "#619FD7",
     "&:hover": {
       color: "rgba(97, 159, 215, 0.8)",
     },
     padding: "5px",
   },
+  removeWatchlistButton: {
+    padding: "5px",
+  },
   watchlistIcon: {
-    height: "30px",
-    width: "30px",
+    height: "22px",
+    width: "22px",
+  },
+  removeWatchlistIcon: {
+    height: "22px",
+    width: "22px",
+    color: "white",
+    "&:hover": {
+      color: "#e23d3d",
+    },
   },
   arrowUp: {
     color: "#219653",
@@ -108,6 +121,7 @@ class HoldingsTableRow extends React.Component {
   state = {
     lastPrice: "Updating",
     profitOrLoss: "Updating",
+    isInWatchlist: false,
   };
 
   checkStockPriceInterval;
@@ -187,6 +201,66 @@ class HoldingsTableRow extends React.Component {
     );
   };
 
+  addToWatchlist = () => {
+    const { code } = this.props.rowData;
+    const { email, watchlist } = this.props.userSession;
+    let newWatchlist = watchlist;
+
+    newWatchlist.push(code);
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser)
+      .then(() => {
+        this.setState({
+          isInWatchlist: true,
+        });
+        this.props.openSnackbar(code, "Added");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  removeFromWatchlist = () => {
+    const { code } = this.props.rowData;
+    const { email, watchlist } = this.props.userSession;
+    let newWatchlist = [];
+    watchlist.map((companyCodeString) => {
+      if (!isEqual(companyCodeString, code)) {
+        newWatchlist.push(companyCodeString);
+      }
+      return "dummy value";
+    });
+
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser)
+      .then(() => {
+        this.setState({
+          isInWatchlist: false,
+        });
+        this.props.openSnackbar(code, "Removed");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  setStateIsInWatchlist = () => {
+    const { code } = this.props.rowData;
+    const { watchlist } = this.props.userSession;
+
+    this.setState({
+      isInWatchlist: watchlist.includes(code),
+    });
+  };
+
   setStateHoldingInformation = (lastPrice, buyPriceAvg, holding) => {
     let brokerage;
 
@@ -242,6 +316,8 @@ class HoldingsTableRow extends React.Component {
   };
 
   componentDidMount() {
+    this.setStateIsInWatchlist();
+
     this.updateHoldingInformation();
     this.checkStockPriceInterval = setInterval(
       () => this.updateHoldingInformation(),
@@ -253,8 +329,24 @@ class HoldingsTableRow extends React.Component {
     clearInterval(this.checkStockPriceInterval);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["watchlist"];
+    const nextPropsCompareUserSession = pick(
+      nextProps.userSession,
+      compareKeys
+    );
+    const propsCompareUserSession = pick(this.props.userSession, compareKeys);
+
+    return (
+      !isEqual(nextProps.isMarketClosed, this.props.isMarketClosed) ||
+      !isEqual(nextState, this.state) ||
+      !isEqual(nextPropsCompareUserSession, propsCompareUserSession)
+    );
+  }
+
   render() {
     const { classes } = this.props;
+    const { isInWatchlist } = this.state;
 
     return (
       <TableRow>
@@ -288,9 +380,24 @@ class HoldingsTableRow extends React.Component {
           })}
         >
           <div className={classes.cellDiv}>
-            <IconButton className={classes.watchlistButton}>
-              <AddBoxRoundedIcon className={classes.watchlistIcon} />
-            </IconButton>
+            {!isInWatchlist && (
+              <IconButton
+                className={classes.addWatchlistButton}
+                onClick={this.addToWatchlist}
+              >
+                <AddBoxRoundedIcon className={classes.watchlistIcon} />
+              </IconButton>
+            )}
+            {isInWatchlist && (
+              <IconButton
+                className={classes.removeWatchlistButton}
+                onClick={this.removeFromWatchlist}
+              >
+                <DeleteForeverRoundedIcon
+                  className={classes.removeWatchlistIcon}
+                />
+              </IconButton>
+            )}
           </div>
         </TableCell>
       </TableRow>
@@ -299,6 +406,7 @@ class HoldingsTableRow extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
+  userSession: state.userSession,
   isMarketClosed: state.isMarketClosed,
 });
 

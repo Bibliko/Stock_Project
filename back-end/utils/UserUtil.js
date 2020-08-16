@@ -7,7 +7,8 @@ const {
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { setAsync } = require("../redis/redis-client");
+
+const { redisUpdateRankingList } = require("./RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -93,23 +94,16 @@ const updateRankingList = () => {
           }
         });
 
-        const key = index + 1;
-        const value = `${user.firstName}&${user.lastName}&${user.totalPortfolio}&${user.region}`;
-        const redisUpdateRankingList = setAsync(
-          `RANKING${key.toString()}`,
-          value
-        );
-
         return Promise.all([
           updateRankingAndPortfolioLastClosure,
-          redisUpdateRankingList
+          redisUpdateRankingList(user, index + 1)
         ]);
       });
 
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
-      console.log("Successfully updated ranking for all users");
+      console.log("Successfully updated all users ranking");
     })
     .catch((err) => {
       console.log(err);
@@ -138,7 +132,7 @@ const updateAllUsers = () => {
       );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
-        const updateRankingAndPortfolioLastClosure = prisma.user.update({
+        const updatePortfolioLastClosure = prisma.user.update({
           where: {
             id: user.id
           },
@@ -150,15 +144,14 @@ const updateAllUsers = () => {
           user
         );
 
-        return Promise.all([
-          updateRankingAndPortfolioLastClosure,
-          accountSummaryPromise
-        ]);
+        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise]);
       });
       return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
-      console.log("Successfully updated all users");
+      console.log(
+        "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp"
+      );
     })
     .catch((err) => {
       console.log(err);
@@ -209,8 +202,11 @@ const checkAndUpdateAllUsers = (objVariables) => {
 
 module.exports = {
   deleteExpiredVerification,
+
   createAccountSummaryChartTimestampIfNecessary,
+
   updateAllUsers,
   checkAndUpdateAllUsers,
+
   updateRankingList
 };

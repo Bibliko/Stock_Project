@@ -56,12 +56,27 @@ const styles = (theme) => ({
 });
 
 class SearchField extends React.Component {
+  inputRef = React.createRef(null);
+
+  focusInput = () => {
+    if (this.props.focused) {
+      this.inputRef.current.focus();
+    }
+  };
+
+  componentDidMount() {
+    this.focusInput();
+  }
+
+  componentDidUpdate() {
+    this.focusInput();
+  }
+
   render() {
     const {
       classes,
       forwardedRef,
       searchCompany,
-      focused,
       changeSearchCompany,
       extendSearchMenu,
       shrinkSearchMenu,
@@ -74,7 +89,7 @@ class SearchField extends React.Component {
         ref={forwardedRef}
         value={searchCompany}
         label="Search"
-        focused={focused}
+        inputRef={this.inputRef}
         autoComplete="off"
         variant="outlined"
         margin="normal"

@@ -16,6 +16,7 @@ const theme = {
   },
   customZIndex: {
     reminder: 10,
+    countdown: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchFieldContainer: 1000,
     searchMenu: 1200,
@@ -27,6 +28,10 @@ const theme = {
 
     backgroundBlue: {
       main: "#619FD7",
+    },
+
+    appBarButtonBackground: {
+      gradient: "linear-gradient(#66CCFF 20%, #6666FF 50%)",
     },
 
     paperBackground: {

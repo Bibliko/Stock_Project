@@ -109,6 +109,7 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       marginTop: theme.customMargin.topCountdownSmall,
     },
+    zIndex: theme.customZIndex.countdown,
   },
   countdownText: {
     color: "white",
@@ -222,26 +223,9 @@ class Layout extends React.Component {
       });
   };
 
-  marketCountdownChooseComponent = (classes) => {
-    if (this.props.isMarketClosed) {
-      return (
-        <Typography className={classes.countdownText}>Market Closed</Typography>
-      );
-    } else {
-      if (isEmpty(this.state.countdown)) {
-        return <CircularProgress />;
-      } else {
-        return (
-          <Typography className={classes.countdownText}>
-            Until Market Close {this.state.countdown}
-          </Typography>
-        );
-      }
-    }
-  };
-
   componentDidMount() {
     console.log(this.props.userSession);
+
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
       return;
@@ -284,7 +268,8 @@ class Layout extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, isMarketClosed } = this.props;
+    const { countdown } = this.state;
 
     if (shouldRedirectToLogin(this.props)) {
       return null;
@@ -294,11 +279,7 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar />
-        <Reminder
-          hasUserFinishedSettingUpAccount={
-            this.props.userSession.hasFinishedSettingUp
-          }
-        />
+        <Reminder />
         <main className={classes.main}>
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
@@ -306,7 +287,17 @@ class Layout extends React.Component {
             <div className={classes.secondBackground} />
             <div className={classes.thirdBackground} />
             <div className={classes.countdown}>
-              {this.marketCountdownChooseComponent(classes)}
+              {isMarketClosed && (
+                <Typography className={classes.countdownText}>
+                  Market Closed
+                </Typography>
+              )}
+              {!isMarketClosed && isEmpty(countdown) && <CircularProgress />}
+              {!isMarketClosed && !isEmpty(countdown) && (
+                <Typography className={classes.countdownText}>
+                  Until Market Close {this.state.countdown}
+                </Typography>
+              )}
             </div>
             {this.props.children}
           </div>
