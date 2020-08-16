@@ -126,7 +126,7 @@ export const changePassword = (password, email) => {
       withCredentials: true,
     })
       .then(() => {
-        resolve("Successfully change password");
+        resolve("Successfully changed password");
       })
       .catch((err) => {
         console.log(err);
@@ -158,7 +158,7 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
     })
       .then((userDataRes) => {
         mutateUser(userDataRes.data);
-        resolve("Successfully change data");
+        resolve("Successfully changed data");
       })
       .catch((err) => {
         reject(err);

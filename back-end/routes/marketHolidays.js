@@ -20,7 +20,7 @@ router.get("/getData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get data of market holidays fails.");
+      res.status(500).send("Failed to get data of market holidays");
     });
 });
 

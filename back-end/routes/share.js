@@ -30,7 +30,7 @@ router.put("/changeData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Change data of share fails.");
+      res.status(500).send("Failed to change data of share");
     });
 });
 
@@ -59,7 +59,7 @@ router.get("/getData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get data of share fails.");
+      res.status(500).send("Failed to get data of share");
     });
 });
 
