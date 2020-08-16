@@ -23,17 +23,12 @@ router.put("/updateAccountSummaryChartWholeList", (req, res) => {
 
   const redisKey = `${email}|accountSummaryChart`;
 
-  listRangeAsync(redisKey, 0, -1)
-    .then((timestampsList) => {
-      if (timestampsList) {
-        const listPushPromise = prismaTimestamps.map((timestamp) => {
-          const { UTCDateString, portfolioValue } = timestamp;
-          const newValue = `${UTCDateString}|${portfolioValue}`;
-          return listPushAsync(redisKey, newValue);
-        });
-        return Promise.all(listPushPromise);
-      }
-    })
+  const listPushPromise = prismaTimestamps.map((timestamp) => {
+    const { UTCDateString, portfolioValue } = timestamp;
+    const newValue = `${UTCDateString}|${portfolioValue}`;
+    return listPushAsync(redisKey, newValue);
+  });
+  Promise.all(listPushPromise)
     .then((finishedUpdatingRedisTimestampsList) => {
       res.sendStatus(200);
     })
@@ -48,12 +43,7 @@ router.put("/updateAccountSummaryChartOneItem", (req, res) => {
   const redisKey = `${email}|accountSummaryChart`;
   const newValue = `${timestamp}|${portfolioValue}`;
 
-  listRangeAsync(redisKey, 0, -1)
-    .then((timestampArray) => {
-      if (timestampArray) {
-        return listPushAsync(redisKey, newValue);
-      }
-    })
+  listPushAsync(redisKey, newValue)
     .then((finishedUpdatingRedisAccountSummaryChart) => {
       res.sendStatus(200);
     })
@@ -100,17 +90,12 @@ router.put("/updateSharesList", (req, res) => {
 
   const redisKey = `${email}|sharesList`;
 
-  listRangeAsync(redisKey, 0, -1)
-    .then((sharesList) => {
-      if (sharesList) {
-        const listPushPromise = shares.map((share) => {
-          const { id, companyCode, quantity, buyPriceAvg, userID } = share;
-          const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
-          return listPushAsync(redisKey, newValue);
-        });
-        return Promise.all(listPushPromise);
-      }
-    })
+  const listPushPromise = shares.map((share) => {
+    const { id, companyCode, quantity, buyPriceAvg, userID } = share;
+    const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
+    return listPushAsync(redisKey, newValue);
+  });
+  Promise.all(listPushPromise)
     .then((finishedUpdatingRedisSharesList) => {
       res.sendStatus(200);
     })
