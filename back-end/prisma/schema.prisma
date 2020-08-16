@@ -23,7 +23,7 @@ model User {
   region                    String?
   occupation                String?
   ranking                   Int?                      @default(0)
-  regionRanking             Int?                      @default(0)
+  regionalRanking           Int?                      @default(0)
   cash                      Float?                    @default(100000)
   totalPortfolio            Float?                    @default(100000)
   totalPortfolioLastClosure Float?                    @default(100000)
