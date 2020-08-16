@@ -7,8 +7,8 @@ const {
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { setAsync } = require("../redis/redis-client");
-const redisUpdateRankingList = require("./RedisUtil");
+
+const { redisUpdateRankingList } = require("./RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -94,16 +94,6 @@ const updateRankingList = () => {
           }
         });
 
-<<<<<<< HEAD
-=======
-        const key = index + 1;
-        const value = `${user.firstName}&${user.lastName}&${user.totalPortfolio}&${user.region}`;
-        const redisUpdateRankingList = setAsync(
-          `RANKING${key.toString()}`,
-          value
-        );
-
->>>>>>> af4295c79bb08dd73bc9b34a71d31b2973f8b1ca
         return Promise.all([
           updateRankingAndPortfolioLastClosure,
           redisUpdateRankingList(user, index + 1)
@@ -113,7 +103,7 @@ const updateRankingList = () => {
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
-      console.log("Update all users successfully.");
+      console.log("Update all users ranking successfully.");
     })
     .catch((err) => {
       console.log(err);
@@ -142,7 +132,7 @@ const updateAllUsers = () => {
       );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
-        const updateRankingAndPortfolioLastClosure = prisma.user.update({
+        const updatePortfolioLastClosure = prisma.user.update({
           where: {
             id: user.id
           },
@@ -154,15 +144,14 @@ const updateAllUsers = () => {
           user
         );
 
-        return Promise.all([
-          updateRankingAndPortfolioLastClosure,
-          accountSummaryPromise
-        ]);
+        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise]);
       });
       return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
-      console.log("Update all users successfully.");
+      console.log(
+        "Update all users portfolioLastClosure and accountSummaryChartTimestamp successfully."
+      );
     })
     .catch((err) => {
       console.log(err);
@@ -213,8 +202,11 @@ const checkAndUpdateAllUsers = (objVariables) => {
 
 module.exports = {
   deleteExpiredVerification,
+
   createAccountSummaryChartTimestampIfNecessary,
+
   updateAllUsers,
   checkAndUpdateAllUsers,
+
   updateRankingList
 };
