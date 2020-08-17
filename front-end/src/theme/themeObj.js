@@ -30,6 +30,10 @@ const theme = {
       main: "#619FD7",
     },
 
+    appBarButtonBackground: {
+      gradient: "linear-gradient(#66CCFF 20%, #6666FF 50%)",
+    },
+
     paperBackground: {
       main: "#1E1E1E",
       onPage: "rgba(46, 44, 48, 1)",

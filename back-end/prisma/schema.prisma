@@ -25,6 +25,7 @@ model User {
   region                    String?
   occupation                String?
   ranking                   Int?                      @default(0)
+  regionalRanking           Int?                      @default(0)
   cash                      Float?                    @default(100000)
   totalPortfolio            Float?                    @default(100000)
   totalPortfolioLastClosure Float?                    @default(100000)
@@ -50,7 +51,6 @@ model Share {
   companyCode String?
   quantity    Int?
   buyPriceAvg Float?
-  lastPrice   Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
   user        User     @relation(fields: [userID], references: [id])
@@ -63,13 +63,13 @@ model UserTransaction {
   updatedAt    DateTime  @default(now()) @updatedAt
   companyCode  String?
   quantity     Int?
-  instantPrice Float?
+  instantPrice Float? // price at the moment transactions are made
   limitPrice   Float?
   brokerage    Float?
   filled       Int?
-  status       String?
+  isFinished   Boolean?
   cancelDate   DateTime?
-  type         String?
+  isTypeBuy    Boolean?
   note         String?
   user         User      @relation(fields: [userID], references: [id])
   userID       String

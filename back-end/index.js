@@ -207,7 +207,7 @@ app.post("/auth/signup", (req, res, next) => {
     Promise.all([file, verificationToken])
       .then(([file, verificationToken]) => {
         const PASSPORT_CALLBACK_HOST = getPassportCallbackHost();
-        console.log(PASSPORT_CALLBACK_HOST);
+        // console.log(PASSPORT_CALLBACK_HOST);
 
         // file is a string of the html file, we replace substring {{ formAction }}
         // by the string 'something else'...

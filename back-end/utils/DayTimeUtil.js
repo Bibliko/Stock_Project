@@ -2,6 +2,11 @@ const { isEqual } = require("lodash");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const {
+  getCachedMarketHoliday,
+  updateCachedMarketHoliday
+} = require("./RedisUtil");
+
 const oneSecond = 1000; // 1000 ms = 1 second
 const oneMinute = 60 * oneSecond;
 const oneHour = 60 * oneMinute;
@@ -121,6 +126,7 @@ const newDate = () => {
 };
 
 /**
+ *  marketHolidayObj:
  *  {
  *      "year":2019,
  *      "New Years Day":"2019-01-01", -> New York Timezone Date
@@ -145,6 +151,7 @@ const findIfTimeNowIsHoliday = (marketHolidayObj) => {
 
   var checkResult = false;
 
+  // Check each key of marketHolidayObj
   Object.entries(marketHolidayObj).forEach(([key, value]) => {
     if (isEqual(key, "id") || isEqual(key, "year")) {
       return;
@@ -197,17 +204,29 @@ const isMarketClosedCheck = () => {
   var UTCYear = getYearUTCString(timeNow);
 
   return new Promise((resolve, reject) => {
-    prisma.marketHolidays
-      .findOne({
-        where: {
-          year: UTCYear
-        }
-      })
+    getCachedMarketHoliday()
       .then((marketHoliday) => {
-        // console.log(findIfTimeNowIsHoliday(marketHoliday));
+        if (!marketHoliday || !isEqual(marketHoliday.year, UTCYear)) {
+          const prismaPromise = prisma.marketHolidays.findOne({
+            where: {
+              year: UTCYear
+            }
+          });
+          return Promise.all([prismaPromise, null]);
+        }
+        return [null, marketHoliday];
+      })
+      .then(([prismaMarketHoliday, marketHoliday]) => {
+        var isTimeNowHoliday = false;
+        if (prismaMarketHoliday) {
+          updateCachedMarketHoliday(prismaMarketHoliday);
+          isTimeNowHoliday = findIfTimeNowIsHoliday(prismaMarketHoliday);
+        } else {
+          isTimeNowHoliday = findIfTimeNowIsHoliday(marketHoliday);
+        }
 
         if (
-          findIfTimeNowIsHoliday(marketHoliday) ||
+          isTimeNowHoliday ||
           findIfTimeNowIsOutOfRange(timeNow) ||
           findIfTimeNowIsWeekend(timeNow)
         ) {

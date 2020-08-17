@@ -5,7 +5,7 @@ const getFrontendHost = () => {
   const { NODE_ENV, FRONTEND_HOST } = process.env;
 
   if (NODE_ENV === "development") {
-    console.log(myIPAddress);
+    console.log(myIPAddress, "NetworkUtil.js 8");
     return `http://${myIPAddress}:3000`;
   } else {
     return FRONTEND_HOST;
