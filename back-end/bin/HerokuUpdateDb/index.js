@@ -21,8 +21,8 @@ const addSchema = () =>
       .child("schema.prisma")
       .put(file)
       .then(() => {
-        console.log("add schema to firebase successfully");
-        resolve("add schema to firebase successfully");
+        console.log("Successfully added schema to firebase");
+        resolve("Successfully added schema to firebase");
       })
       .catch((err) => {
         console.log(err);
@@ -60,8 +60,8 @@ const addMigrations = () =>
         return Promise.all(entryPromiseList);
       })
       .then(() => {
-        console.log("add migrations to firebase successfully");
-        resolve("add migrations to firebase successfully");
+        console.log("Successfully added migrations to firebase");
+        resolve("Successfully added migrations to firebase");
       })
       .catch((err) => {
         console.log(err);
@@ -98,8 +98,8 @@ const fsWriteFilePrismaMigrations = (contents, fileName, migrationName) =>
         contents
       )
         .then(() => {
-          console.log(`write ${fileName} successfully`);
-          resolve(`write ${fileName} successfully`);
+          console.log(`Successfully wrote ${fileName}`);
+          resolve(`Successfully wrote ${fileName}`);
         })
         .catch((err) => {
           console.log(err);
@@ -108,8 +108,8 @@ const fsWriteFilePrismaMigrations = (contents, fileName, migrationName) =>
     } else {
       fs.outputFile(`./prisma/migrations/${fileName}`, contents)
         .then(() => {
-          console.log(`write ${fileName} successfully`);
-          resolve(`write ${fileName} successfully`);
+          console.log(`Successfully wrote ${fileName}`);
+          resolve(`Successfully wrote ${fileName}`);
         })
         .catch((err) => {
           console.log(err);
@@ -170,8 +170,8 @@ const putFirebaseToLocal = () =>
 
             Promise.all([migrateLockPromise, Promise.all(prefixPromiseList)])
               .then(() => {
-                console.log("write all files successfully");
-                resolve("write all files successfully");
+                console.log("Successfully wrote all files");
+                resolve("Successfully wrote all files");
               })
               .catch((err) => {
                 // If there is migrateLock, there must be migrations.

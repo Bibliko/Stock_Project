@@ -55,8 +55,8 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
         }
       })
       .then(() => {
-        console.log("find and create timestamp done");
-        resolve("find and create timestamp done");
+        console.log("Finished finding and creating timestamp");
+        resolve("Finished finding and creating timestamp");
       })
       .catch((err) => {
         reject(err);
@@ -103,7 +103,7 @@ const updateRankingList = () => {
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
-      console.log("Update all users ranking successfully.");
+      console.log("Successfully updated all users ranking");
     })
     .catch((err) => {
       console.log(err);
@@ -150,7 +150,7 @@ const updateAllUsers = () => {
     })
     .then(() => {
       console.log(
-        "Update all users portfolioLastClosure and accountSummaryChartTimestamp successfully."
+        "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp"
       );
     })
     .catch((err) => {

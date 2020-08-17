@@ -92,7 +92,7 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
 
         objVariables.isPrismaMarketHolidaysInitialized = true;
 
-        resolve("prisma market holidays updated");
+        resolve("Successfully updated prisma market holidays");
       })
       .catch((err) => {
         reject(err);

@@ -32,7 +32,7 @@ router.put("/changeData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Change data of user fails.");
+      res.status(500).send("Failed to change user's data");
     });
 });
 
@@ -71,7 +71,7 @@ router.get("/getData", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get data of user fails.");
+      res.status(500).send("Failed to get user's data");
     });
 });
 
@@ -102,7 +102,7 @@ router.get("/getOverallRanking", (_, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get overall ranking fails.");
+      res.status(500).send("Failed to get overall ranking");
     });
 });
 
@@ -139,7 +139,7 @@ router.get("/getRegionalRanking", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get overall ranking fails.");
+      res.status(500).send("Failed to get regional ranking");
     });
 });
 
