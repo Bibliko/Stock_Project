@@ -15,7 +15,9 @@ export const getUser = () => {
     axios
       .get(`${BACKEND_HOST}/user`, { withCredentials: true })
       .then((user) => {
-        user.data.dateOfBirth = new Date(user.data.dateOfBirth);
+        if (!isEmpty(user.data)) {
+          user.data.dateOfBirth = new Date(user.data.dateOfBirth);
+        }
         resolve(user);
       })
       .catch((e) => {
@@ -188,7 +190,9 @@ export const getUserData = (dataNeeded, email) => {
       withCredentials: true,
     })
       .then((userData) => {
-        userData.data.dateOfBirth = new Date(userData.data.dateOfBirth);
+        if (!isEmpty(userData.data)) {
+          userData.data.dateOfBirth = new Date(userData.data.dateOfBirth);
+        }
         resolve(userData.data);
       })
       .catch((err) => {

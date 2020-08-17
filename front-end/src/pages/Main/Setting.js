@@ -78,15 +78,11 @@ class AccountSetting extends React.Component {
   }
 
   compareChanges() {
-    return !!Object.keys(this.changes).filter(
-      (key) => {
-        return (
-          typeof(this.changes[key]) === "object" ?
-          !isEqual(this.changes[key], this.props.userSession[key]) :
-          this.changes[key] != this.props.userSession[key]
-        );
-      }
-    ).length;
+    return !!Object.keys(this.changes).filter((key) => {
+      return typeof this.changes[key] === "object"
+        ? !isEqual(this.changes[key], this.props.userSession[key])
+        : this.changes[key] !== this.props.userSession[key];
+    }).length;
   }
 
   recordChanges = (newChanges = {}) => {
@@ -95,14 +91,14 @@ class AccountSetting extends React.Component {
       this.basicSectionRef.current.hasError ||
       this.sensitiveSectionRef.current.hasError;
     this.updateReminder();
-  }
+  };
 
   updateReminder = () => {
     if (this.hasChanges !== this.compareChanges()) {
       this.reminderRef.current.toggleReminder();
       this.hasChanges = this.compareChanges();
     }
-  }
+  };
 
   reset = () => {
     this.changes = pick(this.props.userSession, [
@@ -121,13 +117,27 @@ class AccountSetting extends React.Component {
     this.sensitiveSectionRef.current.reset();
     this.basicSectionRef.current.reset();
     this.selectSectionRef.current.reset();
-  }
+  };
 
   submit = () => {
     if (!this.error) {
-      const { firstName, lastName, dateOfBirth, gender, region, occupation } = this.changes;
+      const {
+        firstName,
+        lastName,
+        dateOfBirth,
+        gender,
+        region,
+        occupation,
+      } = this.changes;
       let hasFinishedSettingUpAccount = false;
-      if (firstName && lastName && dateOfBirth && gender && region && occupation) {
+      if (
+        firstName &&
+        lastName &&
+        dateOfBirth &&
+        gender &&
+        region &&
+        occupation
+      ) {
         hasFinishedSettingUpAccount = true;
       }
       this.changes.hasFinishedSettingUp = hasFinishedSettingUpAccount;
@@ -148,7 +158,7 @@ class AccountSetting extends React.Component {
     } else {
       this.errorDialogRef.current.toggleDialog();
     }
-  }
+  };
 
   shouldComponentUpdate(nextProps, nextState) {
     const keysCompare = [

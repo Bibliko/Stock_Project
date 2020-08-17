@@ -8,57 +8,57 @@ import IconButton from "@material-ui/core/IconButton";
 
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 
-const styles = theme => ({
+const styles = (theme) => ({
   textField: {
-    width: '100%',
-    marginTop: '5px',
-    fontWeight: 'normal',
-    '& label.Mui-focused': {
-      color: 'black'
+    width: "100%",
+    marginTop: "5px",
+    fontWeight: "normal",
+    "& label.Mui-focused": {
+      color: "black",
     },
-    '& .MuiFilledInput-underline:after': {
-      borderBottom: '2px solid #000000'
+    "& .MuiFilledInput-underline:after": {
+      borderBottom: "2px solid #000000",
     },
-    '& .MuiFilledInput-root': {
-      '&.Mui-focused': {
-        backgroundColor: 'rgba(225,225,225,0.5)'
-      }
+    "& .MuiFilledInput-root": {
+      "&.Mui-focused": {
+        backgroundColor: "rgba(225,225,225,0.5)",
+      },
     },
   },
   input: {
-    color: 'black',
-    backgroundColor: 'rgba(225,225,225,0.6)',
-    '&:hover': {
-      backgroundColor: 'rgba(225,225,225,0.8)'
+    color: "black",
+    backgroundColor: "rgba(225,225,225,0.6)",
+    "&:hover": {
+      backgroundColor: "rgba(225,225,225,0.8)",
     },
-    '& input': {
-      backgroundColor: 'rgba(225,225,225,0)'
+    "& input": {
+      backgroundColor: "rgba(225,225,225,0)",
     },
-    fontSize: '18px',
-    height: '45px',
-    [theme.breakpoints.down('xs')]: {
-      fontSize: 'small',
-      height: '35px'
+    fontSize: "18px",
+    height: "45px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+      height: "35px",
     },
   },
 });
 
 class DatePickerTextField extends React.Component {
   state = {
-    onHover: false
+    onHover: false,
   };
 
   onMouseOver = () => {
     this.setState({
-        onHover: true
+      onHover: true,
     });
-  }
+  };
 
   onMouseOut = () => {
     this.setState({
-        onHover: false
+      onHover: false,
     });
-  }
+  };
   render() {
     const {
       classes,
@@ -77,35 +77,31 @@ class DatePickerTextField extends React.Component {
 
     return (
       <div>
-      <TextField
-        onMouseOver={this.onMouseOver}
-        onMouseOut={this.onMouseOut}
-        onClick={onClick}
-        id={id}
-        ref={inputRef}
-        error={error}
-        helperText={helperText}
-        value={value}
-        disabled={disabled}
-        variant="outlined"
-        className={classes.textField}
-        InputProps={{
-          className: classes.input,
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                disabled
-                edge="start"
-              >
-                {onHover && <EditRoundedIcon style={{margin:'-12px'}}/>}
-              </IconButton>
-            </InputAdornment>
-          ),
-          ...InputProps
-        }}
-        {...inputProps}
-      />
-      
+        <TextField
+          onMouseOver={this.onMouseOver}
+          onMouseOut={this.onMouseOut}
+          onClick={onClick}
+          id={id}
+          ref={inputRef}
+          error={error}
+          helperText={helperText}
+          value={value}
+          disabled={disabled}
+          variant="outlined"
+          className={classes.textField}
+          InputProps={{
+            className: classes.input,
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton disabled edge="start">
+                  {onHover && <EditRoundedIcon style={{ margin: "-12px" }} />}
+                </IconButton>
+              </InputAdornment>
+            ),
+            ...InputProps,
+          }}
+          {...inputProps}
+        />
       </div>
     );
   }
