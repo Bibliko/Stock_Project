@@ -6,7 +6,7 @@ import SelectBox from "../SelectBox/SelectBox";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import Grid from '@material-ui/core/Grid';
+import Grid from "@material-ui/core/Grid";
 
 const styles = (theme) => ({
   gridContainer: {
@@ -65,7 +65,7 @@ class SelectSection extends React.Component {
     this.props.recordChanges(
       this.createChangeLog(event.target.value, this.state.input.occupation)
     );
-  }
+  };
 
   recordOccupation = (event) => {
     const input = { ...this.state.input, occupation: event.target.value };
@@ -75,7 +75,7 @@ class SelectSection extends React.Component {
     this.props.recordChanges(
       this.createChangeLog(this.state.input.region, event.target.value)
     );
-  }
+  };
 
   render() {
     const { classes } = this.props;
@@ -103,7 +103,7 @@ class SelectSection extends React.Component {
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SelectBox
               name="Region"
-              value={input.region}
+              value={input.region ? input.region : ""}
               items={regions}
               onChange={this.recordRegion}
             />
@@ -111,7 +111,7 @@ class SelectSection extends React.Component {
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SelectBox
               name="Occupation"
-              value={input.occupation}
+              value={input.occupation ? input.occupation : ""}
               items={occupations}
               onChange={this.recordOccupation}
             />
