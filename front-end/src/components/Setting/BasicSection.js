@@ -59,7 +59,7 @@ class BasicSection extends React.Component {
       input: {
         firstName: this.props.firstName || "",
         lastName: this.props.lastName || "",
-        dateOfBirth: this.props.dateOfBirth || new Date("1 1 1970"),
+        dateOfBirth: this.props.dateOfBirth, //|| new Date("1 1 1970"),
         gender: this.props.gender || "",
       },
     };
@@ -74,7 +74,7 @@ class BasicSection extends React.Component {
       input: {
         firstName: this.props.firstName || "",
         lastName: this.props.lastName || "",
-        dateOfBirth: this.props.dateOfBirth || new Date("1 1 1970"),
+        dateOfBirth: this.props.dateOfBirth, //|| new Date("1 1 1970"),
         gender: this.props.gender || "",
       },
     });
@@ -152,13 +152,15 @@ class BasicSection extends React.Component {
 
   handleDateError = (error) => {
     this.isInvalidDate = !!error;
-    this.checkForError(this.state.input.firstName,this.state.input.lastName);
+    this.checkForError(this.state.input.firstName, this.state.input.lastName);
   };
 
   render() {
     const { input } = this.state;
     const { classes } = this.props;
     const genders = ["Female", "Male", "Other", "Prefer not to say"];
+
+    console.log(input.dateOfBirth);
 
     return (
       <div className={classes.fullWidth}>

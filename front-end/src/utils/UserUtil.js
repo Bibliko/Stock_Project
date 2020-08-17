@@ -15,7 +15,7 @@ export const getUser = () => {
     axios
       .get(`${BACKEND_HOST}/user`, { withCredentials: true })
       .then((user) => {
-        if (!isEmpty(user.data)) {
+        if (user.data.dateOfBirth) {
           user.data.dateOfBirth = new Date(user.data.dateOfBirth);
         }
         resolve(user);
@@ -160,7 +160,9 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
       withCredentials: true,
     })
       .then((userDataRes) => {
-        userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
+        if (userDataRes.data.dateOfBirth) {
+          userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
+        }
         mutateUser(userDataRes.data);
         resolve("Successfully changed data");
       })
@@ -190,7 +192,7 @@ export const getUserData = (dataNeeded, email) => {
       withCredentials: true,
     })
       .then((userData) => {
-        if (!isEmpty(userData.data)) {
+        if (userData.data.dateOfBirth) {
           userData.data.dateOfBirth = new Date(userData.data.dateOfBirth);
         }
         resolve(userData.data);
