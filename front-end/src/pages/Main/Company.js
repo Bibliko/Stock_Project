@@ -67,7 +67,7 @@ const styles = (theme) => ({
   },
 });
 
-class Companies extends React.Component {
+class Company extends React.Component {
   componentDidMount() {
     console.log(this.props.userSession);
   }
@@ -85,7 +85,7 @@ class Companies extends React.Component {
         >
           <Grid item xs={12} className={classes.itemGrid}>
             <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Companies
+              Company
             </Typography>
           </Grid>
           <Grid item xs={12} className={classes.itemGrid}>
@@ -126,4 +126,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Companies)));
+)(withStyles(styles)(withRouter(Company)));

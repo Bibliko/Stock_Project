@@ -17,21 +17,14 @@ import Succeed from "./pages/Login/Verification/Succeed";
 import Fail from "./pages/Login/Verification/Fail";
 import LandingPage from "./pages/Main/LandingPage";
 import AccountSummary from "./pages/Main/AccountSummary";
-<<<<<<< HEAD
-import Ranking from "./pages/Main/Ranking";
-import Companies from "./pages/Main/Companies";
-import Layout from "./components/Layout/Layout";
-import { createTheme } from "./theme/ThemeUtil";
-
-=======
 import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
 import Setting from "./pages/Main/Setting";
+import Company from "./pages/Main/Company";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
 
->>>>>>> master
 import { ThemeProvider } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
@@ -68,11 +61,7 @@ class App extends React.Component {
       .then((user) => {
         this.reduxStoreInitialState = {
           userSession: user.data,
-<<<<<<< HEAD
-          isMarketClosed: false,
-=======
           isMarketClosed: true,
->>>>>>> master
         };
 
         this.setState({
@@ -132,7 +121,7 @@ class App extends React.Component {
             <Switch>
               <Layout toggleTheme={this.toggleTheme}>
                 <Route exact path="/" component={LandingPage} />
-                <Route path="/companies" component={Companies} />
+                <Route path="/company/:companyCode" component={Company} />
                 <Route path="/accountSummary" component={AccountSummary} />
                 <Route path="/watchlist" component={Watchlist} />
                 <Route path="/setting" component={Setting} />
