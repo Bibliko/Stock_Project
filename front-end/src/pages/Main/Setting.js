@@ -179,8 +179,6 @@ class AccountSetting extends React.Component {
   render() {
     const { classes, userSession } = this.props;
 
-    console.log(userSession.dateOfBirth);
-
     return (
       <Container className={classes.root} disableGutters>
         <AvatarSection userId={userSession.id} />

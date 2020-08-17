@@ -160,8 +160,6 @@ class BasicSection extends React.Component {
     const { classes } = this.props;
     const genders = ["Female", "Male", "Other", "Prefer not to say"];
 
-    console.log(input.dateOfBirth);
-
     return (
       <div className={classes.fullWidth}>
         <Grid
