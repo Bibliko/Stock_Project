@@ -23,6 +23,10 @@ model User {
   region                    String?
   occupation                String?
   ranking                   Int?                      @default(0)
+<<<<<<< HEAD
+=======
+  regionalRanking           Int?                      @default(0)
+>>>>>>> master
   cash                      Float?                    @default(100000)
   totalPortfolio            Float?                    @default(100000)
   totalPortfolioLastClosure Float?                    @default(100000)
@@ -48,7 +52,10 @@ model Share {
   companyCode String?
   quantity    Int?
   buyPriceAvg Float?
+<<<<<<< HEAD
   lastPrice   Float?
+=======
+>>>>>>> master
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
   user        User     @relation(fields: [userID], references: [id])
@@ -61,6 +68,7 @@ model UserTransaction {
   updatedAt    DateTime  @default(now()) @updatedAt
   companyCode  String?
   quantity     Int?
+<<<<<<< HEAD
   instantPrice Float?
   limitPrice   Float?
   brokerage    Float?
@@ -68,6 +76,15 @@ model UserTransaction {
   status       String?
   cancelDate   DateTime?
   type         String?
+=======
+  instantPrice Float? // price at the moment transactions are made
+  limitPrice   Float?
+  brokerage    Float?
+  filled       Int?
+  isFinished   Boolean?
+  cancelDate   DateTime?
+  isTypeBuy    Boolean?
+>>>>>>> master
   note         String?
   user         User      @relation(fields: [userID], references: [id])
   userID       String

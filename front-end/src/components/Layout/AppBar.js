@@ -1,5 +1,9 @@
 import React, { createRef } from "react";
+<<<<<<< HEAD
 import { isEmpty } from "lodash";
+=======
+import { isEmpty, isEqual, pick } from "lodash";
+>>>>>>> master
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -7,6 +11,7 @@ import { userAction } from "../../redux/storeActions/actions";
 import { redirectToPage } from "../../utils/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
 
+<<<<<<< HEAD
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -23,6 +28,28 @@ import MenuList from "@material-ui/core/MenuList";
 
 import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
 
+=======
+import SearchFieldLayout from "../Search/SearchFieldLayout";
+
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import { withStyles } from "@material-ui/core/styles";
+import Avatar from "@material-ui/core/Avatar";
+import Grid from "@material-ui/core/Grid";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import Grow from "@material-ui/core/Grow";
+import Paper from "@material-ui/core/Paper";
+import Popper from "@material-ui/core/Popper";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+
+import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
+import VideogameAssetRoundedIcon from "@material-ui/icons/VideogameAssetRounded";
+import MenuBookRoundedIcon from "@material-ui/icons/MenuBookRounded";
+import InfoRoundedIcon from "@material-ui/icons/InfoRounded";
+
+>>>>>>> master
 const styles = (theme) => ({
   appBar: {
     transition: theme.transitions.create(["margin", "width"], {
@@ -30,6 +57,7 @@ const styles = (theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     backgroundColor: theme.palette.appBarBlue.main,
+<<<<<<< HEAD
     height: "60px",
   },
   menuButton: {
@@ -81,6 +109,95 @@ const styles = (theme) => ({
   },
   endMenuItem: {
     marginBottom: "5px",
+=======
+    height: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      height: theme.customHeight.appBarHeightSmall,
+    },
+  },
+  menuButton: {
+    height: "fit-content",
+    width: "fit-content",
+    padding: 0,
+    margin: "8px",
+    marginRight: "16px",
+    "& .MuiIconButton-colorPrimary": {
+      color: "white",
+    },
+  },
+  secondaryMenuButton: {
+    height: "fit-content",
+    width: "fit-content",
+    padding: 0,
+    margin: "8px",
+    "& .MuiIconButton-colorPrimary": {
+      color: "white",
+    },
+  },
+  normalIcon: {
+    height: "35px",
+    width: "35px",
+    [theme.breakpoints.down("xs")]: {
+      height: "25px",
+      width: "25px",
+    },
+    color: "white",
+    "&:hover": {
+      background: theme.palette.appBarButtonBackground.gradient,
+      borderRadius: "50%",
+    },
+  },
+  avatarIcon: {
+    height: "35px",
+    width: "35px",
+    [theme.breakpoints.down("xs")]: {
+      height: "25px",
+      width: "25px",
+    },
+    color: "white",
+    "&:hover": {
+      background: "rgba(255, 255, 255, 0.8)",
+      borderRadius: "50%",
+    },
+  },
+  toolbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: theme.customHeight.appBarHeight,
+    minHeight: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      height: theme.customHeight.appBarHeightSmall,
+      minHeight: theme.customHeight.appBarHeightSmall,
+    },
+    padding: 0,
+  },
+  leftNavbarGrid: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexGrow: 1,
+  },
+  rightNavbarGrid: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  menuPaper: {
+    backgroundColor: theme.palette.menuBackground.main,
+    color: "white",
+    minWidth: "160px",
+  },
+  endMenuItem: {
+    marginBottom: "5px",
+  },
+  accountMenuItem: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "0.875rem",
+      minHeight: "40px",
+    },
+>>>>>>> master
   },
 });
 
@@ -90,6 +207,7 @@ class PersistentAppBar extends React.Component {
     this.accountAnchorRef = createRef(null);
     this.gameAnchorRef = createRef(null);
   }
+<<<<<<< HEAD
 
   state = {
     openAccountMenu: false,
@@ -111,6 +229,29 @@ class PersistentAppBar extends React.Component {
     });
   };
 
+=======
+
+  state = {
+    openAccountMenu: false,
+    openGameMenu: false,
+  };
+
+  prevOpenAccountMenu = false;
+  prevOpenGameMenu = false;
+
+  toggleAccountMenu = () => {
+    this.setState({
+      openAccountMenu: true,
+    });
+  };
+
+  toggleGameMenu = () => {
+    this.setState({
+      openGameMenu: true,
+    });
+  };
+
+>>>>>>> master
   handleClose = (event) => {
     this.setState({
       openAccountMenu: false,
@@ -138,6 +279,13 @@ class PersistentAppBar extends React.Component {
       });
   };
 
+<<<<<<< HEAD
+=======
+  disableIfHasNotFinishedSettingUpAccount = () => {
+    return !this.props.userSession.hasFinishedSettingUp;
+  };
+
+>>>>>>> master
   reFocusWhenTransitionMenu = () => {
     if (this.prevOpenAccountMenu && !this.state.openAccountMenu) {
       this.accountAnchorRef.current.focus();
@@ -152,13 +300,34 @@ class PersistentAppBar extends React.Component {
   };
 
   componentDidMount() {
+<<<<<<< HEAD
+=======
+    // console.log("mountAppBar");
+>>>>>>> master
     this.reFocusWhenTransitionMenu();
   }
 
   componentDidUpdate() {
+<<<<<<< HEAD
     this.reFocusWhenTransitionMenu();
   }
 
+=======
+    // console.log("updateAppBar");
+    this.reFocusWhenTransitionMenu();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["avatarUrl", "hasFinishedSettingUp"];
+    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
+    const propsCompare = pick(this.props.userSession, compareKeys);
+    return (
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
+    );
+  }
+
+>>>>>>> master
   render() {
     const { classes, userSession } = this.props;
 
@@ -167,6 +336,7 @@ class PersistentAppBar extends React.Component {
     return (
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
+<<<<<<< HEAD
           <img
             src="/bibliko.png"
             alt="Bibliko"
@@ -178,10 +348,20 @@ class PersistentAppBar extends React.Component {
           <Grid className={classes.leftNavbarGrid}>
             <Button
               className={classes.navbarButton}
+=======
+          <Grid className={classes.leftNavbarGrid}>
+            <SearchFieldLayout />
+          </Grid>
+          <Grid className={classes.rightNavbarGrid}>
+            <IconButton
+              title="Game"
+              className={classes.secondaryMenuButton}
+>>>>>>> master
               ref={this.gameAnchorRef}
               aria-controls={openGameMenu ? "menu-list-grow" : undefined}
               aria-haspopup="true"
               onClick={this.toggleGameMenu}
+<<<<<<< HEAD
             >
               Game
             </Button>
@@ -192,6 +372,19 @@ class PersistentAppBar extends React.Component {
               transition
               disablePortal
             >
+=======
+              disableRipple
+            >
+              <VideogameAssetRoundedIcon className={classes.normalIcon} />
+            </IconButton>
+            <Popper
+              open={openGameMenu}
+              anchorEl={this.gameAnchorRef.current}
+              role={undefined}
+              transition
+              disablePortal
+            >
+>>>>>>> master
               {({ TransitionProps, placement }) => (
                 <Grow
                   {...TransitionProps}
@@ -207,6 +400,7 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
+<<<<<<< HEAD
                         <MenuItem dense disabled>
                           Transactions
                         </MenuItem>
@@ -233,12 +427,51 @@ class PersistentAppBar extends React.Component {
                         <MenuItem dense disabled>
                           Explore
                         </MenuItem>
+=======
+                        <MenuItem disabled>Transactions</MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                        >
+                          Buy Stocks
+                        </MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                        >
+                          Trading History
+                        </MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          className={classes.endMenuItem}
+                        >
+                          Pending Orders
+                        </MenuItem>
+
+                        <MenuItem disabled>List</MenuItem>
+                        <MenuItem
+                          dense
+                          onClick={() => {
+                            redirectToPage("/watchlist", this.props);
+                          }}
+                        >
+                          Watchlist
+                        </MenuItem>
+                        <MenuItem dense>Companies</MenuItem>
+
+                        <MenuItem disabled>Explore</MenuItem>
+>>>>>>> master
                         <MenuItem dense>Charts</MenuItem>
                         <MenuItem
                           dense
                           onClick={() => {
                             redirectToPage("/ranking", this.props);
                           }}
+<<<<<<< HEAD
+=======
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+>>>>>>> master
                         >
                           Ranking
                         </MenuItem>
@@ -248,12 +481,30 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
+<<<<<<< HEAD
             <Button className={classes.navbarButton}>Education</Button>
             <Button className={classes.navbarButton}>About Us</Button>
             <IconButton
               color="inherit"
               component="span"
               edge="end"
+=======
+            <IconButton
+              title="Education"
+              className={classes.secondaryMenuButton}
+              disableRipple
+            >
+              <MenuBookRoundedIcon className={classes.normalIcon} />
+            </IconButton>
+            <IconButton
+              title="About Us"
+              className={classes.secondaryMenuButton}
+              disableRipple
+            >
+              <InfoRoundedIcon className={classes.normalIcon} />
+            </IconButton>
+            <IconButton
+>>>>>>> master
               className={classes.menuButton}
               ref={this.accountAnchorRef}
               aria-label="Account Menu"
@@ -293,6 +544,7 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
+<<<<<<< HEAD
                         <MenuItem>Account Settings</MenuItem>
                         <MenuItem
                           onClick={() => {
@@ -302,6 +554,31 @@ class PersistentAppBar extends React.Component {
                           Portfolio
                         </MenuItem>
                         <MenuItem onClick={this.logout}>Log Out</MenuItem>
+=======
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={() => {
+                            redirectToPage("/setting", this.props);
+                          }}
+                        >
+                          Account Settings
+                        </MenuItem>
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={() => {
+                            redirectToPage("/accountSummary", this.props);
+                          }}
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                        >
+                          Portfolio
+                        </MenuItem>
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={this.logout}
+                        >
+                          Log Out
+                        </MenuItem>
+>>>>>>> master
                       </MenuList>
                     </ClickAwayListener>
                   </Paper>

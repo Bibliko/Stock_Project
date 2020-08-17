@@ -207,7 +207,7 @@ app.post("/auth/signup", (req, res, next) => {
     Promise.all([file, verificationToken])
       .then(([file, verificationToken]) => {
         const PASSPORT_CALLBACK_HOST = getPassportCallbackHost();
-        console.log(PASSPORT_CALLBACK_HOST);
+        // console.log(PASSPORT_CALLBACK_HOST);
 
         // file is a string of the html file, we replace substring {{ formAction }}
         // by the string 'something else'...
@@ -265,12 +265,14 @@ app.use("/user", (req, res) => {
 
 app.get("/logout", (req, res) => {
   keysAsync(`${req.user.email}*`)
-    .then((value) => {
-      console.log(value);
-      return delAsync(value);
+    .then((values) => {
+      console.log(values);
+      return delAsync(values);
     })
     .then((numberOfKeysDeleted) => {
-      console.log(numberOfKeysDeleted);
+      console.log(
+        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys`
+      );
       req.logout();
       res.send("Successful");
     })

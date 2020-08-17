@@ -13,25 +13,69 @@ const redisClient = require("./redis-client");
 //     return res.json(JSON.parse(rawData));
 // });
 
-const test = () => {
-  Promise.all([
-    redisClient.setAsync("testKey", "testValue"),
-    redisClient.setAsync("testKey1", "testValue1"),
-    redisClient.setAsync("troll", "testValue")
-  ])
-    .then((value) => {
-      return redisClient.keysAsync("test*");
-    })
-    .then((value) => {
-      console.log(value);
-      return redisClient.delAsync(value);
-    })
-    .then((value) => {
-      console.log(value); // null
+// const test = () => {
+//   Promise.all([
+//     redisClient.setAsync("testKey", "testValue"),
+//     redisClient.setAsync("testKey1", "testValue1"),
+//     redisClient.setAsync("troll", "testValue")
+//   ])
+//     .then((value) => {
+//       return redisClient.keysAsync("test*");
+//     })
+//     .then((value) => {
+//       console.log(value);
+//       return redisClient.delAsync(value);
+//     })
+//     .then((value) => {
+//       console.log(value); // null
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+// const test2 = () => {
+//   redisClient
+//     .getAsync("TestKeyWithoutPriorSetup") // -> return null if no key found
+//     .then((value) => {
+//       console.log(value);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+// const test3 = () => {
+//   redisClient
+//     .keysAsync("test*") // -> return [] if no key found
+//     .then((values) => {
+//       console.log(values);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+// const test4 = () => {
+//   redisClient
+//     .delAsync("cachedShares|AAPL") // -> return [] if no key found
+//     .then((values) => {
+//       console.log(values);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+const testList = () => {
+  redisClient
+    .listRangeAsync("asdf", 0, -1)
+    .then((list) => {
+      console.log(list);
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-test();
+testList();

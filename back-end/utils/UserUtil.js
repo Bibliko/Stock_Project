@@ -67,16 +67,23 @@ const updateAllUsers = () => {
 
   prisma.user
     .findMany({
+      where: {
+        hasFinishedSettingUp: true
+      },
       select: {
         id: true,
         totalPortfolio: true
       },
-      orderBy: {
-        totalPortfolio: "desc"
-      }
+      orderBy: [
+        {
+          totalPortfolio: "desc"
+        }
+      ]
     })
     .then((usersArray) => {
-      // console.log(usersArray);
+      console.log(
+        `Updated ${usersArray.length} user(s): ranking and portfolioLastClosure`
+      );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
         const updateRankingAndPortfolioLastClosure = prisma.user.update({
@@ -114,7 +121,6 @@ const checkAndUpdateAllUsers = (objVariables) => {
   // console.log(objVariables);
 
   if (!objVariables.isPrismaMarketHolidaysInitialized) {
-    console.log("UserUtil, 68");
     return;
   }
 
@@ -122,7 +128,6 @@ const checkAndUpdateAllUsers = (objVariables) => {
     .then((checkResult) => {
       // check if market is closed and update the status of objVariables
       if (!isEqual(checkResult, objVariables.isMarketClosed)) {
-        console.log(checkResult, "UserUtil, 76");
         objVariables.isMarketClosed = checkResult;
       }
 
