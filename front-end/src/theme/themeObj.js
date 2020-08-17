@@ -76,6 +76,118 @@ const theme = {
 
     type: "light",
   },
+
+  // Mui Pickers
+  overrides: {
+    MuiPickersToolbar: {
+      root: {
+        backgroundColor: "#180B66",
+        color: "white",
+      },
+    },
+    MuiPickersCalendarHeader: {
+      root: {
+        backgroundColor: "#2196f3",
+        marginTop: '0px',
+        marginBottom: '0px',
+        minHeight: '50px',
+        maxHeight: '50px',
+        color: "white",
+      },
+    },
+    MuiPickersCalendar: {
+      daysHeader: {
+        backgroundColor: "#303030",
+        '& span': {
+          color: 'white',
+        },
+      },
+      root: {
+        backgroundColor: "#303030",
+      },
+    },
+    // MuiPickersArrowSwitcher:{
+    //   root:{
+    //     backgroundColor: "#180B66",
+    //     color: "white",
+    //   },
+    // },
+    MuiPickersYear: {
+      yearButton:{
+        "&:hover": {
+          backgroundColor: "#2196f3",
+        },
+        "&$selected": {
+          backgroundColor: "#2196f3",
+        },
+        "&$disabled": {
+          color: 'rgba(255,255,255,0.2)',
+          backgroundColor: 'rgba(255,255,255,0.02)',
+        },
+      },
+    },
+    MuiPickersMonth: {
+      root: {
+        "&:hover": {
+          backgroundColor: "#2196f3",
+          color: "white",
+        },
+      },
+    },
+    MuiPickersDay: {
+      root: {
+        color: 'white',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        "&:hover": {
+          backgroundColor: "#2196f3"
+        },
+        "&$selected": {
+          backgroundColor: "#2196f3"
+        },
+        "&$disabled": {
+          backgroundColor: 'rgba(255,255,255,0.02)'
+        },
+        "&$today": {
+          backgroundColor: "red",
+        },
+      },
+    },
+    MuiPickersYearSelection: {
+      root: {
+        backgroundColor: "#303030",
+        margin: "none",
+        color: "white",
+      },
+    },
+    MuiPickersMonthSelection: {
+      root: {
+        backgroundColor: "#303030",
+        margin: "none",
+        color: "white",
+      },
+    },
+    MuiPickersBasePicker: {
+      pickerViewLandscape: {
+        padding: "none",
+        backgroundColor: "#303030",
+      },
+      pickerView: {
+        backgroundColor: "#303030",
+      },
+    },
+    MuiPickersModalDialog: {
+      dialogAction: {
+        backgroundColor: "#180B66",
+        "& button": {
+          color: "#2196f3",
+          "&:hover": {
+            backgroundColor: "rgba(0,0,0,0.25)"
+          },
+        },
+      },
+    },
+  },
+  // Mui Pickers
 };
 
 export default theme;

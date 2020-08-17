@@ -12,7 +12,7 @@ import { changeUserData } from "../../utils/UserUtil";
 
 import StickyReminder from "../../components/Reminder/StickyReminder";
 import SensitiveSection from "../../components/Setting/SensitiveSection";
-import NameSection from "../../components/Setting/NameSection";
+import BasicSection from "../../components/Setting/BasicSection";
 import SelectSection from "../../components/Setting/SelectSection";
 import TextDialog from "../../components/Dialog/TextDialog";
 import AvatarSection from "../../components/Setting/AvatarSection";
@@ -60,52 +60,54 @@ class AccountSetting extends React.Component {
     this.hasChanges = false;
 
     this.changes = pick(this.props.userSession, [
+      "email",
       "password",
       "firstName",
       "lastName",
-      "avatarUrl",
+      "dateOfBirth",
+      "gender",
       "region",
       "occupation",
     ]);
 
-    this.recordChanges = this.recordChanges.bind(this);
-    this.updateReminder = this.updateReminder.bind(this);
-    this.reset = this.reset.bind(this);
-    this.submit = this.submit.bind(this);
-
     this.reminderRef = React.createRef();
-    this.nameSectionRef = React.createRef();
+    this.basicSectionRef = React.createRef();
     this.sensitiveSectionRef = React.createRef();
     this.selectSectionRef = React.createRef();
     this.errorDialogRef = React.createRef();
   }
 
   compareChanges() {
-    return !!Object.keys(this.changes).filter(
-      (key) => this.changes[key] !== this.props.userSession[key]
-    ).length;
+    return !!Object.keys(this.changes).filter((key) => {
+      return typeof this.changes[key] === "object"
+        ? !isEqual(this.changes[key], this.props.userSession[key])
+        : this.changes[key] !== this.props.userSession[key];
+    }).length;
   }
 
-  recordChanges(newChanges = {}) {
+  recordChanges = (newChanges = {}) => {
     extend(this.changes, newChanges);
     this.error =
-      this.nameSectionRef.current.hasError ||
+      this.basicSectionRef.current.hasError ||
       this.sensitiveSectionRef.current.hasError;
     this.updateReminder();
-  }
+  };
 
-  updateReminder() {
+  updateReminder = () => {
     if (this.hasChanges !== this.compareChanges()) {
       this.reminderRef.current.toggleReminder();
       this.hasChanges = this.compareChanges();
     }
-  }
+  };
 
-  reset() {
+  reset = () => {
     this.changes = pick(this.props.userSession, [
+      "email",
       "password",
       "firstName",
       "lastName",
+      "dateOfBirth",
+      "gender",
       "region",
       "occupation",
     ]);
@@ -113,15 +115,29 @@ class AccountSetting extends React.Component {
     this.updateReminder();
 
     this.sensitiveSectionRef.current.reset();
-    this.nameSectionRef.current.reset();
+    this.basicSectionRef.current.reset();
     this.selectSectionRef.current.reset();
-  }
+  };
 
-  submit() {
+  submit = () => {
     if (!this.error) {
-      const { firstName, lastName, region, occupation } = this.changes;
+      const {
+        firstName,
+        lastName,
+        dateOfBirth,
+        gender,
+        region,
+        occupation,
+      } = this.changes;
       let hasFinishedSettingUpAccount = false;
-      if (firstName && lastName && region && occupation) {
+      if (
+        firstName &&
+        lastName &&
+        dateOfBirth &&
+        gender &&
+        region &&
+        occupation
+      ) {
         hasFinishedSettingUpAccount = true;
       }
       this.changes.hasFinishedSettingUp = hasFinishedSettingUpAccount;
@@ -142,13 +158,15 @@ class AccountSetting extends React.Component {
     } else {
       this.errorDialogRef.current.toggleDialog();
     }
-  }
+  };
 
   shouldComponentUpdate(nextProps, nextState) {
     const keysCompare = [
       "email",
       "firstName",
       "lastName",
+      "dateOfBirth",
+      "gender",
       "password",
       "region",
       "occupation",
@@ -165,11 +183,13 @@ class AccountSetting extends React.Component {
       <Container className={classes.root} disableGutters>
         <AvatarSection userId={userSession.id} />
 
-        <NameSection
-          id="name-section"
-          ref={this.nameSectionRef}
+        <BasicSection
+          id="basic-section"
+          ref={this.basicSectionRef}
           firstName={userSession.firstName}
           lastName={userSession.lastName}
+          dateOfBirth={userSession.dateOfBirth}
+          gender={userSession.gender}
           recordChanges={this.recordChanges}
         />
 

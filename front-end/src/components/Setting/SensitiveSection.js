@@ -110,13 +110,9 @@ class SensitiveSection extends React.Component {
     };
     this.newPassword = this.props.oldPassword;
     this.hasError = false;
-    this.checkOldPassword = this.checkOldPassword.bind(this);
-    this.recordNewPassword = this.recordNewPassword.bind(this);
-    this.recordConfirmedPassword = this.recordConfirmedPassword.bind(this);
-    this.toggle = this.toggle.bind(this);
   }
 
-  toggle() {
+  toggle = () => {
     this.setState({
       show: !this.state.show,
     });
@@ -145,10 +141,10 @@ class SensitiveSection extends React.Component {
     return { password: this.newPassword };
   }
 
-  checkOldPassword(e) {
-    const input = { ...this.state.input, oldPassword: e.target.value };
-    let wrongPassword = this.props.oldPassword !== e.target.value;
-    if (!e.target.value && !input.newPassword && !input.confirmedPassword)
+  checkOldPassword = (event) => {
+    const input = { ...this.state.input, oldPassword: event.target.value };
+    let wrongPassword = this.props.oldPassword !== event.target.value;
+    if (!event.target.value && !input.newPassword && !input.confirmedPassword)
       wrongPassword = false;
     this.setState({
       input: input,
@@ -160,15 +156,15 @@ class SensitiveSection extends React.Component {
       this.state.unmatchedPassword;
   }
 
-  recordNewPassword(e) {
-    const input = { ...this.state.input, newPassword: e.target.value };
-    this.newPassword = e.target.value || this.props.oldPassword;
+  recordNewPassword = (event) => {
+    const input = { ...this.state.input, newPassword: event.target.value };
+    this.newPassword = event.target.value || this.props.oldPassword;
 
     let wrongPassword = this.state.wrongPassword;
-    if (e.target.value && !input.oldPassword)
+    if (event.target.value && !input.oldPassword)
       // not empty and oldPassword is empty
       wrongPassword = true;
-    else if (!e.target.value && !input.oldPassword && !input.confirmedPassword)
+    else if (!event.target.value && !input.oldPassword && !input.confirmedPassword)
       // everthing is empty
       wrongPassword = false;
 
@@ -176,36 +172,36 @@ class SensitiveSection extends React.Component {
       input: input,
       wrongPassword: wrongPassword,
       invalidPassword: this.newPassword.length < 8,
-      unmatchedPassword: input.confirmedPassword !== e.target.value,
+      unmatchedPassword: input.confirmedPassword !== event.target.value,
     });
 
     this.hasError =
       wrongPassword ||
       (!!this.newPassword && this.newPassword.length < 8) ||
-      input.confirmedPassword !== e.target.value;
+      input.confirmedPassword !== event.target.value;
     this.props.recordChanges(this.createChangeLog());
   }
 
-  recordConfirmedPassword(e) {
-    const input = { ...this.state.input, confirmedPassword: e.target.value };
+  recordConfirmedPassword = (event) => {
+    const input = { ...this.state.input, confirmedPassword: event.target.value };
     let wrongPassword = this.state.wrongPassword;
-    if (e.target.value && !input.oldPassword)
+    if (event.target.value && !input.oldPassword)
       // not empty and oldPassword is empty
       wrongPassword = true;
-    else if (!e.target.value && !input.oldPassword && !input.confirmedPassword)
+    else if (!event.target.value && !input.oldPassword && !input.confirmedPassword)
       // everthing is empty
       wrongPassword = false;
 
     this.setState({
       input: input,
       wrongPassword: wrongPassword,
-      unmatchedPassword: input.newPassword !== e.target.value,
+      unmatchedPassword: input.newPassword !== event.target.value,
     });
 
     this.hasError =
       wrongPassword ||
       this.state.invalidPassword ||
-      input.newPassword !== e.target.value;
+      input.newPassword !== event.target.value;
     this.props.recordChanges(this.createChangeLog());
   }
 
