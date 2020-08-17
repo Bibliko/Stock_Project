@@ -59,7 +59,7 @@ class BasicSection extends React.Component {
       input: {
         firstName: this.props.firstName || "",
         lastName: this.props.lastName || "",
-        dateOfBirth: this.props.dateOfBirth, //|| new Date("1 1 1970"),
+        dateOfBirth: this.props.dateOfBirth,
         gender: this.props.gender || "",
       },
     };
@@ -74,7 +74,7 @@ class BasicSection extends React.Component {
       input: {
         firstName: this.props.firstName || "",
         lastName: this.props.lastName || "",
-        dateOfBirth: this.props.dateOfBirth, //|| new Date("1 1 1970"),
+        dateOfBirth: this.props.dateOfBirth,
         gender: this.props.gender || "",
       },
     });

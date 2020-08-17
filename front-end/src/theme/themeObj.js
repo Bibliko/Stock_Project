@@ -106,12 +106,12 @@ const theme = {
         backgroundColor: "#303030",
       },
     },
-    MuiPickersArrowSwitcher:{
-      root:{
-        backgroundColor: "#180B66",
-        color: "white",
-      },
-    },
+    // MuiPickersArrowSwitcher:{
+    //   root:{
+    //     backgroundColor: "#180B66",
+    //     color: "white",
+    //   },
+    // },
     MuiPickersYear: {
       yearButton:{
         "&:hover": {
