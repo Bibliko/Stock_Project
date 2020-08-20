@@ -7,8 +7,9 @@ const {
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { keysAsync, delAsync } = require("../redis/redis-client");
 
-const { redisUpdateRankingList } = require("./RedisUtil");
+const { redisUpdateOverallRankingList, redisUpdateRegionalRankingList } = require("./RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -65,6 +66,11 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 };
 
 const updateRankingList = () => {
+  keysAsync("RANKING_LIST*")
+    .then((keysList) => {
+      keysList.forEach(key => delAsync(key));
+    });
+
   prisma.user
     .findMany({
       where: {
@@ -84,8 +90,8 @@ const updateRankingList = () => {
     .then((usersArray) => {
       console.log(`Updating ${usersArray.length} user(s): ranking`);
 
-      const updateAllUsersRanking = usersArray.map((user, index) => {
-        const updateRankingAndPortfolioLastClosure = prisma.user.update({
+      const updateAllUsersOverallRanking = usersArray.map((user, index) => {
+        const updateOverallRanking = prisma.user.update({
           where: {
             id: user.id
           },
@@ -95,12 +101,35 @@ const updateRankingList = () => {
         });
 
         return Promise.all([
-          updateRankingAndPortfolioLastClosure,
-          redisUpdateRankingList(user, index + 1)
+          updateOverallRanking,
+          redisUpdateOverallRankingList(user)
         ]);
       });
 
-      return Promise.all(updateAllUsersRanking);
+      const regionsList = [...new Set(usersArray.map(user => user.region))];
+      const updateAllUsersRegionalRanking = regionsList.map(region => {
+        const usersInRegion = usersArray.filter(user => user.region === region);
+        for (let i = 0; i <= usersInRegion.length; i++) {
+          const updateRegionRanking = prisma.user.update({
+            where: {
+              id: usersInRegion[i].id
+            },
+            data: {
+              regionalRanking: i + 1
+            }
+          });
+
+          return Promise.all([
+            updateRegionRanking,
+            redisUpdateRegionalRankingList(region, usersInRegion[i])
+          ]);
+        }
+      });
+
+      return Promise.all([
+        updateAllUsersOverallRanking,
+        updateAllUsersRegionalRanking
+      ]);
     })
     .then(() => {
       console.log("Successfully updated all users ranking");

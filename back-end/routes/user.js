@@ -4,7 +4,7 @@ const router = Router();
 const prisma = new PrismaClient();
 // const { indices } = require('../algolia');
 
-const { keysAsync, getAsync } = require("../redis/redis-client");
+const { listRangeAsync } = require("../redis/redis-client");
 
 router.put("/changeData", (req, res) => {
   const { dataNeedChange, email } = req.body;
@@ -75,30 +75,20 @@ router.get("/getData", (req, res) => {
     });
 });
 
-router.get("/getOverallRanking", (_, res) => {
-  keysAsync("RANKING|*")
-    .then((keysList) => {
-      const usersRankingList = keysList.map((key) => {
-        return new Promise((resolve, reject) => {
-          getAsync(key)
-            .then((user) => {
-              const getUser = user.split("|");
-              resolve({
-                firstName: getUser[0],
-                lastName: getUser[1],
-                totalPortfolio: parseInt(getUser[2], 10),
-                region: getUser[3]
-              });
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        });
-      });
-      return Promise.all(usersRankingList);
-    })
+router.get("/getOverallRanking", (req, res) => {
+  const { range } = req.query;
+
+  listRangeAsync("RANKING_LIST", range - 9, range - 1)
     .then((usersList) => {
-      res.send(usersList);
+      res.send(usersList.map((user) => {
+        const data = user.split("|");
+        return {
+          firstName: data[0],
+          lastName: data[1],
+          totalPortfolio: parseInt(data[2]),
+          region: data[3]
+        };
+      }));
     })
     .catch((err) => {
       console.log(err);
@@ -107,35 +97,19 @@ router.get("/getOverallRanking", (_, res) => {
 });
 
 router.get("/getRegionalRanking", (req, res) => {
-  const { region } = req.query;
+  const { region, range } = req.query;
 
-  keysAsync("RANKING|*")
-    .then((keysList) => {
-      const usersRankingList = keysList.map((key) => {
-        return new Promise((resolve, reject) => {
-          getAsync(key)
-            .then((user) => {
-              const getUser = user.split("|");
-              if (getUser[3] === region) {
-                resolve({
-                  firstName: getUser[0],
-                  lastName: getUser[1],
-                  totalPortfolio: parseInt(getUser[2]),
-                  region: getUser[3]
-                });
-              } else {
-                resolve(0);
-              }
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        });
-      });
-      return Promise.all(usersRankingList);
-    })
+  listRangeAsync(`RANKING_LIST_${region}`, range - 9, range - 1)
     .then((usersList) => {
-      res.send(usersList.filter((user) => user !== 0));
+      res.send(usersList.map((user) => {
+        const data = user.split("|");
+        return {
+          firstName: data[0],
+          lastName: data[1],
+          totalPortfolio: parseInt(data[2]),
+          region: data[3]
+        };
+      }));
     })
     .catch((err) => {
       console.log(err);
