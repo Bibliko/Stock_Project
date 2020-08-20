@@ -21,6 +21,7 @@ model User {
   createdAt                 DateTime                  @default(now())
   updatedAt                 DateTime                  @default(now()) @updatedAt
   region                    String?
+  regionalRanking           Int?                      @default(0)
   occupation                String?
   ranking                   Int?                      @default(0)
   cash                      Float?                    @default(100000)
