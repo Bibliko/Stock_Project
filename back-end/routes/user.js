@@ -75,12 +75,25 @@ router.get("/getData", (req, res) => {
     });
 });
 
-router.get("/getOverallRanking", (req, res) => {
-  const { range } = req.query;
+Object.defineProperty(Array.prototype, "chunk", {
+  value: function (chunkSize) {
+    let result = [];
+    let len = this.length;
+    if (len <= chunkSize) {
+      result.push(this);
+    } else {
+      for (let i = 0; i < len; i += chunkSize) {
+        result.push(this.slice(i, i + chunkSize));
+      }
+    }
+    return result;
+  }
+});
 
-  listRangeAsync("RANKING_LIST", range - 9, range - 1)
+router.get("/getOverallRanking", (_, res) => {
+  listRangeAsync("RANKING_LIST", 0, -1)
     .then((usersList) => {
-      res.send(usersList.map((user) => {
+      const usersListJson = usersList.map((user) => {
         const data = user.split("|");
         return {
           firstName: data[0],
@@ -88,7 +101,9 @@ router.get("/getOverallRanking", (req, res) => {
           totalPortfolio: parseInt(data[2]),
           region: data[3]
         };
-      }));
+      });
+
+      res.send(usersListJson.chunk(8));
     })
     .catch((err) => {
       console.log(err);
@@ -97,11 +112,11 @@ router.get("/getOverallRanking", (req, res) => {
 });
 
 router.get("/getRegionalRanking", (req, res) => {
-  const { region, range } = req.query;
+  const {region} = req.query;
 
-  listRangeAsync(`RANKING_LIST_${region}`, range - 9, range - 1)
+  listRangeAsync(`RANKING_LIST_${region}`, 0, -1)
     .then((usersList) => {
-      res.send(usersList.map((user) => {
+      const usersListJson = usersList.map((user) => {
         const data = user.split("|");
         return {
           firstName: data[0],
@@ -109,7 +124,8 @@ router.get("/getRegionalRanking", (req, res) => {
           totalPortfolio: parseInt(data[2]),
           region: data[3]
         };
-      }));
+      });
+      res.send(usersListJson.chunk(8));
     })
     .catch((err) => {
       console.log(err);

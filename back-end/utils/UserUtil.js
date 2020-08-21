@@ -68,8 +68,10 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const updateRankingList = () => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
-      keysList.forEach(key => delAsync(key));
-    });
+      Promise.all(keysList.map(key => delAsync(key)));
+    })
+    .then(() => console.log("Deleted all RANKING_LIST"))
+    .catch((err) => console.log(err));
 
   prisma.user
     .findMany({
