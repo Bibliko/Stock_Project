@@ -8,8 +8,8 @@ const theme = {
     appBarHeightSmall: "50px",
   },
   customMargin: {
-    topLayout: "100px",
-    topLayoutSmall: "90px",
+    topLayout: "120px",
+    topLayoutSmall: "110px",
 
     topCountdown: "65px",
     topCountdownSmall: "55px",
@@ -77,95 +77,131 @@ const theme = {
     type: "light",
   },
 
-  // Mui Pickers
   overrides: {
+    // Mui Pickers
     MuiPickersToolbar: {
       root: {
-        backgroundColor: "#180B66",
+        backgroundColor: "#000033",
+        color: "#3399FF",
+      },
+      dateTitleContainer: {
         color: "white",
       },
     },
+
     MuiPickersCalendarHeader: {
       root: {
-        backgroundColor: "#2196f3",
-        marginTop: '0px',
-        marginBottom: '0px',
-        minHeight: '50px',
-        maxHeight: '50px',
+        backgroundColor: "#3399FF",
+        marginTop: "0px",
+        marginBottom: "0px",
+        minHeight: "50px",
+        maxHeight: "50px",
         color: "white",
+      },
+      monthTitleContainer: {
+        color: "black",
       },
     },
     MuiPickersCalendar: {
       daysHeader: {
-        backgroundColor: "#303030",
-        '& span': {
-          color: 'white',
+        backgroundColor: "#000066",
+        "& span": {
+          color: "white",
         },
       },
       root: {
-        backgroundColor: "#303030",
+        backgroundColor: "#000066",
       },
     },
-    // MuiPickersArrowSwitcher:{
-    //   root:{
-    //     backgroundColor: "#180B66",
-    //     color: "white",
-    //   },
-    // },
+    MuiPickersArrowSwitcher: {
+      iconButton: {
+        backgroundColor: "unset",
+      },
+    },
+
     MuiPickersYear: {
-      yearButton:{
+      yearButton: {
         "&:hover": {
-          backgroundColor: "#2196f3",
+          backgroundColor: "#3399FF",
         },
         "&$selected": {
-          backgroundColor: "#2196f3",
+          backgroundColor: "#3399FF",
         },
         "&$disabled": {
-          color: 'rgba(255,255,255,0.2)',
-          backgroundColor: 'rgba(255,255,255,0.02)',
+          color: "rgba(255,255,255,0.2)",
+          backgroundColor: "rgba(255,255,255,0.02)",
         },
       },
     },
     MuiPickersMonth: {
       root: {
         "&:hover": {
-          backgroundColor: "#2196f3",
+          backgroundColor: "rgba(51, 153, 255, 0.4)",
           color: "white",
+        },
+        "&.Mui-selected": {
+          color: "#3399FF",
         },
       },
     },
     MuiPickersDay: {
       root: {
-        color: 'white',
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        color: "white",
+        border: "unset",
+        backgroundColor: "rgba(255,255,255,0.2)",
+        transition: "unset",
         "&:hover": {
-          backgroundColor: "#2196f3"
+          backgroundColor: "rgba(51, 153, 255, 0.7)",
+          "&.Mui-selected": {
+            backgroundColor: "rgba(51, 153, 255, 0.7)",
+          },
+        },
+        "&:focus": {
+          backgroundColor: "rgba(51, 153, 255, 0.9)",
+          "&.Mui-selected": {
+            backgroundColor: "rgba(51, 153, 255, 0.9)",
+          },
         },
         "&$selected": {
-          backgroundColor: "#2196f3"
+          backgroundColor: "#3399FF",
         },
         "&$disabled": {
-          backgroundColor: 'rgba(255,255,255,0.02)'
+          backgroundColor: "rgba(255,255,255,0.1)",
+          color: "rgba(255,255,255,0.5)",
         },
-        "&$today": {
-          backgroundColor: "red",
+        // "&$today": {
+        //   border: "unset",
+        // },
+      },
+      today: {
+        border: "unset",
+        "&:not(.Mui-selected)": {
+          border: "unset",
         },
       },
     },
     MuiPickersYearSelection: {
       root: {
-        backgroundColor: "#303030",
+        backgroundColor: "#000066",
         margin: "none",
         color: "white",
       },
     },
     MuiPickersMonthSelection: {
       root: {
-        backgroundColor: "#303030",
+        backgroundColor: "#000066",
         margin: "none",
         color: "white",
+        width: "unset",
       },
     },
+
+    MuiFormHelperText: {
+      root: {
+        color: "#3399FF",
+      },
+    },
+
     MuiPickersBasePicker: {
       pickerViewLandscape: {
         padding: "none",
@@ -177,17 +213,28 @@ const theme = {
     },
     MuiPickersModalDialog: {
       dialogAction: {
-        backgroundColor: "#180B66",
+        backgroundColor: "#000033",
         "& button": {
-          color: "#2196f3",
+          color: "#3399FF",
           "&:hover": {
-            backgroundColor: "rgba(0,0,0,0.25)"
+            backgroundColor: "rgba(51, 153, 255, 0.2)",
           },
         },
       },
     },
+
+    MuiPickersCalendarView: {
+      viewTransitionContainer: {
+        backgroundColor: "#000066",
+      },
+    },
+    MuiPickersMobileKeyboardInputView: {
+      root: {
+        backgroundColor: "#000066",
+      },
+    },
+    // Mui Pickers
   },
-  // Mui Pickers
 };
 
 export default theme;

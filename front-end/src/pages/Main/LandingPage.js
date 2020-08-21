@@ -22,12 +22,12 @@ const styles = (theme) => ({
     width: "75%",
     marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "85%",
+      width: "90%",
       marginTop: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
     maxWidth: "none",
   },
@@ -78,14 +78,16 @@ const styles = (theme) => ({
   paperRedirectingToAccountSetting: {
     width: "80%",
     height: "200px",
+    padding: "10px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "column",
     backgroundColor: theme.palette.paperBackground.onPage,
-    padding: 5,
     "&:hover": {
       cursor: "pointer",
     },
+    marginTop: "20px",
   },
   accountSettingIcon: {
     width: "50px",

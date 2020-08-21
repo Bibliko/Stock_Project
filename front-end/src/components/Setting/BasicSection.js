@@ -192,7 +192,7 @@ class BasicSection extends React.Component {
               <MobileDatePicker
                 disableFuture
                 allowKeyboardControl={true}
-                reduceAnimations={true}
+                reduceAnimations={false}
                 toolbarPlaceholder="Enter Date"
                 openTo="year"
                 inputFormat="dd/MM/yyyy"
