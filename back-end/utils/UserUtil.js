@@ -68,70 +68,58 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const updateRankingList = () => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
-      Promise.all(keysList.map(key => delAsync(key)));
+      return Promise.all(keysList.map(key => delAsync(key)));
     })
-    .then(() => console.log("Deleted all RANKING_LIST"))
-    .catch((err) => console.log(err));
+    .then(() => {
+      console.log(`Deleted all redis ranking relating lists`);
 
-  prisma.user
-    .findMany({
-      where: {
-        hasFinishedSettingUp: true
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        totalPortfolio: true,
-        region: true
-      },
-      orderBy: {
-        totalPortfolio: "desc"
-      }
+      return prisma.user.findMany({
+        where: {
+          hasFinishedSettingUp: true
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          totalPortfolio: true,
+          region: true
+        },
+        orderBy: {
+          totalPortfolio: "desc"
+        }
+      });
     })
     .then((usersArray) => {
       console.log(`Updating ${usersArray.length} user(s): ranking`);
 
-      const updateAllUsersOverallRanking = usersArray.map((user, index) => {
-        const updateOverallRanking = prisma.user.update({
+      const regionsList = new Map();
+      const updateAllUsersRanking = usersArray.map((user, index) => {
+        const nowRegion = user.region;
+
+        if (regionsList.has(nowRegion)) {
+          regionsList.set(nowRegion, regionsList.get(nowRegion) + 1);
+        } else {
+          regionsList.set(nowRegion, 1);
+        }
+
+        const updateUserRanking = prisma.user.update({
           where: {
             id: user.id
           },
           data: {
-            ranking: index + 1
+            ranking: index + 1,
+            regionalRanking: regionsList.get(nowRegion)
           }
         });
 
         return Promise.all([
-          updateOverallRanking,
-          redisUpdateOverallRankingList(user)
+          updateUserRanking,
+          redisUpdateOverallRankingList(user),
+          redisUpdateRegionalRankingList(nowRegion, user)
         ]);
       });
 
-      const regionsList = [...new Set(usersArray.map(user => user.region))];
-      const updateAllUsersRegionalRanking = regionsList.map(region => {
-        const usersInRegion = usersArray.filter(user => user.region === region);
-        for (let i = 0; i <= usersInRegion.length; i++) {
-          const updateRegionRanking = prisma.user.update({
-            where: {
-              id: usersInRegion[i].id
-            },
-            data: {
-              regionalRanking: i + 1
-            }
-          });
-
-          return Promise.all([
-            updateRegionRanking,
-            redisUpdateRegionalRankingList(region, usersInRegion[i])
-          ]);
-        }
-      });
-
-      return Promise.all([
-        updateAllUsersOverallRanking,
-        updateAllUsersRegionalRanking
-      ]);
+      return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
       console.log("Successfully updated all users ranking");
