@@ -9,7 +9,10 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const { keysAsync, delAsync } = require("../redis/redis-client");
 
-const { redisUpdateOverallRankingList, redisUpdateRegionalRankingList } = require("./RedisUtil");
+const {
+  redisUpdateOverallRankingList,
+  redisUpdateRegionalRankingList
+} = require("./RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -68,7 +71,7 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const updateRankingList = () => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
-      return Promise.all(keysList.map(key => delAsync(key)));
+      return delAsync(keysList);
     })
     .then(() => {
       console.log(`Deleted all redis ranking relating lists`);
