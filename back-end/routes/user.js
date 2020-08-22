@@ -90,7 +90,9 @@ Object.defineProperty(Array.prototype, "chunk", {
   }
 });
 
-router.get("/getOverallRanking", (_, res) => {
+router.get("/getOverallRanking", (req, res) => {
+  const { page } = req.query;
+
   listRangeAsync("RANKING_LIST", 0, -1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
@@ -103,7 +105,7 @@ router.get("/getOverallRanking", (_, res) => {
         };
       });
 
-      res.send(usersListJson.chunk(8));
+      res.send(usersListJson.chunk(8)[page - 1]);
     })
     .catch((err) => {
       console.log(err);
@@ -112,7 +114,7 @@ router.get("/getOverallRanking", (_, res) => {
 });
 
 router.get("/getRegionalRanking", (req, res) => {
-  const {region} = req.query;
+  const {region, page} = req.query;
 
   listRangeAsync(`RANKING_LIST_${region}`, 0, -1)
     .then((usersList) => {
@@ -125,7 +127,7 @@ router.get("/getRegionalRanking", (req, res) => {
           region: data[3]
         };
       });
-      res.send(usersListJson.chunk(8));
+      res.send(usersListJson.chunk(8)[page - 1]);
     })
     .catch((err) => {
       console.log(err);
