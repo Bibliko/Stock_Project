@@ -112,11 +112,11 @@ setInterval(deleteExpiredVerification, oneDay);
 // This function to help initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(objVariables);
 
-setInterval(updateMarketHolidaysFromFMP.bind(this, objVariables), oneDay);
+setInterval(() => updateMarketHolidaysFromFMP(objVariables), oneDay);
 
 setInterval(deletePrismaMarketHolidays, oneDay);
 
-setInterval(checkAndUpdateAllUsers.bind(this, objVariables), oneSecond);
+setInterval(() => checkAndUpdateAllUsers(objVariables), oneSecond);
 
 // All app routes are written below this comment:
 
