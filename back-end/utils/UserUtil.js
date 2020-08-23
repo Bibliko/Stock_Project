@@ -118,8 +118,6 @@ const updateAllUsers = () => {
  * objVariables: object passed in from back-end/index
  */
 const checkAndUpdateAllUsers = (objVariables) => {
-  // console.log(objVariables);
-
   if (!objVariables.isPrismaMarketHolidaysInitialized) {
     return;
   }

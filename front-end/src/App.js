@@ -28,6 +28,10 @@ import { createTheme } from "./theme/ThemeUtil";
 import { ThemeProvider } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
+import { LocalizationProvider } from '@material-ui/pickers';
+
+import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
+
 var socket;
 
 const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
@@ -111,6 +115,7 @@ class App extends React.Component {
 
     return (
       <ThemeProvider theme={createTheme()}>
+<<<<<<< HEAD
         <Provider store={this.getReduxStore()}>
           {this.state.path === "/login" && <Login />}
           {this.state.path === "/signup" && <Signup />}
@@ -130,6 +135,29 @@ class App extends React.Component {
             </Switch>
           )}
         </Provider>
+=======
+        <LocalizationProvider dateAdapter={DateFnsUtils}>
+          <Provider store={this.getReduxStore()}>
+            {this.state.path === "/login" && <Login />}
+            {this.state.path === "/signup" && <Signup />}
+            {this.state.path === "/forgotpassword" && <ForgotPassword />}
+            {this.state.path === "/verificationSucceed" && <Succeed />}
+            {this.state.path === "/verificationFail" && <Fail />}
+            {!this.specialLinks.includes(this.state.path) && (
+              <Switch>
+                <Layout toggleTheme={this.toggleTheme}>
+                  <Route exact path="/" component={LandingPage} />
+
+                  <Route path="/accountSummary" component={AccountSummary} />
+                  <Route path="/watchlist" component={Watchlist} />
+                  <Route path="/setting" component={Setting} />
+                  <Route path="/ranking" component={Ranking} />
+                </Layout>
+              </Switch>
+            )}
+          </Provider>
+        </LocalizationProvider>
+>>>>>>> master
       </ThemeProvider>
     );
   }

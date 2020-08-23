@@ -20,7 +20,6 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 const styles = (theme) => ({
   fullHeigthWidth: {
-    heigth: "100%",
     width: "100%",
   },
   itemGrid: {

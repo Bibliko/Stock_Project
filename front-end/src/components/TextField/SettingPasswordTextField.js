@@ -46,10 +46,10 @@ const styles = theme => ({
             backgroundColor: 'rgba(225,225,225,0)'
         },
         fontSize: '18px',
-        height: '50px',
+        height: '45px',
         [theme.breakpoints.down('xs')]: {
             fontSize: 'small',
-            height: '40px'
+            height: '35px'
         },
     },
     title: {
