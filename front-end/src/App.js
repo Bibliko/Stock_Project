@@ -15,11 +15,13 @@ import Signup from "./pages/Login/Signup";
 import ForgotPassword from "./pages/Login/ForgotPassword";
 import Succeed from "./pages/Login/Verification/Succeed";
 import Fail from "./pages/Login/Verification/Fail";
+
 import LandingPage from "./pages/Main/LandingPage";
 import AccountSummary from "./pages/Main/AccountSummary";
 import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
 import Setting from "./pages/Main/Setting";
+import TransactionHistory from "./pages/Main/TransactionHistory";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
@@ -27,9 +29,9 @@ import { createTheme } from "./theme/ThemeUtil";
 import { ThemeProvider } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
-import { LocalizationProvider } from '@material-ui/pickers';
+import { LocalizationProvider } from "@material-ui/pickers";
 
-import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
+import DateFnsUtils from "@material-ui/pickers/adapter/date-fns";
 
 var socket;
 
@@ -130,6 +132,10 @@ class App extends React.Component {
                   <Route path="/watchlist" component={Watchlist} />
                   <Route path="/setting" component={Setting} />
                   <Route path="/ranking" component={Ranking} />
+                  <Route
+                    path="/transactionHistory"
+                    component={TransactionHistory}
+                  />
                 </Layout>
               </Switch>
             )}

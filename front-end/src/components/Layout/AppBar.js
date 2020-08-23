@@ -270,6 +270,9 @@ class PersistentAppBar extends React.Component {
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          onClick={() => {
+                            redirectToPage("/transactionHistory", this.props);
+                          }}
                         >
                           Trading History
                         </MenuItem>

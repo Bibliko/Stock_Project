@@ -108,6 +108,7 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "medium",
     },
+    textAlign: "center",
   },
 });
 
