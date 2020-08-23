@@ -1,16 +1,18 @@
-import React from "react";
 import { isEqual } from "lodash";
 import { withRouter } from "react-router";
-
+import * as React from "react";
+import { TextField } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import {
+  DatePicker,
+  TimePicker,
+  DateTimePicker,
+  LocalizationProvider,
+} from "@material-ui/pickers";
+import { DateRangePicker } from "@material-ui/pickers";
 
 import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
 //import DatePicker from "react-datepicker";
 const styles = (theme) => ({
   setDate: {
@@ -56,9 +58,10 @@ class DatePickerHistory extends React.Component {
     const { classes } = this.props;
 
     return (
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <KeyboardDatePicker
+      <LocalizationProvider dateAdapter={DateFnsUtils}>
+        <DatePicker
           disableToolbar
+          //renderInput={(props) => <TextField {...props} />}
           className={classes.setDate}
           variant="inline"
           inputVariant="filled"
@@ -76,7 +79,7 @@ class DatePickerHistory extends React.Component {
             "aria-label": "change date",
           }}
         />
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
     );
   }
 }
