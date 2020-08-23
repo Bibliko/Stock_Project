@@ -28,9 +28,9 @@ import { createTheme } from "./theme/ThemeUtil";
 import { ThemeProvider } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
-import { LocalizationProvider } from '@material-ui/pickers';
+import { LocalizationProvider } from "@material-ui/pickers";
 
-import DateFnsUtils from '@material-ui/pickers/adapter/date-fns';
+import DateFnsUtils from "@material-ui/pickers/adapter/date-fns";
 
 var socket;
 
@@ -115,27 +115,6 @@ class App extends React.Component {
 
     return (
       <ThemeProvider theme={createTheme()}>
-<<<<<<< HEAD
-        <Provider store={this.getReduxStore()}>
-          {this.state.path === "/login" && <Login />}
-          {this.state.path === "/signup" && <Signup />}
-          {this.state.path === "/forgotpassword" && <ForgotPassword />}
-          {this.state.path === "/verificationSucceed" && <Succeed />}
-          {this.state.path === "/verificationFail" && <Fail />}
-          {!this.specialLinks.includes(this.state.path) && (
-            <Switch>
-              <Layout toggleTheme={this.toggleTheme}>
-                <Route exact path="/" component={LandingPage} />
-                <Route path="/company/:companyCode" component={Company} />
-                <Route path="/accountSummary" component={AccountSummary} />
-                <Route path="/watchlist" component={Watchlist} />
-                <Route path="/setting" component={Setting} />
-                <Route path="/ranking" component={Ranking} />
-              </Layout>
-            </Switch>
-          )}
-        </Provider>
-=======
         <LocalizationProvider dateAdapter={DateFnsUtils}>
           <Provider store={this.getReduxStore()}>
             {this.state.path === "/login" && <Login />}
@@ -147,7 +126,7 @@ class App extends React.Component {
               <Switch>
                 <Layout toggleTheme={this.toggleTheme}>
                   <Route exact path="/" component={LandingPage} />
-
+                  <Route path="/company/:companyCode" component={Company} />
                   <Route path="/accountSummary" component={AccountSummary} />
                   <Route path="/watchlist" component={Watchlist} />
                   <Route path="/setting" component={Setting} />
@@ -157,7 +136,6 @@ class App extends React.Component {
             )}
           </Provider>
         </LocalizationProvider>
->>>>>>> master
       </ThemeProvider>
     );
   }

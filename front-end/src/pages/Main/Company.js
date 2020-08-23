@@ -50,9 +50,9 @@ const styles = (theme) => ({
   },
   datePickerGrid: {
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    //flexDirection: "colmun",
+    //justifyContent: "center",
+    alignItems: "flex-start",
+    //flexDirection: "column",
   },
   gridTitle: {
     fontSize: "x-large",
@@ -64,6 +64,21 @@ const styles = (theme) => ({
   },
   titleLabel: {
     color: "#DC3D4A",
+  },
+  title: {
+    color: "white",
+    fontSize: "20px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+    },
+    paddingLeft: "5px",
+    fontWeight: "bold",
+  },
+  textFieldContainer: {
+    maxWidth: "none",
+    minWidth: "150px",
+    marginLeft: "10px",
+    marginRight: "10px",
   },
 });
 
@@ -101,13 +116,21 @@ class Company extends React.Component {
               Price history chart
             </Typography>
           </Grid>
-          <Grid item xs={12} className={classes.datePickerGrid}>
-            <DatePickerHistory
-              name="FROM" //onChange={this.handleChange}
-            />
-            <DatePickerHistory
-              name="TO" //onChange={this.handleChange}
-            />
+          <Grid item xs={12} sm={6} className={classes.datePickerGrid}>
+            <Container className={classes.textFieldContainer}>
+              <Typography className={classes.title}> From </Typography>
+              <DatePickerHistory
+              //name="FROM" //onChange={this.handleChange}
+              />
+            </Container>
+          </Grid>
+          <Grid item xs={12} sm={6} className={classes.datePickerGrid}>
+            <Container className={classes.textFieldContainer}>
+              <Typography className={classes.title}> To </Typography>
+              <DatePickerHistory
+              //name="FROM" //onChange={this.handleChange}
+              />
+            </Container>
           </Grid>
         </Grid>
       </Container>

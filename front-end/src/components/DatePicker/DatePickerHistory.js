@@ -1,15 +1,17 @@
-import { isEqual } from "lodash";
+import React from "react";
+//import { isEqual } from "lodash";
 import { withRouter } from "react-router";
-import * as React from "react";
-import { TextField } from "@material-ui/core";
+//import { TextField } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
+//import Grid from "@material-ui/core/Grid";
 import {
   DatePicker,
   TimePicker,
   DateTimePicker,
   LocalizationProvider,
 } from "@material-ui/pickers";
+import { MobileDatePicker } from "@material-ui/pickers";
+import DatePickerTextField from "../TextField/DatePickerTextField";
 import { DateRangePicker } from "@material-ui/pickers";
 
 import DateFnsUtils from "@date-io/date-fns";
@@ -58,28 +60,19 @@ class DatePickerHistory extends React.Component {
     const { classes } = this.props;
 
     return (
-      <LocalizationProvider dateAdapter={DateFnsUtils}>
-        <DatePicker
-          disableToolbar
-          //renderInput={(props) => <TextField {...props} />}
-          className={classes.setDate}
-          variant="inline"
-          inputVariant="filled"
-          format="dd/MM/yyyy"
-          margin="normal"
-          id={this.props.name}
-          name={this.props.name}
-          label={this.props.name}
-          InputProps={{
-            className: classes.input,
-          }}
-          value={this.state.startDate}
-          onChange={this.handleChange}
-          KeyboardButtonProps={{
-            "aria-label": "change date",
-          }}
-        />
-      </LocalizationProvider>
+      <DatePicker
+        disableFuture
+        allowKeyboardControl={true}
+        reduceAnimations={false}
+        toolbarPlaceholder="Enter Date"
+        openTo="year"
+        inputFormat="dd/MM/yyyy"
+        views={["year", "month", "date"]}
+        value={this.state.startDate}
+        onChange={this.handleChange}
+        //onError={this.handleDateError}
+        renderInput={(props) => <DatePickerTextField {...props} />}
+      />
     );
   }
 }
