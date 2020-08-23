@@ -75,25 +75,10 @@ router.get("/getData", (req, res) => {
     });
 });
 
-Object.defineProperty(Array.prototype, "chunk", {
-  value: function (chunkSize) {
-    let result = [];
-    let len = this.length;
-    if (len <= chunkSize) {
-      result.push(this);
-    } else {
-      for (let i = 0; i < len; i += chunkSize) {
-        result.push(this.slice(i, i + chunkSize));
-      }
-    }
-    return result;
-  }
-});
-
 router.get("/getOverallRanking", (req, res) => {
-  const { page } = req.query;
+  const {page} = req.query;
 
-  listRangeAsync("RANKING_LIST", 0, -1)
+  listRangeAsync("RANKING_LIST", 8 * page - 8, 8 * page - 1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
         const data = user.split("|");
@@ -105,7 +90,7 @@ router.get("/getOverallRanking", (req, res) => {
         };
       });
 
-      res.send(usersListJson.chunk(8)[page - 1]);
+      res.send(usersListJson);
     })
     .catch((err) => {
       console.log(err);
@@ -116,7 +101,7 @@ router.get("/getOverallRanking", (req, res) => {
 router.get("/getRegionalRanking", (req, res) => {
   const {region, page} = req.query;
 
-  listRangeAsync(`RANKING_LIST_${region}`, 0, -1)
+  listRangeAsync(`RANKING_LIST_${region}`, 8 * page - 8, 8 * page - 1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
         const data = user.split("|");
@@ -127,7 +112,7 @@ router.get("/getRegionalRanking", (req, res) => {
           region: data[3]
         };
       });
-      res.send(usersListJson.chunk(8)[page - 1]);
+      res.send(usersListJson);
     })
     .catch((err) => {
       console.log(err);
