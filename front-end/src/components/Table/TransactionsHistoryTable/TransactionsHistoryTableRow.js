@@ -91,7 +91,7 @@ const styles = (theme) => ({
   },
 });
 
-class TransactionHistoryTableRow extends React.Component {
+class TransactionsHistoryTableRow extends React.Component {
   isTableRowTheLast = () => {
     const { rowIndex, rowsLength } = this.props;
     return rowIndex === rowsLength - 1;
@@ -185,4 +185,4 @@ class TransactionHistoryTableRow extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(TransactionHistoryTableRow));
+export default withStyles(styles)(withRouter(TransactionsHistoryTableRow));

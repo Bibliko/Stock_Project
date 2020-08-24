@@ -21,7 +21,7 @@ import AccountSummary from "./pages/Main/AccountSummary";
 import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
 import Setting from "./pages/Main/Setting";
-import TransactionHistory from "./pages/Main/TransactionHistory";
+import TransactionsHistory from "./pages/Main/TransactionsHistory";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
@@ -133,8 +133,8 @@ class App extends React.Component {
                   <Route path="/setting" component={Setting} />
                   <Route path="/ranking" component={Ranking} />
                   <Route
-                    path="/transactionHistory"
-                    component={TransactionHistory}
+                    path="/transactionsHistory"
+                    component={TransactionsHistory}
                   />
                 </Layout>
               </Switch>

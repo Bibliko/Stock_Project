@@ -1,9 +1,8 @@
 import axios from "axios";
 import { isEmpty, isEqual } from "lodash";
 
-import { getManyStockQuotes } from "./FinancialModelingPrepUtil";
 import { getBackendHost } from "./NetworkUtil";
-import { getParsedCachedSharesList } from "./RedisUtil";
+import { getParsedCachedSharesList, getManyStockQuotes } from "./RedisUtil";
 
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
@@ -203,6 +202,33 @@ export const getUserData = (dataNeeded, email) => {
   });
 };
 
+export const getUserTransactions = (filtering, email) => {
+  /**
+   * filtering in form:
+   *    filtering = {
+   *      isFinished: true, -> prisma relation filtering
+   *      ...
+   *    }
+   */
+
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getUserTransactions`, {
+      method: "get",
+      params: {
+        email,
+        filtering,
+      },
+      withCredentials: true,
+    })
+      .then((transactions) => {
+        resolve(transactions.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 // User Calculations Related:
 
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
@@ -326,6 +352,7 @@ export default {
   changePassword,
   changeUserData,
   getUserData,
+  getUserTransactions,
 
   calculateTotalSharesValue,
   checkStockQuotesForUser,

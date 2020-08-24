@@ -1,4 +1,34 @@
-const { getAsync, setAsync } = require("../redis/redis-client");
+const { getAsync, setAsync, listPushAsync } = require("../redis/redis-client");
+
+/**
+ * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
+ * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID", "..."
+ */
+const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
+  const redisKey = `${email}|transactionsHistoryList`;
+  const {
+    id,
+    createdAt,
+    companyCode,
+    quantity,
+    priceAtTransaction,
+    brokerage,
+    finishedTime,
+    isTypeBuy,
+    userID
+  } = finishedTransaction;
+  const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+
+  listPushAsync(redisKey, newValue)
+    .then((finishedUpdatingRedisTransactionsHistoryList) => {
+      console.log(
+        `Successfully added transaction to ${email}'s cached transactions history.`
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 /**
  * 'cachedMarketHoliday': 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
@@ -159,6 +189,8 @@ const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
 };
 
 module.exports = {
+  updateTransactionsHistoryListOneItem,
+
   parseCachedMarketHoliday,
   getCachedMarketHoliday,
   updateCachedMarketHoliday,

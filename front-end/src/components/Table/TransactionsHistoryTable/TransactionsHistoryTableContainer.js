@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
-import TransactionHistoryTableRow from "./TransactionHistoryTableRow";
+import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
@@ -79,13 +79,15 @@ const styles = (theme) => ({
     },
     textAlign: "center",
   },
-  transactionHistoryContainerDiv: {
+  transactionsHistoryContainerDiv: {
     width: "100%",
     marginTop: "24px",
   },
-  stickyCell: {
-    position: "sticky",
-    left: 0,
+  firstElementTopLeftRounded: {
+    borderTopLeftRadius: "4px",
+  },
+  lastElementTopRightRounded: {
+    borderTopRightRadius: "4px",
   },
 });
 
@@ -95,7 +97,7 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-class TransactionHistoryTableContainer extends React.Component {
+class TransactionsHistoryTableContainer extends React.Component {
   state = {
     hoverPaper: false,
   };
@@ -114,7 +116,13 @@ class TransactionHistoryTableContainer extends React.Component {
 
   chooseTableCell = (type, classes) => {
     return (
-      <StyledTableCell align="center" className={classes.tableCell}>
+      <StyledTableCell
+        align="center"
+        className={clsx(classes.tableCell, {
+          [classes.firstElementTopLeftRounded]: type === "Type",
+          [classes.lastElementTopRightRounded]: type === "Transaction Time",
+        })}
+      >
         <div className={classes.cellDiv}>{type}</div>
       </StyledTableCell>
     );
@@ -125,7 +133,7 @@ class TransactionHistoryTableContainer extends React.Component {
     const { hoverPaper } = this.state;
 
     return (
-      <div className={classes.transactionHistoryContainerDiv}>
+      <div className={classes.transactionsHistoryContainerDiv}>
         {isEmpty(rows) && (
           <Paper
             className={classes.emptyRowsPaper}
@@ -158,7 +166,7 @@ class TransactionHistoryTableContainer extends React.Component {
               </TableHead>
               <TableBody className={classes.tableBody}>
                 {rows.map((row, index) => (
-                  <TransactionHistoryTableRow
+                  <TransactionsHistoryTableRow
                     key={index}
                     transactionInfo={row}
                     rowIndex={index}
@@ -174,4 +182,6 @@ class TransactionHistoryTableContainer extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(TransactionHistoryTableContainer));
+export default withStyles(styles)(
+  withRouter(TransactionsHistoryTableContainer)
+);

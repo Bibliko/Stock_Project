@@ -3,9 +3,9 @@ import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
-import { getUserData } from "../../utils/UserUtil";
+import { getParsedCachedPaginatedTransactionsHistoryList } from "../../utils/RedisUtil";
 
-import TransactionHistoryTableContainer from "../../components/Table/TransactionHistoryTable/TransactionHistoryTableContainer";
+import TransactionsHistoryTableContainer from "../../components/Table/TransactionsHistoryTable/TransactionsHistoryTableContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -38,14 +38,9 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     justifyContent: "center",
   },
-  itemGrid: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
 });
 
-class TransactionHistoryPage extends React.Component {
+class TransactionsHistoryPage extends React.Component {
   state = {
     transactions: [],
   };
@@ -53,13 +48,13 @@ class TransactionHistoryPage extends React.Component {
   componentDidMount() {
     console.log(this.props.userSession);
 
-    const dataNeeded = {
-      transactions: true,
-    };
-    getUserData(dataNeeded, this.props.userSession.email)
-      .then((result) => {
+    getParsedCachedPaginatedTransactionsHistoryList(
+      this.props.userSession.email,
+      1
+    )
+      .then((transactions) => {
         this.setState({
-          transactions: result.transactions,
+          transactions,
         });
       })
       .catch((err) => {
@@ -85,9 +80,7 @@ class TransactionHistoryPage extends React.Component {
     return (
       <Container className={classes.root} disableGutters>
         <Grid container spacing={4} className={classes.fullWidth}>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <TransactionHistoryTableContainer rows={transactions} />
-          </Grid>
+          <TransactionsHistoryTableContainer rows={transactions} />
         </Grid>
       </Container>
     );
@@ -99,5 +92,5 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(TransactionHistoryPage))
+  withStyles(styles)(withRouter(TransactionsHistoryPage))
 );

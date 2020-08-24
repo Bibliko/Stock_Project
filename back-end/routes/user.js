@@ -76,4 +76,35 @@ router.get("/getData", (req, res) => {
     });
 });
 
+router.get("/getUserTransactions", (req, res) => {
+  const { email, filtering } = req.query;
+
+  var filteringJSON = JSON.parse(filtering);
+
+  /**
+   * filtering in form:
+   *    filtering = {
+   *      isFinished: true, -> prisma relation filtering
+   *      ...
+   *    }
+   */
+
+  prisma.user
+    .findOne({
+      where: {
+        email
+      }
+    })
+    .transactions({
+      where: filteringJSON
+    })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Get data of user fails.");
+    });
+});
+
 module.exports = router;

@@ -48,6 +48,10 @@ const styles = (theme) => ({
   stickyCell: {
     position: "sticky",
     left: 0,
+    borderTopLeftRadius: "4px",
+  },
+  lastElementTopRightRounded: {
+    borderTopRightRadius: "4px",
   },
 });
 
@@ -71,6 +75,7 @@ class HoldingsTableContainer extends React.Component {
         className={clsx(classes.tableCell, {
           [classes.tableCellProfitOrLoss]: type === "Profit/Loss",
           [classes.stickyCell]: type === "Code",
+          [classes.lastElementTopRightRounded]: type === "Watchlist",
         })}
       >
         <div

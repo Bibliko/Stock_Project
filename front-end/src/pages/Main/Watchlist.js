@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -57,10 +57,11 @@ class WatchlistPage extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(
-      nextProps.userSession.watchlist,
-      this.props.userSession.watchlist
-    );
+    const compareKeys = ["email", "watchlist"];
+    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
+    const propsCompare = pick(this.props.userSession, compareKeys);
+
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   render() {
@@ -69,9 +70,7 @@ class WatchlistPage extends React.Component {
     return (
       <Container className={classes.root} disableGutters>
         <Grid container spacing={4} className={classes.fullWidth}>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <WatchlistTableContainer rows={userSession.watchlist} />
-          </Grid>
+          <WatchlistTableContainer rows={userSession.watchlist} />
         </Grid>
       </Container>
     );

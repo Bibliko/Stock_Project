@@ -76,8 +76,8 @@ const styles = (theme) => ({
     color: "#9ED2EF",
   },
   paperRedirectingToAccountSetting: {
-    width: "80%",
-    height: "200px",
+    height: theme.customHeight.redirectingPaper,
+    width: theme.customWidth.redirectingPaper,
     padding: "10px",
     display: "flex",
     alignItems: "center",

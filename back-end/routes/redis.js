@@ -120,6 +120,83 @@ router.get("/getSharesList", (req, res) => {
 });
 
 /**
+ * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
+ * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|finishedTime|isTypeBuy|userID", "..."
+ */
+router.put("/updateTransactionsHistoryListWholeList", (req, res) => {
+  const { email, finishedTransactions } = req.body;
+
+  const redisKey = `${email}|transactionsHistoryList`;
+
+  const listPushPromise = finishedTransactions.map((transaction) => {
+    const {
+      id,
+      createdAt,
+      companyCode,
+      quantity,
+      priceAtTransaction,
+      brokerage,
+      finishedTime,
+      isTypeBuy,
+      userID
+    } = transaction;
+    const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+    return listPushAsync(redisKey, newValue);
+  });
+  Promise.all(listPushPromise)
+    .then((finishedUpdatingRedisTransactionsHistoryList) => {
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+router.put("/updateTransactionsHistoryListOneItem", (req, res) => {
+  const { email, finishedTransaction } = req.body;
+
+  const redisKey = `${email}|transactionsHistoryList`;
+  const {
+    id,
+    createdAt,
+    companyCode,
+    quantity,
+    priceAtTransaction,
+    brokerage,
+    finishedTime,
+    isTypeBuy,
+    userID
+  } = finishedTransaction;
+  const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+
+  listPushAsync(redisKey, newValue)
+    .then((finishedUpdatingRedisTransactionsHistoryList) => {
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+router.get("/getPaginatedTransactionsHistoryList", (req, res) => {
+  // Each page has 10 transactions
+  const { email, page } = req.query;
+
+  const redisKey = `${email}|transactionsHistoryList`;
+  const startIndex = 10 * (page - 1);
+  const endIndex = startIndex + (10 - 1);
+
+  listRangeAsync(redisKey, startIndex, endIndex)
+    .then((transactionsHistoryList) => {
+      res.send(transactionsHistoryList);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+/**
  * 'cachedShares|AAPL': 'isUpdatingUsingFMP|timestampLastUpdated|name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
  *
  * find cachedShares first:

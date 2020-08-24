@@ -206,9 +206,10 @@ class PersistentAppBar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["avatarUrl", "hasFinishedSettingUp"];
+    const compareKeys = ["email", "avatarUrl", "hasFinishedSettingUp"];
     const nextPropsCompare = pick(nextProps.userSession, compareKeys);
     const propsCompare = pick(this.props.userSession, compareKeys);
+
     return (
       !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
@@ -271,7 +272,7 @@ class PersistentAppBar extends React.Component {
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
                           onClick={() => {
-                            redirectToPage("/transactionHistory", this.props);
+                            redirectToPage("/transactionsHistory", this.props);
                           }}
                         >
                           Trading History

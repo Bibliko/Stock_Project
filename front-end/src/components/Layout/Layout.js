@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
 
 import { socket } from "../../App";
+import { mainSetup } from "./setupForCachingInLayout";
 
 import {
   shouldRedirectToLogin,
@@ -25,26 +26,15 @@ import {
   offSocketListeners,
 } from "../../utils/SocketUtil";
 
-import {
-  checkStockQuotesToCalculateSharesValue,
-  getUserData,
-} from "../../utils/UserUtil";
-
-import {
-  updateCachedSharesList,
-  getCachedSharesList,
-  getCachedAccountSummaryChartInfo,
-  updateCachedAccountSummaryChartInfoWholeList,
-  updateCachedAccountSummaryChartInfoOneItem,
-} from "../../utils/RedisUtil";
+import { updateCachedAccountSummaryChartInfoOneItem } from "../../utils/RedisUtil";
 
 import AppBar from "./AppBar";
 import Reminder from "../Reminder/Reminder";
+import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 const styles = (theme) => ({
   root: {
@@ -103,20 +93,16 @@ const styles = (theme) => ({
     width: "75%",
     position: "fixed",
   },
-  countdown: {
-    position: "absolute",
-    marginTop: theme.customMargin.topCountdown,
+  skeletonDiv: {
+    position: "fixed",
+    width: "75%",
     [theme.breakpoints.down("xs")]: {
-      marginTop: theme.customMargin.topCountdownSmall,
+      width: "100%",
     },
-    zIndex: theme.customZIndex.countdown,
   },
-  countdownText: {
-    color: "white",
-    fontSize: "x-large",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "large",
-    },
+  skeleton: {
+    height: "100vh",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
 });
 
@@ -124,6 +110,8 @@ class Layout extends React.Component {
   state = {
     countdown: "",
     hideReminder: false,
+
+    finishedSettingUp: false,
   };
 
   marketCountdownInterval;
@@ -169,62 +157,6 @@ class Layout extends React.Component {
     }
   };
 
-  setupSharesListForCaching = () => {
-    const { email } = this.props.userSession;
-    getCachedSharesList(email)
-      .then((res) => {
-        const { data: cachedShares } = res;
-        if (isEmpty(cachedShares)) {
-          const dataNeeded = {
-            shares: true,
-          };
-          return getUserData(dataNeeded, email);
-        }
-      })
-      .then((sharesData) => {
-        if (sharesData && !isEmpty(sharesData)) {
-          const { shares } = sharesData;
-          return updateCachedSharesList(email, shares);
-        }
-      })
-      .then((afterUpdatingCachedSharesList) => {
-        // checkStockQuotesToCalculateSharesValue(
-        //   this.props.isMarketClosed,
-        //   this.props.userSession,
-        //   this.props.mutateUser
-        // );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  setupAccountSummaryChartForCaching = () => {
-    const { email } = this.props.userSession;
-    getCachedAccountSummaryChartInfo(email)
-      .then((res) => {
-        const { data: chartInfo } = res;
-        if (isEmpty(chartInfo)) {
-          const dataNeeded = {
-            accountSummaryChartInfo: true,
-          };
-          return getUserData(dataNeeded, email);
-        }
-      })
-      .then((chartInfoFromDatabase) => {
-        if (chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
-          const { accountSummaryChartInfo } = chartInfoFromDatabase;
-          return updateCachedAccountSummaryChartInfoWholeList(
-            email,
-            accountSummaryChartInfo
-          );
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   componentDidMount() {
     console.log(this.props.userSession);
 
@@ -234,8 +166,23 @@ class Layout extends React.Component {
     }
 
     if (this.props.userSession.hasFinishedSettingUp) {
-      this.setupAccountSummaryChartForCaching();
-      this.setupSharesListForCaching();
+      mainSetup(
+        this.props.isMarketClosed,
+        this.props.userSession,
+        this.props.mutateUser
+      )
+        .then((finishedSettingUp) => {
+          this.setState({
+            finishedSettingUp: true,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      this.setState({
+        finishedSettingUp: true,
+      });
     }
 
     socketCheckMarketClosed(
@@ -271,7 +218,7 @@ class Layout extends React.Component {
 
   render() {
     const { classes, isMarketClosed } = this.props;
-    const { countdown } = this.state;
+    const { countdown, finishedSettingUp } = this.state;
 
     if (shouldRedirectToLogin(this.props)) {
       return null;
@@ -288,20 +235,16 @@ class Layout extends React.Component {
             <div className={classes.mainBackground} />
             <div className={classes.secondBackground} />
             <div className={classes.thirdBackground} />
-            <div className={classes.countdown}>
-              {isMarketClosed && (
-                <Typography className={classes.countdownText}>
-                  Market Closed
-                </Typography>
-              )}
-              {!isMarketClosed && isEmpty(countdown) && <CircularProgress />}
-              {!isMarketClosed && !isEmpty(countdown) && (
-                <Typography className={classes.countdownText}>
-                  Until Market Close {this.state.countdown}
-                </Typography>
-              )}
-            </div>
-            {this.props.children}
+            <LayoutSpeedDial
+              isMarketClosed={isMarketClosed}
+              remainingTime={countdown}
+            />
+            {!finishedSettingUp && (
+              <div className={classes.skeletonDiv}>
+                <Skeleton variant="rect" className={classes.skeleton} />
+              </div>
+            )}
+            {finishedSettingUp && this.props.children}
           </div>
         </main>
       </div>

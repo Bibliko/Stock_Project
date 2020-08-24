@@ -54,7 +54,7 @@ const styles = (theme) => ({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    height: "200px",
+    height: theme.customHeight.redirectingPaper,
     color: "white",
     padding: 20,
     backgroundColor: theme.palette.paperBackground.onPage,
@@ -94,6 +94,10 @@ const styles = (theme) => ({
   stickyCell: {
     position: "sticky",
     left: 0,
+    borderTopLeftRadius: "4px",
+  },
+  lastElementTopRightRounded: {
+    borderTopRightRadius: "4px",
   },
 });
 
@@ -150,6 +154,7 @@ class WatchlistTableContainer extends React.Component {
         className={clsx(classes.tableCell, {
           [classes.tableCellName]: type === "Name",
           [classes.stickyCell]: type === "Code",
+          [classes.lastElementTopRightRounded]: type === " ",
         })}
       >
         <div
@@ -176,6 +181,7 @@ class WatchlistTableContainer extends React.Component {
         {isEmpty(rows) && (
           <Paper
             className={classes.emptyRowsPaper}
+            elevation={2}
             onMouseEnter={this.hoverPaper}
             onMouseLeave={this.notHoverPaper}
           >
@@ -194,8 +200,8 @@ class WatchlistTableContainer extends React.Component {
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  {this.chooseTableCell("Name", classes)}
                   {this.chooseTableCell("Code", classes)}
+                  {this.chooseTableCell("Name", classes)}
                   {this.chooseTableCell("Price", classes)}
                   {this.chooseTableCell("Volume", classes)}
                   {this.chooseTableCell("Change %", classes)}
