@@ -23,6 +23,7 @@ model User {
   dateOfBirth               DateTime?
   gender                    String?
   region                    String?
+  regionalRanking           Int?                      @default(0)
   occupation                String?
   ranking                   Int?                      @default(0)
   regionalRanking           Int?                      @default(0)

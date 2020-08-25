@@ -7,6 +7,12 @@ const {
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { keysAsync, delAsync } = require("../redis/redis-client");
+
+const {
+  redisUpdateOverallRankingList,
+  redisUpdateRegionalRankingList
+} = require("./RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -53,13 +59,79 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
         }
       })
       .then(() => {
-        console.log("find and create timestamp done");
-        resolve("find and create timestamp done");
+        console.log("Finished finding and creating timestamp");
+        resolve("Finished finding and creating timestamp");
       })
       .catch((err) => {
         reject(err);
       });
   });
+};
+
+const updateRankingList = () => {
+  keysAsync("RANKING_LIST*")
+    .then((keysList) => {
+      return delAsync(keysList);
+    })
+    .then(() => {
+      console.log(`Deleted all redis ranking relating lists`);
+
+      return prisma.user.findMany({
+        where: {
+          hasFinishedSettingUp: true
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          totalPortfolio: true,
+          region: true
+        },
+        orderBy: [
+          {
+            totalPortfolio: "desc"
+          }
+        ]
+      });
+    })
+    .then((usersArray) => {
+      console.log(`Updating ${usersArray.length} user(s): ranking`);
+
+      const regionsList = new Map(); // `region : recent rank`
+      const updateAllUsersRanking = usersArray.map((user, index) => {
+        const nowRegion = user.region;
+
+        if (regionsList.has(nowRegion)) {
+          regionsList.set(nowRegion, regionsList.get(nowRegion) + 1);
+        } else {
+          regionsList.set(nowRegion, 1);
+        }
+
+        const updateUserRanking = prisma.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            ranking: index + 1,
+            regionalRanking: regionsList.get(nowRegion)
+          }
+        });
+
+        return Promise.all([
+          updateUserRanking,
+          redisUpdateOverallRankingList(user),
+          redisUpdateRegionalRankingList(nowRegion, user)
+        ]);
+      });
+
+      return Promise.all(updateAllUsersRanking);
+    })
+    .then(() => {
+      console.log("Successfully updated all users ranking");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 const updateAllUsers = () => {
@@ -82,32 +154,30 @@ const updateAllUsers = () => {
     })
     .then((usersArray) => {
       console.log(
-        `Updated ${usersArray.length} user(s): ranking and portfolioLastClosure`
+        `Updating ${usersArray.length} user(s): portfolioLastClosure and accountSummaryTimestamp`
       );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
-        const updateRankingAndPortfolioLastClosure = prisma.user.update({
+        const updatePortfolioLastClosure = prisma.user.update({
           where: {
             id: user.id
           },
           data: {
-            totalPortfolioLastClosure: user.totalPortfolio,
-            ranking: index + 1
+            totalPortfolioLastClosure: user.totalPortfolio
           }
         });
         const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
           user
         );
 
-        return Promise.all([
-          updateRankingAndPortfolioLastClosure,
-          accountSummaryPromise
-        ]);
+        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise]);
       });
       return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
-      console.log("Update all users successfully.");
+      console.log(
+        "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp"
+      );
     })
     .catch((err) => {
       console.log(err);
@@ -154,7 +224,11 @@ const checkAndUpdateAllUsers = (objVariables) => {
 
 module.exports = {
   deleteExpiredVerification,
+
   createAccountSummaryChartTimestampIfNecessary,
+
   updateAllUsers,
-  checkAndUpdateAllUsers
+  checkAndUpdateAllUsers,
+
+  updateRankingList
 };

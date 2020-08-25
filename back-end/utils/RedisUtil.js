@@ -6,6 +6,20 @@ const {
 } = require("../redis/redis-client");
 
 /**
+ * Keys list:
+ * - '${email}|transactionsHistoryList'
+ * - '${email}|passwordVerification'
+ * - '${email}|accountSummaryChart'
+ * - '${email}|sharesList'
+ *
+ * - 'cachedMarketHoliday'
+ * - 'cachedShares|${companyCode}'
+ *
+ * - 'RANKING_LIST'
+ * - 'RANKING_LIST_${region}'
+ */
+
+/**
  * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
  * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID", "..."
  */
@@ -77,6 +91,15 @@ const getParsedCachedPasswordVerificationCode = (email) => {
 const removeCachedPasswordVerificationCode = (email) => {
   const redisKey = `${email}|passwordVerification`;
   return delAsync(redisKey);
+};
+
+const redisUpdateOverallRankingList = (user) => {
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  return listPushAsync("RANKING_LIST", value);
+};
+const redisUpdateRegionalRankingList = (region, user) => {
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  return listPushAsync(`RANKING_LIST_${region}`, value);
 };
 
 /**
@@ -243,6 +266,9 @@ module.exports = {
   cachePasswordVerificationCode, // user related
   getParsedCachedPasswordVerificationCode, // user related
   removeCachedPasswordVerificationCode, // user related
+
+  redisUpdateOverallRankingList,
+  redisUpdateRegionalRankingList,
 
   parseCachedMarketHoliday,
   getCachedMarketHoliday,

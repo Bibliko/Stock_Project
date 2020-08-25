@@ -100,8 +100,8 @@ const updatePrismaMarketHolidays = (stockMarketHoliday) => {
         }
       })
       .then(() => {
-        console.log("market holiday updated");
-        resolve("market holiday updated");
+        console.log("Successfully updated market holiday");
+        resolve("Successfully updated market holiday");
       })
       .catch((err) => {
         reject(err);
