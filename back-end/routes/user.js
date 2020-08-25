@@ -76,9 +76,9 @@ router.get("/getData", (req, res) => {
 });
 
 router.get("/getOverallRanking", (req, res) => {
-  const {page} = req.query;
+  const { page } = req.query;
 
-  listRangeAsync("RANKING_LIST", 8 * page - 8, 8 * page - 1)
+  listRangeAsync("RANKING_LIST", 8 * (page - 1), 8 * page - 1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
         const data = user.split("|");
@@ -99,9 +99,9 @@ router.get("/getOverallRanking", (req, res) => {
 });
 
 router.get("/getRegionalRanking", (req, res) => {
-  const {region, page} = req.query;
+  const { region, page } = req.query;
 
-  listRangeAsync(`RANKING_LIST_${region}`, 8 * page - 8, 8 * page - 1)
+  listRangeAsync(`RANKING_LIST_${region}`, 8 * (page - 1), 8 * page - 1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
         const data = user.split("|");
