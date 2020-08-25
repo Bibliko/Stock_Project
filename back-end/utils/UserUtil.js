@@ -87,15 +87,17 @@ const updateRankingList = () => {
           totalPortfolio: true,
           region: true
         },
-        orderBy: {
-          totalPortfolio: "desc"
-        }
+        orderBy: [
+          {
+            totalPortfolio: "desc"
+          }
+        ]
       });
     })
     .then((usersArray) => {
       console.log(`Updating ${usersArray.length} user(s): ranking`);
 
-      const regionsList = new Map();
+      const regionsList = new Map(); // `region : recent rank`
       const updateAllUsersRanking = usersArray.map((user, index) => {
         const nowRegion = user.region;
 
