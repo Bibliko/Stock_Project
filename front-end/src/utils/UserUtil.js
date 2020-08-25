@@ -133,7 +133,7 @@ export const changePassword = (password, email) => {
       })
       .catch((err) => {
         console.log(err);
-        reject("Your email or credentials may be wrong.");
+        reject("Your email or credentials may be wrong");
       });
   });
 };

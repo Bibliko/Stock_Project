@@ -209,7 +209,7 @@ class ForgotPassword extends React.Component {
       sendPasswordVerificationCode(this.email)
         .then(() => {
           this.setState({
-            success: "Password Verification Code has been sent.",
+            success: "Password Verification Code has been sent",
             error: "",
             allowCode: true,
           });
@@ -253,7 +253,7 @@ class ForgotPassword extends React.Component {
     } else {
       changePassword(this.password, this.email)
         .then((res) => {
-          this.setState({ success: "Successfully changed password." });
+          this.setState({ success: "Successfully changed password" });
         })
         .catch((err) => {
           this.setState({ error: err });
@@ -283,7 +283,7 @@ class ForgotPassword extends React.Component {
     const { success, error } = this.state;
     return (
       !isEmpty(success) &&
-      isEqual(success, "Successfully changed password.") &&
+      isEqual(success, "Successfully changed password") &&
       isEmpty(error)
     );
   };

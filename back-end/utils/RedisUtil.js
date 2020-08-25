@@ -41,7 +41,7 @@ const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
   listPushAsync(redisKey, newValue)
     .then((finishedUpdatingRedisTransactionsHistoryList) => {
       console.log(
-        `Successfully added transaction to ${email}'s cached transactions history.`
+        `Successfully added transaction to ${email}'s cached transactions history`
       );
     })
     .catch((err) => {
@@ -233,7 +233,7 @@ const updateCachedShareInfo = (
 
     setAsync(redisKey, valueString)
       .then((quote) => {
-        resolve(`Updated ${redisKey} successfully.`);
+        resolve(`Updated ${redisKey} successfully`);
       })
       .catch((err) => {
         reject(err);
@@ -252,7 +252,7 @@ const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
         );
       })
       .then((afterUpdate) => {
-        resolve(`Updated ${redisKey} successfully.`);
+        resolve(`Updated ${redisKey} successfully`);
       })
       .catch((err) => {
         reject(err);
