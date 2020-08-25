@@ -31,6 +31,11 @@ const styles = (theme) => ({
   paper: {
     maxWidth: "330px",
     minWidth: "220px",
+    backgroundColor: theme.palette.paperBackground.onPage,
+    color: "white",
+  },
+  iconButton: {
+    color: "white",
   },
   dialogTitle: {
     display: "flex",
@@ -124,7 +129,11 @@ function UploadFileDialog(props) {
                 onChange={handleFile}
               />
               <label htmlFor="raised-button-file">
-                <IconButton variant="raised" component="span">
+                <IconButton
+                  variant="raised"
+                  component="span"
+                  className={classes.iconButton}
+                >
                   <CloudUploadIcon />
                 </IconButton>
               </label>

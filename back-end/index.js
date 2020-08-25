@@ -1,7 +1,7 @@
 /**
  * Table of content of this file:
  * - 1st part: set up passport
- * - 2nd part: important timers and intervals
+ * - 2nd part: important intervals
  * - 3rd part: APIs for Passport
  * - 4th part: verification APIs
  * - 5th part: other APIs
@@ -48,12 +48,17 @@ const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
+const {
+  cachePasswordVerificationCode,
+  getParsedCachedPasswordVerificationCode,
+  removeCachedPasswordVerificationCode
+} = require("./utils/RedisUtil");
+
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const fs = require("fs-extra");
 const randomKey = require("random-key");
-let passwordVerificationCode = "";
 
 const http = require("http");
 const server = http.createServer(app);
@@ -95,9 +100,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 setupPassport(passport);
-
-// important timers and intervals
-var timerForSendCodeVerifyingPassword;
 
 /**
  * objVariables allow us to change variables inside the object by using
@@ -284,65 +286,99 @@ app.get("/logout", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
+      res.sendStatus(500);
     });
 });
 
 // verification APIs are listed below:
 
 app.get("/passwordVerification", (req, res) => {
-  if (
-    timerForSendCodeVerifyingPassword &&
-    timerForSendCodeVerifyingPassword._idleTimeout > -1
-  ) {
-    console.log(timerForSendCodeVerifyingPassword);
-    return res
-      .status(429)
-      .send(
-        `Wait ${
-          timerForSendCodeVerifyingPassword._idleTimeout / 1000
-        } seconds to send code again.`
-      );
-  }
+  const { email } = req.query;
+  const timestampNowOfRequest = Math.round(Date.now() / 1000);
 
-  passwordVerificationCode = randomKey.generate(6);
-  fs.readFile("./verificationHTML/verifyPassword.html", "utf8")
-    .then((data) => {
-      const htmlFile = data.replace(
-        "{{ verificationKey }}",
-        passwordVerificationCode
-      );
+  getParsedCachedPasswordVerificationCode(email)
+    .then((redisCachedCode) => {
+      if (!redisCachedCode) {
+        const passwordVerificationCode = randomKey.generate(6);
+        return Promise.all([
+          cachePasswordVerificationCode(email, passwordVerificationCode),
+          passwordVerificationCode
+        ]);
+      }
 
-      const msg = {
-        to: `${req.query.email}`,
-        from: "Bibliko <biblikoorg@gmail.com>",
-        subject: "Password Reset Code",
-        html: htmlFile
-      };
-
-      // return mg.messages().send(msg);
-      return sgMail.send(msg);
+      const { timestamp } = redisCachedCode;
+      if (timestampNowOfRequest < timestamp + 15) {
+        res
+          .status(429)
+          .send(
+            `Wait ${
+              timestamp + 15 - timestampNowOfRequest
+            }  seconds to send code again.`
+          );
+      } else {
+        const passwordVerificationCode = randomKey.generate(6);
+        return Promise.all([
+          cachePasswordVerificationCode(email, passwordVerificationCode),
+          passwordVerificationCode
+        ]);
+      }
     })
-    .then(() => {
-      console.log("Code for password recovery has been sent.");
+    .then((resultArray) => {
+      if (resultArray) {
+        const passwordVerificationCode = resultArray[1];
 
-      timerForSendCodeVerifyingPassword = setTimeout(() => {
-        clearTimeout(timerForSendCodeVerifyingPassword);
-      }, 15 * oneSecond);
+        return fs
+          .readFile("./verificationHTML/verifyPassword.html", "utf8")
+          .then((dataHTML) => {
+            const htmlFile = dataHTML.replace(
+              "{{ verificationKey }}",
+              passwordVerificationCode
+            );
 
-      res.sendStatus(200);
+            const msg = {
+              to: `${email}`,
+              from: "Bibliko <biblikoorg@gmail.com>",
+              subject: "Password Reset Code",
+              html: htmlFile
+            };
+
+            // return mg.messages().send(msg);
+            return sgMail.send(msg);
+          })
+          .catch((err) => {
+            console.log(err);
+            res.sendStatus(500);
+          });
+      }
+    })
+    .then((passwordVerificationCodeSent) => {
+      if (passwordVerificationCodeSent) {
+        console.log(`Sent password verification code for ${email}.`);
+        res.sendStatus(200);
+      }
     })
     .catch((err) => {
       console.log(err);
+      res.sendStatus(500);
     });
 });
 
-app.get("/checkVerificationCode", (req, res) => {
-  const { code } = req.query;
-  if (code !== passwordVerificationCode) {
-    res.status(404).send("Your verification code does not match.");
-  } else {
-    res.sendStatus(200);
-  }
+app.get("/checkPasswordVerificationCode", (req, res) => {
+  const { email, code } = req.query;
+  getParsedCachedPasswordVerificationCode(email)
+    .then((redisCachedCode) => {
+      const { secretCode } = redisCachedCode;
+      if (code !== secretCode) {
+        res.status(404).send("Your verification code does not match.");
+      } else {
+        res.sendStatus(200);
+        return removeCachedPasswordVerificationCode(email);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
 });
 
 app.use("/verification/:tokenId", (req, res) => {
@@ -393,6 +429,7 @@ app.use("/verification/:tokenId", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
+      res.sendStatus(500);
     });
 });
 

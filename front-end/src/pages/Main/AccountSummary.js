@@ -17,6 +17,9 @@ import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
+
+import StorefrontRoundedIcon from "@material-ui/icons/StorefrontRounded";
 
 const styles = (theme) => ({
   root: {
@@ -82,12 +85,32 @@ const styles = (theme) => ({
   portfolioChart: {
     color: "#2F80ED",
   },
+  paperAccountSummary: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    height: "200px",
+    width: "100%",
+    color: "white",
+    padding: 20,
+    backgroundColor: theme.palette.paperBackground.onPage,
+  },
+  storeIcon: {
+    height: "50px",
+    width: "auto",
+    marginBottom: "5px",
+    [theme.breakpoints.down("xs")]: {
+      height: "40px",
+    },
+  },
   holdingsText: {
     color: "white",
     fontSize: "large",
     [theme.breakpoints.down("xs")]: {
       fontSize: "medium",
     },
+    textAlign: "center",
   },
   titleChart: {
     fontSize: "x-large",
@@ -203,9 +226,12 @@ class AccountSummary extends React.Component {
               Holdings
             </Typography>
             {isEmpty(this.state.holdingsRows) && (
-              <Typography className={classes.holdingsText}>
-                Start by buying some stocks!
-              </Typography>
+              <Paper className={classes.paperAccountSummary} elevation={2}>
+                <StorefrontRoundedIcon className={classes.storeIcon} />
+                <Typography className={classes.holdingsText}>
+                  Start by buying some stocks!
+                </Typography>
+              </Paper>
             )}
             {!isEmpty(this.state.holdingsRows) && (
               <HoldingsTableContainer rows={this.state.holdingsRows} />

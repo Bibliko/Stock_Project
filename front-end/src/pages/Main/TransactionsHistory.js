@@ -1,10 +1,11 @@
 import React from "react";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
-
 import { connect } from "react-redux";
 
-import WatchlistTableContainer from "../../components/Table/WatchlistTable/WatchlistTableContainer";
+import { getParsedCachedPaginatedTransactionsHistoryList } from "../../utils/RedisUtil";
+
+import TransactionsHistoryTableContainer from "../../components/Table/TransactionsHistoryTable/TransactionsHistoryTableContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -37,40 +38,49 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     justifyContent: "center",
   },
-  itemGrid: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  watchlistStartingText: {
-    color: "white",
-    fontSize: "large",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "medium",
-    },
-  },
 });
 
-class WatchlistPage extends React.Component {
+class TransactionsHistoryPage extends React.Component {
+  state = {
+    transactions: [],
+  };
+
   componentDidMount() {
     console.log(this.props.userSession);
+
+    getParsedCachedPaginatedTransactionsHistoryList(
+      this.props.userSession.email,
+      1
+    )
+      .then((transactions) => {
+        this.setState({
+          transactions,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email", "watchlist"];
+    const compareKeys = ["email"];
     const nextPropsCompare = pick(nextProps.userSession, compareKeys);
     const propsCompare = pick(this.props.userSession, compareKeys);
 
-    return !isEqual(nextPropsCompare, propsCompare);
+    return (
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
+    );
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { classes } = this.props;
+    const { transactions } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
         <Grid container spacing={4} className={classes.fullWidth}>
-          <WatchlistTableContainer rows={userSession.watchlist} />
+          <TransactionsHistoryTableContainer rows={transactions} />
         </Grid>
       </Container>
     );
@@ -82,5 +92,5 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(WatchlistPage))
+  withStyles(styles)(withRouter(TransactionsHistoryPage))
 );

@@ -1,9 +1,8 @@
 import axios from "axios";
 import { isEmpty, isEqual } from "lodash";
 
-import { getManyStockQuotes } from "./FinancialModelingPrepUtil";
 import { getBackendHost } from "./NetworkUtil";
-import { getParsedCachedSharesList } from "./RedisUtil";
+import { getParsedCachedSharesList, getManyStockQuotes } from "./RedisUtil";
 
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
@@ -98,11 +97,12 @@ export const sendPasswordVerificationCode = (email) => {
   });
 };
 
-export const checkVerificationCode = (code) => {
+export const checkPasswordVerificationCode = (email, code) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/checkVerificationCode`, {
+    axios(`${BACKEND_HOST}/checkPasswordVerificationCode`, {
       method: "get",
       params: {
+        email,
         code,
       },
       withCredentials: true,
@@ -133,7 +133,7 @@ export const changePassword = (password, email) => {
       })
       .catch((err) => {
         console.log(err);
-        reject("Your email or credentials may be wrong.");
+        reject("Your email or credentials may be wrong");
       });
   });
 };
@@ -196,6 +196,33 @@ export const getUserData = (dataNeeded, email) => {
           userData.data.dateOfBirth = new Date(userData.data.dateOfBirth);
         }
         resolve(userData.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getUserTransactions = (filtering, email) => {
+  /**
+   * filtering in form:
+   *    filtering = {
+   *      isFinished: true, -> prisma relation filtering
+   *      ...
+   *    }
+   */
+
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getUserTransactions`, {
+      method: "get",
+      params: {
+        email,
+        filtering,
+      },
+      withCredentials: true,
+    })
+      .then((transactions) => {
+        resolve(transactions.data);
       })
       .catch((err) => {
         reject(err);
@@ -321,11 +348,12 @@ export default {
   signupUser,
 
   sendPasswordVerificationCode,
-  checkVerificationCode,
+  checkPasswordVerificationCode,
 
   changePassword,
   changeUserData,
   getUserData,
+  getUserTransactions,
 
   calculateTotalSharesValue,
   checkStockQuotesForUser,

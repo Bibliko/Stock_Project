@@ -2,21 +2,23 @@ const theme = {
   customWidth: {
     maxSearchFieldWithLogo: "360px",
     maxSearchFieldWidth: "235px",
+
+    redirectingPaper: "90%",
   },
   customHeight: {
     appBarHeight: "60px",
     appBarHeightSmall: "50px",
+
+    redirectingPaper: "200px",
   },
   customMargin: {
-    topLayout: "120px",
-    topLayoutSmall: "110px",
-
-    topCountdown: "65px",
-    topCountdownSmall: "55px",
+    topLayout: "80px",
+    topLayoutSmall: "70px",
   },
   customZIndex: {
     reminder: 10,
     countdown: 5,
+    floatingActionButton: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchFieldContainer: 1000,
     searchMenu: 1200,
