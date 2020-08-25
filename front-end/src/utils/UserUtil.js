@@ -97,11 +97,12 @@ export const sendPasswordVerificationCode = (email) => {
   });
 };
 
-export const checkVerificationCode = (code) => {
+export const checkPasswordVerificationCode = (email, code) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/checkVerificationCode`, {
+    axios(`${BACKEND_HOST}/checkPasswordVerificationCode`, {
       method: "get",
       params: {
+        email,
         code,
       },
       withCredentials: true,
@@ -347,7 +348,7 @@ export default {
   signupUser,
 
   sendPasswordVerificationCode,
-  checkVerificationCode,
+  checkPasswordVerificationCode,
 
   changePassword,
   changeUserData,

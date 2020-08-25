@@ -105,7 +105,7 @@ class LayoutSpeedDial extends React.Component {
           direction="up"
         >
           <SpeedDialAction
-            icon={isMarketClosed ? <TimerIcon /> : <TimerOffIcon />}
+            icon={!isMarketClosed ? <TimerIcon /> : <TimerOffIcon />}
             tooltipTitle={"Market Time"}
             onClick={this.openMarketTimeDialog}
             classes={{ fab: classes.speedDialButton }}

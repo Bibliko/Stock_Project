@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
@@ -10,7 +11,7 @@ import {
 import {
   loginUser,
   sendPasswordVerificationCode,
-  checkVerificationCode,
+  checkPasswordVerificationCode,
   changePassword,
 } from "../../utils/UserUtil";
 
@@ -99,6 +100,14 @@ const styles = (theme) => ({
   announcementText: {
     fontSize: "small",
   },
+  successText: {
+    fontSize: "small",
+    color: theme.palette.succeed.main,
+  },
+  successTextLarge: {
+    fontSize: "large",
+    fontWeight: "bold",
+  },
   orLogInWith: {
     fontWeight: "lighter",
     color: theme.palette.subText.main,
@@ -151,25 +160,32 @@ class ForgotPassword extends React.Component {
   password = "";
   confirmPassword = "";
 
+  clearSuccessAndError = () => {
+    if (!isEmpty(this.state.error)) {
+      this.setState({
+        error: "",
+      });
+    }
+    if (!isEmpty(this.state.success)) {
+      this.setState({
+        success: "",
+      });
+    }
+  };
+
   changeEmail = (event) => {
     this.email = event.target.value;
-    if (!isEmpty(this.state.error)) {
-      this.setState({ error: "" });
-    }
+    this.clearSuccessAndError();
   };
 
   changeCode = (event) => {
     this.code = event.target.value;
-    if (!isEmpty(this.state.error)) {
-      this.setState({ error: "" });
-    }
+    this.clearSuccessAndError();
   };
 
   changePassword = (event) => {
     this.password = event.target.value;
-    if (!isEmpty(this.state.error)) {
-      this.setState({ error: "" });
-    }
+    this.clearSuccessAndError();
   };
 
   changeConfirmPassword = (event) => {
@@ -193,7 +209,7 @@ class ForgotPassword extends React.Component {
       sendPasswordVerificationCode(this.email)
         .then(() => {
           this.setState({
-            success: "Reset Code has been sent.",
+            success: "Password Verification Code has been sent.",
             error: "",
             allowCode: true,
           });
@@ -211,7 +227,7 @@ class ForgotPassword extends React.Component {
         error: this.errorTypes[1],
       });
     } else {
-      checkVerificationCode(this.code)
+      checkPasswordVerificationCode(this.email, this.code)
         .then(() => {
           this.setState({
             allowButtonSendCode: false,
@@ -237,7 +253,7 @@ class ForgotPassword extends React.Component {
     } else {
       changePassword(this.password, this.email)
         .then((res) => {
-          this.setState({ success: res });
+          this.setState({ success: "Successfully changed password." });
         })
         .catch((err) => {
           this.setState({ error: err });
@@ -263,6 +279,15 @@ class ForgotPassword extends React.Component {
     }
   };
 
+  shouldShowSuccessOnly = () => {
+    const { success, error } = this.state;
+    return (
+      !isEmpty(success) &&
+      isEqual(success, "Successfully changed password.") &&
+      isEmpty(error)
+    );
+  };
+
   componentDidMount() {
     if (shouldRedirectToLandingPage(this.props)) {
       redirectToPage("/", this.props);
@@ -277,6 +302,13 @@ class ForgotPassword extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const {
+      allowButtonSendCode,
+      allowCode,
+      allowPassword,
+      success,
+      error,
+    } = this.state;
 
     if (shouldRedirectToLandingPage(this.props)) {
       return null;
@@ -298,38 +330,19 @@ class ForgotPassword extends React.Component {
                 src="/bibOfficial.jpg"
                 alt="Bibliko"
               />
-              <Typography className={classes.instruction}>
-                Please enter your email and we’ll send you a code.
-              </Typography>
-              <Grid
-                item
-                xs
-                container
-                direction="column"
-                className={classes.mainGridOfPaper}
-              >
+              {!this.shouldShowSuccessOnly() && (
+                <Typography className={classes.instruction}>
+                  Please enter your email and we’ll send you a code.
+                </Typography>
+              )}
+              {!this.shouldShowSuccessOnly() && (
                 <Grid
                   item
                   xs
-                  className={classes.textFieldGrid}
                   container
                   direction="column"
+                  className={classes.mainGridOfPaper}
                 >
-                  <NormalTextField
-                    name="Email"
-                    changeData={this.changeEmail}
-                    enterData={this.enterEmail}
-                  />
-                  {this.state.allowButtonSendCode && (
-                    <Button
-                      onClick={this.sendCode}
-                      className={classes.buttonStyles}
-                    >
-                      Send
-                    </Button>
-                  )}
-                </Grid>
-                {this.state.allowCode && (
                   <Grid
                     item
                     xs
@@ -338,64 +351,88 @@ class ForgotPassword extends React.Component {
                     direction="column"
                   >
                     <NormalTextField
-                      name="Code"
-                      changeData={this.changeCode}
-                      enterData={this.enterCode}
+                      name="Email"
+                      changeData={this.changeEmail}
+                      enterData={this.enterEmail}
                     />
-                    <Button
-                      onClick={this.verifyCode}
-                      className={classes.buttonStyles}
-                    >
-                      Confirm
-                    </Button>
+                    {allowButtonSendCode && (
+                      <Button
+                        onClick={this.sendCode}
+                        className={classes.buttonStyles}
+                      >
+                        Send
+                      </Button>
+                    )}
                   </Grid>
-                )}
-                {this.state.allowPassword && (
-                  <Grid
-                    item
-                    xs
-                    container
-                    direction="column"
-                    className={classes.textFieldGrid}
-                  >
-                    <PasswordTextField
-                      name="Password"
-                      changePassword={this.changePassword}
-                      enterPassword={this.enterPassword}
-                    />
-                    <PasswordTextField
-                      name="Confirm Password"
-                      changePassword={this.changeConfirmPassword}
-                      enterPassword={this.enterPassword}
-                    />
-                    <Button
-                      onClick={this.submit}
-                      className={classes.buttonStyles}
+                  {allowCode && (
+                    <Grid
+                      item
+                      xs
+                      className={classes.textFieldGrid}
+                      container
+                      direction="column"
                     >
-                      Submit
-                    </Button>
-                  </Grid>
-                )}
-              </Grid>
-              {!isEmpty(this.state.error) && (
+                      <NormalTextField
+                        name="Code"
+                        changeData={this.changeCode}
+                        enterData={this.enterCode}
+                      />
+                      <Button
+                        onClick={this.verifyCode}
+                        className={classes.buttonStyles}
+                      >
+                        Confirm
+                      </Button>
+                    </Grid>
+                  )}
+                  {allowPassword && (
+                    <Grid
+                      item
+                      xs
+                      container
+                      direction="column"
+                      className={classes.textFieldGrid}
+                    >
+                      <PasswordTextField
+                        name="Password"
+                        changePassword={this.changePassword}
+                        enterPassword={this.enterPassword}
+                      />
+                      <PasswordTextField
+                        name="Confirm Password"
+                        changePassword={this.changeConfirmPassword}
+                        enterPassword={this.enterPassword}
+                      />
+                      <Button
+                        onClick={this.submit}
+                        className={classes.buttonStyles}
+                      >
+                        Submit
+                      </Button>
+                    </Grid>
+                  )}
+                </Grid>
+              )}
+              {!isEmpty(error) && (
                 <Grid item xs className={classes.center}>
                   <Typography
                     color="error"
                     align="center"
                     className={classes.announcementText}
                   >
-                    Error: {this.state.error}
+                    Error: {error}
                   </Typography>
                 </Grid>
               )}
-              {!isEmpty(this.state.success) && (
+              {!isEmpty(success) && isEmpty(error) && (
                 <Grid item xs className={classes.center}>
                   <Typography
-                    color="primary"
                     align="center"
-                    className={classes.announcementText}
+                    className={clsx(classes.successText, {
+                      [classes.successTextLarge]: this.shouldShowSuccessOnly(),
+                    })}
                   >
-                    Success: {this.state.success}
+                    Success: {success}
                   </Typography>
                 </Grid>
               )}
