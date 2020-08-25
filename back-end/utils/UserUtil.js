@@ -154,7 +154,7 @@ const updateAllUsers = () => {
     })
     .then((usersArray) => {
       console.log(
-        `Updating ${usersArray.length} user(s): portfolioLastClosure`
+        `Updating ${usersArray.length} user(s): portfolioLastClosure and accountSummaryTimestamp`
       );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
