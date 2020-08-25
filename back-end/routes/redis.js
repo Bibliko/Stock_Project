@@ -16,6 +16,15 @@ const {
 } = require("../utils/RedisUtil");
 
 /**
+ * Keys list:
+ * - '${email}|accountSummaryChart'
+ * - '${email}|sharesList'
+ * - 'cachedShares|${companyCode}'
+ * - 'RANKING_LIST'
+ * - 'RANKING_LIST_${region}'
+ */
+
+/**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
  */
 router.put("/updateAccountSummaryChartWholeList", (req, res) => {

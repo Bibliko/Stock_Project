@@ -29,13 +29,15 @@ const {
 const {
   oneSecond,
   oneDay,
+  oneMinute,
   clearIntervals,
   clearIntervalsIfIntervalsNotEmpty
 } = require("./utils/DayTimeUtil");
 
 const {
   deleteExpiredVerification,
-  checkAndUpdateAllUsers
+  checkAndUpdateAllUsers,
+  updateRankingList
 } = require("./utils/UserUtil");
 
 const { checkMarketClosed } = require("./utils/SocketUtil");
@@ -117,6 +119,10 @@ setInterval(() => updateMarketHolidaysFromFMP(objVariables), oneDay);
 setInterval(deletePrismaMarketHolidays, oneDay);
 
 setInterval(() => checkAndUpdateAllUsers(objVariables), oneSecond);
+
+// Update RankingList after 10 minutes
+updateRankingList();
+setInterval(updateRankingList, 10 * oneMinute);
 
 // All app routes are written below this comment:
 
