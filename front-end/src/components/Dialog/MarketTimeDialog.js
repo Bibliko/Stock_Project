@@ -16,8 +16,6 @@ const styles = (theme) => ({
   dialogPaper: {
     "& .MuiDialog-paper": {
       paddingTop: 16,
-      paddingLeft: 16,
-      paddingRight: 16,
       paddingBottom: 32,
       backgroundColor: theme.palette.paperBackground.onPage,
       color: "white",
