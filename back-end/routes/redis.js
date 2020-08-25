@@ -2,10 +2,18 @@ const express = require("express");
 const router = express.Router();
 const {
   getAsync,
-  setAsync,
   listPushAsync,
   listRangeAsync
 } = require("../redis/redis-client");
+const {
+  getFullStockQuoteFromFMP
+} = require("../utils/FinancialModelingPrepUtil");
+const { isMarketClosedCheck } = require("../utils/DayTimeUtil");
+const {
+  parseCachedShareInfo,
+  updateCachedShareInfo,
+  switchFlagUpdatingUsingFMPToTrue
+} = require("../utils/RedisUtil");
 
 /**
  * Keys list:
@@ -24,17 +32,12 @@ router.put("/updateAccountSummaryChartWholeList", (req, res) => {
 
   const redisKey = `${email}|accountSummaryChart`;
 
-  listRangeAsync(redisKey, 0, -1)
-    .then((timestampsList) => {
-      if (timestampsList) {
-        const listPushPromise = prismaTimestamps.map((timestamp) => {
-          const { UTCDateString, portfolioValue } = timestamp;
-          const newValue = `${UTCDateString}|${portfolioValue}`;
-          return listPushAsync(redisKey, newValue);
-        });
-        return Promise.all(listPushPromise);
-      }
-    })
+  const listPushPromise = prismaTimestamps.map((timestamp) => {
+    const { UTCDateString, portfolioValue } = timestamp;
+    const newValue = `${UTCDateString}|${portfolioValue}`;
+    return listPushAsync(redisKey, newValue);
+  });
+  Promise.all(listPushPromise)
     .then((finishedUpdatingRedisTimestampsList) => {
       res.sendStatus(200);
     })
@@ -49,12 +52,7 @@ router.put("/updateAccountSummaryChartOneItem", (req, res) => {
   const redisKey = `${email}|accountSummaryChart`;
   const newValue = `${timestamp}|${portfolioValue}`;
 
-  listRangeAsync(redisKey, 0, -1)
-    .then((timestampArray) => {
-      if (timestampArray) {
-        return listPushAsync(redisKey, newValue);
-      }
-    })
+  listPushAsync(redisKey, newValue)
     .then((finishedUpdatingRedisAccountSummaryChart) => {
       res.sendStatus(200);
     })
@@ -94,31 +92,19 @@ router.get("/getAccountSummaryChartLatestItem", (req, res) => {
 
 /**
  * 'doanhtu07@gmail.com|sharesList' :
- * List -> "id1|companyCode1|quantity1|buyPriceAvg1|lastPrice1|userID1", "..."
+ * List -> "id1|companyCode1|quantity1|buyPriceAvg1|userID1", "..."
  */
 router.put("/updateSharesList", (req, res) => {
   const { email, shares } = req.body;
 
   const redisKey = `${email}|sharesList`;
 
-  listRangeAsync(redisKey, 0, -1)
-    .then((sharesList) => {
-      if (sharesList) {
-        const listPushPromise = shares.map((share) => {
-          const {
-            id,
-            companyCode,
-            quantity,
-            buyPriceAvg,
-            lastPrice,
-            userID
-          } = share;
-          const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${lastPrice}|${userID}`;
-          return listPushAsync(redisKey, newValue);
-        });
-        return Promise.all(listPushPromise);
-      }
-    })
+  const listPushPromise = shares.map((share) => {
+    const { id, companyCode, quantity, buyPriceAvg, userID } = share;
+    const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
+    return listPushAsync(redisKey, newValue);
+  });
+  Promise.all(listPushPromise)
     .then((finishedUpdatingRedisSharesList) => {
       res.sendStatus(200);
     })
@@ -143,61 +129,61 @@ router.get("/getSharesList", (req, res) => {
 });
 
 /**
- * 'cachedShares|AAPL': 'name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
+ * 'cachedShares|AAPL': 'isUpdatingUsingFMP|timestampLastUpdated|name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
+ *
+ * find cachedShares first:
+ *
+ * if no exist:
+ *  go to FMP directly
+ *  cache
+ *
+ * if exist already:
+ *  request send to this route -> get timestamp of request -> check if ( timestamp > timestampLastUpdated 500ms )
+ *  - if ( timestamp > timestampLastUpdated 500ms && isUpdatingUsingFMP false) -> cache new stock
+ *  - else -> get old stock
+ *
+ *
  */
 router.get("/getCachedShareInfo", (req, res) => {
   const { companyCode } = req.query;
 
   const redisKey = `cachedShares|${companyCode}`;
 
-  getAsync(redisKey)
-    .then((quote) => {
-      res.send(quote);
+  const timeNowOfRequest = new Date().getTime(); // in miliseconds
+
+  isMarketClosedCheck()
+    .then((isMarketClosed) => {
+      return Promise.all([getAsync(redisKey), isMarketClosed]);
     })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-router.put("/updateCachedShareInfo", (req, res) => {
-  const { stockQuoteJSON } = req.body;
-  if (!stockQuoteJSON) {
-    res.send("stockQuoteJSON is empty, redis.js 156");
-    return;
-  }
+    .then(([quote, isMarketClosed]) => {
+      console.log(quote, "redis.js /getCachedShareInfo");
+      if (!quote) {
+        return Promise.all([getFullStockQuoteFromFMP(companyCode), null, null]);
+      }
 
-  const {
-    symbol,
-    name,
-    price,
-    changesPercentage,
-    change,
-    dayLow,
-    dayHigh,
-    yearHigh,
-    yearLow,
-    marketCap,
-    priceAvg50,
-    priceAvg200,
-    volume,
-    avgVolume,
-    exchange,
-    open,
-    previousClose,
-    eps,
-    pe,
-    earningsAnnouncement,
-    sharesOutstanding,
-    timestamp
-  } = stockQuoteJSON;
+      const parsedCachedShare = parseCachedShareInfo(quote);
+      const { timestampLastUpdated, isUpdatingUsingFMP } = parsedCachedShare;
 
-  const redisKey = `cachedShares|${symbol}`;
-
-  const valueString = `${name}|${price}|${changesPercentage}|${change}|${dayLow}|${dayHigh}|${yearHigh}|${yearLow}|${marketCap}|${priceAvg50}|${priceAvg200}|${volume}|${avgVolume}|${exchange}|${open}|${previousClose}|${eps}|${pe}|${earningsAnnouncement}|${sharesOutstanding}|${timestamp}`;
-
-  setAsync(redisKey, valueString)
-    .then((quote) => {
-      res.sendStatus(200);
+      if (
+        timeNowOfRequest >= timestampLastUpdated + 500 &&
+        !isUpdatingUsingFMP &&
+        !isMarketClosed
+      ) {
+        return Promise.all([
+          getFullStockQuoteFromFMP(companyCode),
+          parsedCachedShare,
+          switchFlagUpdatingUsingFMPToTrue(companyCode, timeNowOfRequest)
+        ]);
+      }
+      return [null, parsedCachedShare, null];
+    })
+    .then(([stockQuoteJSON, cachedQuote, switchUpdatingFromFMPFlag]) => {
+      if (stockQuoteJSON) {
+        res.send(stockQuoteJSON);
+        return updateCachedShareInfo(stockQuoteJSON, false, timeNowOfRequest);
+      } else {
+        res.send(cachedQuote);
+      }
     })
     .catch((err) => {
       console.log(err);

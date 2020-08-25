@@ -91,7 +91,7 @@ class AvatarSection extends React.Component {
           console.log(err);
         });
     } else {
-      this.dialogRef.current.fail();
+      this.setFail();
     }
   };
 

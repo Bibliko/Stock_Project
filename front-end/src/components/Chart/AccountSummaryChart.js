@@ -9,6 +9,7 @@ import {
   getCachedAccountSummaryChartInfo,
   parseRedisAccountSummaryChartItem,
 } from "../../utils/RedisUtil";
+import { numberWithCommas } from "../../utils/NumberUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -90,7 +91,7 @@ class AccountSummaryChart extends React.Component {
         tickAmount: 6,
         tooltip: {
           formatter: function (val, opts) {
-            return new Date(val);
+            return new Date(val).toLocaleTimeString();
           },
         },
       },
@@ -112,6 +113,11 @@ class AccountSummaryChart extends React.Component {
       tooltip: {
         x: {
           format: "dd MMM yyyy",
+        },
+        y: {
+          formatter: function (val, opts) {
+            return `$${numberWithCommas(val)}`;
+          },
         },
       },
       dataLabels: {
@@ -149,12 +155,7 @@ class AccountSummaryChart extends React.Component {
   intervalCheckThemeBreakpoints;
   intervalUpdateChartSeries;
 
-  setStateChart = (
-    enableSparkline,
-    showLabelsXaxis,
-    showLabelsYaxis,
-    showComplexXaxisTooltipFormatter
-  ) => {
+  setStateChart = (enableSparkline, showLabelsXaxis, showLabelsYaxis) => {
     this.setState({
       options: {
         ...this.state.options,
@@ -169,15 +170,6 @@ class AccountSummaryChart extends React.Component {
           labels: {
             ...this.state.options.xaxis.labels,
             show: showLabelsXaxis,
-          },
-          tooltip: {
-            formatter: showComplexXaxisTooltipFormatter
-              ? function (val, opts) {
-                  return new Date(val);
-                }
-              : function (val, opt) {
-                  return new Date(val).toLocaleTimeString();
-                },
           },
         },
         yaxis: {
@@ -198,10 +190,10 @@ class AccountSummaryChart extends React.Component {
 
     // mediaQuery in this case check if theme breakpoints is below sm (600px)
     if (!isScreenSmall && this.state.options.chart.sparkline.enabled) {
-      this.setStateChart(false, true, true, true);
+      this.setStateChart(false, true, true);
     }
     if (isScreenSmall && !this.state.options.chart.sparkline.enabled) {
-      this.setStateChart(true, false, false, false);
+      this.setStateChart(true, false, false);
     }
   };
 
@@ -213,9 +205,17 @@ class AccountSummaryChart extends React.Component {
         const { data } = cachedTimestamp;
         if (data) {
           data.map((timestamp) => {
-            return seriesData.push(
-              parseRedisAccountSummaryChartItem(timestamp)
+            const parsedChartItem = parseRedisAccountSummaryChartItem(
+              timestamp
             );
+
+            // eliminate cases that value of timestamp is null
+            if (parsedChartItem[1]) {
+              return seriesData.push(
+                parseRedisAccountSummaryChartItem(timestamp)
+              );
+            }
+            return "dummy value";
           });
         }
 

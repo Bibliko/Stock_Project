@@ -144,9 +144,11 @@ const updateAllUsers = () => {
         id: true,
         totalPortfolio: true
       },
-      orderBy: {
-        totalPortfolio: "desc"
-      }
+      orderBy: [
+        {
+          totalPortfolio: "desc"
+        }
+      ]
     })
     .then((usersArray) => {
       console.log(
@@ -184,10 +186,7 @@ const updateAllUsers = () => {
  * objVariables: object passed in from back-end/index
  */
 const checkAndUpdateAllUsers = (objVariables) => {
-  // console.log(objVariables);
-
   if (!objVariables.isPrismaMarketHolidaysInitialized) {
-    console.log("UserUtil, 68");
     return;
   }
 
@@ -195,7 +194,6 @@ const checkAndUpdateAllUsers = (objVariables) => {
     .then((checkResult) => {
       // check if market is closed and update the status of objVariables
       if (!isEqual(checkResult, objVariables.isMarketClosed)) {
-        console.log(checkResult, "UserUtil, 76");
         objVariables.isMarketClosed = checkResult;
       }
 

@@ -6,8 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { changeShareData } from "../../../utils/ShareUtil";
-import { getStockPriceFromFMP } from "../../../utils/FinancialModelingPrepUtil";
+import { getFullStockQuote } from "../../../utils/FinancialModelingPrepUtil";
 import { oneSecond } from "../../../utils/DayTimeUtil";
 import { numberWithCommas } from "../../../utils/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
@@ -277,7 +276,7 @@ class HoldingsTableRow extends React.Component {
       brokerage = 20 + (0.25 / 100) * (lastPrice * holding - 10000);
     }
 
-    if (!isEqual(this.state.lastPrice, lastPrice)) {
+    if (lastPrice && !isEqual(this.state.lastPrice, lastPrice)) {
       this.setState({
         lastPrice: lastPrice.toFixed(2),
         profitOrLoss: ((lastPrice - buyPriceAvg) * holding - brokerage).toFixed(
@@ -288,37 +287,23 @@ class HoldingsTableRow extends React.Component {
   };
 
   updateHoldingInformation = () => {
-    const { id, code, holding, buyPriceAvg, lastPrice } = this.props.rowData;
-
-    console.log(lastPrice);
-
-    if (this.props.isMarketClosed) {
-      this.setStateHoldingInformation(lastPrice, buyPriceAvg, holding);
-    } else {
-      // getStockPriceFromFMP(code)
-      // .then(stockQuoteJSON => {
-      //     const { price } = stockQuoteJSON;
-      //     const dataNeedChange = {
-      //         lastPrice: price
-      //     };
-      //     if(
-      //         !isEqual(this.state.lastPrice, 'Updating') &&
-      //         !isEqual(this.state.lastPrice, price)
-      //     ) {
-      //         return changeShareData(dataNeedChange, id);
-      //     }
-      //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
-      // })
-      // .catch(err => {
-      //     console.log(err);
-      // })
-    }
+    // const { code, holding, buyPriceAvg } = this.props.rowData;
+    // getFullStockQuote(code)
+    //   .then((stockQuoteJSON) => {
+    //     console.log(stockQuoteJSON);
+    //     const { price } = stockQuoteJSON;
+    //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
   componentDidMount() {
     this.setStateIsInWatchlist();
 
     this.updateHoldingInformation();
+
     this.checkStockPriceInterval = setInterval(
       () => this.updateHoldingInformation(),
       30 * oneSecond

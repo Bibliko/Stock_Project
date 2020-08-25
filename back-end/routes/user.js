@@ -43,10 +43,13 @@ router.get("/getData", (req, res) => {
 
   if (dataJSON.shares) {
     dataJSON = {
+      ...dataJSON,
       shares: {
-        orderBy: {
-          companyCode: "asc"
-        }
+        orderBy: [
+          {
+            companyCode: "asc"
+          }
+        ]
       }
     };
   }

@@ -39,9 +39,11 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
           id: true,
           year: true
         },
-        orderBy: {
-          year: "desc"
-        }
+        orderBy: [
+          {
+            year: "desc"
+          }
+        ]
       })
       .then((marketHolidaysPrisma) => {
         if (
@@ -100,6 +102,60 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
   });
 };
 
+/** 
+ * Example response of full stock:
+ * [ {
+  "symbol" : "AAPL",
+  "name" : "Apple Inc.",
+  "price" : 425.04000000,
+  "changesPercentage" : 10.47000000,
+  "change" : 40.28000000,
+  "dayLow" : 403.36000000,
+  "dayHigh" : 425.66000000,
+  "yearHigh" : 425.66000000,
+  "yearLow" : 192.58000000,
+  "marketCap" : 1842263621632.00000000,
+  "priceAvg50" : 372.20715000,
+  "priceAvg200" : 314.67236000,
+  "volume" : 93573867,
+  "avgVolume" : 35427873,
+  "exchange" : "NASDAQ",
+  "open" : 411.53500000,
+  "previousClose" : 384.76000000,
+  "eps" : 13.18500000,
+  "pe" : 32.23663300,
+  "earningsAnnouncement" : "2020-07-30T20:00:00.000+0000",
+  "sharesOutstanding" : 4334329996,
+  "timestamp" : 1596329461
+},
+ ...
+]
+ */
+const getFullStockQuoteFromFMP = (shareSymbol) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/quote/${shareSymbol.toUpperCase()}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stockQuote) => {
+        return stockQuote.json();
+      })
+      .then((stockQuoteJSON) => {
+        if (isEmpty(stockQuoteJSON)) {
+          reject(
+            new Error(`shareSymbol ${shareSymbol} does not exist in FMP.`)
+          );
+        } else {
+          resolve(stockQuoteJSON[0]);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 module.exports = {
-  updateMarketHolidaysFromFMP
+  updateMarketHolidaysFromFMP,
+
+  getFullStockQuoteFromFMP
 };

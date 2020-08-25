@@ -45,18 +45,40 @@ const redisClient = require("./redis-client");
 //     });
 // };
 
-const test3 = () => {
-  redisClient
-    .keysAsync("test*") // -> return [] if no key found
-    .then((values) => {
-      console.log(values);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+// const test3 = () => {
+//   redisClient
+//     .keysAsync("test*") // -> return [] if no key found
+//     .then((values) => {
+//       console.log(values);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
 
-const testList = () => {
+// const test4 = () => {
+//   redisClient
+//     .delAsync("cachedShares|AAPL") // -> return [] if no key found
+//     .then((values) => {
+//       console.log(values);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+// const testList1 = () => {
+//   redisClient
+//     .listRangeAsync("asdf", 0, -1)
+//     .then((list) => {
+//       console.log(list);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+const testList2 = () => {
   const redisKey = `test`;
 
   redisClient
@@ -73,4 +95,4 @@ const testList = () => {
     });
 };
 
-testList();
+testList2();

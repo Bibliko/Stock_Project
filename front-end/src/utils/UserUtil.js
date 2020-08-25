@@ -1,7 +1,7 @@
 import axios from "axios";
 import { isEmpty, isEqual } from "lodash";
 
-import { getManyStockPricesFromFMP } from "./FinancialModelingPrepUtil";
+import { getManyStockQuotes } from "./FinancialModelingPrepUtil";
 import { getBackendHost } from "./NetworkUtil";
 import { getParsedCachedSharesList } from "./RedisUtil";
 
@@ -14,8 +14,11 @@ export const getUser = () => {
   return new Promise((resolve, reject) => {
     axios
       .get(`${BACKEND_HOST}/user`, { withCredentials: true })
-      .then((res) => {
-        resolve(res);
+      .then((user) => {
+        if (user.data.dateOfBirth) {
+          user.data.dateOfBirth = new Date(user.data.dateOfBirth);
+        }
+        resolve(user);
       })
       .catch((e) => {
         console.log(e);
@@ -157,6 +160,9 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
       withCredentials: true,
     })
       .then((userDataRes) => {
+        if (userDataRes.data.dateOfBirth) {
+          userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
+        }
         mutateUser(userDataRes.data);
         resolve("Successfully changed data");
       })
@@ -186,6 +192,9 @@ export const getUserData = (dataNeeded, email) => {
       withCredentials: true,
     })
       .then((userData) => {
+        if (userData.data.dateOfBirth) {
+          userData.data.dateOfBirth = new Date(userData.data.dateOfBirth);
+        }
         resolve(userData.data);
       })
       .catch((err) => {
@@ -202,23 +211,14 @@ export const calculateTotalSharesValue = (
   stockQuotesJSON,
   shares
 ) => {
-  if (isEmpty(stockQuotesJSON)) {
+  if (isEmpty(stockQuotesJSON) && isEmpty(shares)) {
     return 0;
   }
 
   let totalValue = 0;
 
-  if (isMarketClosed) {
-    // if market closed, we will use lastPrice we saved in our database
-    for (let stockQuote of stockQuotesJSON) {
-      totalValue += stockQuote.lastPrice * stockQuote.quantity;
-    }
-    return totalValue;
-  }
-
   /**
-   * if market opened, we use prices of stockQuotesJSON to calculate total shares
-   * value
+   * we use prices of stockQuotesJSON to calculate total shares value
    */
 
   let hashSharesIndices = new Map();
@@ -227,8 +227,12 @@ export const calculateTotalSharesValue = (
   });
 
   for (let stockQuote of stockQuotesJSON) {
+    const symbolOrCompanyCode = stockQuote.companyCode
+      ? stockQuote.companyCode
+      : stockQuote.symbol;
+
     let shareWithSameStockQuoteSymbol =
-      shares[hashSharesIndices.get(stockQuote.symbol)];
+      shares[hashSharesIndices.get(symbolOrCompanyCode)];
 
     // add into total value this stock value: stock price * stock quantity
     totalValue += stockQuote.price * shareWithSameStockQuoteSymbol.quantity;
@@ -245,25 +249,18 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
     getParsedCachedSharesList(email)
       .then((shares) => {
         if (isEmpty(shares)) {
-          return [[], shares];
+          return [[], []];
         } else {
-          /**
-           * Uncomment below line if in Production:
-           * - We are using Financial Modeling Prep free API key
-           * -> The amount of requests is limited. Use wisely when testing!
-           */
-
           if (!isMarketClosed) {
-            //return Promise.all([getManyStockPricesFromFMP(shares), shares]);
+            return Promise.all([getManyStockQuotes(shares), shares]);
           } else {
             return [shares, shares];
           }
         }
       })
-      .then((resultSharesList) => {
-        if (resultSharesList) {
-          resolve(resultSharesList);
-        }
+      .then(([stockQuotesJSON, cachedShares]) => {
+        console.log(stockQuotesJSON);
+        resolve([stockQuotesJSON, cachedShares]);
       })
       .catch((err) => {
         reject(err);
@@ -282,33 +279,31 @@ export const checkStockQuotesToCalculateSharesValue = (
 ) => {
   // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
   checkStockQuotesForUser(isMarketClosed, userSession.email)
-    .then((resultStockQuotes) => {
-      if (resultStockQuotes) {
-        const stockQuotesJSON = resultStockQuotes[0];
-        const cachedShares = resultStockQuotes[1];
+    .then(([stockQuotesJSON, cachedShares]) => {
+      const totalSharesValue = calculateTotalSharesValue(
+        isMarketClosed,
+        stockQuotesJSON,
+        cachedShares
+      );
 
-        const totalSharesValue = calculateTotalSharesValue(
-          isMarketClosed,
-          stockQuotesJSON,
-          cachedShares
-        );
+      const newTotalPortfolioValue = userSession.cash + totalSharesValue;
 
-        const newTotalPortfolioValue = userSession.cash + totalSharesValue;
+      /**
+       * changeData so that when we reload page or go to other page, the data
+       * would be up-to-date.
+       */
 
-        /**
-         * changeData so that when we reload page or go to other page, the data
-         * would be up-to-date.
-         */
+      const dataNeedChange = {
+        totalPortfolio: newTotalPortfolioValue,
+      };
 
-        const dataNeedChange = {
-          totalPortfolio: newTotalPortfolioValue,
-        };
-
-        if (!isEqual(newTotalPortfolioValue, userSession.totalPortfolio)) {
-          return changeUserData(dataNeedChange, userSession.email, mutateUser);
-        } else {
-          //console.log("No need to update user data.");
-        }
+      if (
+        newTotalPortfolioValue &&
+        !isEqual(newTotalPortfolioValue, userSession.totalPortfolio)
+      ) {
+        return changeUserData(dataNeedChange, userSession.email, mutateUser);
+      } else {
+        //console.log("No need to update user data.");
       }
     })
     .catch((err) => {
@@ -324,11 +319,14 @@ export default {
   logoutUser,
   loginUser,
   signupUser,
+
   sendPasswordVerificationCode,
   checkVerificationCode,
+
   changePassword,
   changeUserData,
   getUserData,
+
   calculateTotalSharesValue,
   checkStockQuotesForUser,
   checkStockQuotesToCalculateSharesValue,

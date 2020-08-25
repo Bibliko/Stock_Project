@@ -20,10 +20,13 @@ model User {
   avatarUrl                 String?
   createdAt                 DateTime                  @default(now())
   updatedAt                 DateTime                  @default(now()) @updatedAt
+  dateOfBirth               DateTime?
+  gender                    String?
   region                    String?
   regionalRanking           Int?                      @default(0)
   occupation                String?
   ranking                   Int?                      @default(0)
+  regionalRanking           Int?                      @default(0)
   cash                      Float?                    @default(100000)
   totalPortfolio            Float?                    @default(100000)
   totalPortfolioLastClosure Float?                    @default(100000)
@@ -49,7 +52,6 @@ model Share {
   companyCode String?
   quantity    Int?
   buyPriceAvg Float?
-  lastPrice   Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
   user        User     @relation(fields: [userID], references: [id])

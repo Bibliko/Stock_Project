@@ -80,7 +80,7 @@ const styles = (theme) => ({
     },
     color: "white",
     "&:hover": {
-      background: "rgba(255, 255, 255, 0.8)",
+      background: "rgba(255, 255, 255, 0.3)",
       borderRadius: "50%",
     },
   },

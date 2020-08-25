@@ -9,7 +9,7 @@ export const parseRedisAccountSummaryChartItem = (redisString) => {
   return valuesArray;
 };
 
-// redisString: "id1|companyCode1|quantity1|buyPriceAvg1|lastPrice1|userID1"
+// redisString: "id1|companyCode1|quantity1|buyPriceAvg1|userID1"
 export const parseRedisSharesListItem = (redisString) => {
   const valuesArray = redisString.split("|");
 
@@ -18,37 +18,38 @@ export const parseRedisSharesListItem = (redisString) => {
     companyCode: valuesArray[1],
     quantity: parseInt(valuesArray[2], 10),
     buyPriceAvg: parseFloat(valuesArray[3]),
-    lastPrice: parseFloat(valuesArray[4]),
-    userID: valuesArray[5],
+    userID: valuesArray[4],
   };
 };
 
-// redisString: "name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp"
+// redisString: "isUpdatingUsingFMP|timestampLastUpdated|name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp"
 export const parseRedisShareInfo = (redisString) => {
   const valuesArray = redisString.split("|");
 
   return {
-    name: valuesArray[0],
-    price: parseFloat(valuesArray[1]),
-    changesPercentage: parseFloat(valuesArray[2]),
-    change: parseFloat(valuesArray[3]),
-    dayLow: parseFloat(valuesArray[4]),
-    dayHigh: parseFloat(valuesArray[5]),
-    yearHigh: parseFloat(valuesArray[6]),
-    yearLow: parseFloat(valuesArray[7]),
-    marketCap: parseFloat(valuesArray[8]),
-    priceAvg50: parseFloat(valuesArray[9]),
-    priceAvg200: parseFloat(valuesArray[10]),
-    volume: parseInt(valuesArray[11], 10),
-    avgVolume: parseInt(valuesArray[12], 10),
-    exchange: valuesArray[13],
-    open: parseFloat(valuesArray[14]),
-    previousClose: parseFloat(valuesArray[15]),
-    eps: parseFloat(valuesArray[16]),
-    pe: parseFloat(valuesArray[17]),
-    earningsAnnouncement: valuesArray[18],
-    sharesOutstanding: parseInt(valuesArray[19], 10),
-    timestamp: parseInt(valuesArray[20], 10),
+    isUpdatingUsingFMP: valuesArray[0] === "true",
+    timestampLastUpdated: parseInt(valuesArray[1], 10),
+    name: valuesArray[2],
+    price: parseFloat(valuesArray[3]),
+    changesPercentage: parseFloat(valuesArray[4]),
+    change: parseFloat(valuesArray[5]),
+    dayLow: parseFloat(valuesArray[6]),
+    dayHigh: parseFloat(valuesArray[7]),
+    yearHigh: parseFloat(valuesArray[8]),
+    yearLow: parseFloat(valuesArray[9]),
+    marketCap: parseFloat(valuesArray[10]),
+    priceAvg50: parseFloat(valuesArray[11]),
+    priceAvg200: parseFloat(valuesArray[12]),
+    volume: parseInt(valuesArray[13], 10),
+    avgVolume: parseInt(valuesArray[14], 10),
+    exchange: valuesArray[15],
+    open: parseFloat(valuesArray[16]),
+    previousClose: parseFloat(valuesArray[17]),
+    eps: parseFloat(valuesArray[18]),
+    pe: parseFloat(valuesArray[19]),
+    earningsAnnouncement: valuesArray[20],
+    sharesOutstanding: parseInt(valuesArray[21], 10),
+    timestamp: parseInt(valuesArray[22], 10),
   };
 };
 
@@ -189,47 +190,6 @@ export const updateCachedSharesList = (email, shares) => {
   });
 };
 
-export const getParsedCachedShareInfo = (companyCode) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getCachedShareInfo`, {
-      method: "get",
-      params: {
-        companyCode,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        const { data: redisShareInfoString } = res;
-        if (!redisShareInfoString) {
-          resolve(null);
-        } else {
-          resolve(parseRedisShareInfo(redisShareInfoString));
-        }
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-export const updateCachedShareInfo = (stockQuoteJSON) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateCachedShareInfo`, {
-      method: "put",
-      data: {
-        stockQuoteJSON,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
 export default {
   parseRedisAccountSummaryChartItem,
   parseRedisSharesListItem,
@@ -239,10 +199,7 @@ export default {
   getLatestCachedAccountSummaryChartInfoItem,
   updateCachedAccountSummaryChartInfoOneItem,
 
-  getCachedSharesList,
-  getParsedCachedSharesList,
-  updateCachedSharesList,
-
-  getParsedCachedShareInfo,
-  updateCachedShareInfo,
+  getCachedSharesList, // Layout.js
+  getParsedCachedSharesList, // AccountSummary, UserUtil
+  updateCachedSharesList, // Layout.js
 };
