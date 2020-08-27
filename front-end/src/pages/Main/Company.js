@@ -6,13 +6,13 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
-import SharePriceTableContainer from "../../components/Table/SharePriceTable/SharePriceTableContainer";
+import SharePriceTableContainer from "../../components/CompanyDetail/SharePriceTableContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import DatePickerHistory from "../../components/DatePicker/DatePickerHistory";
+import DatePickerHistory from "../../components/CompanyDetail/DatePickerHistory";
 
 const styles = (theme) => ({
   root: {
@@ -50,8 +50,8 @@ const styles = (theme) => ({
   },
   datePickerGrid: {
     display: "flex",
-    //justifyContent: "center",
-    alignItems: "flex-start",
+    justifyContent: "center",
+    alignItems: "center",
     //flexDirection: "column",
   },
   gridTitle: {
@@ -75,10 +75,10 @@ const styles = (theme) => ({
     fontWeight: "bold",
   },
   textFieldContainer: {
-    maxWidth: "none",
+    maxWidth: "fit-content",
     minWidth: "150px",
-    marginLeft: "10px",
-    marginRight: "10px",
+    marginLeft: "5px",
+    marginRight: "5px",
   },
 });
 
@@ -116,19 +116,16 @@ class Company extends React.Component {
               Price history chart
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6} className={classes.datePickerGrid}>
+          <Grid item xs={12} className={classes.datePickerGrid}>
             <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}> From </Typography>
-              <DatePickerHistory
-              //name="FROM" //onChange={this.handleChange}
-              />
+              <Typography className={classes.title}>From</Typography>
+              <DatePickerHistory recordChanges={this.recordChanges} />
             </Container>
-          </Grid>
-          <Grid item xs={12} sm={6} className={classes.datePickerGrid}>
             <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}> To </Typography>
+              <Typography className={classes.title}>To</Typography>
               <DatePickerHistory
-              //name="FROM" //onChange={this.handleChange}
+                //name="TO"
+                recordChanges={this.recordChanges}
               />
             </Container>
           </Grid>
