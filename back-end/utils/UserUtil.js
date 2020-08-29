@@ -1,7 +1,8 @@
 const {
   isMarketClosedCheck,
   newDate,
-  getFullDateUTCString
+  getFullDateUTCString,
+  getYearUTCString
 } = require("./DayTimeUtil");
 
 const { PrismaClient } = require("@prisma/client");
@@ -48,6 +49,7 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
             data: {
               UTCDateString: newDate(),
               UTCDateKey: getFullDateUTCString(newDate()),
+              year: getYearUTCString(newDate()),
               portfolioValue: user.totalPortfolio,
               user: {
                 connect: {
@@ -76,7 +78,7 @@ const updateRankingList = () => {
       }
     })
     .then(() => {
-      console.log(`Deleted all redis ranking relating lists`);
+      console.log(`Deleted all redis ranking relating lists\n`);
 
       return prisma.user.findMany({
         where: {
@@ -129,7 +131,7 @@ const updateRankingList = () => {
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
-      console.log("Successfully updated all users ranking");
+      console.log("Successfully updated all users ranking\n");
     })
     .catch((err) => {
       console.log(err);
@@ -178,7 +180,7 @@ const updateAllUsers = () => {
     })
     .then(() => {
       console.log(
-        "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp"
+        "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp\n"
       );
     })
     .catch((err) => {

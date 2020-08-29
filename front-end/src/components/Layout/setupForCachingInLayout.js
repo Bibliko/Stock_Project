@@ -3,6 +3,7 @@ import {
   checkStockQuotesToCalculateSharesValue,
   getUserData,
   getUserTransactions,
+  getUserAccountSummaryChartTimestamps,
 } from "../../utils/UserUtil";
 import {
   updateCachedSharesList,
@@ -12,6 +13,7 @@ import {
   getCachedPaginatedTransactionsHistoryList,
   updateCachedTransactionsHistoryListWholeList,
 } from "../../utils/RedisUtil";
+import { getYearUTCString, newDate } from "../..//utils/DayTimeUtil";
 
 const setupSharesListForCaching = (isMarketClosed, userSession, mutateUser) => {
   return new Promise((resolve, reject) => {
@@ -53,21 +55,18 @@ const setupAccountSummaryChartForCaching = (userSession) => {
       .then((res) => {
         const { data: chartInfo } = res;
         if (isEmpty(chartInfo)) {
-          const dataNeeded = {
-            accountSummaryChartInfo: true,
-          };
-          return getUserData(dataNeeded, userSession.email);
+          return getUserAccountSummaryChartTimestamps(
+            getYearUTCString(newDate()) - 2,
+            userSession.email
+          );
         }
       })
       .then((chartInfoFromDatabase) => {
-        if (chartInfoFromDatabase) {
-          const { accountSummaryChartInfo } = chartInfoFromDatabase;
-          if (accountSummaryChartInfo && !isEmpty(accountSummaryChartInfo)) {
-            return updateCachedAccountSummaryChartInfoWholeList(
-              userSession.email,
-              accountSummaryChartInfo
-            );
-          }
+        if (chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
+          return updateCachedAccountSummaryChartInfoWholeList(
+            userSession.email,
+            chartInfoFromDatabase
+          );
         }
       })
       .then((afterUpdatingCachedAccountSummaryChartInfoList) => {

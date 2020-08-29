@@ -150,7 +150,40 @@ router.get("/getUserTransactions", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get data of user fails.");
+      res.status(500).send("Failed to get user's data.");
+    });
+});
+
+router.get("/getUserAccountSummaryChartTimestamps", (req, res) => {
+  const { email, afterOrEqualThisYear } = req.query;
+
+  const afterOrEqualThisYearInteger = parseInt(afterOrEqualThisYear, 10);
+
+  /**
+   * filtering in form:
+   *    filtering = {
+   *      isFinished: true, -> prisma relation filtering
+   *      ...
+   *    }
+   */
+
+  prisma.accountSummaryTimestamp
+    .findMany({
+      where: {
+        user: {
+          email
+        },
+        year: {
+          gte: afterOrEqualThisYearInteger
+        }
+      }
+    })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get user's data.");
     });
 });
 

@@ -41,6 +41,7 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
     },
+    textAlign: "center",
   },
 });
 
@@ -280,8 +281,7 @@ class AccountSummaryChart extends React.Component {
         )}
         {isChartReady && isEmpty(series[0].data) && (
           <Typography className={classes.note}>
-            Chart is not updated yet. It's only updated whenever market is
-            closed.
+            The chart will be updated every minute.
           </Typography>
         )}
       </div>

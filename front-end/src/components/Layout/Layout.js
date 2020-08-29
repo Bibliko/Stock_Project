@@ -16,7 +16,6 @@ import {
   marketCountdownUpdate,
   oneSecond,
   oneMinute,
-  convertToLocalTimeString,
   newDate,
 } from "../../utils/DayTimeUtil";
 
@@ -122,7 +121,7 @@ class Layout extends React.Component {
     const { email, totalPortfolio } = this.props.userSession;
     updateCachedAccountSummaryChartInfoOneItem(
       email,
-      convertToLocalTimeString(newDate()),
+      newDate(),
       totalPortfolio
     ).catch((err) => {
       console.log(err);

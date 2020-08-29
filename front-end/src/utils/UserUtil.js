@@ -230,6 +230,28 @@ export const getUserTransactions = (filtering, email) => {
   });
 };
 
+export const getUserAccountSummaryChartTimestamps = (
+  afterOrEqualThisYear,
+  email
+) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getUserAccountSummaryChartTimestamps`, {
+      method: "get",
+      params: {
+        email,
+        afterOrEqualThisYear,
+      },
+      withCredentials: true,
+    })
+      .then((accountSummaryChartTimestamps) => {
+        resolve(accountSummaryChartTimestamps.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 // User Calculations Related:
 
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
@@ -354,6 +376,7 @@ export default {
   changeUserData,
   getUserData,
   getUserTransactions,
+  getUserAccountSummaryChartTimestamps,
 
   calculateTotalSharesValue,
   checkStockQuotesForUser,
