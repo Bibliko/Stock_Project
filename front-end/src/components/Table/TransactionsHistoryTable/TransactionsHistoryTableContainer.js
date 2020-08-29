@@ -13,6 +13,7 @@ import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import { Typography, Paper } from "@material-ui/core";
+import TablePagination from "@material-ui/core/TablePagination";
 
 import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 
@@ -89,6 +90,17 @@ const styles = (theme) => ({
   lastElementTopRightRounded: {
     borderTopRightRadius: "4px",
   },
+  tablePagination: {
+    color: "white",
+  },
+  tablePaginationSelectIcon: {
+    color: "white",
+  },
+  tablePaginationActions: {
+    "& .Mui-disabled": {
+      color: theme.palette.disabled.whiteColor,
+    },
+  },
 });
 
 const StyledTableCell = withStyles((theme) => ({
@@ -100,6 +112,9 @@ const StyledTableCell = withStyles((theme) => ({
 class TransactionsHistoryTableContainer extends React.Component {
   state = {
     hoverPaper: false,
+
+    rowsPerPage: 10,
+    page: 0,
   };
 
   hoverPaper = () => {
@@ -128,9 +143,20 @@ class TransactionsHistoryTableContainer extends React.Component {
     );
   };
 
+  handleChangePage = (event, newPage) => {
+    this.setState({ page: newPage });
+  };
+
+  handleChangeRowsPerPage = (event) => {
+    this.setState({
+      rowsPerPage: parseInt(event.target.value, 10),
+      page: 0,
+    });
+  };
+
   render() {
     const { classes, rows } = this.props;
-    const { hoverPaper } = this.state;
+    const { hoverPaper, rowsPerPage, page } = this.state;
 
     return (
       <div className={classes.transactionsHistoryContainerDiv}>
@@ -176,6 +202,22 @@ class TransactionsHistoryTableContainer extends React.Component {
               </TableBody>
             </Table>
           </TableContainer>
+        )}
+        {!isEmpty(rows) && (
+          <TablePagination
+            classes={{
+              selectIcon: classes.tablePaginationSelectIcon,
+              actions: classes.tablePaginationActions,
+            }}
+            className={classes.tablePagination}
+            rowsPerPageOptions={[5, 10]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          />
         )}
       </div>
     );

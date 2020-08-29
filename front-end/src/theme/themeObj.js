@@ -76,6 +76,10 @@ const theme = {
         "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
     },
 
+    disabled: {
+      whiteColor: "rgba(255, 255, 255, 0.3)",
+    },
+
     type: "light",
   },
 
@@ -236,6 +240,15 @@ const theme = {
       },
     },
     // Mui Pickers
+
+    // Mui Popover
+    MuiPopover: {
+      paper: {
+        backgroundColor: "rgba(46, 44, 48, 1)",
+        color: "white",
+      },
+    },
+    // Mui Popover
   },
 };
 

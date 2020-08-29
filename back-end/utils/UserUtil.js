@@ -1,4 +1,3 @@
-const { isEqual } = require("lodash");
 const {
   isMarketClosedCheck,
   newDate,
@@ -8,6 +7,7 @@ const {
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const { keysAsync, delAsync } = require("../redis/redis-client");
+const { isEqual, isEmpty } = require("lodash");
 
 const {
   redisUpdateOverallRankingList,
@@ -71,7 +71,9 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const updateRankingList = () => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
-      return delAsync(keysList);
+      if (!isEmpty(keysList)) {
+        return delAsync(keysList);
+      }
     })
     .then(() => {
       console.log(`Deleted all redis ranking relating lists`);
