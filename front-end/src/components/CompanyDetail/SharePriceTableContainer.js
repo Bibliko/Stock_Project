@@ -1,6 +1,5 @@
 import React from "react";
 import clsx from "clsx";
-import { withRouter } from "react-router";
 
 //import SharePriceTableRow from "./SharePriceTableRow";
 
@@ -101,4 +100,4 @@ class SharePriceTableContainer extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(SharePriceTableContainer));
+export default withStyles(styles)(SharePriceTableContainer);

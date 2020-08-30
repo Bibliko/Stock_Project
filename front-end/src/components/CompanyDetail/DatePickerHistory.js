@@ -2,7 +2,6 @@ import React from "react";
 //import { isEqual } from "lodash";
 import clsx from "clsx";
 
-import { withRouter } from "react-router";
 import { TextField } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 //import Grid from "@material-ui/core/Grid";
@@ -10,19 +9,14 @@ import {
   DatePicker,
   TimePicker,
   DateTimePicker,
-  LocalizationProvider,
 } from "@material-ui/pickers";
 import { MobileDatePicker } from "@material-ui/pickers";
 import DatePickerTextField from "./DatePickerTextField";
 import {
   DateRangePicker,
-  DateRange,
   DateRangeDelimiter,
 } from "@material-ui/pickers";
 import { Grid, Container, Typography } from "@material-ui/core";
-
-import DateFnsUtils from "@date-io/date-fns";
-//import DatePicker from "react-datepicker";
 
 const styles = (theme) => ({
   gridContainer: {
@@ -126,4 +120,4 @@ class DatePickerHistory extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(DatePickerHistory));
+export default withStyles(styles)(DatePickerHistory);

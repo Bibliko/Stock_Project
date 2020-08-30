@@ -1,18 +1,16 @@
 import React from "react";
-import { isEqual } from "lodash";
-import clsx from "clsx";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
-import SharePriceTableContainer from "../../components/CompanyDetail/SharePriceTableContainer";
-
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import DatePickerHistory from "../../components/CompanyDetail/DatePickerHistory";
+import Button from '@material-ui/core/Button';
+
+import CompanyDialog from "../../components/CompanyDetail/CompanyDialog";
 
 const styles = (theme) => ({
   root: {
@@ -82,13 +80,30 @@ const styles = (theme) => ({
   },
 });
 
-class Company extends React.Component {
-  componentDidMount() {
-    console.log(this.props.userSession);
-  }
+class Companies extends React.Component {
+  state = {
+    openDialog: false,
+  };
+
+  handleOpen = () => {
+    this.setState({
+      openDialog: true,
+      companyName: 'bibliko',
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      openDialog: false,
+    });
+  };
 
   render() {
     const { classes } = this.props;
+    const {
+      openDialog,
+      companyName,
+    } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
@@ -99,37 +114,16 @@ class Company extends React.Component {
           className={classes.fullHeightWidth}
         >
           <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Company
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Share price
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <SharePriceTableContainer />
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Price history chart
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.datePickerGrid}>
-            <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}>From</Typography>
-              <DatePickerHistory recordChanges={this.recordChanges} />
-            </Container>
-            <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}>To</Typography>
-              <DatePickerHistory
-                //name="TO"
-                recordChanges={this.recordChanges}
-              />
-            </Container>
+            <Button variant="outlined" color="primary" onClick={this.handleOpen}>
+              Open
+            </Button>
           </Grid>
         </Grid>
+        <CompanyDialog
+          open={openDialog}
+          handleClose={this.handleClose}
+          companyName={companyName}
+        />
       </Container>
     );
   }
@@ -146,4 +140,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Company)));
+)(withStyles(styles)(withRouter(Companies)));

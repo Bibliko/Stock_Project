@@ -24,7 +24,6 @@ const styles = (theme) => ({
         backgroundColor: "rgba(225,225,225,0.5)",
       },
     },
-    fontWeight: "bold",
   },
   input: {
     color: "black",

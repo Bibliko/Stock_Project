@@ -78,7 +78,7 @@ class DatePickerTextField extends React.Component {
     return (
       <div>
         <TextField
-          id={this.props.name}
+          // id={this.props.name}
           //name={this.props.name}
           label={this.props.name}
           onMouseOver={this.onMouseOver}

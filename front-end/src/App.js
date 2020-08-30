@@ -20,7 +20,7 @@ import AccountSummary from "./pages/Main/AccountSummary";
 import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
 import Setting from "./pages/Main/Setting";
-import Company from "./pages/Main/Company";
+import Companies from "./pages/Main/Companies";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
@@ -126,7 +126,7 @@ class App extends React.Component {
               <Switch>
                 <Layout toggleTheme={this.toggleTheme}>
                   <Route exact path="/" component={LandingPage} />
-                  <Route path="/company/:companyCode" component={Company} />
+                  <Route path="/companies" component={Companies} />
                   <Route path="/accountSummary" component={AccountSummary} />
                   <Route path="/watchlist" component={Watchlist} />
                   <Route path="/setting" component={Setting} />
