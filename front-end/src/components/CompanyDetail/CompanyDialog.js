@@ -16,6 +16,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
 import CompanyDetail from "./CompanyDetail";
+import CompanyGraph from "./CompanyGraph";
 
 const styles = (theme) => ({
   root: {
@@ -56,11 +57,7 @@ function TabPanel(props) {
       aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box p={3}>{children}</Box>}
     </div>
   );
 }
@@ -68,41 +65,36 @@ function TabPanel(props) {
 TabPanel.propTypes = {
   // children: PropTypes.node,
   index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired
+  value: PropTypes.any.isRequired,
 };
 
 function a11yProps(index) {
   return {
     id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`
+    "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
 
 class CompanyDialog extends React.Component {
   state = {
     value: 0,
-    open: false
+    open: false,
   };
 
   handleChange = (event, newValue) => {
     this.setState({
-      value: newValue
+      value: newValue,
     });
   };
 
   handleChangeIndex = (index) => {
     this.setState({
-      value: index
+      value: index,
     });
   };
 
   render() {
-    const {
-      classes,
-      handleClose,
-      open,
-      companyName,
-    } = this.props;
+    const { classes, handleClose, open, companyName } = this.props;
     const { value } = this.state;
 
     return (
@@ -118,9 +110,7 @@ class CompanyDialog extends React.Component {
             {companyName}
           </DialogTitle>
 
-          <DialogContent
-            className={classes.dialogContent}
-          >
+          <DialogContent className={classes.dialogContent}>
             <AppBar position="sticky" color="default">
               <Tabs
                 value={value}
@@ -141,7 +131,7 @@ class CompanyDialog extends React.Component {
                   {...a11yProps(1)}
                 />
                 <Tab
-                  label="Other"
+                  label="About"
                   className={classes.dialogTab}
                   {...a11yProps(2)}
                 />
@@ -152,14 +142,12 @@ class CompanyDialog extends React.Component {
               onChangeIndex={this.handleChangeIndex}
             >
               <TabPanel value={value} index={0}>
-                <CompanyDetail/>
+                <CompanyDetail />
               </TabPanel>
               <TabPanel value={value} index={1}>
-                <CompanyDetail/>
+                <CompanyGraph />
               </TabPanel>
-              <TabPanel value={value} index={2}>
-                <CompanyDetail/>
-              </TabPanel>
+              <TabPanel value={value} index={2}></TabPanel>
             </SwipeableViews>
           </DialogContent>
 

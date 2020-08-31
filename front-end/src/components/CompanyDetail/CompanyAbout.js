@@ -1,16 +1,14 @@
 import React from "react";
-import { withRouter } from "react-router";
+import { isEqual } from "lodash";
+import clsx from "clsx";
 
-import { connect } from "react-redux";
-import { userAction } from "../../redux/storeActions/actions";
+import SharePriceTableContainer from "./SharePriceTableContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-
-import CompanyDialog from "../../components/CompanyDetail/CompanyDialog";
+//import DatePickerHistory from "./DatePickerHistory";
 
 const styles = (theme) => ({
   root: {
@@ -80,65 +78,25 @@ const styles = (theme) => ({
   },
 });
 
-class Companies extends React.Component {
-  state = {
-    openDialog: false,
-  };
-
-  handleOpen = () => {
-    this.setState({
-      openDialog: true,
-      companyName: "bibliko",
-    });
-  };
-
-  handleClose = () => {
-    this.setState({
-      openDialog: false,
-    });
-  };
-
+class CompanyAbout extends React.Component {
   render() {
-    const { classes } = this.props;
-    const { openDialog, companyName } = this.state;
+    const { classes, companyName } = this.props;
 
     return (
-      <Container className={classes.root} disableGutters>
-        <Grid
-          container
-          spacing={4}
-          direction="row"
-          className={classes.fullHeightWidth}
-        >
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={this.handleOpen}
-            >
-              Open
-            </Button>
-          </Grid>
+      <Grid
+        container
+        spacing={4}
+        direction="row"
+        className={classes.fullHeightWidth}
+      >
+        <Grid item xs={12} className={classes.itemGrid}>
+          <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
+            Description
+          </Typography>
         </Grid>
-        <CompanyDialog
-          open={openDialog}
-          handleClose={this.handleClose}
-          companyName={companyName}
-        />
-      </Container>
+      </Grid>
     );
   }
 }
 
-const mapStateToProps = (state) => ({
-  userSession: state.userSession,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(withRouter(Companies)));
+export default withStyles(styles)(CompanyAbout);

@@ -8,7 +8,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import DatePickerHistory from "./DatePickerHistory";
+//import DatePickerHistory from "./DatePickerHistory";
 
 const styles = (theme) => ({
   root: {
@@ -83,44 +83,16 @@ class CompanyDetail extends React.Component {
     const { classes } = this.props;
 
     return (
-        <Grid
-          container
-          spacing={4}
-          direction="row"
-          className={classes.fullHeightWidth}
-        >
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Company
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Share price
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <SharePriceTableContainer />
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
-              Price history chart
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.datePickerGrid}>
-            <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}>From</Typography>
-              <DatePickerHistory recordChanges={this.recordChanges} />
-            </Container>
-            <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}>To</Typography>
-              <DatePickerHistory
-                //name="TO"
-                recordChanges={this.recordChanges}
-              />
-            </Container>
-          </Grid>
+      <Grid
+        container
+        spacing={4}
+        direction="row"
+        className={classes.fullHeightWidth}
+      >
+        <Grid item xs={12} className={classes.itemGrid}>
+          <SharePriceTableContainer />
         </Grid>
+      </Grid>
     );
   }
 }
