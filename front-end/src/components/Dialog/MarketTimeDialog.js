@@ -19,6 +19,9 @@ const styles = (theme) => ({
       paddingBottom: 32,
       backgroundColor: theme.palette.paperBackground.onPage,
       color: "white",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
   },
   dialogTitle: {

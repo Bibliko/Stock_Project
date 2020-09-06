@@ -1,6 +1,5 @@
 import React from "react";
 import { withRouter } from "react-router";
-import { isEmpty } from "lodash";
 import { connect } from "react-redux";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
 
@@ -12,13 +11,7 @@ import {
   redirectToPage,
 } from "../../utils/PageRedirectUtil";
 
-import {
-  marketCountdownUpdate,
-  oneSecond,
-  oneMinute,
-  convertToLocalTimeString,
-  newDate,
-} from "../../utils/DayTimeUtil";
+import { oneMinute, newDate } from "../../utils/DayTimeUtil";
 
 import {
   checkMarketClosed,
@@ -63,42 +56,27 @@ const styles = (theme) => ({
     },
     justifyContent: "flex-start",
   },
-  mainBackground: {
-    backgroundColor: theme.palette.backgroundBlue.main,
-    [theme.breakpoints.down("xs")]: {
-      background: theme.palette.paperBackground.gradient,
-    },
+  gradientBackground: {
+    background: theme.palette.paperBackground.gradient,
+    backgroundSize: "cover",
+    height: "100%",
+    width: "100%",
+    position: "fixed",
+  },
+  secondLayerBackground: {
+    background: "rgba(25, 19, 89, 1)",
     backgroundSize: "cover",
     height: "100vh",
     width: "100%",
     position: "fixed",
   },
-  secondBackground: {
-    background: "#180B66",
-    [theme.breakpoints.down("xs")]: {
-      display: "none",
-    },
-    backgroundSize: "cover",
-    height: "100vh",
-    width: "75%",
-    position: "fixed",
-  },
-  thirdBackground: {
-    background: theme.palette.paperBackground.gradient,
-    [theme.breakpoints.down("xs")]: {
-      display: "none",
-    },
-    backgroundSize: "cover",
-    height: "100vh",
-    width: "75%",
-    position: "fixed",
+  bottomSpace: {
+    width: "100%",
+    height: "50px",
   },
   skeletonDiv: {
     position: "fixed",
-    width: "75%",
-    [theme.breakpoints.down("xs")]: {
-      width: "100%",
-    },
+    width: theme.customWidth.mainSkeletonWidth,
   },
   skeleton: {
     height: "100vh",
@@ -108,13 +86,10 @@ const styles = (theme) => ({
 
 class Layout extends React.Component {
   state = {
-    countdown: "",
     hideReminder: false,
-
     finishedSettingUp: false,
   };
 
-  marketCountdownInterval;
   checkStockQuotesInterval;
   accountSummaryChartSeriesInterval;
 
@@ -122,7 +97,7 @@ class Layout extends React.Component {
     const { email, totalPortfolio } = this.props.userSession;
     updateCachedAccountSummaryChartInfoOneItem(
       email,
-      convertToLocalTimeString(newDate()),
+      newDate(),
       totalPortfolio
     ).catch((err) => {
       console.log(err);
@@ -130,15 +105,6 @@ class Layout extends React.Component {
   };
 
   setupIntervals = () => {
-    this.marketCountdownInterval = setInterval(
-      () =>
-        marketCountdownUpdate(
-          this.setState.bind(this),
-          this.props.isMarketClosed
-        ),
-      oneSecond
-    );
-
     if (this.props.userSession.hasFinishedSettingUp) {
       // this.checkStockQuotesInterval = setInterval(
       //   () =>
@@ -188,8 +154,7 @@ class Layout extends React.Component {
     socketCheckMarketClosed(
       socket,
       this.props.isMarketClosed,
-      this.props.mutateMarket,
-      this.state.countdown
+      this.props.mutateMarket
     );
 
     this.setupIntervals();
@@ -199,17 +164,9 @@ class Layout extends React.Component {
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
     }
-
-    if (!isEmpty(this.state.countdown) && this.props.isMarketClosed) {
-      clearInterval(this.marketCountdownInterval);
-      this.setState({
-        countdown: "",
-      });
-    }
   }
 
   componentWillUnmount() {
-    clearInterval(this.marketCountdownInterval);
     clearInterval(this.checkStockQuotesInterval);
     clearInterval(this.accountSummaryChartSeriesInterval);
 
@@ -217,8 +174,8 @@ class Layout extends React.Component {
   }
 
   render() {
-    const { classes, isMarketClosed } = this.props;
-    const { countdown, finishedSettingUp } = this.state;
+    const { classes } = this.props;
+    const { finishedSettingUp } = this.state;
 
     if (shouldRedirectToLogin(this.props)) {
       return null;
@@ -232,19 +189,16 @@ class Layout extends React.Component {
         <main className={classes.main}>
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
-            <div className={classes.mainBackground} />
-            <div className={classes.secondBackground} />
-            <div className={classes.thirdBackground} />
-            <LayoutSpeedDial
-              isMarketClosed={isMarketClosed}
-              remainingTime={countdown}
-            />
+            <div className={classes.secondLayerBackground} />
+            <div className={classes.gradientBackground} />
+            <LayoutSpeedDial />
             {!finishedSettingUp && (
               <div className={classes.skeletonDiv}>
                 <Skeleton variant="rect" className={classes.skeleton} />
               </div>
             )}
             {finishedSettingUp && this.props.children}
+            <div className={classes.bottomSpace} />
           </div>
         </main>
       </div>

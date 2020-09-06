@@ -23,16 +23,16 @@ const styles = (theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    padding: "10px",
+    flexDirection: "column",
     marginBottom: "10px",
     marginTop: "20px",
   },
   chart: {
-    height: "100%",
-    width: "100%",
+    height: "80%",
+    width: "80%",
     [theme.breakpoints.up("md")]: {
-      height: "75%",
-      width: "75%",
+      height: "60%",
+      width: "60%",
     },
   },
   note: {
@@ -41,6 +41,27 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
     },
+    alignSelf: "center",
+  },
+  noteChart: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+    color: "white",
+    alignSelf: "center",
+    marginTop: "16px",
+  },
+  noteChartSmaller: {
+    fontSize: "small",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "smaller",
+    },
+    color: "white",
+    alignSelf: "center",
+    textAlign: "center",
+    marginTop: "5px",
+    fontStyle: "italic",
   },
 });
 
@@ -280,10 +301,13 @@ class AccountSummaryChart extends React.Component {
         )}
         {isChartReady && isEmpty(series[0].data) && (
           <Typography className={classes.note}>
-            Chart is not updated yet. It's only updated whenever market is
-            closed.
+            The chart will be updated every minute.
           </Typography>
         )}
+        <Typography className={classes.noteChart}>2-year records</Typography>
+        <Typography className={classes.noteChartSmaller}>
+          (If you need longer-than-2-year records, contact us...)
+        </Typography>
       </div>
     );
   }

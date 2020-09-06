@@ -67,7 +67,7 @@ const styles = (theme) => ({
     },
     color: "white",
     "&:hover": {
-      background: theme.palette.appBarButtonBackground.gradient,
+      background: "rgba(255, 255, 255, 0.3)",
       borderRadius: "50%",
     },
   },

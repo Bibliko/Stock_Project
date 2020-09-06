@@ -1,9 +1,13 @@
 import React from "react";
 import clsx from "clsx";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
+import { connect } from "react-redux";
 
 import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
+
+import { parseRedisTransactionsHistoryListItem } from "../../../utils/RedisUtil";
+import { getUserTransactionsHistory } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
@@ -13,6 +17,8 @@ import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import { Typography, Paper } from "@material-ui/core";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 
 import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 
@@ -39,7 +45,6 @@ const styles = (theme) => ({
   cellDiv: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
   },
   emptyRowsPaper: {
     display: "flex",
@@ -89,6 +94,32 @@ const styles = (theme) => ({
   lastElementTopRightRounded: {
     borderTopRightRadius: "4px",
   },
+  tablePagination: {
+    color: "white",
+  },
+  tablePaginationSelectIcon: {
+    color: "white",
+  },
+  tablePaginationActions: {
+    "& .Mui-disabled": {
+      color: theme.palette.disabled.whiteColor,
+    },
+  },
+  skeleton: {
+    width: "100%",
+    height: "200px",
+  },
+  visuallyHidden: {
+    border: 0,
+    clip: "rect(0 0 0 0)",
+    height: 1,
+    margin: -1,
+    overflow: "hidden",
+    padding: 0,
+    position: "absolute",
+    top: 20,
+    width: 1,
+  },
 });
 
 const StyledTableCell = withStyles((theme) => ({
@@ -100,6 +131,37 @@ const StyledTableCell = withStyles((theme) => ({
 class TransactionsHistoryTableContainer extends React.Component {
   state = {
     hoverPaper: false,
+    loading: true,
+
+    rowsLengthChoices: [1, 5, 10], // min to max
+    rowsPerPage: 5,
+    pageBase0: 0,
+    searchBy: "none",
+    searchQuery: "none",
+    orderBy: "finishedTime",
+    orderQuery: "desc",
+
+    transactions: [],
+    transactionsLength: 0,
+
+    names: [
+      "Type",
+      "Code",
+      "Quantity",
+      "Price",
+      "Brokerage",
+      "Spend/Gain",
+      "Transaction Time",
+    ],
+    prismaNames: [
+      "",
+      "companyCode",
+      "quantity",
+      "priceAtTransaction",
+      "brokerage",
+      "spendOrGain",
+      "finishedTime",
+    ],
   };
 
   hoverPaper = () => {
@@ -114,27 +176,158 @@ class TransactionsHistoryTableContainer extends React.Component {
     });
   };
 
-  chooseTableCell = (type, classes) => {
+  handleRequestSort = (event, property) => {
+    const { orderBy, orderQuery } = this.state;
+    const isAsc = orderBy === property && orderQuery === "asc";
+
+    this.setState(
+      {
+        orderBy: property,
+        orderQuery: isAsc ? "desc" : "asc",
+      },
+      () => {
+        this.getUserTransactionsHistoryPageData();
+      }
+    );
+  };
+
+  createSortHandler = (property) => (event) => {
+    this.handleRequestSort(event, property);
+  };
+
+  chooseTableCell = (indexInNamesState, classes) => {
+    const { orderBy, orderQuery, names, prismaNames } = this.state;
+    const type = names[indexInNamesState];
+    const prismaType = prismaNames[indexInNamesState];
+
     return (
       <StyledTableCell
-        align="center"
+        key={indexInNamesState}
+        align={type === "Type" ? "left" : "right"}
         className={clsx(classes.tableCell, {
           [classes.firstElementTopLeftRounded]: type === "Type",
           [classes.lastElementTopRightRounded]: type === "Transaction Time",
         })}
+        sortDirection={orderBy === prismaType ? orderQuery : false}
       >
-        <div className={classes.cellDiv}>{type}</div>
+        <TableSortLabel
+          active={orderBy === prismaType}
+          direction={orderBy === prismaType ? orderQuery : "asc"}
+          onClick={this.createSortHandler(prismaType)}
+          className={clsx(classes.cellDiv, {
+            [classes.cellDivSpecialForType]: type === "Type",
+          })}
+          disabled={type === "Type"}
+        >
+          {type}
+          {orderBy === prismaType ? (
+            <span className={classes.visuallyHidden}>
+              {orderQuery === "desc" ? "sorted descending" : "sorted ascending"}
+            </span>
+          ) : null}
+        </TableSortLabel>
       </StyledTableCell>
     );
   };
 
+  setStateTransactions = (redisTransactions) => {
+    let newTransactions = [];
+
+    const { transactions, transactionsLength } = redisTransactions;
+
+    transactions.map((transaction) => {
+      newTransactions.push(parseRedisTransactionsHistoryListItem(transaction));
+      return "dummy value";
+    });
+    this.setState({
+      transactions: newTransactions,
+      transactionsLength,
+      loading: false,
+    });
+  };
+
+  getUserTransactionsHistoryPageData = () => {
+    const { email } = this.props.userSession;
+    const {
+      rowsLengthChoices,
+      pageBase0,
+      rowsPerPage,
+      searchBy,
+      searchQuery,
+      orderBy,
+      orderQuery,
+    } = this.state;
+
+    getUserTransactionsHistory(
+      email,
+      rowsLengthChoices,
+      pageBase0 + 1,
+      rowsPerPage,
+      searchBy,
+      searchQuery,
+      orderBy,
+      orderQuery
+    )
+      .then((redisTransactions) => {
+        this.setStateTransactions(redisTransactions);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  handleChangePage = (event, newPage) => {
+    this.setState({ pageBase0: newPage }, () => {
+      this.getUserTransactionsHistoryPageData();
+    });
+  };
+
+  handleChangeRowsPerPage = (event) => {
+    this.setState(
+      {
+        rowsPerPage: parseInt(event.target.value, 10),
+        pageBase0: 0,
+      },
+      () => {
+        this.getUserTransactionsHistoryPageData();
+      }
+    );
+  };
+
+  componentDidMount() {
+    console.log(this.props.userSession);
+    this.getUserTransactionsHistoryPageData();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["email"];
+    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
+    const propsCompare = pick(this.props.userSession, compareKeys);
+
+    return (
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
+    );
+  }
+
   render() {
-    const { classes, rows } = this.props;
-    const { hoverPaper } = this.state;
+    const { classes } = this.props;
+    const {
+      hoverPaper,
+      loading,
+
+      rowsPerPage,
+      pageBase0,
+      transactions,
+      transactionsLength,
+      rowsLengthChoices,
+
+      names,
+    } = this.state;
 
     return (
       <div className={classes.transactionsHistoryContainerDiv}>
-        {isEmpty(rows) && (
+        {isEmpty(transactions) && !loading && (
           <Paper
             className={classes.emptyRowsPaper}
             onMouseEnter={this.hoverPaper}
@@ -150,38 +343,54 @@ class TransactionsHistoryTableContainer extends React.Component {
             </Typography>
           </Paper>
         )}
-        {!isEmpty(rows) && (
+        {!isEmpty(transactions) && !loading && (
           <TableContainer className={classes.tableContainer}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  {this.chooseTableCell("Type", classes)}
-                  {this.chooseTableCell("Code", classes)}
-                  {this.chooseTableCell("Quantity", classes)}
-                  {this.chooseTableCell("Price", classes)}
-                  {this.chooseTableCell("Brokerage", classes)}
-                  {this.chooseTableCell("Spend/Gain", classes)}
-                  {this.chooseTableCell("Transaction Time", classes)}
+                  {names.map((typeName, index) => {
+                    return this.chooseTableCell(index, classes);
+                  })}
                 </TableRow>
               </TableHead>
               <TableBody className={classes.tableBody}>
-                {rows.map((row, index) => (
+                {transactions.map((row, index) => (
                   <TransactionsHistoryTableRow
                     key={index}
                     transactionInfo={row}
                     rowIndex={index}
-                    rowsLength={rows.length}
+                    rowsLength={transactions.length}
                   />
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
         )}
+        {!isEmpty(transactions) && !loading && (
+          <TablePagination
+            classes={{
+              selectIcon: classes.tablePaginationSelectIcon,
+              actions: classes.tablePaginationActions,
+            }}
+            className={classes.tablePagination}
+            rowsPerPageOptions={rowsLengthChoices}
+            component="div"
+            count={transactionsLength}
+            rowsPerPage={rowsPerPage}
+            page={pageBase0}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          />
+        )}
       </div>
     );
   }
 }
 
-export default withStyles(styles)(
-  withRouter(TransactionsHistoryTableContainer)
+const mapStateToProps = (state) => ({
+  userSession: state.userSession,
+});
+
+export default connect(mapStateToProps)(
+  withStyles(styles)(withRouter(TransactionsHistoryTableContainer))
 );

@@ -2,12 +2,20 @@ const {
   getAsync,
   setAsync,
   listPushAsync,
-  delAsync
+  listLeftPushAsync,
+  delAsync,
+  listRangeAsync,
+  listPopAsync
 } = require("../redis/redis-client");
+const { isEqual } = require("lodash");
+
+const { SequentialPromises } = require("./PromisesUtil");
 
 /**
  * Keys list:
  * - '${email}|transactionsHistoryList'
+ * - '${email}|transactionsHistoryM5RU' -> Most 5 recently used
+ * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy|orderQuery'
  * - '${email}|passwordVerification'
  * - '${email}|accountSummaryChart'
  * - '${email}|sharesList'
@@ -23,8 +31,7 @@ const {
  * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
  * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID", "..."
  */
-const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
-  const redisKey = `${email}|transactionsHistoryList`;
+const formRedisValueFromFinishedTransaction = (finishedTransaction) => {
   const {
     id,
     createdAt,
@@ -32,21 +39,285 @@ const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
     quantity,
     priceAtTransaction,
     brokerage,
+    spendOrGain,
     finishedTime,
     isTypeBuy,
     userID
   } = finishedTransaction;
-  const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+  return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${isTypeBuy}|${userID}`;
+};
+const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryList`;
+    const newValue = formRedisValueFromFinishedTransaction(finishedTransaction);
 
-  listPushAsync(redisKey, newValue)
-    .then((finishedUpdatingRedisTransactionsHistoryList) => {
-      console.log(
-        `Successfully added transaction to ${email}'s cached transactions history`
-      );
-    })
-    .catch((err) => {
-      console.log(err);
+    listPushAsync(redisKey, newValue)
+      .then((finishedUpdatingRedisTransactionsHistoryList) => {
+        resolve(
+          `Successfully added transaction to ${email}'s cached transactions history.\n`
+        );
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const updateTransactionsHistoryListWholeList = (
+  email,
+  finishedTransactions
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryList`;
+
+    const tasksList = [];
+
+    finishedTransactions.map((transaction) => {
+      const newValue = formRedisValueFromFinishedTransaction(transaction);
+      tasksList.push(() => listPushAsync(redisKey, newValue));
+      return "dummy value";
     });
+
+    SequentialPromises(tasksList)
+      .then((finishedUpdatingRedisTransactionsHistoryList) => {
+        resolve(
+          `Successfully added many transactions to ${email}'s cached transactions history.\n`
+        );
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * 'doanhtu07@gmail.com|transactionsHistoryM5RU' :
+ * List -> "numberOfChunksSkipped|searchBy|searchQuery|orderBy"
+ */
+const isInTransactionsHistoryM5RU = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery // 'none' or 'desc' or 'asc'
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryM5RU`;
+
+    listRangeAsync(redisKey, 0, -1)
+      .then((M5RUList) => {
+        const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+        resolve(M5RUList.indexOf(valueString));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const pushNewestItemAndDeleteOldItemToTransactionsHistoryM5RU = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery // 'none' or 'desc' or 'asc'
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryM5RU`;
+    const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+
+    listLeftPushAsync(redisKey, valueString)
+      .then((M5RUListLength) => {
+        if (M5RUListLength > 5) {
+          return listPopAsync(redisKey);
+        }
+      })
+      .then((poppedItem) => {
+        if (poppedItem) {
+          return delAsync(`${redisKey}|${poppedItem}`);
+        }
+      })
+      .then((finishedPoppingAndRemovingIfOverflow) => {
+        resolve(
+          `Successfully updated cached most-5-recently-used transactions history of ${email}.`
+        );
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const reorganizeTransactionsHistoryM5RU = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery, // 'none' or 'desc' or 'asc'
+  M5RUList // required
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryM5RU`;
+    const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+
+    delAsync(redisKey)
+      .then((finishedDeletingOldTransactionsHistoryM5RU) => {
+        const tasksList = [];
+
+        tasksList.push(() => {
+          listPushAsync(redisKey, valueString);
+        });
+
+        M5RUList.map((M5RUItem) => {
+          if (!isEqual(M5RUItem, valueString)) {
+            tasksList.push(() => {
+              listPushAsync(redisKey, M5RUItem);
+            });
+          }
+          return "dummy value";
+        });
+
+        return SequentialPromises(tasksList);
+      })
+      .then((finishedReorganizingTransactionsHistoryM5RU) => {
+        resolve(
+          `Successfully reorganized most-5-recently-used transactions history for ${email}.\n`
+        );
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const searchAndUpdateTransactionsHistoryM5RU = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery // 'none' or 'desc' or 'asc'
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryM5RU`;
+    listRangeAsync(redisKey, 0, -1)
+      .then((M5RUList) => {
+        const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+        const index = M5RUList.indexOf(valueString);
+
+        if (index !== 0) {
+          if (index === -1) {
+            return Promise.all([
+              pushNewestItemAndDeleteOldItemToTransactionsHistoryM5RU(
+                email,
+                numberOfChunksSkipped,
+                searchBy,
+                searchQuery,
+                orderBy,
+                orderQuery
+              ),
+              index
+            ]);
+          } else {
+            return Promise.all([
+              reorganizeTransactionsHistoryM5RU(
+                email,
+                numberOfChunksSkipped,
+                searchBy,
+                searchQuery,
+                orderBy,
+                orderQuery,
+                M5RUList
+              ),
+              index
+            ]);
+          }
+        } else {
+          return [null, index];
+        }
+      })
+      .then(([finishedSearchedAndUpdated, indexInM5RUList]) => {
+        resolve([
+          `Successfully searched and updated most-5-recently-used transactions history for ${email}.\n`,
+          indexInM5RUList
+        ]);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * 'doanhtu07@gmail.com|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy' :
+ * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID"
+ *
+ * - Special Note: First element of the list is length of transactions history that fits the description attributes (searchBy, searchQuery, ...)
+ */
+const createOrOverwriteTransactionsHistoryM5RUItemRedisKey = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery, // 'none' or 'desc' or 'asc'
+  prismaTransactionsHistory // array of prisma finished transactions, required
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+    delAsync(redisKey)
+      .then((finishedDeletingOldTransactionsHistoryM5RUItem) => {
+        const tasksList = [];
+
+        prismaTransactionsHistory.map((transaction) => {
+          const redisValue = formRedisValueFromFinishedTransaction(transaction);
+          tasksList.push(() => {
+            listPushAsync(redisKey, redisValue);
+          });
+          return "dummy value";
+        });
+
+        return SequentialPromises(tasksList);
+      })
+      .then((finishedPushingPrismaTransactionsHistoryToRedisKey) => {
+        resolve(
+          `Successfully updated most-5-recently-used transactions history redis key ${redisKey}.\n`
+        );
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery, // 'none' or 'desc' or 'asc'
+  transactionsHistoryLength
+) => {
+  const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+  return listLeftPushAsync(redisKey, transactionsHistoryLength);
+};
+const getTransactionsHistoryItemInM5RU = (
+  email,
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery // 'none' or 'desc' or 'asc'
+) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+    listRangeAsync(redisKey, 0, -1)
+      .then((transactionsHistoryM5RUItem) => {
+        resolve(transactionsHistoryM5RUItem);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 };
 
 /**
@@ -261,11 +532,25 @@ const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
 };
 
 module.exports = {
-  updateTransactionsHistoryListOneItem, // user related
+  // User Related
+  formRedisValueFromFinishedTransaction,
 
-  cachePasswordVerificationCode, // user related
-  getParsedCachedPasswordVerificationCode, // user related
-  removeCachedPasswordVerificationCode, // user related
+  updateTransactionsHistoryListOneItem,
+  updateTransactionsHistoryListWholeList,
+
+  isInTransactionsHistoryM5RU,
+  pushNewestItemAndDeleteOldItemToTransactionsHistoryM5RU,
+  reorganizeTransactionsHistoryM5RU,
+  searchAndUpdateTransactionsHistoryM5RU,
+
+  createOrOverwriteTransactionsHistoryM5RUItemRedisKey,
+  addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey,
+  getTransactionsHistoryItemInM5RU,
+
+  cachePasswordVerificationCode,
+  getParsedCachedPasswordVerificationCode,
+  removeCachedPasswordVerificationCode,
+  // User Related
 
   redisUpdateOverallRankingList,
   redisUpdateRegionalRankingList,

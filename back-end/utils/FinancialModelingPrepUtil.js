@@ -89,7 +89,7 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
       })
       .then((afterUpdated) => {
         console.log(
-          "prisma market holidays updated FinancialModelingPrepUtil, 90"
+          "prisma market holidays updated FinancialModelingPrepUtil, 92\n"
         );
 
         objVariables.isPrismaMarketHolidaysInitialized = true;

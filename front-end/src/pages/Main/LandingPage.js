@@ -4,6 +4,8 @@ import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 
+import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
+
 import { redirectToPage } from "../../utils/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -19,10 +21,9 @@ const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: "75%",
+    width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "90%",
       marginTop: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
@@ -43,9 +44,9 @@ const styles = (theme) => ({
     width: "100%",
     minHeight: "200px",
     padding: "24px",
-    [theme.breakpoints.down("xs")]: {
-      padding: 0,
-    },
+  },
+  paperColor: {
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   itemGrid: {
     display: "flex",
@@ -179,7 +180,9 @@ class LandingPage extends React.Component {
               >
                 MARKET WATCH
               </Typography>
-              <Paper className={classes.fullHeightWidth} />
+              <Paper
+                className={clsx(classes.fullHeightWidth, classes.paperColor)}
+              />
             </Grid>
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
               <Typography
@@ -187,7 +190,9 @@ class LandingPage extends React.Component {
               >
                 STOCKS ON THE MOVE
               </Typography>
-              <Paper className={classes.fullHeightWidth} />
+              <Paper
+                className={clsx(classes.fullHeightWidth, classes.paperColor)}
+              />
             </Grid>
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
               <Typography
@@ -195,14 +200,19 @@ class LandingPage extends React.Component {
               >
                 ACCOUNT SUMMARY
               </Typography>
-              <Paper className={classes.fullHeightWidth} />
+              <Paper
+                className={clsx(classes.fullHeightWidth, classes.paperColor)}
+              />
             </Grid>
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
               <Typography className={clsx(classes.gridTitle, classes.rankings)}>
                 RANKINGS
               </Typography>
-              <Paper className={classes.fullHeightWidth} />
+              <Paper
+                className={clsx(classes.fullHeightWidth, classes.paperColor)}
+              />
             </Grid>
+            <SpaceDivMainPages />
           </Grid>
         )}
       </Container>

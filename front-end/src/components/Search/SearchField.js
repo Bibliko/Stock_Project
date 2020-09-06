@@ -31,7 +31,8 @@ const styles = (theme) => ({
       borderBottom: "2px solid #000000",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(156, 140, 249, 0.8)",
+      borderWidth: "2px",
+      borderColor: "rgba(156, 140, 249, 0.7)",
     },
     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
       borderColor: "rgba(156, 140, 249, 1)",

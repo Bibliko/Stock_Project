@@ -1,4 +1,4 @@
-import { isEqual, isEmpty } from "lodash";
+import { isEqual } from "lodash";
 
 export const checkMarketClosed = "checkMarketClosed";
 
@@ -9,16 +9,9 @@ export const checkMarketClosed = "checkMarketClosed";
 export const socketCheckMarketClosed = (
   socket,
   isMarketClosedInReduxStore,
-  mutateMarket,
-  marketCountdownInLayout
+  mutateMarket
 ) => {
   socket.on(checkMarketClosed, (ifClosed) => {
-    // Special case: I see that sometimes this socket is not running asynchronous with market countdown in Layout.js
-    if (ifClosed && !isEmpty(marketCountdownInLayout)) {
-      mutateMarket("closeMarket");
-      return;
-    }
-
     if (!isEqual(ifClosed, isMarketClosedInReduxStore)) {
       if (ifClosed) {
         mutateMarket("closeMarket");

@@ -5,6 +5,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import WatchlistTableContainer from "../../components/Table/WatchlistTable/WatchlistTableContainer";
+import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -14,10 +15,9 @@ const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: "75%",
+    width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "85%",
       marginTop: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
@@ -30,9 +30,6 @@ const styles = (theme) => ({
     width: "100%",
     minHeight: "200px",
     padding: "24px",
-    [theme.breakpoints.down("xs")]: {
-      padding: 0,
-    },
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "center",
@@ -71,6 +68,7 @@ class WatchlistPage extends React.Component {
       <Container className={classes.root} disableGutters>
         <Grid container spacing={4} className={classes.fullWidth}>
           <WatchlistTableContainer rows={userSession.watchlist} />
+          <SpaceDivMainPages />
         </Grid>
       </Container>
     );

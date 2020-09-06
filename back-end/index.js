@@ -14,13 +14,6 @@ try {
   console.log("No config found. Using default ENV.");
 }
 
-const { PORT: port, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
-const express = require("express");
-const app = express();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("./redis/redis-client");
-
 const {
   getFrontendHost,
   getPassportCallbackHost
@@ -54,6 +47,14 @@ const {
   removeCachedPasswordVerificationCode
 } = require("./utils/RedisUtil");
 
+const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const express = require("express");
+const app = express();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const { keysAsync, delAsync } = require("./redis/redis-client");
+const { isEmpty } = require("lodash");
+
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -83,10 +84,23 @@ const session = require("express-session");
  * response is NOT a cors, and back-end accepts this response
  * without being regulated by this corsOptions.
  */
+
+const whitelist = [FRONTEND_HOST];
 const corsOptions = {
-  origin: FRONTEND_HOST,
+  origin: function (origin, callback) {
+    if (NODE_ENV === "development") {
+      callback(null, true);
+    } else {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    }
+  },
   credentials: true
 };
+
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(
@@ -275,11 +289,13 @@ app.get("/logout", (req, res) => {
   keysAsync(`${req.user.email}*`)
     .then((values) => {
       console.log(values);
-      return delAsync(values);
+      if (!isEmpty(values)) {
+        return delAsync(values);
+      }
     })
     .then((numberOfKeysDeleted) => {
       console.log(
-        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys`
+        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys\n`
       );
       req.logout();
       res.send("Successful");
@@ -465,5 +481,5 @@ io.on("connection", (socket) => {
 
 // back-end server listen
 server.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
+  console.log(`server is listening on port ${port}\n`);
 });
