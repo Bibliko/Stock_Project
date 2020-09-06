@@ -1,3 +1,5 @@
+// @flow
+
 try {
   require("../config/config");
 } catch (err) {
@@ -15,6 +17,9 @@ module.exports = {
   delAsync: promisify(client.del).bind(client),
 
   keysAsync: promisify(client.keys).bind(client),
+  listLeftPushAsync: promisify(client.lpush).bind(client),
   listPushAsync: promisify(client.rpush).bind(client),
+  listPopAsync: promisify(client.rpop).bind(client),
+  listTrimAsync: promisify(client.ltrim).bind(client),
   listRangeAsync: promisify(client.lrange).bind(client) // listRange: both startIndex and endIndex elements are included.
 };

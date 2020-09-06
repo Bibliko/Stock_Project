@@ -54,7 +54,7 @@ export const parseRedisShareInfo = (redisString) => {
 };
 
 /**
- * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|finishedTime|isTypeBuy|userID"
+ * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|isTypeBuy|userID"
  */
 export const parseRedisTransactionsHistoryListItem = (redisString) => {
   const valuesArray = redisString.split("|");
@@ -66,9 +66,10 @@ export const parseRedisTransactionsHistoryListItem = (redisString) => {
     quantity: parseInt(valuesArray[3], 10),
     priceAtTransaction: parseFloat(valuesArray[4]),
     brokerage: parseFloat(valuesArray[5]),
-    finishedTime: valuesArray[6],
-    isTypeBuy: valuesArray[7] === "true" ? true : false,
-    userID: valuesArray[8],
+    spendOrGain: parseFloat(valuesArray[6]),
+    finishedTime: valuesArray[7],
+    isTypeBuy: valuesArray[8] === "true" ? true : false,
+    userID: valuesArray[9],
   };
 };
 
@@ -209,106 +210,6 @@ export const updateCachedSharesList = (email, shares) => {
   });
 };
 
-export const getCachedPaginatedTransactionsHistoryList = (email, page) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getPaginatedTransactionsHistoryList`, {
-      method: "get",
-      params: {
-        email,
-        page,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-export const getParsedCachedPaginatedTransactionsHistoryList = (
-  email,
-  page
-) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getPaginatedTransactionsHistoryList`, {
-      method: "get",
-      params: {
-        email,
-        page,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        const { data: redisTransactionsHistoryString } = res;
-        let transactionsHistory = [];
-
-        redisTransactionsHistoryString.map((transactionHistoryString) => {
-          return transactionsHistory.push(
-            parseRedisTransactionsHistoryListItem(transactionHistoryString)
-          );
-        });
-
-        resolve(transactionsHistory);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-/**
- * finishedTransactions will take in prisma transactions that have attribute isFinished true
- */
-export const updateCachedTransactionsHistoryListWholeList = (
-  email,
-  finishedTransactions
-) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateTransactionsHistoryListWholeList`, {
-      method: "put",
-      data: {
-        email,
-        finishedTransactions,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-/**
- * finishedTransaction will take in one prisma transaction that have attribute isFinished true
- */
-export const updateCachedTransactionsHistoryListOneItem = (
-  email,
-  finishedTransaction
-) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateTransactionsHistoryListOneItem`, {
-      method: "put",
-      data: {
-        email,
-        finishedTransaction,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
 /** 
  * Example response of full stock:
  * [ {
@@ -389,11 +290,6 @@ export default {
   getCachedSharesList, // Layout.js
   getParsedCachedSharesList, // AccountSummary, UserUtil
   updateCachedSharesList, // Layout.js
-
-  getCachedPaginatedTransactionsHistoryList,
-  getParsedCachedPaginatedTransactionsHistoryList,
-  updateCachedTransactionsHistoryListOneItem,
-  updateCachedTransactionsHistoryListWholeList,
 
   getFullStockQuote,
   getManyStockQuotes,

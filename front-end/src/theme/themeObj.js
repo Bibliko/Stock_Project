@@ -3,6 +3,9 @@ const theme = {
     maxSearchFieldWithLogo: "360px",
     maxSearchFieldWidth: "235px",
 
+    mainPageWidth: "100%",
+    mainSkeletonWidth: "100%",
+
     redirectingPaper: "90%",
   },
   customHeight: {
@@ -40,7 +43,7 @@ const theme = {
       main: "#1E1E1E",
       onPage: "rgba(46, 44, 48, 1)",
       deepBlueTable: "rgba(26,22,75,1)",
-      gradient: "linear-gradient(180deg, #1E1E1E 0%, #180B66 100%)",
+      gradient: "linear-gradient(180deg, #1E1E1E 30%, #180B66 100%)",
     },
 
     tableBackground: {
@@ -78,6 +81,11 @@ const theme = {
 
     disabled: {
       whiteColor: "rgba(255, 255, 255, 0.3)",
+    },
+
+    layoutSpeedDial: {
+      main: "rgba(74, 50, 209, 1)",
+      onHover: "rgba(90, 70, 220, 1)",
     },
 
     type: "light",

@@ -14,10 +14,13 @@ const {
   updateCachedShareInfo,
   switchFlagUpdatingUsingFMPToTrue
 } = require("../utils/RedisUtil");
+const { SequentialPromises } = require("../utils/PromisesUtil");
 
 /**
  * Keys list:
  * - '${email}|transactionsHistoryList'
+ * - '${email}|transactionsHistoryM5RU'
+ * - '${email}|transactionsHistoryM5RU|skipHowManyChunk100|searchBy|searchQuery|orderBy|orderQuery'
  * - '${email}|passwordVerification'
  * - '${email}|accountSummaryChart'
  * - '${email}|sharesList'
@@ -37,12 +40,16 @@ router.put("/updateAccountSummaryChartWholeList", (req, res) => {
 
   const redisKey = `${email}|accountSummaryChart`;
 
-  const listPushPromise = prismaTimestamps.map((timestamp) => {
+  const tasksList = [];
+
+  prismaTimestamps.map((timestamp) => {
     const { UTCDateString, portfolioValue } = timestamp;
     const newValue = `${UTCDateString}|${portfolioValue}`;
-    return listPushAsync(redisKey, newValue);
+    tasksList.push(() => listPushAsync(redisKey, newValue));
+    return "dummy value";
   });
-  Promise.all(listPushPromise)
+
+  SequentialPromises(tasksList)
     .then((finishedUpdatingRedisTimestampsList) => {
       res.sendStatus(200);
     })
@@ -104,12 +111,16 @@ router.put("/updateSharesList", (req, res) => {
 
   const redisKey = `${email}|sharesList`;
 
-  const listPushPromise = shares.map((share) => {
+  const tasksList = [];
+
+  shares.map((share) => {
     const { id, companyCode, quantity, buyPriceAvg, userID } = share;
     const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
-    return listPushAsync(redisKey, newValue);
+    tasksList.push(() => listPushAsync(redisKey, newValue));
+    return "dummy value";
   });
-  Promise.all(listPushPromise)
+
+  SequentialPromises(tasksList)
     .then((finishedUpdatingRedisSharesList) => {
       res.sendStatus(200);
     })
@@ -126,83 +137,6 @@ router.get("/getSharesList", (req, res) => {
   listRangeAsync(redisKey, 0, -1)
     .then((sharesList) => {
       res.send(sharesList);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-
-/**
- * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
- * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|finishedTime|isTypeBuy|userID", "..."
- */
-router.put("/updateTransactionsHistoryListWholeList", (req, res) => {
-  const { email, finishedTransactions } = req.body;
-
-  const redisKey = `${email}|transactionsHistoryList`;
-
-  const listPushPromise = finishedTransactions.map((transaction) => {
-    const {
-      id,
-      createdAt,
-      companyCode,
-      quantity,
-      priceAtTransaction,
-      brokerage,
-      finishedTime,
-      isTypeBuy,
-      userID
-    } = transaction;
-    const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
-    return listPushAsync(redisKey, newValue);
-  });
-  Promise.all(listPushPromise)
-    .then((finishedUpdatingRedisTransactionsHistoryList) => {
-      res.sendStatus(200);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-router.put("/updateTransactionsHistoryListOneItem", (req, res) => {
-  const { email, finishedTransaction } = req.body;
-
-  const redisKey = `${email}|transactionsHistoryList`;
-  const {
-    id,
-    createdAt,
-    companyCode,
-    quantity,
-    priceAtTransaction,
-    brokerage,
-    finishedTime,
-    isTypeBuy,
-    userID
-  } = finishedTransaction;
-  const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
-
-  listPushAsync(redisKey, newValue)
-    .then((finishedUpdatingRedisTransactionsHistoryList) => {
-      res.sendStatus(200);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-router.get("/getPaginatedTransactionsHistoryList", (req, res) => {
-  // Each page has 10 transactions
-  const { email, page } = req.query;
-
-  const redisKey = `${email}|transactionsHistoryList`;
-  const startIndex = 10 * (page - 1);
-  const endIndex = startIndex + (10 - 1);
-
-  listRangeAsync(redisKey, startIndex, endIndex)
-    .then((transactionsHistoryList) => {
-      res.send(transactionsHistoryList);
     })
     .catch((err) => {
       console.log(err);

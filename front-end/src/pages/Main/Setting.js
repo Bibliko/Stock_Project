@@ -25,10 +25,9 @@ const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: "75%",
+    width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "85%",
       marginTop: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",

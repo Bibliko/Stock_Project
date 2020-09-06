@@ -8,6 +8,7 @@ import { userAction } from "../../redux/storeActions/actions";
 
 import MyStatsTable from "../../components/Table/RankingTable/MyStatsTable";
 import OverallTable from "../../components/Table/RankingTable/OverallTable";
+import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -20,10 +21,10 @@ const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: "75%",
-    marginTop: "100px",
+    width: theme.customWidth.mainPageWidth,
+    marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "85%",
+      marginTop: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
@@ -40,9 +41,6 @@ const styles = (theme) => ({
     height: "100%",
     width: "100%",
     padding: "24px",
-    [theme.breakpoints.down("xs")]: {
-      padding: 0,
-    },
   },
   itemGrid: {
     display: "flex",
@@ -196,6 +194,7 @@ class Ranking extends React.Component {
               portfolioHigh={portfolioHigh}
             />
           </Grid>
+          <SpaceDivMainPages />
         </Grid>
       </Container>
     );

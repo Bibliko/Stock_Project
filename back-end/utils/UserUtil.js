@@ -226,6 +226,97 @@ const checkAndUpdateAllUsers = (objVariables) => {
     });
 };
 
+/**
+ * if searchBy === 'type' -> searchQuery takes in two of these parameters 'buy' or 'sell'
+ * if searchBy === 'companyCode' -> searchQuery takes in any non-empty string
+ *
+ *
+ */
+const getChunkUserTransactionsHistoryForRedisM5RU = (
+  email,
+  chunkSize, // required
+  numberOfChunksSkipped, // required
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  orderBy, // 'none' or '...'
+  orderQuery // 'none' or 'desc' or 'asc'
+) => {
+  // Each transactions history page has 10 items, but we cache beforehand 100 items
+  return new Promise((resolve, reject) => {
+    const filtering = {
+      isFinished: true
+    };
+    if (isEqual(searchBy, "companyCode")) {
+      filtering.companyCode = { contains: searchQuery };
+    }
+    if (isEqual(searchBy, "type")) {
+      filtering.isTypeBuy = isEqual(searchQuery, "buy");
+    }
+
+    const orderObject = {};
+    if (!isEqual(orderBy, "none")) {
+      orderObject[`${orderBy}`] = orderQuery;
+    }
+
+    const orderByPrisma = [];
+    if (!isEmpty(orderObject)) {
+      orderByPrisma.push(orderObject);
+    }
+
+    prisma.user
+      .findOne({
+        where: {
+          email
+        }
+      })
+      .transactions({
+        where: filtering,
+        orderBy: orderByPrisma,
+        skip: chunkSize * numberOfChunksSkipped,
+        take: chunkSize
+      })
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const getLengthUserTransactionsHistoryForRedisM5RU = (
+  email,
+  searchBy, // 'none' or 'type' or 'companyCode'
+  searchQuery // 'none' or 'buy'/'sell' or RANDOM
+) => {
+  return new Promise((resolve, reject) => {
+    const filtering = {
+      isFinished: true
+    };
+    if (isEqual(searchBy, "companyCode")) {
+      filtering.companyCode = { contains: searchQuery };
+    }
+    if (isEqual(searchBy, "type")) {
+      filtering.isTypeBuy = isEqual(searchQuery, "buy");
+    }
+
+    prisma.user
+      .findOne({
+        where: {
+          email
+        }
+      })
+      .transactions({
+        where: filtering
+      })
+      .then((data) => {
+        resolve(data.length);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 module.exports = {
   deleteExpiredVerification,
 
@@ -234,5 +325,8 @@ module.exports = {
   updateAllUsers,
   checkAndUpdateAllUsers,
 
-  updateRankingList
+  updateRankingList,
+
+  getChunkUserTransactionsHistoryForRedisM5RU,
+  getLengthUserTransactionsHistoryForRedisM5RU
 };

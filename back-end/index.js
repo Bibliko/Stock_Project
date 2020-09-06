@@ -295,7 +295,7 @@ app.get("/logout", (req, res) => {
     })
     .then((numberOfKeysDeleted) => {
       console.log(
-        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys`
+        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys\n`
       );
       req.logout();
       res.send("Successful");

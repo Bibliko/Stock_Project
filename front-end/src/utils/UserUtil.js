@@ -203,7 +203,16 @@ export const getUserData = (dataNeeded, email) => {
   });
 };
 
-export const getUserTransactions = (filtering, email) => {
+export const getUserTransactionsHistory = (
+  email,
+  rowsLengthChoices,
+  page,
+  rowsPerPage,
+  searchBy,
+  searchQuery,
+  orderBy,
+  orderQuery
+) => {
   /**
    * filtering in form:
    *    filtering = {
@@ -213,16 +222,26 @@ export const getUserTransactions = (filtering, email) => {
    */
 
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/userData/getUserTransactions`, {
+    axios(`${BACKEND_HOST}/userData/getUserTransactionsHistory`, {
       method: "get",
       params: {
         email,
-        filtering,
+        rowsLengthChoices, // required, min to max
+        page, // required
+        rowsPerPage, // required
+        searchBy, // 'none' or 'type' or 'companyCode'
+        searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+        orderBy, // 'none' or '...'
+        orderQuery, // 'none' or 'desc' or 'asc
       },
       withCredentials: true,
     })
-      .then((transactions) => {
-        resolve(transactions.data);
+      .then((transactionsData) => {
+        /**
+         * data includes: transactions, length
+         */
+        const { transactions, length } = transactionsData.data;
+        resolve({ transactions, transactionsLength: parseInt(length, 10) });
       })
       .catch((err) => {
         reject(err);
@@ -375,7 +394,7 @@ export default {
   changePassword,
   changeUserData,
   getUserData,
-  getUserTransactions,
+  getUserTransactionsHistory,
   getUserAccountSummaryChartTimestamps,
 
   calculateTotalSharesValue,

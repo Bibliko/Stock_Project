@@ -67,6 +67,7 @@ model UserTransaction {
   priceAtTransaction Float? // price at the moment transactions are made
   limitPrice         Float?
   brokerage          Float?
+  spendOrGain        Float? // totalValue = priceAtTransaction * quantity + (buy) or - (sell) brokerage;
   isFinished         Boolean?
   finishedTime       DateTime?
   isTypeBuy          Boolean?
