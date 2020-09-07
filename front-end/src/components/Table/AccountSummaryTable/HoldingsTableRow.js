@@ -20,9 +20,9 @@ import Typography from "@material-ui/core/Typography";
 import AddBoxRoundedIcon from "@material-ui/icons/AddBoxRounded";
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
-import AddShoppingCartRoundedIcon from "@material-ui/icons/AddShoppingCartRounded";
 import AttachMoneyRoundedIcon from "@material-ui/icons/AttachMoneyRounded";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
+import AddCircleOutlineRoundedIcon from "@material-ui/icons/AddCircleOutlineRounded";
 
 const styles = (theme) => ({
   tableCell: {
@@ -349,7 +349,7 @@ class HoldingsTableRow extends React.Component {
         >
           <div className={classes.cellDiv}>
             <IconButton className={classes.buyButton}>
-              <AddShoppingCartRoundedIcon />
+              <AddCircleOutlineRoundedIcon />
             </IconButton>
             <IconButton className={classes.sellButton}>
               <AttachMoneyRoundedIcon />

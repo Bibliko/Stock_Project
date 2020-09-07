@@ -23,9 +23,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
 
 import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
-import VideogameAssetRoundedIcon from "@material-ui/icons/VideogameAssetRounded";
 import MenuBookRoundedIcon from "@material-ui/icons/MenuBookRounded";
-import InfoRoundedIcon from "@material-ui/icons/InfoRounded";
+import EqualizerRoundedIcon from "@material-ui/icons/EqualizerRounded";
 
 const styles = (theme) => ({
   appBar: {
@@ -59,11 +58,11 @@ const styles = (theme) => ({
     },
   },
   normalIcon: {
-    height: "35px",
-    width: "35px",
+    height: "40px",
+    width: "40px",
     [theme.breakpoints.down("xs")]: {
-      height: "25px",
-      width: "25px",
+      height: "30px",
+      width: "30px",
     },
     color: "white",
     "&:hover": {
@@ -72,11 +71,11 @@ const styles = (theme) => ({
     },
   },
   avatarIcon: {
-    height: "35px",
-    width: "35px",
+    height: "40px",
+    width: "40px",
     [theme.breakpoints.down("xs")]: {
-      height: "25px",
-      width: "25px",
+      height: "30px",
+      width: "30px",
     },
     color: "white",
     "&:hover": {
@@ -237,7 +236,7 @@ class PersistentAppBar extends React.Component {
               onClick={this.toggleGameMenu}
               disableRipple
             >
-              <VideogameAssetRoundedIcon className={classes.normalIcon} />
+              <EqualizerRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <Popper
               open={openGameMenu}
@@ -319,13 +318,6 @@ class PersistentAppBar extends React.Component {
               disableRipple
             >
               <MenuBookRoundedIcon className={classes.normalIcon} />
-            </IconButton>
-            <IconButton
-              title="About Us"
-              className={classes.secondaryMenuButton}
-              disableRipple
-            >
-              <InfoRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
               className={classes.menuButton}

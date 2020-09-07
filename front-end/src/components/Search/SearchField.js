@@ -20,6 +20,10 @@ const styles = (theme) => ({
     "& .MuiInputBase-root": {
       height: "40px",
       borderRadius: "20px",
+      boxShadow: `0.5px 0.5px 1px ${theme.palette.searchField.main}`,
+      "&:hover": {
+        boxShadow: `0.5px 0.5px 1px ${theme.palette.searchField.onHover}`,
+      },
     },
     "& .MuiInputLabel-outlined": {
       transform: "translate(14px, 13px) scale(1)",
@@ -32,25 +36,25 @@ const styles = (theme) => ({
     },
     "& .MuiOutlinedInput-notchedOutline": {
       borderWidth: "2px",
-      borderColor: "rgba(156, 140, 249, 0.7)",
+      borderColor: theme.palette.searchField.main,
     },
     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(156, 140, 249, 1)",
+      borderColor: theme.palette.searchField.onHover,
     },
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(156, 140, 249, 1)",
+      borderColor: theme.palette.searchField.onHover,
     },
     "& .MuiFormLabel-root": {
       fontSize: "small",
-      color: "rgba(156, 140, 249, 0.7)",
+      color: theme.palette.searchField.main,
       "&.Mui-focused": {
-        color: "rgba(156, 140, 249, 1)",
+        color: theme.palette.searchField.onHover,
       },
     },
   },
   input: { color: "white", fontSize: "medium" },
   iconButton: { color: "rgba(255, 255, 255, 0.8)" },
-  searchIcon: { color: "rgba(156, 140, 249, 0.7)" },
+  searchIcon: { color: theme.palette.searchField.main },
   hide: {
     display: "none",
   },

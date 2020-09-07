@@ -68,13 +68,22 @@ const styles = (theme) => ({
       fontSize: "large",
     },
     fontWeight: "bold",
-    marginBottom: "10px",
+    marginBottom: "5px",
+  },
+  gridSubtitle: {
+    color: "white",
+    fontStyle: "italic",
+    fontSize: "small",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "smaller",
+    },
+    marginBottom: "20px",
   },
   summary: {
     color: "#DC3D4A",
   },
   holdings: {
-    color: "#9ED2EF",
+    color: "#4d36ff",
   },
   portfolioChart: {
     color: "#2F80ED",
@@ -236,6 +245,9 @@ class AccountSummary extends React.Component {
               className={clsx(classes.gridTitle, classes.portfolioChart)}
             >
               Portfolio Chart
+            </Typography>
+            <Typography className={classes.gridSubtitle}>
+              Chart tooltips are best supported on Chrome!
             </Typography>
             <Typography className={classes.titleChart}>
               ${numberWithCommas(totalPortfolio.toFixed(2))}

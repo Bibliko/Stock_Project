@@ -28,11 +28,11 @@ const styles = (theme) => ({
     marginTop: "20px",
   },
   chart: {
-    height: "80%",
-    width: "80%",
+    height: "65%",
+    width: "65%",
     [theme.breakpoints.up("md")]: {
-      height: "60%",
-      width: "60%",
+      height: "55%",
+      width: "55%",
     },
   },
   note: {
@@ -74,7 +74,7 @@ class AccountSummaryChart extends React.Component {
           enabled: false,
         },
         zoom: {
-          enabled: false,
+          enabled: true,
         },
         toolbar: {
           show: true,
@@ -82,11 +82,11 @@ class AccountSummaryChart extends React.Component {
           tools: {
             download: true,
             selection: false,
-            zoom: false,
+            zoom: true,
             zoomin: false,
             zoomout: false,
             pan: false,
-            reset: false,
+            reset: true,
             customIcons: [],
           },
           export: {
