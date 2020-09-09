@@ -64,12 +64,8 @@ const StyledTableRow = withStyles((theme) => ({
 
 class SummaryTableContainer extends React.Component {
   checkIfDailyChangeUpOrDown = (type) => {
-    if (type === "Daily Change" && this.props.userDailyChange >= 0) {
-      return "Up";
-    }
-    if (type === "Daily Change" && this.props.userDailyChange < 0) {
-      return "Down";
-    }
+    if (type === "Daily Change") 
+      return this.props.userDailyChange >= 0 ? "Up" : "Down";
   };
 
   chooseTableRowValue = (type) => {
@@ -100,6 +96,8 @@ class SummaryTableContainer extends React.Component {
   };
 
   chooseTableRow = (type, classes) => {
+    const dailyChangeTrend = this.checkIfDailyChangeUpOrDown(type);
+
     return (
       <StyledTableRow>
         <TableCell
@@ -113,18 +111,17 @@ class SummaryTableContainer extends React.Component {
         <TableCell
           align="left"
           className={clsx(classes.tableCellCenter, {
-            [classes.arrowUp]: this.checkIfDailyChangeUpOrDown(type) === "Up",
-            [classes.arrowDown]:
-              this.checkIfDailyChangeUpOrDown(type) === "Down",
+            [classes.arrowUp]: dailyChangeTrend === "Up",
+            [classes.arrowDown]: dailyChangeTrend === "Down",
           })}
         >
           <Typography className={classes.summaryTableItem}>
             {this.chooseTableRowValue(type)}
           </Typography>
-          {this.checkIfDailyChangeUpOrDown(type) === "Up" && (
+          {dailyChangeTrend === "Up" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
-          {this.checkIfDailyChangeUpOrDown(type) === "Down" && (
+          {dailyChangeTrend === "Down" && (
             <ArrowDropDownRoundedIcon className={classes.arrowDown} />
           )}
         </TableCell>
