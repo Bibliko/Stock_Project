@@ -1,8 +1,8 @@
 import axios from "axios";
 import { isEmpty, isEqual } from "lodash";
 
-import { getBackendHost } from "./NetworkUtil";
-import { getParsedCachedSharesList, getManyStockQuotes } from "./RedisUtil";
+import { getBackendHost } from "./low-dependency/NetworkUtil";
+import { getParsedCachedSharesList, getManyStockInfos } from "./RedisUtil";
 
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
@@ -203,7 +203,16 @@ export const getUserData = (dataNeeded, email) => {
   });
 };
 
-export const getUserTransactions = (filtering, email) => {
+export const getUserTransactionsHistory = (
+  email,
+  rowsLengthChoices,
+  page,
+  rowsPerPage,
+  searchBy,
+  searchQuery,
+  orderBy,
+  orderQuery
+) => {
   /**
    * filtering in form:
    *    filtering = {
@@ -213,16 +222,48 @@ export const getUserTransactions = (filtering, email) => {
    */
 
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/userData/getUserTransactions`, {
+    axios(`${BACKEND_HOST}/userData/getUserTransactionsHistory`, {
       method: "get",
       params: {
         email,
-        filtering,
+        rowsLengthChoices, // required, min to max
+        page, // required
+        rowsPerPage, // required
+        searchBy, // 'none' or 'type' or 'companyCode'
+        searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+        orderBy, // 'none' or '...'
+        orderQuery, // 'none' or 'desc' or 'asc
       },
       withCredentials: true,
     })
-      .then((transactions) => {
-        resolve(transactions.data);
+      .then((transactionsData) => {
+        /**
+         * data includes: transactions, length
+         */
+        const { transactions, length } = transactionsData.data;
+        resolve({ transactions, transactionsLength: parseInt(length, 10) });
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getUserAccountSummaryChartTimestamps = (
+  afterOrEqualThisYear,
+  email
+) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getUserAccountSummaryChartTimestamps`, {
+      method: "get",
+      params: {
+        email,
+        afterOrEqualThisYear,
+      },
+      withCredentials: true,
+    })
+      .then((accountSummaryChartTimestamps) => {
+        resolve(accountSummaryChartTimestamps.data);
       })
       .catch((err) => {
         reject(err);
@@ -279,7 +320,7 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
           return [[], []];
         } else {
           if (!isMarketClosed) {
-            return Promise.all([getManyStockQuotes(shares), shares]);
+            return Promise.all([getManyStockInfos(shares), shares]);
           } else {
             return [shares, shares];
           }
@@ -353,7 +394,8 @@ export default {
   changePassword,
   changeUserData,
   getUserData,
-  getUserTransactions,
+  getUserTransactionsHistory,
+  getUserAccountSummaryChartTimestamps,
 
   calculateTotalSharesValue,
   checkStockQuotesForUser,

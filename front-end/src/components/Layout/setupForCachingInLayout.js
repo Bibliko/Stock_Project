@@ -2,16 +2,18 @@ import { isEmpty } from "lodash";
 import {
   checkStockQuotesToCalculateSharesValue,
   getUserData,
-  getUserTransactions,
+  getUserAccountSummaryChartTimestamps,
 } from "../../utils/UserUtil";
 import {
   updateCachedSharesList,
   getCachedSharesList,
   getCachedAccountSummaryChartInfo,
   updateCachedAccountSummaryChartInfoWholeList,
-  getCachedPaginatedTransactionsHistoryList,
-  updateCachedTransactionsHistoryListWholeList,
 } from "../../utils/RedisUtil";
+import {
+  getYearUTCString,
+  newDate,
+} from "../../utils/low-dependency/DayTimeUtil";
 
 const setupSharesListForCaching = (isMarketClosed, userSession, mutateUser) => {
   return new Promise((resolve, reject) => {
@@ -53,49 +55,17 @@ const setupAccountSummaryChartForCaching = (userSession) => {
       .then((res) => {
         const { data: chartInfo } = res;
         if (isEmpty(chartInfo)) {
-          const dataNeeded = {
-            accountSummaryChartInfo: true,
-          };
-          return getUserData(dataNeeded, userSession.email);
+          return getUserAccountSummaryChartTimestamps(
+            getYearUTCString(newDate()) - 2,
+            userSession.email
+          );
         }
       })
       .then((chartInfoFromDatabase) => {
-        if (chartInfoFromDatabase) {
-          const { accountSummaryChartInfo } = chartInfoFromDatabase;
-          if (accountSummaryChartInfo && !isEmpty(accountSummaryChartInfo)) {
-            return updateCachedAccountSummaryChartInfoWholeList(
-              userSession.email,
-              accountSummaryChartInfo
-            );
-          }
-        }
-      })
-      .then((afterUpdatingCachedAccountSummaryChartInfoList) => {
-        resolve("Finished setting up Redis Account Summary Chart List.");
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-const setupTransactionsHistoryForCaching = (userSession) => {
-  return new Promise((resolve, reject) => {
-    getCachedPaginatedTransactionsHistoryList(userSession.email, 1)
-      .then((res) => {
-        const { data: transactionsHistory } = res;
-        if (isEmpty(transactionsHistory)) {
-          const filtering = {
-            isFinished: true,
-          };
-          return getUserTransactions(filtering, userSession.email);
-        }
-      })
-      .then((transactions) => {
-        if (transactions && !isEmpty(transactions)) {
-          return updateCachedTransactionsHistoryListWholeList(
+        if (chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
+          return updateCachedAccountSummaryChartInfoWholeList(
             userSession.email,
-            transactions
+            chartInfoFromDatabase
           );
         }
       })
@@ -112,14 +82,12 @@ export const mainSetup = (isMarketClosed, userSession, mutateUser) => {
   return Promise.all([
     setupSharesListForCaching(isMarketClosed, userSession, mutateUser),
     setupAccountSummaryChartForCaching(userSession),
-    setupTransactionsHistoryForCaching(userSession),
   ]);
 };
 
 export default {
   setupSharesListForCaching,
   setupAccountSummaryChartForCaching,
-  setupTransactionsHistoryForCaching,
 
   mainSetup,
 };

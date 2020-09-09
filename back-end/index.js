@@ -14,17 +14,10 @@ try {
   console.log("No config found. Using default ENV.");
 }
 
-const { PORT: port, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
-const express = require("express");
-const app = express();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("./redis/redis-client");
-
 const {
   getFrontendHost,
   getPassportCallbackHost
-} = require("./utils/NetworkUtil");
+} = require("./utils/low-dependency/NetworkUtil");
 
 const {
   oneSecond,
@@ -32,15 +25,15 @@ const {
   oneMinute,
   clearIntervals,
   clearIntervalsIfIntervalsNotEmpty
-} = require("./utils/DayTimeUtil");
+} = require("./utils/low-dependency/DayTimeUtil");
 
 const {
   deleteExpiredVerification,
   checkAndUpdateAllUsers,
   updateRankingList
-} = require("./utils/UserUtil");
+} = require("./utils/top-layer/UserUtil");
 
-const { checkMarketClosed } = require("./utils/SocketUtil");
+const { checkMarketClosed } = require("./utils/top-layer/SocketUtil");
 
 const { deletePrismaMarketHolidays } = require("./utils/MarketHolidaysUtil");
 
@@ -52,7 +45,18 @@ const {
   cachePasswordVerificationCode,
   getParsedCachedPasswordVerificationCode,
   removeCachedPasswordVerificationCode
+
+  // updateCachedShareQuotesUsingCache,
+  // updateCachedShareProfilesUsingCache
 } = require("./utils/RedisUtil");
+
+const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const express = require("express");
+const app = express();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const { keysAsync, delAsync } = require("./redis/redis-client");
+const { isEmpty } = require("lodash");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -83,10 +87,23 @@ const session = require("express-session");
  * response is NOT a cors, and back-end accepts this response
  * without being regulated by this corsOptions.
  */
+
+const whitelist = [FRONTEND_HOST];
 const corsOptions = {
-  origin: FRONTEND_HOST,
+  origin: function (origin, callback) {
+    if (NODE_ENV === "development") {
+      callback(null, true);
+    } else {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    }
+  },
   credentials: true
 };
+
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(
@@ -116,13 +133,18 @@ setInterval(deleteExpiredVerification, oneDay);
 // This function to help initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(objVariables);
 
+// Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
 setInterval(() => updateMarketHolidaysFromFMP(objVariables), oneDay);
-
 setInterval(deletePrismaMarketHolidays, oneDay);
 
+// Check if market closed to update users portfolio last closure
 setInterval(() => checkAndUpdateAllUsers(objVariables), oneSecond);
 
-// Update RankingList after 10 minutes
+// Update Cached Shares
+// setInterval(() => updateCachedShareQuotesUsingCache(), 2 * oneSecond);
+// setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
+
+// Update Ranking List after 10 minutes
 updateRankingList();
 setInterval(updateRankingList, 10 * oneMinute);
 
@@ -275,11 +297,13 @@ app.get("/logout", (req, res) => {
   keysAsync(`${req.user.email}*`)
     .then((values) => {
       console.log(values);
-      return delAsync(values);
+      if (!isEmpty(values)) {
+        return delAsync(values);
+      }
     })
     .then((numberOfKeysDeleted) => {
       console.log(
-        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys`
+        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys\n`
       );
       req.logout();
       res.send("Successful");
@@ -465,5 +489,5 @@ io.on("connection", (socket) => {
 
 // back-end server listen
 server.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
+  console.log(`server is listening on port ${port}\n`);
 });

@@ -1,7 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const { newDate, getYearUTCString } = require("./DayTimeUtil");
+const { newDate, getYearUTCString } = require("./low-dependency/DayTimeUtil");
 
 const deletePrismaMarketHolidays = () => {
   var timeNow = newDate();

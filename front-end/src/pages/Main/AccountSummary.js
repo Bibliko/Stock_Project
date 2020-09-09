@@ -7,11 +7,12 @@ import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
 import { getParsedCachedSharesList } from "../../utils/RedisUtil";
-import { numberWithCommas } from "../../utils/NumberUtil";
+import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
 
 import HoldingsTableContainer from "../../components/Table/AccountSummaryTable/HoldingsTableContainer";
 import SummaryTableContainer from "../../components/Table/AccountSummaryTable/SummaryTableContainer";
 import AccountSummaryChart from "../../components/Chart/AccountSummaryChart";
+import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -25,11 +26,12 @@ const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: "75%",
+    width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
+    marginBottom: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "85%",
       marginTop: theme.customMargin.topLayoutSmall,
+      marginBottom: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
@@ -48,25 +50,17 @@ const styles = (theme) => ({
     height: "100%",
     width: "100%",
     padding: "24px",
-    [theme.breakpoints.down("xs")]: {
-      padding: 0,
-    },
   },
-  itemGrid: {
+  itemContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
-  },
-  noteGrid: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    flexDirection: "column",
-    padding: 0,
-    paddingLeft: "24px",
-    paddingRight: "24px",
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingBottom: 24,
+    paddingTop: 24,
   },
   gridTitle: {
     fontSize: "x-large",
@@ -74,13 +68,22 @@ const styles = (theme) => ({
       fontSize: "large",
     },
     fontWeight: "bold",
-    marginBottom: "10px",
+    marginBottom: "5px",
+  },
+  gridSubtitle: {
+    color: "white",
+    fontStyle: "italic",
+    fontSize: "small",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "smaller",
+    },
+    marginBottom: "20px",
   },
   summary: {
     color: "#DC3D4A",
   },
   holdings: {
-    color: "#9ED2EF",
+    color: "#4d36ff",
   },
   portfolioChart: {
     color: "#2F80ED",
@@ -210,7 +213,7 @@ class AccountSummary extends React.Component {
           direction="row"
           className={classes.fullHeightWidth}
         >
-          <Grid item xs={12} className={classes.itemGrid}>
+          <Container className={classes.itemContainer}>
             <Typography className={clsx(classes.gridTitle, classes.summary)}>
               Summary
             </Typography>
@@ -220,8 +223,8 @@ class AccountSummary extends React.Component {
               ranking={ranking}
               userDailyChange={userDailyChange.toFixed(2)}
             />
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
+          </Container>
+          <Container className={classes.itemContainer}>
             <Typography className={clsx(classes.gridTitle, classes.holdings)}>
               Holdings
             </Typography>
@@ -236,12 +239,15 @@ class AccountSummary extends React.Component {
             {!isEmpty(this.state.holdingsRows) && (
               <HoldingsTableContainer rows={this.state.holdingsRows} />
             )}
-          </Grid>
-          <Grid item xs={12} className={classes.noteGrid}>
+          </Container>
+          <Container className={classes.itemContainer}>
             <Typography
               className={clsx(classes.gridTitle, classes.portfolioChart)}
             >
               Portfolio Chart
+            </Typography>
+            <Typography className={classes.gridSubtitle}>
+              Chart tooltips are best supported on Chrome!
             </Typography>
             <Typography className={classes.titleChart}>
               ${numberWithCommas(totalPortfolio.toFixed(2))}
@@ -250,7 +256,8 @@ class AccountSummary extends React.Component {
               Portfolio Now
             </Typography>
             <AccountSummaryChart email={email} />
-          </Grid>
+          </Container>
+          <SpaceDivMainPages />
         </Grid>
       </Container>
     );

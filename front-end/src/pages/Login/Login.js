@@ -8,7 +8,7 @@ import { userAction } from "../../redux/storeActions/actions";
 import {
   shouldRedirectToLandingPage,
   redirectToPage,
-} from "../../utils/PageRedirectUtil";
+} from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
 
 import Paper from "@material-ui/core/Paper";

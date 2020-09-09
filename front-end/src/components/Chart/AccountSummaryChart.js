@@ -3,13 +3,11 @@ import Chart from "react-apexcharts";
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 
-import { oneSecond } from "../../utils/DayTimeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
-import {
-  getCachedAccountSummaryChartInfo,
-  parseRedisAccountSummaryChartItem,
-} from "../../utils/RedisUtil";
-import { numberWithCommas } from "../../utils/NumberUtil";
+import { getCachedAccountSummaryChartInfo } from "../../utils/RedisUtil";
+import { parseRedisAccountSummaryChartItem } from "../../utils/low-dependency/ParserUtil";
+import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -23,16 +21,16 @@ const styles = (theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    padding: "10px",
+    flexDirection: "column",
     marginBottom: "10px",
     marginTop: "20px",
   },
   chart: {
-    height: "100%",
-    width: "100%",
+    height: "65%",
+    width: "65%",
     [theme.breakpoints.up("md")]: {
-      height: "75%",
-      width: "75%",
+      height: "55%",
+      width: "55%",
     },
   },
   note: {
@@ -41,6 +39,27 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
     },
+    alignSelf: "center",
+  },
+  noteChart: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+    color: "white",
+    alignSelf: "center",
+    marginTop: "16px",
+  },
+  noteChartSmaller: {
+    fontSize: "small",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "smaller",
+    },
+    color: "white",
+    alignSelf: "center",
+    textAlign: "center",
+    marginTop: "5px",
+    fontStyle: "italic",
   },
 });
 
@@ -53,7 +72,7 @@ class AccountSummaryChart extends React.Component {
           enabled: false,
         },
         zoom: {
-          enabled: false,
+          enabled: true,
         },
         toolbar: {
           show: true,
@@ -61,11 +80,11 @@ class AccountSummaryChart extends React.Component {
           tools: {
             download: true,
             selection: false,
-            zoom: false,
+            zoom: true,
             zoomin: false,
             zoomout: false,
             pan: false,
-            reset: false,
+            reset: true,
             customIcons: [],
           },
           export: {
@@ -280,10 +299,13 @@ class AccountSummaryChart extends React.Component {
         )}
         {isChartReady && isEmpty(series[0].data) && (
           <Typography className={classes.note}>
-            Chart is not updated yet. It's only updated whenever market is
-            closed.
+            The chart will be updated every minute.
           </Typography>
         )}
+        <Typography className={classes.noteChart}>2-year records</Typography>
+        <Typography className={classes.noteChartSmaller}>
+          (If you need longer-than-2-year records, contact us...)
+        </Typography>
       </div>
     );
   }

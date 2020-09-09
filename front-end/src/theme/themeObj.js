@@ -3,6 +3,9 @@ const theme = {
     maxSearchFieldWithLogo: "360px",
     maxSearchFieldWidth: "235px",
 
+    mainPageWidth: "100%",
+    mainSkeletonWidth: "100%",
+
     redirectingPaper: "90%",
   },
   customHeight: {
@@ -40,7 +43,7 @@ const theme = {
       main: "#1E1E1E",
       onPage: "rgba(46, 44, 48, 1)",
       deepBlueTable: "rgba(26,22,75,1)",
-      gradient: "linear-gradient(180deg, #1E1E1E 0%, #180B66 100%)",
+      gradient: "linear-gradient(180deg, #1E1E1E 30%, #180B66 100%)",
     },
 
     tableBackground: {
@@ -52,11 +55,12 @@ const theme = {
     },
 
     appBarBlue: {
-      main: "#180B66",
+      main: "rgba(35, 20, 150, 1)",
     },
 
-    barButton: {
-      main: "linear-gradient(45deg, #2196f3, #03b6fc)",
+    filterButton: {
+      main: "rgba(74, 50, 209, 1)",
+      onHover: "rgba(90, 70, 220, 1)",
     },
 
     subText: {
@@ -64,7 +68,9 @@ const theme = {
     },
 
     succeed: {
-      main: "#209A54",
+      main: "rgba(32, 154, 85, 1)",
+      tableSorted: "rgba(90, 210, 130, 1)",
+      tableSortIcon: "rgba(90, 210, 130, 0.8)",
     },
 
     fail: {
@@ -74,6 +80,31 @@ const theme = {
     gradientPaper: {
       main:
         "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
+    },
+
+    disabled: {
+      whiteColor: "rgba(255, 255, 255, 0.3)",
+    },
+
+    layoutSpeedDial: {
+      main: "rgba(74, 50, 209, 1)",
+      onHover: "rgba(90, 70, 220, 1)",
+    },
+
+    searchField: {
+      main: "rgba(160, 150, 250, 0.7)",
+      onHover: "rgba(160, 150, 250, 1)",
+    },
+
+    searchFieldButtonSmallScreen: {
+      main: "rgba(160, 150, 250, 0.3)",
+      onHover: "rgba(160, 150, 250, 0.4)",
+      rippleSpan: "rgba(160, 150, 250, 0.6)",
+      searchIcon: "rgba(160, 150, 250, 1)",
+    },
+
+    tableHeader: {
+      main: "rgba(35, 20, 150, 1)",
     },
 
     type: "light",
@@ -236,6 +267,15 @@ const theme = {
       },
     },
     // Mui Pickers
+
+    // Mui Popover
+    MuiPopover: {
+      paper: {
+        backgroundColor: "rgba(46, 44, 48, 1)",
+        color: "white",
+      },
+    },
+    // Mui Popover
   },
 };
 

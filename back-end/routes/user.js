@@ -1,10 +1,23 @@
-const { Router } = require("express");
-const { PrismaClient } = require("@prisma/client");
-const router = Router();
-const prisma = new PrismaClient();
-// const { indices } = require('../algolia');
-
 const { listRangeAsync } = require("../redis/redis-client");
+
+const { Router } = require("express");
+const router = Router();
+
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+const {
+  searchAndUpdateTransactionsHistoryM5RU,
+  getTransactionsHistoryItemInM5RU,
+  createOrOverwriteTransactionsHistoryM5RUItemRedisKey,
+  addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey
+} = require("../utils/RedisUtil");
+const {
+  getChunkUserTransactionsHistoryForRedisM5RU,
+  getLengthUserTransactionsHistoryForRedisM5RU
+} = require("../utils/top-layer/UserUtil");
+
+// const { indices } = require('../algolia');
 
 router.put("/changeData", (req, res) => {
   const { dataNeedChange, email } = req.body;
@@ -123,10 +136,148 @@ router.get("/getRegionalRanking", (req, res) => {
     });
 });
 
-router.get("/getUserTransactions", (req, res) => {
-  const { email, filtering } = req.query;
+router.get("/getUserTransactionsHistory", (req, res) => {
+  /**
+   * Each page has max 10 transactions. We only cache 100 transactions.
+   * We need to be able to check if this page already exceeds 100 cached transactions.
+   * - If no, just return the right page from these 100 cached transactions.
+   * - If yes, cache the next 100 transactions into M5RU and return the right page.
+   */
 
-  var filteringJSON = JSON.parse(filtering);
+  const {
+    email,
+    rowsLengthChoices, // required, min to max
+    page, // required
+    rowsPerPage, // required
+    searchBy, // 'none' or 'type' or 'companyCode'
+    searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+    orderBy, // 'none' or '...'
+    orderQuery // 'none' or 'desc' or 'asc'
+  } = req.query;
+
+  const pageInteger = parseInt(page, 10);
+  const rowsPerPageInteger = parseInt(rowsPerPage, 10);
+  const maxNumberOfTransactionsUpToThisPage = rowsPerPageInteger * pageInteger;
+
+  let numberOfChunksSkipped = 0;
+  const chunkSize = rowsLengthChoices[rowsLengthChoices.length - 1] * 10; // how many transactions we want to cache beforehand
+
+  /**
+   * Important Note:
+   * - Both chunkSize and rowsLength must be multiples of 5. rowsLength exception is 1.
+   * - chunkSize must be larger than or equal to rowsLength.
+   */
+
+  while (
+    maxNumberOfTransactionsUpToThisPage >
+    chunkSize * numberOfChunksSkipped
+  ) {
+    numberOfChunksSkipped++;
+  }
+  // return to true number of chunks 100 skipped
+  numberOfChunksSkipped--;
+
+  searchAndUpdateTransactionsHistoryM5RU(
+    email,
+    numberOfChunksSkipped,
+    searchBy,
+    searchQuery,
+    orderBy,
+    orderQuery
+  )
+    .then(([note, indexInM5RUList]) => {
+      if (indexInM5RUList === -1) {
+        return getChunkUserTransactionsHistoryForRedisM5RU(
+          email,
+          chunkSize,
+          numberOfChunksSkipped,
+          searchBy,
+          searchQuery,
+          orderBy,
+          orderQuery
+        );
+      }
+    })
+    .then((new100TransactionsFromPrisma) => {
+      if (new100TransactionsFromPrisma) {
+        return Promise.all([
+          createOrOverwriteTransactionsHistoryM5RUItemRedisKey(
+            email,
+            numberOfChunksSkipped,
+            searchBy,
+            searchQuery,
+            orderBy,
+            orderQuery,
+            new100TransactionsFromPrisma
+          ),
+          getLengthUserTransactionsHistoryForRedisM5RU(
+            email,
+            searchBy,
+            searchQuery
+          )
+        ]);
+      }
+    })
+    .then((newToM5RU) => {
+      if (newToM5RU) {
+        const transactionsHistoryLength = newToM5RU[1];
+        return addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey(
+          email,
+          numberOfChunksSkipped,
+          searchBy,
+          searchQuery,
+          orderBy,
+          orderQuery,
+          transactionsHistoryLength
+        );
+      }
+    })
+    .then((finishedUpdatingM5RU) => {
+      return getTransactionsHistoryItemInM5RU(
+        email,
+        numberOfChunksSkipped,
+        searchBy,
+        searchQuery,
+        orderBy,
+        orderQuery
+      );
+    })
+    .then((transactionsAndLength) => {
+      const length = transactionsAndLength[0];
+
+      const paginationStopsInChunk = [1];
+      const numberOfStops = chunkSize / rowsPerPageInteger;
+      for (let i = 1; i < numberOfStops; i++) {
+        paginationStopsInChunk.push(
+          paginationStopsInChunk[i - 1] + rowsPerPageInteger
+        );
+      }
+
+      let startIndexStop = (pageInteger % paginationStopsInChunk.length) - 1;
+      if (startIndexStop < 0) {
+        startIndexStop = paginationStopsInChunk.length + startIndexStop;
+      }
+
+      const startIndex = paginationStopsInChunk[startIndexStop];
+      const excludedEndIndex = startIndex + rowsPerPageInteger;
+
+      const transactions = transactionsAndLength.slice(
+        startIndex,
+        excludedEndIndex
+      );
+
+      res.send({ transactions, length });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get user's transactions history.");
+    });
+});
+
+router.get("/getUserAccountSummaryChartTimestamps", (req, res) => {
+  const { email, afterOrEqualThisYear } = req.query;
+
+  const afterOrEqualThisYearInteger = parseInt(afterOrEqualThisYear, 10);
 
   /**
    * filtering in form:
@@ -136,21 +287,23 @@ router.get("/getUserTransactions", (req, res) => {
    *    }
    */
 
-  prisma.user
-    .findOne({
+  prisma.accountSummaryTimestamp
+    .findMany({
       where: {
-        email
+        user: {
+          email
+        },
+        year: {
+          gte: afterOrEqualThisYearInteger
+        }
       }
-    })
-    .transactions({
-      where: filteringJSON
     })
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send("Get data of user fails.");
+      res.status(500).send("Failed to get user's data.");
     });
 });
 

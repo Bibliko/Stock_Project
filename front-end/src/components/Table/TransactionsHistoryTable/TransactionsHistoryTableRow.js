@@ -2,8 +2,8 @@ import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
 
-import { numberWithCommas } from "../../../utils/NumberUtil";
-import { convertToLocalTimeString } from "../../../utils/DayTimeUtil";
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import { convertToLocalTimeString } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
@@ -28,49 +28,10 @@ const styles = (theme) => ({
   cellDiv: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-end",
   },
-  cellDivName: {
+  cellDivSpecialForType: {
     justifyContent: "flex-start",
-  },
-  watchlistButton: {
-    color: "#619FD7",
-    "&:hover": {
-      color: "rgba(97, 159, 215, 0.8)",
-    },
-    padding: "5px",
-  },
-  watchlistIcon: {
-    height: "30px",
-    width: "30px",
-  },
-  arrowUp: {
-    color: "#219653",
-  },
-  arrowDown: {
-    color: "#ef0808",
-  },
-  marginLeftIfProfitOrLoss: {
-    marginLeft: "12px",
-  },
-  iconInsideIconButton: {
-    height: "22px",
-    width: "22px",
-    color: "white",
-    "&:hover": {
-      color: "#e23d3d",
-      cursor: "pointer",
-    },
-  },
-  stickyCell: {
-    position: "sticky",
-    left: 0,
-  },
-  watchlistRowItem: {
-    fontSize: "medium",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "small",
-    },
   },
   buyIcon: {
     color: "#27AE60",
@@ -110,7 +71,11 @@ class TransactionsHistoryTableRow extends React.Component {
             this.isTableRowTheLast() && type === "Transaction Time",
         })}
       >
-        <div className={classes.cellDiv}>
+        <div
+          className={clsx(classes.cellDiv, {
+            [classes.cellDivSpecialForType]: type === "Type",
+          })}
+        >
           <Typography
             className={clsx(classes.watchlistRowItem, {
               [classes.buyIcon]: type === "Type" && isTypeBuy,
@@ -132,6 +97,7 @@ class TransactionsHistoryTableRow extends React.Component {
       quantity,
       priceAtTransaction,
       brokerage,
+      spendOrGain,
       finishedTime,
     } = this.props.transactionInfo;
 
@@ -152,13 +118,7 @@ class TransactionsHistoryTableRow extends React.Component {
         return `$${numberWithCommas(brokerage.toFixed(2))}`;
 
       case "Spend/Gain":
-        let totalValue = 0;
-        if (isTypeBuy) {
-          totalValue = priceAtTransaction * quantity + brokerage;
-        } else {
-          totalValue = priceAtTransaction * quantity - brokerage;
-        }
-        return `$${numberWithCommas(totalValue.toFixed(2))}`;
+        return `$${numberWithCommas(spendOrGain.toFixed(2))}`;
 
       case "Transaction Time":
         return convertToLocalTimeString(finishedTime);

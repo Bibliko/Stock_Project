@@ -1,8 +1,14 @@
 import React from "react";
 import { isEqual, pick } from "lodash";
+import { connect } from "react-redux";
 import { withRouter } from "react-router";
 
 import MarketTimeDialog from "../Dialog/MarketTimeDialog";
+
+import {
+  marketCountdownUpdate,
+  oneSecond,
+} from "../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -25,10 +31,10 @@ const styles = (theme) => ({
       width: "40px",
     },
     "& .MuiFab-primary": {
-      backgroundColor: "rgba(147, 102, 255, 1)",
+      backgroundColor: theme.palette.layoutSpeedDial.main,
       [theme.breakpoints.down("xs")]: {
-        height: "40px",
-        width: "40px",
+        height: "50px",
+        width: "50px",
       },
     },
   },
@@ -37,12 +43,12 @@ const styles = (theme) => ({
     height: "56px",
     width: "56px",
     [theme.breakpoints.down("xs")]: {
-      height: "40px",
-      width: "40px",
+      height: "50px",
+      width: "50px",
     },
-    backgroundColor: "rgba(147, 102, 255, 1)",
+    backgroundColor: theme.palette.layoutSpeedDial.main,
     "&:hover": {
-      backgroundColor: "rgba(147, 102, 255, 0.85)",
+      backgroundColor: theme.palette.layoutSpeedDial.onHover,
     },
   },
 });
@@ -50,9 +56,12 @@ const styles = (theme) => ({
 class LayoutSpeedDial extends React.Component {
   state = {
     open: false,
-
     openMarketTimeDialog: false,
+
+    countdown: "",
   };
+
+  marketCountdownInterval;
 
   handleOpen = (event, reason) => {
     if (!isEqual(reason, "mouseEnter")) {
@@ -72,11 +81,34 @@ class LayoutSpeedDial extends React.Component {
     this.setState({ openMarketTimeDialog: false });
   };
 
+  componentDidMount() {
+    this.marketCountdownInterval = setInterval(
+      () =>
+        marketCountdownUpdate(
+          this.setState.bind(this),
+          this.props.isMarketClosed
+        ),
+      oneSecond
+    );
+  }
+
+  componentDidUpdate() {
+    if (this.props.isMarketClosed) {
+      this.setState({
+        countdown: "",
+      });
+      clearInterval(this.marketCountdownInterval);
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.marketCountdownInterval);
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["isMarketClosed", "remainingTime"];
+    const compareKeys = ["isMarketClosed"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
-
     return (
       !isEqual(nextState, this.state) ||
       !isEqual(nextPropsCompare, propsCompare)
@@ -84,9 +116,9 @@ class LayoutSpeedDial extends React.Component {
   }
 
   render() {
-    const { classes, isMarketClosed, remainingTime } = this.props;
+    const { classes, isMarketClosed } = this.props;
 
-    const { open, openMarketTimeDialog } = this.state;
+    const { open, openMarketTimeDialog, countdown } = this.state;
 
     return (
       <React.Fragment>
@@ -115,11 +147,18 @@ class LayoutSpeedDial extends React.Component {
           openMarketTimeDialog={openMarketTimeDialog}
           handleClose={this.closeMarketTimeDialog}
           isMarketClosed={isMarketClosed}
-          remainingTime={remainingTime}
+          remainingTime={countdown}
         />
       </React.Fragment>
     );
   }
 }
 
-export default withStyles(styles)(withRouter(LayoutSpeedDial));
+const mapStateToProps = (state) => ({
+  isMarketClosed: state.isMarketClosed,
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(withStyles(styles)(withRouter(LayoutSpeedDial)));

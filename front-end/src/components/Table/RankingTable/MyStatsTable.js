@@ -117,9 +117,6 @@ class MyStatsTable extends React.Component {
             {this.chooseTableRow("Change from previous week:", classes)}
             {this.chooseTableRow("Portfolio high:", classes)}
             {this.chooseTableRow("Portfolio low:", classes)}
-            {this.chooseTableRow("Overall rank syndicates:", classes)}
-            {this.chooseTableRow("Average syndicate value:", classes)}
-            {this.chooseTableRow("% of syndicates in profit:", classes)}
           </TableBody>
         </Table>
       </TableContainer>

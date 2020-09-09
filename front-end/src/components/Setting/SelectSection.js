@@ -3,6 +3,7 @@ import React from "react";
 import clsx from "clsx";
 
 import SelectBox from "../SelectBox/SelectBox";
+import SpaceDivMainPages from "../Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -116,6 +117,7 @@ class SelectSection extends React.Component {
               onChange={this.recordOccupation}
             />
           </Grid>
+          <SpaceDivMainPages />
         </Grid>
       </div>
     );

@@ -3,7 +3,7 @@ const { isEmpty, isEqual } = require("lodash");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const { newDate, getYearUTCString } = require("./DayTimeUtil");
+const { newDate, getYearUTCString } = require("./low-dependency/DayTimeUtil");
 
 const { updatePrismaMarketHolidays } = require("./MarketHolidaysUtil");
 
@@ -89,7 +89,7 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
       })
       .then((afterUpdated) => {
         console.log(
-          "prisma market holidays updated FinancialModelingPrepUtil, 90"
+          "prisma market holidays updated FinancialModelingPrepUtil updateMarketHolidaysFromFMP.\n"
         );
 
         objVariables.isPrismaMarketHolidaysInitialized = true;
@@ -103,6 +103,8 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
 };
 
 /** 
+ * Batch requests up to 800 companies in one request
+ * 
  * Example response of full stock:
  * [ {
   "symbol" : "AAPL",
@@ -130,22 +132,88 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
 },
  ...
 ]
+  shareSymbolsString: 'AAPL,GOOGL,...'
  */
-const getFullStockQuoteFromFMP = (shareSymbol) => {
+const getFullStockQuotesFromFMP = (shareSymbolsString) => {
   return new Promise((resolve, reject) => {
     fetch(
-      `https://financialmodelingprep.com/api/v3/quote/${shareSymbol.toUpperCase()}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      `https://financialmodelingprep.com/api/v3/quote/${shareSymbolsString}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
-      .then((stockQuote) => {
-        return stockQuote.json();
+      .then((stockQuotes) => {
+        return stockQuotes.json();
       })
-      .then((stockQuoteJSON) => {
-        if (isEmpty(stockQuoteJSON)) {
-          reject(
-            new Error(`shareSymbol ${shareSymbol} does not exist in FMP.`)
-          );
+      .then((stockQuotesJSON) => {
+        if (isEmpty(stockQuotesJSON)) {
+          reject(new Error(`Share symbols do not exist in FMP.`));
+        } else if (stockQuotesJSON["Error Message"]) {
+          reject(stockQuotesJSON["Error Message"]);
         } else {
-          resolve(stockQuoteJSON[0]);
+          resolve(stockQuotesJSON);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * Batch requests up to 50 companies in one request
+ * 
+ * [ {
+  "symbol" : "AAPL",
+  "price" : 120.96,
+  "beta" : 1.28511,
+  "volAvg" : 165778904,
+  "mktCap" : 2068718420000,
+  "lastDiv" : 0.75,
+  "range" : "52.7675-137.98",
+  "changes" : 0.08,
+  "companyName" : "Apple Inc",
+  "exchange" : "Nasdaq Global Select",
+  "exchangeShortName" : "NASDAQ",
+  "industry" : "Consumer Electronics",
+  "website" : "https://www.apple.com/",
+  "description" : "Apple, Inc. engages in the design, manufacture, and sale of smartphones, personal computers, tablets, wearables and accessories, and other variety of related services. The company is headquartered in Cupertino, California and currently employs 137,000 full-time employees. The company is considered one of the Big Four technology companies, alongside Amazon, Google, and Microsoft. The firm's hardware products include the iPhone smartphone, the iPad tablet computer, the Mac personal computer, the iPod portable media player, the Apple Watch smartwatch, the Apple TV digital media player, the AirPods wireless earbuds and the HomePod smart speaker. Apple's software includes the macOS, iOS, iPadOS, watchOS, and tvOS operating systems, the iTunes media player, the Safari web browser, the Shazam acoustic fingerprint utility, and the iLife and iWork creativity and productivity suites, as well as professional applications like Final Cut Pro, Logic Pro, and Xcode. Its online services include the iTunes Store, the iOS App Store, Mac App Store, Apple Music, Apple TV+, iMessage, and iCloud. Other services include Apple Store, Genius Bar, AppleCare, Apple Pay, Apple Pay Cash, and Apple Card.",
+  "ceo" : "Mr. Timothy Cook",
+  "sector" : "Technology",
+  "country" : "US",gh90 
+  "fullTimeEmployees" : "137000",
+  "phone" : "14089961010",
+  "address" : "1 Apple Park Way",
+  "city" : "Cupertino",
+  "state" : "CALIFORNIA",
+  "zip" : "95014",
+  "dcfDiff" : 89.92,
+  "dcf" : 297.11,
+  "image" : "https://financialmodelingprep.com/image-stock/AAPL.jpg",
+  "ipoDate" : "1980-12-12"
+
+  -> redisValue: price|beta|volAvg|mktCap|lastDiv|range|changes|companyName|exchange|exchangeShortName|industry|website|description|ceo|sector|country|fullTimeEmployees|phone|address|city|state|zip|dcfDiff|dcf|image|ipoDate
+} ]
+
+  shareSymbolsString: 'AAPL,GOOGL,...'
+ */
+const getFullStockProfilesFromFMP = (shareSymbolsString) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/profile/${shareSymbolsString}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stockProfiles) => {
+        return stockProfiles.json();
+      })
+      .then((stockProfilesJSON) => {
+        if (isEmpty(stockProfilesJSON)) {
+          reject(new Error(`Share symbols do not exist in FMP.`));
+        } else {
+          resolve(stockProfilesJSON);
+        }
+        if (isEmpty(stockProfilesJSON)) {
+          reject(new Error(`Share symbols do not exist in FMP.`));
+        } else if (stockProfilesJSON["Error Message"]) {
+          reject(stockProfilesJSON["Error Message"]);
+        } else {
+          resolve(stockProfilesJSON);
         }
       })
       .catch((err) => {
@@ -157,5 +225,6 @@ const getFullStockQuoteFromFMP = (shareSymbol) => {
 module.exports = {
   updateMarketHolidaysFromFMP,
 
-  getFullStockQuoteFromFMP
+  getFullStockQuotesFromFMP,
+  getFullStockProfilesFromFMP
 };
