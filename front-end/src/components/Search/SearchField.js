@@ -61,6 +61,8 @@ class SearchField extends React.Component {
   focusInput = () => {
     if (this.props.focused) {
       this.inputRef.current.focus();
+    } else {
+      this.inputRef.current.blur();
     }
   };
 

@@ -1,4 +1,106 @@
-const { getAsync, setAsync } = require("../redis/redis-client");
+const {
+  getAsync,
+  setAsync,
+  listPushAsync,
+  delAsync
+} = require("../redis/redis-client");
+
+/**
+ * Keys list:
+ * - '${email}|transactionsHistoryList'
+ * - '${email}|passwordVerification'
+ * - '${email}|accountSummaryChart'
+ * - '${email}|sharesList'
+ *
+ * - 'cachedMarketHoliday'
+ * - 'cachedShares|${companyCode}'
+ *
+ * - 'RANKING_LIST'
+ * - 'RANKING_LIST_${region}'
+ */
+
+/**
+ * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
+ * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID", "..."
+ */
+const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
+  const redisKey = `${email}|transactionsHistoryList`;
+  const {
+    id,
+    createdAt,
+    companyCode,
+    quantity,
+    priceAtTransaction,
+    brokerage,
+    finishedTime,
+    isTypeBuy,
+    userID
+  } = finishedTransaction;
+  const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+
+  listPushAsync(redisKey, newValue)
+    .then((finishedUpdatingRedisTransactionsHistoryList) => {
+      console.log(
+        `Successfully added transaction to ${email}'s cached transactions history`
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+/**
+ * 'doanhtu07@gmail.com|passwordVerification' : 'secretCode|timestamp'
+ */
+const cachePasswordVerificationCode = (email, secretCode) => {
+  return new Promise((resolve, reject) => {
+    const timestamp = Math.round(Date.now() / 1000);
+    const redisKey = `${email}|passwordVerification`;
+    const redisValue = `${secretCode}|${timestamp}`;
+
+    setAsync(redisKey, redisValue)
+      .then((finishedCachingSecretCode) => {
+        resolve(`Finished caching password verification code for ${email}`);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const getParsedCachedPasswordVerificationCode = (email) => {
+  return new Promise((resolve, reject) => {
+    const redisKey = `${email}|passwordVerification`;
+
+    getAsync(redisKey)
+      .then((redisString) => {
+        if (!redisString) {
+          resolve(null);
+        } else {
+          const valuesArray = redisString.split("|");
+          resolve({
+            secretCode: valuesArray[0],
+            timestamp: parseInt(valuesArray[1], 10)
+          });
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const removeCachedPasswordVerificationCode = (email) => {
+  const redisKey = `${email}|passwordVerification`;
+  return delAsync(redisKey);
+};
+
+const redisUpdateOverallRankingList = (user) => {
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  return listPushAsync("RANKING_LIST", value);
+};
+const redisUpdateRegionalRankingList = (region, user) => {
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  return listPushAsync(`RANKING_LIST_${region}`, value);
+};
 
 /**
  * 'cachedMarketHoliday': 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
@@ -131,7 +233,7 @@ const updateCachedShareInfo = (
 
     setAsync(redisKey, valueString)
       .then((quote) => {
-        resolve(`Updated ${redisKey} successfully.`);
+        resolve(`Updated ${redisKey} successfully`);
       })
       .catch((err) => {
         reject(err);
@@ -150,7 +252,7 @@ const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
         );
       })
       .then((afterUpdate) => {
-        resolve(`Updated ${redisKey} successfully.`);
+        resolve(`Updated ${redisKey} successfully`);
       })
       .catch((err) => {
         reject(err);
@@ -159,6 +261,15 @@ const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
 };
 
 module.exports = {
+  updateTransactionsHistoryListOneItem, // user related
+
+  cachePasswordVerificationCode, // user related
+  getParsedCachedPasswordVerificationCode, // user related
+  removeCachedPasswordVerificationCode, // user related
+
+  redisUpdateOverallRankingList,
+  redisUpdateRegionalRankingList,
+
   parseCachedMarketHoliday,
   getCachedMarketHoliday,
   updateCachedMarketHoliday,

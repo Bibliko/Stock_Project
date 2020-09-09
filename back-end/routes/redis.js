@@ -16,6 +16,20 @@ const {
 } = require("../utils/RedisUtil");
 
 /**
+ * Keys list:
+ * - '${email}|transactionsHistoryList'
+ * - '${email}|passwordVerification'
+ * - '${email}|accountSummaryChart'
+ * - '${email}|sharesList'
+ *
+ * - 'cachedMarketHoliday'
+ * - 'cachedShares|${companyCode}'
+ *
+ * - 'RANKING_LIST'
+ * - 'RANKING_LIST_${region}'
+ */
+
+/**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
  */
 router.put("/updateAccountSummaryChartWholeList", (req, res) => {
@@ -112,6 +126,83 @@ router.get("/getSharesList", (req, res) => {
   listRangeAsync(redisKey, 0, -1)
     .then((sharesList) => {
       res.send(sharesList);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+/**
+ * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
+ * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|finishedTime|isTypeBuy|userID", "..."
+ */
+router.put("/updateTransactionsHistoryListWholeList", (req, res) => {
+  const { email, finishedTransactions } = req.body;
+
+  const redisKey = `${email}|transactionsHistoryList`;
+
+  const listPushPromise = finishedTransactions.map((transaction) => {
+    const {
+      id,
+      createdAt,
+      companyCode,
+      quantity,
+      priceAtTransaction,
+      brokerage,
+      finishedTime,
+      isTypeBuy,
+      userID
+    } = transaction;
+    const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+    return listPushAsync(redisKey, newValue);
+  });
+  Promise.all(listPushPromise)
+    .then((finishedUpdatingRedisTransactionsHistoryList) => {
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+router.put("/updateTransactionsHistoryListOneItem", (req, res) => {
+  const { email, finishedTransaction } = req.body;
+
+  const redisKey = `${email}|transactionsHistoryList`;
+  const {
+    id,
+    createdAt,
+    companyCode,
+    quantity,
+    priceAtTransaction,
+    brokerage,
+    finishedTime,
+    isTypeBuy,
+    userID
+  } = finishedTransaction;
+  const newValue = `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${finishedTime}|${isTypeBuy}|${userID}`;
+
+  listPushAsync(redisKey, newValue)
+    .then((finishedUpdatingRedisTransactionsHistoryList) => {
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+router.get("/getPaginatedTransactionsHistoryList", (req, res) => {
+  // Each page has 10 transactions
+  const { email, page } = req.query;
+
+  const redisKey = `${email}|transactionsHistoryList`;
+  const startIndex = 10 * (page - 1);
+  const endIndex = startIndex + (10 - 1);
+
+  listRangeAsync(redisKey, startIndex, endIndex)
+    .then((transactionsHistoryList) => {
+      res.send(transactionsHistoryList);
     })
     .catch((err) => {
       console.log(err);

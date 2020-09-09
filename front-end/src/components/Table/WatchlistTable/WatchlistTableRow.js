@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 import { numberWithCommas, shortenNumber } from "../../../utils/NumberUtil";
-import { getFullStockQuote } from "../../../utils/FinancialModelingPrepUtil";
+import { getFullStockQuote } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/DayTimeUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
@@ -124,7 +124,7 @@ class WatchlistTableRow extends React.Component {
             this.checkIfChangeIncreaseOrDecrease(type) === "Increase",
           [classes.arrowDown]:
             this.checkIfChangeIncreaseOrDecrease(type) === "Decrease",
-          [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Name",
+          [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
           [classes.stickyCell]: type === "Code",
         })}
@@ -153,11 +153,11 @@ class WatchlistTableRow extends React.Component {
     const { companyCode } = this.props;
 
     switch (type) {
-      case "Name":
-        return `${this.state.name}`;
-
       case "Code":
         return `${companyCode}`;
+
+      case "Name":
+        return `${this.state.name}`;
 
       case "Price":
         return `$${numberWithCommas(this.state.price.toFixed(2))}`;
@@ -272,8 +272,8 @@ class WatchlistTableRow extends React.Component {
 
     return (
       <TableRow className={classes.tableRow}>
-        {this.chooseTableCell("Name", classes)}
         {this.chooseTableCell("Code", classes)}
+        {this.chooseTableCell("Name", classes)}
         {this.chooseTableCell("Price", classes)}
         {this.chooseTableCell("Volume", classes)}
         {this.chooseTableCell("Change %", classes)}

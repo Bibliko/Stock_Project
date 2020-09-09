@@ -23,6 +23,7 @@ model User {
   dateOfBirth               DateTime?
   gender                    String?
   region                    String?
+  regionalRanking           Int?                      @default(0)
   occupation                String?
   ranking                   Int?                      @default(0)
   regionalRanking           Int?                      @default(0)
@@ -59,21 +60,20 @@ model Share {
 }
 
 model UserTransaction {
-  id           String    @default(cuid()) @id
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
-  companyCode  String?
-  quantity     Int?
-  instantPrice Float?
-  limitPrice   Float?
-  brokerage    Float?
-  filled       Int?
-  status       String?
-  cancelDate   DateTime?
-  type         String?
-  note         String?
-  user         User      @relation(fields: [userID], references: [id])
-  userID       String
+  id                 String    @default(cuid()) @id
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+  companyCode        String?
+  quantity           Int?
+  priceAtTransaction Float? // price at the moment transactions are made
+  limitPrice         Float?
+  brokerage          Float?
+  isFinished         Boolean?
+  finishedTime       DateTime?
+  isTypeBuy          Boolean?
+  note               String?
+  user               User      @relation(fields: [userID], references: [id])
+  userID             String
 }
 
 model MarketHolidays {

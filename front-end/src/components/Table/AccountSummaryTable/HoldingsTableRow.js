@@ -6,7 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { getFullStockQuote } from "../../../utils/FinancialModelingPrepUtil";
+import { getFullStockQuote } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/DayTimeUtil";
 import { numberWithCommas } from "../../../utils/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";

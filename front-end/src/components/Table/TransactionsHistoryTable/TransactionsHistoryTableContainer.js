@@ -1,11 +1,9 @@
 import React from "react";
 import clsx from "clsx";
-import { isEqual, isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
-import { oneSecond } from "../../../utils/DayTimeUtil";
-
-import WatchlistTableRow from "./WatchlistTableRow";
+import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";
@@ -14,12 +12,9 @@ import TableContainer from "@material-ui/core/TableContainer";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
-import Snackbar from "@material-ui/core/Snackbar";
 import { Typography, Paper } from "@material-ui/core";
 
-import BusinessRoundedIcon from "@material-ui/icons/BusinessRounded";
-
-import MuiAlert from "@material-ui/lab/Alert";
+import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 
 const styles = (theme) => ({
   table: {
@@ -46,20 +41,17 @@ const styles = (theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  cellDivName: {
-    justifyContent: "flex-start",
-  },
   emptyRowsPaper: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    height: theme.customHeight.redirectingPaper,
+    height: "200px",
     color: "white",
     padding: 20,
     backgroundColor: theme.palette.paperBackground.onPage,
   },
-  companiesIcon: {
+  assignmentIcon: {
     height: "50px",
     width: "auto",
     marginBottom: "5px",
@@ -76,24 +68,22 @@ const styles = (theme) => ({
     "64%": { transform: "scale(1,1) translateY(0)" },
     "100%": { transform: "scale(1,1) translateY(0)" },
   },
-  companiesIconAnimation: {
+  assignmentIconAnimation: {
     animation: "2s infinite $bounceIcon",
     animationTimingFunction: "cubic-bezier(0.280, 0.840, 0.420, 1)",
   },
-  companiesWord: {
+  assignmentWord: {
     fontSize: "large",
     [theme.breakpoints.down("xs")]: {
       fontSize: "medium",
     },
     textAlign: "center",
   },
-  watchlistContainerDiv: {
+  transactionsHistoryContainerDiv: {
     width: "100%",
     marginTop: "24px",
   },
-  stickyCell: {
-    position: "sticky",
-    left: 0,
+  firstElementTopLeftRounded: {
     borderTopLeftRadius: "4px",
   },
   lastElementTopRightRounded: {
@@ -107,43 +97,20 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
-class WatchlistTableContainer extends React.Component {
+class TransactionsHistoryTableContainer extends React.Component {
   state = {
-    openSnackbar: false,
-    companyCodeRemoved: "",
-
-    hoverWatchlistPaper: false,
+    hoverPaper: false,
   };
 
   hoverPaper = () => {
     this.setState({
-      hoverWatchlistPaper: true,
+      hoverPaper: true,
     });
   };
 
   notHoverPaper = () => {
     this.setState({
-      hoverWatchlistPaper: false,
-    });
-  };
-
-  handleOpenSnackbar = (companyCode) => {
-    this.setState({
-      openSnackbar: true,
-      companyCodeRemoved: companyCode,
-    });
-  };
-
-  handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    this.setState({
-      openSnackbar: false,
+      hoverPaper: false,
     });
   };
 
@@ -152,46 +119,34 @@ class WatchlistTableContainer extends React.Component {
       <StyledTableCell
         align="center"
         className={clsx(classes.tableCell, {
-          [classes.tableCellName]: type === "Name",
-          [classes.stickyCell]: type === "Code",
-          [classes.lastElementTopRightRounded]: type === " ",
+          [classes.firstElementTopLeftRounded]: type === "Type",
+          [classes.lastElementTopRightRounded]: type === "Transaction Time",
         })}
       >
-        <div
-          className={clsx(classes.cellDiv, {
-            [classes.cellDivName]: type === "Name",
-          })}
-        >
-          {type}
-        </div>
+        <div className={classes.cellDiv}>{type}</div>
       </StyledTableCell>
     );
   };
 
   render() {
     const { classes, rows } = this.props;
-    const {
-      openSnackbar,
-      companyCodeRemoved,
-      hoverWatchlistPaper,
-    } = this.state;
+    const { hoverPaper } = this.state;
 
     return (
-      <div className={classes.watchlistContainerDiv}>
+      <div className={classes.transactionsHistoryContainerDiv}>
         {isEmpty(rows) && (
           <Paper
             className={classes.emptyRowsPaper}
-            elevation={2}
             onMouseEnter={this.hoverPaper}
             onMouseLeave={this.notHoverPaper}
           >
-            <BusinessRoundedIcon
-              className={clsx(classes.companiesIcon, {
-                [classes.companiesIconAnimation]: hoverWatchlistPaper,
+            <AssignmentRoundedIcon
+              className={clsx(classes.assignmentIcon, {
+                [classes.assignmentIconAnimation]: hoverPaper,
               })}
             />
-            <Typography className={classes.companiesWord}>
-              Start by adding more companies to your list!
+            <Typography className={classes.assignmentWord}>
+              Start by making some transactions by selling or buying stocks!
             </Typography>
           </Paper>
         )}
@@ -200,44 +155,33 @@ class WatchlistTableContainer extends React.Component {
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
+                  {this.chooseTableCell("Type", classes)}
                   {this.chooseTableCell("Code", classes)}
-                  {this.chooseTableCell("Name", classes)}
+                  {this.chooseTableCell("Quantity", classes)}
                   {this.chooseTableCell("Price", classes)}
-                  {this.chooseTableCell("Volume", classes)}
-                  {this.chooseTableCell("Change %", classes)}
-                  {this.chooseTableCell("Market Cap", classes)}
-                  {this.chooseTableCell(" ", classes)}
+                  {this.chooseTableCell("Brokerage", classes)}
+                  {this.chooseTableCell("Spend/Gain", classes)}
+                  {this.chooseTableCell("Transaction Time", classes)}
                 </TableRow>
               </TableHead>
               <TableBody className={classes.tableBody}>
-                {rows.map(
-                  (row, index) =>
-                    !isEqual(row, companyCodeRemoved) && (
-                      <WatchlistTableRow
-                        key={index}
-                        companyCode={row}
-                        rowIndex={index}
-                        rowsLength={rows.length}
-                        openSnackbar={this.handleOpenSnackbar}
-                      />
-                    )
-                )}
+                {rows.map((row, index) => (
+                  <TransactionsHistoryTableRow
+                    key={index}
+                    transactionInfo={row}
+                    rowIndex={index}
+                    rowsLength={rows.length}
+                  />
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
         )}
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6 * oneSecond}
-          onClose={this.handleCloseSnackbar}
-        >
-          <Alert onClose={this.handleCloseSnackbar} severity="success">
-            {`Removed ${companyCodeRemoved} from watchlist successfully!`}
-          </Alert>
-        </Snackbar>
       </div>
     );
   }
 }
 
-export default withStyles(styles)(withRouter(WatchlistTableContainer));
+export default withStyles(styles)(
+  withRouter(TransactionsHistoryTableContainer)
+);

@@ -53,6 +53,25 @@ export const parseRedisShareInfo = (redisString) => {
   };
 };
 
+/**
+ * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|finishedTime|isTypeBuy|userID"
+ */
+export const parseRedisTransactionsHistoryListItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+
+  return {
+    id: valuesArray[0],
+    createdAt: valuesArray[1],
+    companyCode: valuesArray[2],
+    quantity: parseInt(valuesArray[3], 10),
+    priceAtTransaction: parseFloat(valuesArray[4]),
+    brokerage: parseFloat(valuesArray[5]),
+    finishedTime: valuesArray[6],
+    isTypeBuy: valuesArray[7] === "true" ? true : false,
+    userID: valuesArray[8],
+  };
+};
+
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/redis/getAccountSummaryChartWholeList`, {
@@ -190,16 +209,192 @@ export const updateCachedSharesList = (email, shares) => {
   });
 };
 
+export const getCachedPaginatedTransactionsHistoryList = (email, page) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/getPaginatedTransactionsHistoryList`, {
+      method: "get",
+      params: {
+        email,
+        page,
+      },
+      withCredentials: true,
+    })
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+};
+
+export const getParsedCachedPaginatedTransactionsHistoryList = (
+  email,
+  page
+) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/getPaginatedTransactionsHistoryList`, {
+      method: "get",
+      params: {
+        email,
+        page,
+      },
+      withCredentials: true,
+    })
+      .then((res) => {
+        const { data: redisTransactionsHistoryString } = res;
+        let transactionsHistory = [];
+
+        redisTransactionsHistoryString.map((transactionHistoryString) => {
+          return transactionsHistory.push(
+            parseRedisTransactionsHistoryListItem(transactionHistoryString)
+          );
+        });
+
+        resolve(transactionsHistory);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+};
+
+/**
+ * finishedTransactions will take in prisma transactions that have attribute isFinished true
+ */
+export const updateCachedTransactionsHistoryListWholeList = (
+  email,
+  finishedTransactions
+) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/updateTransactionsHistoryListWholeList`, {
+      method: "put",
+      data: {
+        email,
+        finishedTransactions,
+      },
+      withCredentials: true,
+    })
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+};
+
+/**
+ * finishedTransaction will take in one prisma transaction that have attribute isFinished true
+ */
+export const updateCachedTransactionsHistoryListOneItem = (
+  email,
+  finishedTransaction
+) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/updateTransactionsHistoryListOneItem`, {
+      method: "put",
+      data: {
+        email,
+        finishedTransaction,
+      },
+      withCredentials: true,
+    })
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+};
+
+/** 
+ * Example response of full stock:
+ * [ {
+  "symbol" : "AAPL",
+  "name" : "Apple Inc.",
+  "price" : 425.04000000,
+  "changesPercentage" : 10.47000000,
+  "change" : 40.28000000,
+  "dayLow" : 403.36000000,
+  "dayHigh" : 425.66000000,
+  "yearHigh" : 425.66000000,
+  "yearLow" : 192.58000000,
+  "marketCap" : 1842263621632.00000000,
+  "priceAvg50" : 372.20715000,
+  "priceAvg200" : 314.67236000,
+  "volume" : 93573867,
+  "avgVolume" : 35427873,
+  "exchange" : "NASDAQ",
+  "open" : 411.53500000,
+  "previousClose" : 384.76000000,
+  "eps" : 13.18500000,
+  "pe" : 32.23663300,
+  "earningsAnnouncement" : "2020-07-30T20:00:00.000+0000",
+  "sharesOutstanding" : 4334329996,
+  "timestamp" : 1596329461
+},
+ ...
+]
+ */
+export const getFullStockQuote = (companyCode) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/getCachedShareInfo`, {
+      method: "get",
+      params: {
+        companyCode,
+      },
+      withCredentials: true,
+    })
+      .then((shareInfo) => {
+        const { data: stockQuoteJSON } = shareInfo;
+        resolve(stockQuoteJSON);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getManyStockQuotes = (prismaShares) => {
+  // prismaShares means: shares with companyCode attribute
+  // prismaShares won't be empty since you need to eliminate that case before using this function
+
+  return new Promise((resolve, reject) => {
+    const getCachedSharesInfoPromiseArray = prismaShares.map((share, index) => {
+      return getFullStockQuote(share.companyCode);
+    });
+    Promise.all(getCachedSharesInfoPromiseArray)
+      .then((cachedSharesArray) => {
+        resolve(cachedSharesArray);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export default {
   parseRedisAccountSummaryChartItem,
   parseRedisSharesListItem,
   parseRedisShareInfo,
+  parseRedisTransactionsHistoryListItem,
 
   getCachedAccountSummaryChartInfo,
   getLatestCachedAccountSummaryChartInfoItem,
   updateCachedAccountSummaryChartInfoOneItem,
+  updateCachedAccountSummaryChartInfoWholeList,
 
   getCachedSharesList, // Layout.js
   getParsedCachedSharesList, // AccountSummary, UserUtil
   updateCachedSharesList, // Layout.js
+
+  getCachedPaginatedTransactionsHistoryList,
+  getParsedCachedPaginatedTransactionsHistoryList,
+  updateCachedTransactionsHistoryListOneItem,
+  updateCachedTransactionsHistoryListWholeList,
+
+  getFullStockQuote,
+  getManyStockQuotes,
 };

@@ -67,15 +67,32 @@ const redisClient = require("./redis-client");
 //     });
 // };
 
-const testList = () => {
+// const testList1 = () => {
+//   redisClient
+//     .listRangeAsync("asdf", 0, -1)
+//     .then((list) => {
+//       console.log(list);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+const testList2 = () => {
+  const redisKey = `test`;
+
   redisClient
-    .listRangeAsync("asdf", 0, -1)
-    .then((list) => {
-      console.log(list);
+    .listRangeAsync(redisKey, 0, -1)
+    .then((testValue) => {
+      console.log(testValue);
+      return redisClient.listPushAsync(redisKey, "hello");
+    })
+    .then((finishedUpdating) => {
+      console.log(finishedUpdating);
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-testList();
+testList2();
