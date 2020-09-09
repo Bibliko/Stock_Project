@@ -177,6 +177,21 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
   return `${price}|${beta}|${volAvg}|${mktCap}|${lastDiv}|${range}|${changes}|${companyName}|${exchange}|${exchangeShortName}|${industry}|${website}|${description}|${ceo}|${sector}|${country}|${fullTimeEmployees}|${phone}|${address}|${city}|${state}|${zip}|${dcfDiff}|${dcf}|${image}|${ipoDate}`;
 };
 
+/**
+ * 'AAPL,FB,GOOGL'
+ */
+const createSymbolsStringFromCachedSharesList = (cachedSharesList) => {
+  let symbolsString = "";
+  cachedSharesList.map((symbol, index) => {
+    if (index > 0) {
+      symbolsString = symbolsString.concat(",", symbol);
+    } else {
+      symbolsString = symbolsString.concat(symbol);
+    }
+  });
+  return symbolsString;
+};
+
 const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
   return {
     ...stockQuoteJSON,
@@ -196,6 +211,7 @@ module.exports = {
 
   createRedisValueFromStockQuoteJSON,
   createRedisValueFromStockProfileJSON,
+  createSymbolsStringFromCachedSharesList,
 
   combineFMPStockQuoteAndProfile
 };
