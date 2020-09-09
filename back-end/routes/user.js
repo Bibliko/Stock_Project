@@ -1,7 +1,11 @@
 const { listRangeAsync } = require("../redis/redis-client");
 
 const { Router } = require("express");
+const router = Router();
+
 const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 const {
   searchAndUpdateTransactionsHistoryM5RU,
   getTransactionsHistoryItemInM5RU,
@@ -11,9 +15,8 @@ const {
 const {
   getChunkUserTransactionsHistoryForRedisM5RU,
   getLengthUserTransactionsHistoryForRedisM5RU
-} = require("../utils/UserUtil");
-const router = Router();
-const prisma = new PrismaClient();
+} = require("../utils/top-layer/UserUtil");
+
 // const { indices } = require('../algolia');
 
 router.put("/changeData", (req, res) => {

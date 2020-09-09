@@ -2,7 +2,7 @@ import React from "react";
 import { withRouter } from "react-router";
 import clsx from "clsx";
 
-import { numberWithCommas } from "../../../utils/NumberUtil";
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";

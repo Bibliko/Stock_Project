@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 
 import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
 
-import { parseRedisTransactionsHistoryListItem } from "../../../utils/RedisUtil";
+import { parseRedisTransactionsHistoryListItem } from "../../../utils/low-dependency/ParserUtil";
 import { getUserTransactionsHistory } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";

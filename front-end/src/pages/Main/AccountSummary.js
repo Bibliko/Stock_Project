@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
 import { getParsedCachedSharesList } from "../../utils/RedisUtil";
-import { numberWithCommas } from "../../utils/NumberUtil";
+import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
 
 import HoldingsTableContainer from "../../components/Table/AccountSummaryTable/HoldingsTableContainer";
 import SummaryTableContainer from "../../components/Table/AccountSummaryTable/SummaryTableContainer";

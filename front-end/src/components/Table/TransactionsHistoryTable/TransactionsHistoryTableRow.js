@@ -2,8 +2,8 @@ import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
 
-import { numberWithCommas } from "../../../utils/NumberUtil";
-import { convertToLocalTimeString } from "../../../utils/DayTimeUtil";
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import { convertToLocalTimeString } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import TableRow from "@material-ui/core/TableRow";

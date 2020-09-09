@@ -4,10 +4,10 @@ import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { withMediaQuery } from "../../theme/ThemeUtil";
-import { ComponentWithForwardedRef } from "../../utils/ComponentUtil";
-import { oneSecond } from "../../utils/DayTimeUtil";
+import { ComponentWithForwardedRef } from "../../utils/low-dependency/ComponentUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { searchCompanyTickers } from "../../utils/FinancialModelingPrepUtil";
-import { redirectToPage } from "../../utils/PageRedirectUtil";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import SearchPopper from "./SearchPopper";
 import SearchField from "./SearchField";

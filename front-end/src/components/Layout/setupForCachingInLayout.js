@@ -10,7 +10,10 @@ import {
   getCachedAccountSummaryChartInfo,
   updateCachedAccountSummaryChartInfoWholeList,
 } from "../../utils/RedisUtil";
-import { getYearUTCString, newDate } from "../..//utils/DayTimeUtil";
+import {
+  getYearUTCString,
+  newDate,
+} from "../../utils/low-dependency/DayTimeUtil";
 
 const setupSharesListForCaching = (isMarketClosed, userSession, mutateUser) => {
   return new Promise((resolve, reject) => {

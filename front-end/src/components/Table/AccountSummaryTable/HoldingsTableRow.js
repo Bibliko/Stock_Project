@@ -6,9 +6,9 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { getFullStockQuote } from "../../../utils/RedisUtil";
-import { oneSecond } from "../../../utils/DayTimeUtil";
-import { numberWithCommas } from "../../../utils/NumberUtil";
+import { getFullStockInfo } from "../../../utils/RedisUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -288,10 +288,10 @@ class HoldingsTableRow extends React.Component {
 
   updateHoldingInformation = () => {
     // const { code, holding, buyPriceAvg } = this.props.rowData;
-    // getFullStockQuote(code)
-    //   .then((stockQuoteJSON) => {
-    //     console.log(stockQuoteJSON);
-    //     const { price } = stockQuoteJSON;
+    // getFullStockInfo(code)
+    //   .then((fullStockInfo) => {
+    //     console.log(fullStockInfo);
+    //     const { price } = fullStockInfo;
     //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
     //   })
     //   .catch((err) => {

@@ -20,6 +20,27 @@ const SequentialPromises = (tasksArray) => {
   });
 };
 
+const SequentialPromisesWithResultsArray = (tasksArray) => {
+  return new Promise((resolve, reject) => {
+    const resultsArray = [];
+
+    tasksArray
+      .reduce((currentStack, currentTask) => {
+        return currentStack.then(currentTask).then((taskResult) => {
+          resultsArray.push(taskResult);
+          return taskResult;
+        });
+      }, Promise.resolve())
+      .then((finishedSequentialPromises) => {
+        resolve(resultsArray);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 module.exports = {
-  SequentialPromises
+  SequentialPromises,
+  SequentialPromisesWithResultsArray
 };

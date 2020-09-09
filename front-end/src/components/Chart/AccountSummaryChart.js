@@ -3,13 +3,11 @@ import Chart from "react-apexcharts";
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 
-import { oneSecond } from "../../utils/DayTimeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
-import {
-  getCachedAccountSummaryChartInfo,
-  parseRedisAccountSummaryChartItem,
-} from "../../utils/RedisUtil";
-import { numberWithCommas } from "../../utils/NumberUtil";
+import { getCachedAccountSummaryChartInfo } from "../../utils/RedisUtil";
+import { parseRedisAccountSummaryChartItem } from "../../utils/low-dependency/ParserUtil";
+import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";

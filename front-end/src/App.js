@@ -7,7 +7,7 @@ import initializeStoreState from "./redux/storeReducer";
 
 import socketIOClient from "socket.io-client";
 
-import { getBackendHostForSocket } from "./utils/NetworkUtil";
+import { getBackendHostForSocket } from "./utils/low-dependency/NetworkUtil";
 import { getUser } from "./utils/UserUtil";
 
 import Login from "./pages/Login/Login";

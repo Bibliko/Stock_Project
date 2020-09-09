@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import {
   shouldRedirectToLandingPage,
   redirectToPage,
-} from "../../utils/PageRedirectUtil";
+} from "../../utils/low-dependency/PageRedirectUtil";
 import {
   loginUser,
   sendPasswordVerificationCode,

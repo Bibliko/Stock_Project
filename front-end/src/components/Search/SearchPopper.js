@@ -1,7 +1,7 @@
 import React from "react";
 import { isEmpty } from "lodash";
 
-import { oneSecond } from "../../utils/DayTimeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import Popper from "@material-ui/core/Popper";
 import Fade from "@material-ui/core/Fade";

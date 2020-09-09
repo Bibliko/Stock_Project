@@ -6,9 +6,12 @@ import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { numberWithCommas, shortenNumber } from "../../../utils/NumberUtil";
-import { getFullStockQuote } from "../../../utils/RedisUtil";
-import { oneSecond } from "../../../utils/DayTimeUtil";
+import {
+  numberWithCommas,
+  shortenNumber,
+} from "../../../utils/low-dependency/NumberUtil";
+import { getFullStockInfo } from "../../../utils/RedisUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -232,10 +235,10 @@ class WatchlistTableRow extends React.Component {
 
   setStateShareInfo = () => {
     // const { companyCode } = this.props;
-    // getFullStockQuote(companyCode)
-    //   .then((stockQuoteJSON) => {
-    //     console.log(stockQuoteJSON);
-    //     this.setStateStockQuote(stockQuoteJSON);
+    // getFullStockInfo(companyCode)
+    //   .then((fullStockInfo) => {
+    //     console.log(fullStockInfo);
+    //     this.setStateStockQuote(fullStockInfo);
     //   })
     //   .catch((err) => {
     //     console.log(err);

@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
-import { redirectToPage } from "../../utils/PageRedirectUtil";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";

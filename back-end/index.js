@@ -17,7 +17,7 @@ try {
 const {
   getFrontendHost,
   getPassportCallbackHost
-} = require("./utils/NetworkUtil");
+} = require("./utils/low-dependency/NetworkUtil");
 
 const {
   oneSecond,
@@ -25,15 +25,15 @@ const {
   oneMinute,
   clearIntervals,
   clearIntervalsIfIntervalsNotEmpty
-} = require("./utils/DayTimeUtil");
+} = require("./utils/low-dependency/DayTimeUtil");
 
 const {
   deleteExpiredVerification,
   checkAndUpdateAllUsers,
   updateRankingList
-} = require("./utils/UserUtil");
+} = require("./utils/top-layer/UserUtil");
 
-const { checkMarketClosed } = require("./utils/SocketUtil");
+const { checkMarketClosed } = require("./utils/top-layer/SocketUtil");
 
 const { deletePrismaMarketHolidays } = require("./utils/MarketHolidaysUtil");
 
@@ -45,6 +45,9 @@ const {
   cachePasswordVerificationCode,
   getParsedCachedPasswordVerificationCode,
   removeCachedPasswordVerificationCode
+
+  // updateCachedShareQuotesUsingCache,
+  // updateCachedShareProfilesUsingCache
 } = require("./utils/RedisUtil");
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
@@ -130,13 +133,18 @@ setInterval(deleteExpiredVerification, oneDay);
 // This function to help initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(objVariables);
 
+// Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
 setInterval(() => updateMarketHolidaysFromFMP(objVariables), oneDay);
-
 setInterval(deletePrismaMarketHolidays, oneDay);
 
+// Check if market closed to update users portfolio last closure
 setInterval(() => checkAndUpdateAllUsers(objVariables), oneSecond);
 
-// Update RankingList after 10 minutes
+// Update Cached Shares
+// setInterval(() => updateCachedShareQuotesUsingCache(), 2 * oneSecond);
+// setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
+
+// Update Ranking List after 10 minutes
 updateRankingList();
 setInterval(updateRankingList, 10 * oneMinute);
 

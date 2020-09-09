@@ -1,7 +1,7 @@
 import React from "react";
 import { isEmpty } from "lodash";
 import clsx from "clsx";
-import { ComponentWithForwardedRef } from "../../utils/ComponentUtil";
+import { ComponentWithForwardedRef } from "../../utils/low-dependency/ComponentUtil";
 
 import TextField from "@material-ui/core/TextField";
 import { withStyles } from "@material-ui/core/styles";

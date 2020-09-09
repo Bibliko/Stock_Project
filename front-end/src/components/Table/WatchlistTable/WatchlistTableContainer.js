@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { isEqual, isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
-import { oneSecond } from "../../../utils/DayTimeUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import WatchlistTableRow from "./WatchlistTableRow";
 

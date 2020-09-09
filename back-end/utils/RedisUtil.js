@@ -7,49 +7,112 @@ const {
   listRangeAsync,
   listPopAsync
 } = require("../redis/redis-client");
-const { isEqual } = require("lodash");
+const { isEqual, chunk } = require("lodash");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-const { SequentialPromises } = require("./PromisesUtil");
+const { newDate, getYearUTCString } = require("./low-dependency/DayTimeUtil");
+const {
+  findIfTimeNowIsHoliday,
+  findIfTimeNowIsOutOfRange,
+  findIfTimeNowIsWeekend
+} = require("./MarketTimeUtil");
+
+const {
+  SequentialPromisesWithResultsArray
+} = require("./low-dependency/PromisesUtil");
+const {
+  getFullStockQuotesFromFMP,
+  getFullStockProfilesFromFMP
+} = require("./FinancialModelingPrepUtil");
+const {
+  parseCachedMarketHoliday,
+  parseCachedShareQuote,
+  parseCachedShareProfile,
+  createRedisValueFromStockQuoteJSON,
+  createRedisValueFromStockProfileJSON,
+  createSymbolsStringFromCachedSharesList,
+  createRedisValueFromMarketHoliday,
+  createRedisValueFromFinishedTransaction,
+  combineFMPStockQuoteAndProfile
+} = require("./low-dependency/ParserUtil");
 
 /**
  * Keys list:
- * - '${email}|transactionsHistoryList'
- * - '${email}|transactionsHistoryM5RU' -> Most 5 recently used
- * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy|orderQuery'
- * - '${email}|passwordVerification'
- * - '${email}|accountSummaryChart'
- * - '${email}|sharesList'
+ * - '${email}|transactionsHistoryList': list
+ * - '${email}|transactionsHistoryM5RU': list -> Most 5 recently used
+ * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy|orderQuery': list
+ * - '${email}|passwordVerification': value
+ * - '${email}|accountSummaryChart': list
+ * - '${email}|sharesList': list
  *
- * - 'cachedMarketHoliday'
- * - 'cachedShares|${companyCode}'
+ * - 'cachedMarketHoliday': value
  *
- * - 'RANKING_LIST'
- * - 'RANKING_LIST_${region}'
+ * - 'cachedShares': list
+ * - 'cachedShares|${companyCode}|quote': value
+ * - 'cachedShares|${companyCode}|profile': value
+ *
+ * - 'RANKING_LIST': list
+ * - 'RANKING_LIST_${region}': list
  */
+
+/**
+ * return true if market closed
+ * else return false if market opened
+ */
+const isMarketClosedCheck = () => {
+  var timeNow = newDate();
+
+  var UTCYear = getYearUTCString(timeNow);
+
+  return new Promise((resolve, reject) => {
+    getCachedMarketHoliday()
+      .then((marketHoliday) => {
+        if (!marketHoliday || !isEqual(marketHoliday.year, UTCYear)) {
+          const prismaPromise = prisma.marketHolidays.findOne({
+            where: {
+              year: UTCYear
+            }
+          });
+          return Promise.all([prismaPromise, null]);
+        }
+        return [null, marketHoliday];
+      })
+      .then(([prismaMarketHoliday, marketHoliday]) => {
+        var isTimeNowHoliday = false;
+        if (prismaMarketHoliday) {
+          updateCachedMarketHoliday(prismaMarketHoliday);
+          isTimeNowHoliday = findIfTimeNowIsHoliday(prismaMarketHoliday);
+        } else {
+          isTimeNowHoliday = findIfTimeNowIsHoliday(marketHoliday);
+        }
+
+        if (
+          isTimeNowHoliday ||
+          findIfTimeNowIsOutOfRange(timeNow) ||
+          findIfTimeNowIsWeekend(timeNow)
+        ) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
 /**
  * 'doanhtu07@gmail.com|transactionsHistoryList' : isFinished of these transactions is true!
  * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID", "..."
  */
-const formRedisValueFromFinishedTransaction = (finishedTransaction) => {
-  const {
-    id,
-    createdAt,
-    companyCode,
-    quantity,
-    priceAtTransaction,
-    brokerage,
-    spendOrGain,
-    finishedTime,
-    isTypeBuy,
-    userID
-  } = finishedTransaction;
-  return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${isTypeBuy}|${userID}`;
-};
 const updateTransactionsHistoryListOneItem = (email, finishedTransaction) => {
   return new Promise((resolve, reject) => {
     const redisKey = `${email}|transactionsHistoryList`;
-    const newValue = formRedisValueFromFinishedTransaction(finishedTransaction);
+    const newValue = createRedisValueFromFinishedTransaction(
+      finishedTransaction
+    );
 
     listPushAsync(redisKey, newValue)
       .then((finishedUpdatingRedisTransactionsHistoryList) => {
@@ -72,12 +135,12 @@ const updateTransactionsHistoryListWholeList = (
     const tasksList = [];
 
     finishedTransactions.map((transaction) => {
-      const newValue = formRedisValueFromFinishedTransaction(transaction);
+      const newValue = createRedisValueFromFinishedTransaction(transaction);
       tasksList.push(() => listPushAsync(redisKey, newValue));
       return "dummy value";
     });
 
-    SequentialPromises(tasksList)
+    SequentialPromisesWithResultsArray(tasksList)
       .then((finishedUpdatingRedisTransactionsHistoryList) => {
         resolve(
           `Successfully added many transactions to ${email}'s cached transactions history.\n`
@@ -177,7 +240,7 @@ const reorganizeTransactionsHistoryM5RU = (
           return "dummy value";
         });
 
-        return SequentialPromises(tasksList);
+        return SequentialPromisesWithResultsArray(tasksList);
       })
       .then((finishedReorganizingTransactionsHistoryM5RU) => {
         resolve(
@@ -269,14 +332,16 @@ const createOrOverwriteTransactionsHistoryM5RUItemRedisKey = (
         const tasksList = [];
 
         prismaTransactionsHistory.map((transaction) => {
-          const redisValue = formRedisValueFromFinishedTransaction(transaction);
+          const redisValue = createRedisValueFromFinishedTransaction(
+            transaction
+          );
           tasksList.push(() => {
             listPushAsync(redisKey, redisValue);
           });
           return "dummy value";
         });
 
-        return SequentialPromises(tasksList);
+        return SequentialPromisesWithResultsArray(tasksList);
       })
       .then((finishedPushingPrismaTransactionsHistoryToRedisKey) => {
         resolve(
@@ -373,25 +438,6 @@ const redisUpdateRegionalRankingList = (region, user) => {
   return listPushAsync(`RANKING_LIST_${region}`, value);
 };
 
-/**
- * 'cachedMarketHoliday': 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
- */
-const parseCachedMarketHoliday = (redisString) => {
-  const valuesArray = redisString.split("|");
-  return {
-    id: valuesArray[0],
-    year: parseInt(valuesArray[1], 10),
-    newYearsDay: valuesArray[2],
-    martinLutherKingJrDay: valuesArray[3],
-    washingtonBirthday: valuesArray[4],
-    goodFriday: valuesArray[5],
-    memorialDay: valuesArray[6],
-    independenceDay: valuesArray[7],
-    laborDay: valuesArray[8],
-    thanksgivingDay: valuesArray[9],
-    christmas: valuesArray[10]
-  };
-};
 const getCachedMarketHoliday = () => {
   return new Promise((resolve, reject) => {
     const redisKey = "cachedMarketHoliday";
@@ -409,22 +455,8 @@ const getCachedMarketHoliday = () => {
 };
 const updateCachedMarketHoliday = (marketHoliday) => {
   return new Promise((resolve, reject) => {
-    const {
-      id,
-      year,
-      newYearsDay,
-      martinLutherKingJrDay,
-      washingtonBirthday,
-      goodFriday,
-      memorialDay,
-      independenceDay,
-      laborDay,
-      thanksgivingDay,
-      christmas
-    } = marketHoliday;
-
     const redisKey = "cachedMarketHoliday";
-    const redisValue = `${id}|${year}|${newYearsDay}|${martinLutherKingJrDay}|${washingtonBirthday}|${goodFriday}|${memorialDay}|${independenceDay}|${laborDay}|${thanksgivingDay}|${christmas}`;
+    const redisValue = createRedisValueFromMarketHoliday(marketHoliday);
     setAsync(redisKey, redisValue)
       .then((redisMarketHoliday) => {
         resolve("Cached market holiday object from database successfully");
@@ -436,71 +468,107 @@ const updateCachedMarketHoliday = (marketHoliday) => {
 };
 
 /**
- * 'cachedShares|AAPL': 'isUpdatingUsingFMP|timestampLastUpdated|name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
+ * 'cachedShares' only stores symbols using by users in server
+ *
+ * Every second, update stock quote of every company in 'cachedShares'
+ * Every minute, update stock profile of every company in 'cachedShares'
+ * If user gets in and see no company fitting his/her wish, get directly from FMP and update cache
+ *
  */
-const parseCachedShareInfo = (redisString) => {
-  const valuesArray = redisString.split("|");
-
-  return {
-    isUpdatingUsingFMP: valuesArray[0] === "true",
-    timestampLastUpdated: parseInt(valuesArray[1], 10),
-    name: valuesArray[2],
-    price: parseFloat(valuesArray[3]),
-    changesPercentage: parseFloat(valuesArray[4]),
-    change: parseFloat(valuesArray[5]),
-    dayLow: parseFloat(valuesArray[6]),
-    dayHigh: parseFloat(valuesArray[7]),
-    yearHigh: parseFloat(valuesArray[8]),
-    yearLow: parseFloat(valuesArray[9]),
-    marketCap: parseFloat(valuesArray[10]),
-    priceAvg50: parseFloat(valuesArray[11]),
-    priceAvg200: parseFloat(valuesArray[12]),
-    volume: parseInt(valuesArray[13], 10),
-    avgVolume: parseInt(valuesArray[14], 10),
-    exchange: valuesArray[15],
-    open: parseFloat(valuesArray[16]),
-    previousClose: parseFloat(valuesArray[17]),
-    eps: parseFloat(valuesArray[18]),
-    pe: parseFloat(valuesArray[19]),
-    earningsAnnouncement: valuesArray[20],
-    sharesOutstanding: parseInt(valuesArray[21], 10),
-    timestamp: parseInt(valuesArray[22], 10)
-  };
-};
-const updateCachedShareInfo = (
-  stockQuoteJSON,
-  isUpdatingUsingFMP,
-  timestampLastUpdated
-) => {
+const getCachedShares = () => {
   return new Promise((resolve, reject) => {
-    const {
-      symbol,
-      name,
-      price,
-      changesPercentage,
-      change,
-      dayLow,
-      dayHigh,
-      yearHigh,
-      yearLow,
-      marketCap,
-      priceAvg50,
-      priceAvg200,
-      volume,
-      avgVolume,
-      exchange,
-      open,
-      previousClose,
-      eps,
-      pe,
-      earningsAnnouncement,
-      sharesOutstanding,
-      timestamp
-    } = stockQuoteJSON;
+    const redisKey = "cachedShares";
+    listRangeAsync(redisKey, 0, -1)
+      .then((cachedSharesArray) => {
+        resolve(cachedSharesArray);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const getSingleCachedShareInfo = (companyCode) => {
+  return new Promise((resolve, reject) => {
+    const redisKeyQuote = `cachedShares|${companyCode}|quote`;
+    const redisKeyProfile = `cachedShares|${companyCode}|profile`;
 
-    const redisKey = `cachedShares|${symbol}`;
+    Promise.all([getAsync(redisKeyQuote), getAsync(redisKeyProfile)])
+      .then(([quote, profile]) => {
+        if (!quote || !profile) {
+          return Promise.all([
+            getFullStockQuotesFromFMP(companyCode),
+            getFullStockProfilesFromFMP(companyCode),
+            true
+          ]);
+        }
+        return Promise.all([quote, profile, false]);
+      })
+      .then(([quote, profile, needsDirectDataFromFMP]) => {
+        if (needsDirectDataFromFMP) {
+          const shareInfoObject = combineFMPStockQuoteAndProfile(
+            quote[0],
+            profile[0]
+          );
+          resolve(shareInfoObject);
+          return Promise.all([
+            pushManyCodesToCachedShares([companyCode]),
+            updateSingleCachedShareQuote(quote[0]),
+            updateSingleCachedShareProfile(profile[0])
+          ]);
+        } else {
+          const shareInfoObject = combineFMPStockQuoteAndProfile(
+            parseCachedShareQuote(quote),
+            parseCachedShareProfile(profile)
+          );
+          resolve(shareInfoObject);
+        }
+      })
+      .then((finishedUpdating) => {
+        if (finishedUpdating) {
+          console.log(
+            finishedUpdating,
+            "RedisUtil.js getSingleCachedShareInfo"
+          );
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
-    const valueString = `${isUpdatingUsingFMP}|${timestampLastUpdated}|${name}|${price}|${changesPercentage}|${change}|${dayLow}|${dayHigh}|${yearHigh}|${yearLow}|${marketCap}|${priceAvg50}|${priceAvg200}|${volume}|${avgVolume}|${exchange}|${open}|${previousClose}|${eps}|${pe}|${earningsAnnouncement}|${sharesOutstanding}|${timestamp}`;
+/**
+ * When push, this function already ensures code is in upper case.
+ */
+const pushManyCodesToCachedShares = (companyCodes) => {
+  return new Promise((resolve, reject) => {
+    getCachedShares()
+      .then((cachedShares) => {
+        const redisKey = "cachedShares";
+
+        const pushCompanyCodesAndUpdate = companyCodes.map((code) => {
+          if (cachedShares.indexOf(code) === -1) {
+            return listPushAsync(redisKey, code.toUpperCase());
+          }
+        });
+
+        return Promise.all(pushCompanyCodesAndUpdate);
+      })
+      .then((finishedPushing) => {
+        resolve("Successfully pushed many company codes to cached shares.");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+const updateSingleCachedShareQuote = (stockQuoteJSON) => {
+  return new Promise((resolve, reject) => {
+    const { symbol } = stockQuoteJSON;
+
+    const redisKey = `cachedShares|${symbol}|quote`;
+    const valueString = createRedisValueFromStockQuoteJSON(stockQuoteJSON);
 
     setAsync(redisKey, valueString)
       .then((quote) => {
@@ -511,18 +579,15 @@ const updateCachedShareInfo = (
       });
   });
 };
-const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
+const updateSingleCachedShareProfile = (stockProfileJSON) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `cachedShares|${symbol}`;
-    getAsync(redisKey)
-      .then((cachedStockQuote) => {
-        return updateCachedShareInfo(
-          cachedStockQuote,
-          true,
-          timestampLastUpdated
-        );
-      })
-      .then((afterUpdate) => {
+    const { symbol } = stockProfileJSON;
+
+    const redisKey = `cachedShares|${symbol}|profile`;
+    const valueString = createRedisValueFromStockProfileJSON(stockProfileJSON);
+
+    setAsync(redisKey, valueString)
+      .then((quote) => {
         resolve(`Updated ${redisKey} successfully`);
       })
       .catch((err) => {
@@ -531,10 +596,132 @@ const switchFlagUpdatingUsingFMPToTrue = (symbol, timestampLastUpdated) => {
   });
 };
 
-module.exports = {
-  // User Related
-  formRedisValueFromFinishedTransaction,
+/**
+ * Maximum Parallel Queries:
+ * - 10 queries/sec since there are maximum of only about 8000
+ * companies right now in NYSE and NASDAQ combined.
+ * - We can call 800 companies in 1 query.
+ */
+const updateCachedShareQuotes = (shareSymbols) => {
+  return new Promise((resolve, reject) => {
+    // FMP Stock Quotes can only batch up to 800 symbols
+    const chunks800Symbols = chunk(shareSymbols, 800);
 
+    const getStockQuotesFromFMPPromises = chunks800Symbols.map(
+      (chunkSymbols) => {
+        const symbolsString = createSymbolsStringFromCachedSharesList(
+          chunkSymbols
+        );
+        return getFullStockQuotesFromFMP(symbolsString);
+      }
+    );
+
+    Promise.all(getStockQuotesFromFMPPromises)
+      .then((stockQuotesJSONArray) => {
+        if (stockQuotesJSONArray) {
+          // stockQuotesJSONArray: [ [first 800 chunk], [second 800 chunk], ... ]
+          // We use two loops
+          const updateAllChunks = stockQuotesJSONArray.map(
+            (stockQuotesJSON) => {
+              const updateOneChunk = stockQuotesJSON.map((stockQuote) => {
+                return updateSingleCachedShareQuote(stockQuote);
+              });
+              return Promise.all(updateOneChunk);
+            }
+          );
+          return Promise.all(updateAllChunks);
+        }
+      })
+      .then((finishedUpdatingAllCachedShareQuotes) => {
+        resolve("Successfully updated all cached share quotes.");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+/**
+ * Maximum Parallel Queries: 0
+ * - We will use Sequential Promises for updating profiles
+ * - No parallel since profile query allows only up to 50 companies
+ * -> If we do parellel queries, there could be more than 100 queries/sec since there are
+ * at most 8000 companies in NYSE and NASDAQ combined!
+ */
+const updateCachedShareProfiles = (shareSymbols) => {
+  return new Promise((resolve, reject) => {
+    // FMP Stock Profiles can only batch up to 50 symbols
+    const chunks50Symbols = chunk(shareSymbols, 50);
+    const tasksList = [];
+
+    const getStockProfilesFromFMPPromises = chunks50Symbols.map(
+      (chunkSymbols) => {
+        const symbolsString = createSymbolsStringFromCachedSharesList(
+          chunkSymbols
+        );
+        tasksList.push(() => getFullStockProfilesFromFMP(symbolsString));
+      }
+    );
+
+    SequentialPromisesWithResultsArray(getStockProfilesFromFMPPromises)
+      .then((stockProfilesJSONArray) => {
+        if (stockProfilesJSONArray) {
+          // stockQuotesJSONArray: [ [first 50 chunk], [second 50 chunk], ... ]
+          // We use two loops
+          const updateAllChunks = stockProfilesJSONArray.map(
+            (stockProfilesJSON) => {
+              const updateOneChunk = stockProfilesJSON.map((stockProfile) => {
+                return updateSingleCachedShareProfile(stockProfile);
+              });
+              return Promise.all(updateOneChunk);
+            }
+          );
+          return Promise.all(updateAllChunks);
+        }
+      })
+      .then((finishedUpdatingAllCachedShareProfiles) => {
+        resolve("Successfully updated all cached share profiles.");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+const updateCachedShareQuotesUsingCache = () => {
+  return new Promise((resolve, reject) => {
+    getCachedShares()
+      .then((cachedShares) => {
+        return updateCachedShareQuotes(cachedShares);
+      })
+      .then((finishedUpdatingCachedShareQuotes) => {
+        resolve("Successfully updated cached share quotes automatically.");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+const updateCachedShareProfilesUsingCache = () => {
+  return new Promise((resolve, reject) => {
+    getCachedShares()
+      .then((cachedShares) => {
+        return updateCachedShareProfiles(cachedShares);
+      })
+      .then((finishedUpdatingCachedShareQuotes) => {
+        resolve("Successfully updated cached share profiles automatically.");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+module.exports = {
+  // Market Time
+  isMarketClosedCheck,
+  // Market Time
+
+  // User Related
   updateTransactionsHistoryListOneItem,
   updateTransactionsHistoryListWholeList,
 
@@ -552,14 +739,29 @@ module.exports = {
   removeCachedPasswordVerificationCode,
   // User Related
 
+  // Ranking Update
   redisUpdateOverallRankingList,
   redisUpdateRegionalRankingList,
+  // Ranking Update
 
-  parseCachedMarketHoliday,
+  // Market Holiday
   getCachedMarketHoliday,
   updateCachedMarketHoliday,
+  // Market Holiday
 
-  parseCachedShareInfo,
-  updateCachedShareInfo,
-  switchFlagUpdatingUsingFMPToTrue
+  // Cached Shares Bank
+  getCachedShares,
+  getSingleCachedShareInfo,
+
+  pushManyCodesToCachedShares,
+
+  updateSingleCachedShareQuote,
+  updateSingleCachedShareProfile,
+
+  updateCachedShareQuotes,
+  updateCachedShareProfiles,
+
+  updateCachedShareQuotesUsingCache,
+  updateCachedShareProfilesUsingCache
+  // Cached Shares Bank
 };

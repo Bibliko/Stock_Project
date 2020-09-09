@@ -4,7 +4,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
-import { redirectToPage } from "../../utils/PageRedirectUtil";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
 
 import SearchFieldLayout from "../Search/SearchFieldLayout";

@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {
   shouldRedirectToLandingPage,
   redirectToPage,
-} from "../../utils/PageRedirectUtil";
+} from "../../utils/low-dependency/PageRedirectUtil";
 import { signupUser } from "../../utils/UserUtil";
 
 import Paper from "@material-ui/core/Paper";
