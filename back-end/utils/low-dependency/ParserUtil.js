@@ -181,15 +181,7 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
  * 'AAPL,FB,GOOGL'
  */
 const createSymbolsStringFromCachedSharesList = (cachedSharesList) => {
-  let symbolsString = "";
-  cachedSharesList.map((symbol, index) => {
-    if (index > 0) {
-      symbolsString = symbolsString.concat(",", symbol);
-    } else {
-      symbolsString = symbolsString.concat(symbol);
-    }
-  });
-  return symbolsString;
+  return cachedSharesList.join();
 };
 
 const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
