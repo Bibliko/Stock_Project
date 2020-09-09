@@ -1,4 +1,4 @@
-const { isMarketClosedCheck } = require("./DayTimeUtil");
+const { isMarketClosedCheck } = require("../RedisUtil");
 
 const checkMarketClosedString = "checkMarketClosed";
 

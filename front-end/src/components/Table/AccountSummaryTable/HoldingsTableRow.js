@@ -6,9 +6,9 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { getFullStockQuote } from "../../../utils/RedisUtil";
-import { oneSecond } from "../../../utils/DayTimeUtil";
-import { numberWithCommas } from "../../../utils/NumberUtil";
+import { getFullStockInfo } from "../../../utils/RedisUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -20,9 +20,9 @@ import Typography from "@material-ui/core/Typography";
 import AddBoxRoundedIcon from "@material-ui/icons/AddBoxRounded";
 import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
-import AddShoppingCartRoundedIcon from "@material-ui/icons/AddShoppingCartRounded";
 import AttachMoneyRoundedIcon from "@material-ui/icons/AttachMoneyRounded";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
+import AddCircleOutlineRoundedIcon from "@material-ui/icons/AddCircleOutlineRounded";
 
 const styles = (theme) => ({
   tableCell: {
@@ -288,10 +288,10 @@ class HoldingsTableRow extends React.Component {
 
   updateHoldingInformation = () => {
     // const { code, holding, buyPriceAvg } = this.props.rowData;
-    // getFullStockQuote(code)
-    //   .then((stockQuoteJSON) => {
-    //     console.log(stockQuoteJSON);
-    //     const { price } = stockQuoteJSON;
+    // getFullStockInfo(code)
+    //   .then((fullStockInfo) => {
+    //     console.log(fullStockInfo);
+    //     const { price } = fullStockInfo;
     //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
     //   })
     //   .catch((err) => {
@@ -349,7 +349,7 @@ class HoldingsTableRow extends React.Component {
         >
           <div className={classes.cellDiv}>
             <IconButton className={classes.buyButton}>
-              <AddShoppingCartRoundedIcon />
+              <AddCircleOutlineRoundedIcon />
             </IconButton>
             <IconButton className={classes.sellButton}>
               <AttachMoneyRoundedIcon />

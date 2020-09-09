@@ -5,7 +5,10 @@ import { withRouter } from "react-router";
 
 import MarketTimeDialog from "../Dialog/MarketTimeDialog";
 
-import { marketCountdownUpdate, oneSecond } from "../../utils/DayTimeUtil";
+import {
+  marketCountdownUpdate,
+  oneSecond,
+} from "../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 

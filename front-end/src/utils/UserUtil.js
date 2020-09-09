@@ -1,8 +1,8 @@
 import axios from "axios";
 import { isEmpty, isEqual } from "lodash";
 
-import { getBackendHost } from "./NetworkUtil";
-import { getParsedCachedSharesList, getManyStockQuotes } from "./RedisUtil";
+import { getBackendHost } from "./low-dependency/NetworkUtil";
+import { getParsedCachedSharesList, getManyStockInfos } from "./RedisUtil";
 
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
@@ -320,7 +320,7 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
           return [[], []];
         } else {
           if (!isMarketClosed) {
-            return Promise.all([getManyStockQuotes(shares), shares]);
+            return Promise.all([getManyStockInfos(shares), shares]);
           } else {
             return [shares, shares];
           }

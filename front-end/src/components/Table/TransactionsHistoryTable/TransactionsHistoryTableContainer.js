@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 
 import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
 
-import { parseRedisTransactionsHistoryListItem } from "../../../utils/RedisUtil";
+import { parseRedisTransactionsHistoryListItem } from "../../../utils/low-dependency/ParserUtil";
 import { getUserTransactionsHistory } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -16,11 +16,13 @@ import TableContainer from "@material-ui/core/TableContainer";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
-import { Typography, Paper } from "@material-ui/core";
+import { Typography, Paper, Container } from "@material-ui/core";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
+import Button from "@material-ui/core/Button";
 
 import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
+import FilterListIcon from "@material-ui/icons/FilterList";
 
 const styles = (theme) => ({
   table: {
@@ -36,7 +38,7 @@ const styles = (theme) => ({
     minWidth: "100px",
     fontSize: "12px",
     borderWidth: "1px",
-    borderColor: "#9ED2EF",
+    borderColor: theme.palette.tableHeader.main,
     borderStyle: "solid",
   },
   tableCellName: {
@@ -45,6 +47,24 @@ const styles = (theme) => ({
   cellDiv: {
     display: "flex",
     alignItems: "center",
+    "&.MuiTableSortLabel-root": {
+      "&.MuiTableSortLabel-active": {
+        color: theme.palette.succeed.tableSorted,
+        "&.MuiTableSortLabel-root": {
+          "&.MuiTableSortLabel-active": {
+            "& .MuiTableSortLabel-icon": {
+              color: theme.palette.succeed.tableSortIcon,
+            },
+          },
+        },
+      },
+      "&:hover": {
+        color: theme.palette.succeed.tableSortIcon,
+      },
+      "&:focus": {
+        color: theme.palette.succeed.tableSortIcon,
+      },
+    },
   },
   emptyRowsPaper: {
     display: "flex",
@@ -120,11 +140,28 @@ const styles = (theme) => ({
     top: 20,
     width: 1,
   },
+  filterButton: {
+    backgroundColor: theme.palette.filterButton.main,
+    "&:hover": {
+      backgroundColor: theme.palette.filterButton.onHover,
+    },
+    borderRadius: "4px",
+    color: "white",
+  },
+  filteringContainer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    padding: 0,
+    marginBottom: 24,
+  },
 });
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: "#9ED2EF",
+    backgroundColor: theme.palette.tableHeader.main,
+    color: "white",
   },
 }))(TableCell);
 
@@ -342,6 +379,18 @@ class TransactionsHistoryTableContainer extends React.Component {
               Start by making some transactions by selling or buying stocks!
             </Typography>
           </Paper>
+        )}
+        {!isEmpty(transactions) && !loading && (
+          <Container className={classes.filteringContainer}>
+            <Button
+              variant="contained"
+              size="large"
+              className={classes.filterButton}
+              endIcon={<FilterListIcon />}
+            >
+              Filter
+            </Button>
+          </Container>
         )}
         {!isEmpty(transactions) && !loading && (
           <TableContainer className={classes.tableContainer}>

@@ -4,10 +4,10 @@ import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { withMediaQuery } from "../../theme/ThemeUtil";
-import { ComponentWithForwardedRef } from "../../utils/ComponentUtil";
-import { oneSecond } from "../../utils/DayTimeUtil";
+import { ComponentWithForwardedRef } from "../../utils/low-dependency/ComponentUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { searchCompanyTickers } from "../../utils/FinancialModelingPrepUtil";
-import { redirectToPage } from "../../utils/PageRedirectUtil";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import SearchPopper from "./SearchPopper";
 import SearchField from "./SearchField";
@@ -44,16 +44,16 @@ const styles = (theme) => ({
     opacity: 1,
   },
   searchIcon: {
-    color: "rgba(156, 140, 249, 1)",
+    color: theme.palette.searchFieldButtonSmallScreen.searchIcon,
   },
   iconButton: {
     left: "85px",
-    backgroundColor: "rgba(156, 140, 249, 0.3)",
+    backgroundColor: theme.palette.searchFieldButtonSmallScreen.main,
     "&:hover": {
-      backgroundColor: "rgba(156, 140, 249, 0.4)",
+      backgroundColor: theme.palette.searchFieldButtonSmallScreen.onHover,
     },
     "& .MuiTouchRipple-root span": {
-      backgroundColor: "rgba(156, 140, 249, 0.6)",
+      backgroundColor: theme.palette.searchFieldButtonSmallScreen.rippleSpan,
     },
     position: "absolute",
     height: "40px",

@@ -1,19 +1,20 @@
 const {
-  isMarketClosedCheck,
   newDate,
   getFullDateUTCString,
   getYearUTCString
-} = require("./DayTimeUtil");
+} = require("../low-dependency/DayTimeUtil");
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("../redis/redis-client");
+const { keysAsync, delAsync } = require("../../redis/redis-client");
 const { isEqual, isEmpty } = require("lodash");
 
 const {
+  isMarketClosedCheck,
+
   redisUpdateOverallRankingList,
   redisUpdateRegionalRankingList
-} = require("./RedisUtil");
+} = require("../RedisUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();

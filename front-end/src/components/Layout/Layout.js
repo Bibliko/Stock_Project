@@ -9,9 +9,9 @@ import { mainSetup } from "./setupForCachingInLayout";
 import {
   shouldRedirectToLogin,
   redirectToPage,
-} from "../../utils/PageRedirectUtil";
+} from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneMinute, newDate } from "../../utils/DayTimeUtil";
+import { oneMinute, newDate } from "../../utils/low-dependency/DayTimeUtil";
 
 import {
   checkMarketClosed,
