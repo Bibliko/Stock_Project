@@ -3,7 +3,7 @@ const theme = {
     maxSearchFieldWithLogo: "360px",
     maxSearchFieldWidth: "235px",
 
-    mainPageWidth: "100%",
+    mainPageWidth: "90%",
     mainSkeletonWidth: "100%",
 
     redirectingPaper: "90%",

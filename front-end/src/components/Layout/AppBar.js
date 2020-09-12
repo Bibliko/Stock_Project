@@ -296,7 +296,7 @@ class PersistentAppBar extends React.Component {
                         <MenuItem
                           dense
                           onClick={() => {
-                            redirectToPage("/company", this.props);
+                            redirectToPage("/companies", this.props);
                           }}
                         >
                           Companies

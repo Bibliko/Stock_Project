@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
+import clsx from "clsx";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -8,18 +9,20 @@ import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
 
 import CompanyDialog from "../../components/CompanyDetail/CompanyDialog";
+import CompaniesListTable from "../../components/Table/CompaniesListTable/CompaniesListTable"
 
 const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: "75%",
-    marginTop: "100px",
+    width: theme.customWidth.mainPageWidth,
+    marginTop: theme.customMargin.topLayout,
+    marginBottom: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
-      width: "85%",
+      marginTop: theme.customMargin.topLayoutSmall,
+      marginBottom: theme.customMargin.topLayoutSmall,
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
@@ -31,6 +34,8 @@ const styles = (theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    margin: "auto",
+    flexBasis: "unset",
   },
   fullHeightWidth: {
     height: "100%",
@@ -46,12 +51,6 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
   },
-  datePickerGrid: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    //flexDirection: "column",
-  },
   gridTitle: {
     fontSize: "x-large",
     [theme.breakpoints.down("xs")]: {
@@ -59,24 +58,7 @@ const styles = (theme) => ({
     },
     fontWeight: "bold",
     marginBottom: "1px",
-  },
-  titleLabel: {
-    color: "#DC3D4A",
-  },
-  title: {
     color: "white",
-    fontSize: "20px",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
-    },
-    paddingLeft: "5px",
-    fontWeight: "bold",
-  },
-  textFieldContainer: {
-    maxWidth: "fit-content",
-    minWidth: "150px",
-    marginLeft: "5px",
-    marginRight: "5px",
   },
 });
 
@@ -85,14 +67,14 @@ class Companies extends React.Component {
     openDialog: false,
   };
 
-  handleOpen = () => {
+  handleOpenDialog = (companyName) => {
     this.setState({
       openDialog: true,
-      companyName: "bibliko",
+      companyName: companyName,
     });
   };
 
-  handleClose = () => {
+  handleCloseDialog = () => {
     this.setState({
       openDialog: false,
     });
@@ -111,18 +93,19 @@ class Companies extends React.Component {
           className={classes.fullHeightWidth}
         >
           <Grid item xs={12} className={classes.itemGrid}>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={this.handleOpen}
-            >
-              Open
-            </Button>
+            <Typography className={clsx(classes.gridTitle)}>
+              Companies List
+            </Typography>
           </Grid>
+            <CompaniesListTable
+              height={500}
+              handleOpenCompanyDetail={this.handleOpenDialog}
+            />
         </Grid>
+
         <CompanyDialog
           open={openDialog}
-          handleClose={this.handleClose}
+          handleClose={this.handleCloseDialog}
           companyName={companyName}
         />
       </Container>

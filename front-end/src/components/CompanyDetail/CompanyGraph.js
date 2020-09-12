@@ -1,8 +1,6 @@
 import React from "react";
-import { isEqual } from "lodash";
+// import { isEqual } from "lodash";
 import clsx from "clsx";
-
-//import SharePriceTableContainer from "./SharePriceTableContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
