@@ -8,18 +8,21 @@ import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import WatchlistTableRow from "./WatchlistTableRow";
 
 import { withStyles } from "@material-ui/core/styles";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
-import TableBody from "@material-ui/core/TableBody";
-import Snackbar from "@material-ui/core/Snackbar";
-import { Typography, Paper } from "@material-ui/core";
+import {
+  TableRow,
+  TableCell,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  Snackbar,
+  Typography,
+  Paper,
+} from "@material-ui/core";
 
-import BusinessRoundedIcon from "@material-ui/icons/BusinessRounded";
+import { BusinessRounded as BusinessRoundedIcon } from "@material-ui/icons";
 
-import MuiAlert from "@material-ui/lab/Alert";
+import { Alert as MuiAlert } from "@material-ui/lab";
 
 const styles = (theme) => ({
   table: {

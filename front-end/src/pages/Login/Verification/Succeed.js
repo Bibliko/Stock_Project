@@ -8,13 +8,10 @@ import {
   redirectToPage,
 } from "../../../utils/low-dependency/PageRedirectUtil";
 
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
 import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
+import { Paper, Typography, Grid, Container } from "@material-ui/core";
 
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import { CheckCircleOutlineRounded as CheckCircleOutlineRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
@@ -122,7 +119,9 @@ class Succeed extends React.Component {
                 container
                 direction="column"
               >
-                <CheckCircleOutlineIcon className={classes.succeedIcon} />
+                <CheckCircleOutlineRoundedIcon
+                  className={classes.succeedIcon}
+                />
                 <Typography className={classes.title}>
                   Email Verified Successfully
                 </Typography>

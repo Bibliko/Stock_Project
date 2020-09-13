@@ -9,22 +9,26 @@ import { logoutUser } from "../../utils/UserUtil";
 
 import SearchFieldLayout from "../Search/SearchFieldLayout";
 
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
 import { withStyles } from "@material-ui/core/styles";
-import Avatar from "@material-ui/core/Avatar";
-import Grid from "@material-ui/core/Grid";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import Grow from "@material-ui/core/Grow";
-import Paper from "@material-ui/core/Paper";
-import Popper from "@material-ui/core/Popper";
-import MenuItem from "@material-ui/core/MenuItem";
-import MenuList from "@material-ui/core/MenuList";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Avatar,
+  Grid,
+  ClickAwayListener,
+  Grow,
+  Paper,
+  Popper,
+  MenuItem,
+  MenuList,
+} from "@material-ui/core";
 
-import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
-import MenuBookRoundedIcon from "@material-ui/icons/MenuBookRounded";
-import EqualizerRoundedIcon from "@material-ui/icons/EqualizerRounded";
+import {
+  AccountCircleRounded as AccountCircleRoundedIcon,
+  MenuBookRounded as MenuBookRoundedIcon,
+  BarChartRounded as BarChartRoundedIcon,
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   appBar: {
@@ -236,7 +240,7 @@ class PersistentAppBar extends React.Component {
               onClick={this.toggleGameMenu}
               disableRipple
             >
-              <EqualizerRoundedIcon className={classes.normalIcon} />
+              <BarChartRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <Popper
               open={openGameMenu}
@@ -261,12 +265,6 @@ class PersistentAppBar extends React.Component {
                         onKeyDown={this.handleListKeyDown}
                       >
                         <MenuItem disabled>Transactions</MenuItem>
-                        <MenuItem
-                          dense
-                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
-                        >
-                          Buy Stocks
-                        </MenuItem>
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}

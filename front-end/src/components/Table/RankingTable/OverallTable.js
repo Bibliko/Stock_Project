@@ -2,13 +2,15 @@ import React from "react";
 import { withRouter } from "react-router";
 
 import { withStyles } from "@material-ui/core/styles";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableHead from "@material-ui/core/TableHead";
-import { Typography } from "@material-ui/core";
+import {
+  TableRow,
+  TableCell,
+  TableContainer,
+  Table,
+  TableBody,
+  TableHead,
+  Typography,
+} from "@material-ui/core";
 
 const styles = (theme) => ({
   table: {

@@ -7,11 +7,9 @@ import { connect } from "react-redux";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
-import IconButton from "@material-ui/core/IconButton";
+import { Typography, Link, IconButton } from "@material-ui/core";
 
-import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
+import { CloseRounded as CloseRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   reminder: {

@@ -12,14 +12,14 @@ import {
 
 import { withStyles } from "@material-ui/core/styles";
 
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@material-ui/lab";
 
-import MenuRoundedIcon from "@material-ui/icons/MenuRounded";
-import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
-import TimerIcon from "@material-ui/icons/Timer";
-import TimerOffIcon from "@material-ui/icons/TimerOff";
+import {
+  MenuRounded as MenuRoundedIcon,
+  CloseRounded as CloseRoundedIcon,
+  Timer as TimerIcon,
+  TimerOff as TimerOffIcon,
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   speedDial: {
