@@ -7,11 +7,7 @@ import Type from "../TabPanel/TransactionsHistoryFilterTabPanel/type";
 import Code from "../TabPanel/TransactionsHistoryFilterTabPanel/code";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Box from "@material-ui/core/Box";
+import { Dialog, AppBar, Tabs, Tab, Box } from "@material-ui/core";
 
 const styles = (theme) => ({
   dialogPaper: {

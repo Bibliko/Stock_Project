@@ -6,9 +6,7 @@ import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 import { convertToLocalTimeString } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import Typography from "@material-ui/core/Typography";
+import { TableRow, TableCell, Typography } from "@material-ui/core";
 
 const styles = (theme) => ({
   tableCell: {

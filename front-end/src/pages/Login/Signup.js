@@ -9,14 +9,11 @@ import {
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { signupUser } from "../../utils/UserUtil";
 
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import { withStyles } from "@material-ui/core/styles";
 import NormalTextField from "../../components/TextField/NormalTextField";
 import PasswordTextField from "../../components/TextField/PasswordTextField";
-import { Container } from "@material-ui/core";
+
+import { withStyles } from "@material-ui/core/styles";
+import { Paper, Typography, Button, Grid, Container } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {

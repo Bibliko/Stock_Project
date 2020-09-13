@@ -11,19 +11,25 @@ import { parseRedisTransactionsHistoryListItem } from "../../../utils/low-depend
 import { getUserTransactionsHistory } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
-import TableBody from "@material-ui/core/TableBody";
-import { Typography, Paper, Container } from "@material-ui/core";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Fab from "@material-ui/core/Fab";
+import {
+  TableRow,
+  TableCell,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TablePagination,
+  TableSortLabel,
+  Fab,
+  Typography,
+  Paper,
+  Container,
+} from "@material-ui/core";
 
-import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import {
+  AssignmentRounded as AssignmentRoundedIcon,
+  FilterList as FilterListIcon,
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   table: {

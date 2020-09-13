@@ -12,11 +12,10 @@ import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 import SearchPopper from "./SearchPopper";
 import SearchField from "./SearchField";
 
-import { withStyles } from "@material-ui/core/styles";
-import { withTheme } from "@material-ui/core/styles";
+import { withStyles, withTheme } from "@material-ui/core/styles";
 import { IconButton } from "@material-ui/core";
 
-import SearchRoundedIcon from "@material-ui/icons/SearchRounded";
+import { SearchRounded as SearchRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   searchFieldMotherContainer: {
