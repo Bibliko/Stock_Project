@@ -17,10 +17,13 @@ const theme = {
   customMargin: {
     topLayout: "80px",
     topLayoutSmall: "70px",
+
+    topFloatingToolButton: "110px",
+    smallTopFloatingToolButton: '100px'
   },
   customZIndex: {
     reminder: 10,
-    countdown: 5,
+    floatingToolButton: 5,
     floatingActionButton: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchFieldContainer: 1000,

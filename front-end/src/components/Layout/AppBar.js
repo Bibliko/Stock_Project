@@ -24,7 +24,7 @@ import MenuList from "@material-ui/core/MenuList";
 
 import AccountCircleRoundedIcon from "@material-ui/icons/AccountCircleRounded";
 import MenuBookRoundedIcon from "@material-ui/icons/MenuBookRounded";
-import EqualizerRoundedIcon from "@material-ui/icons/EqualizerRounded";
+import BarChartRoundedIcon from "@material-ui/icons/BarChartRounded";
 
 const styles = (theme) => ({
   appBar: {
@@ -236,7 +236,7 @@ class PersistentAppBar extends React.Component {
               onClick={this.toggleGameMenu}
               disableRipple
             >
-              <EqualizerRoundedIcon className={classes.normalIcon} />
+              <BarChartRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <Popper
               open={openGameMenu}
@@ -261,12 +261,6 @@ class PersistentAppBar extends React.Component {
                         onKeyDown={this.handleListKeyDown}
                       >
                         <MenuItem disabled>Transactions</MenuItem>
-                        <MenuItem
-                          dense
-                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
-                        >
-                          Buy Stocks
-                        </MenuItem>
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}

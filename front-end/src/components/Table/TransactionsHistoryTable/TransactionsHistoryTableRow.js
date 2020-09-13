@@ -103,7 +103,7 @@ class TransactionsHistoryTableRow extends React.Component {
 
     switch (type) {
       case "Type":
-        return isTypeBuy ? "Buy/Spend" : "Sell/Gain";
+        return isTypeBuy ? "Buy_Spend" : "Sell_Gain";
 
       case "Code":
         return `${companyCode}`;

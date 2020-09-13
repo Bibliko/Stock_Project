@@ -5,6 +5,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
+import TransactionsHistoryFilterDialog from "../../Dialog/TransactionsHistoryFilterDialog";
 
 import { parseRedisTransactionsHistoryListItem } from "../../../utils/low-dependency/ParserUtil";
 import { getUserTransactionsHistory } from "../../../utils/UserUtil";
@@ -19,7 +20,7 @@ import TableBody from "@material-ui/core/TableBody";
 import { Typography, Paper, Container } from "@material-ui/core";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Button from "@material-ui/core/Button";
+import Fab from "@material-ui/core/Fab";
 
 import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 import FilterListIcon from "@material-ui/icons/FilterList";
@@ -141,12 +142,33 @@ const styles = (theme) => ({
     width: 1,
   },
   filterButton: {
+    "&.MuiFab-extended": {
+      "&.MuiFab-sizeMedium": {
+        width: "110px",
+      },
+    },
     backgroundColor: theme.palette.filterButton.main,
     "&:hover": {
       backgroundColor: theme.palette.filterButton.onHover,
     },
-    borderRadius: "4px",
     color: "white",
+    position: "fixed",
+    zIndex: theme.customZIndex.floatingToolButton,
+    transition: "width 0.2s",
+    top: theme.customMargin.topFloatingToolButton,
+    [theme.breakpoints.down("xs")]: {
+      top: theme.customMargin.smallTopFloatingToolButton,
+    },
+  },
+  filterButtonNotExtended: {
+    "&.MuiFab-extended": {
+      "&.MuiFab-sizeMedium": {
+        width: "40px",
+      },
+    },
+  },
+  filterIconMargin: {
+    marginLeft: "5px",
   },
   filteringContainer: {
     width: "100%",
@@ -169,6 +191,8 @@ class TransactionsHistoryTableContainer extends React.Component {
   state = {
     hoverPaper: false,
     loading: true,
+    openFilterDialog: false,
+    isScrollingUp: true,
 
     rowsLengthChoices: [1, 5, 10], // min to max
     rowsPerPage: 5,
@@ -201,6 +225,8 @@ class TransactionsHistoryTableContainer extends React.Component {
     ],
   };
 
+  scrollPosition;
+
   hoverPaper = () => {
     this.setState({
       hoverPaper: true,
@@ -211,6 +237,13 @@ class TransactionsHistoryTableContainer extends React.Component {
     this.setState({
       hoverPaper: false,
     });
+  };
+
+  openFilterDialog = () => {
+    this.setState({ openFilterDialog: true });
+  };
+  closeFilterDialog = () => {
+    this.setState({ openFilterDialog: false });
   };
 
   handleRequestSort = (event, property) => {
@@ -232,7 +265,7 @@ class TransactionsHistoryTableContainer extends React.Component {
     this.handleRequestSort(event, property);
   };
 
-  chooseTableCell = (indexInNamesState, classes) => {
+  chooseTableCellHeader = (indexInNamesState, classes) => {
     const { orderBy, orderQuery, names, prismaNames } = this.state;
     const type = names[indexInNamesState];
     const prismaType = prismaNames[indexInNamesState];
@@ -331,9 +364,37 @@ class TransactionsHistoryTableContainer extends React.Component {
     );
   };
 
+  handleScroll = (event) => {
+    const window = event.currentTarget;
+    const { isScrollingUp } = this.state;
+
+    if (this.scrollPosition > window.scrollY + 5) {
+      if (!isScrollingUp) {
+        this.setState({
+          isScrollingUp: true,
+        });
+      }
+    } else if (this.scrollPosition + 5 < window.scrollY) {
+      if (isScrollingUp) {
+        this.setState({
+          isScrollingUp: false,
+        });
+      }
+    }
+
+    this.scrollPosition = window.scrollY;
+  };
+
   componentDidMount() {
     console.log(this.props.userSession);
     this.getUserTransactionsHistoryPageData();
+
+    this.scrollPosition = window.scrollY;
+    window.addEventListener("scroll", this.handleScroll);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -352,6 +413,8 @@ class TransactionsHistoryTableContainer extends React.Component {
     const {
       hoverPaper,
       loading,
+      openFilterDialog,
+      isScrollingUp,
 
       rowsPerPage,
       pageBase0,
@@ -382,14 +445,23 @@ class TransactionsHistoryTableContainer extends React.Component {
         )}
         {!isEmpty(transactions) && !loading && (
           <Container className={classes.filteringContainer}>
-            <Button
-              variant="contained"
-              size="large"
-              className={classes.filterButton}
-              endIcon={<FilterListIcon />}
+            <Fab
+              variant="extended"
+              size="medium"
+              className={clsx(classes.filterButton, {
+                [classes.filterButtonNotExtended]: !isScrollingUp,
+              })}
+              onClick={this.openFilterDialog}
             >
-              Filter
-            </Button>
+              {isScrollingUp ? "Filter" : null}
+              <FilterListIcon
+                className={isScrollingUp ? classes.filterIconMargin : null}
+              />
+            </Fab>
+            <TransactionsHistoryFilterDialog
+              openFilterDialog={openFilterDialog}
+              handleClose={this.closeFilterDialog}
+            />
           </Container>
         )}
         {!isEmpty(transactions) && !loading && (
@@ -398,7 +470,7 @@ class TransactionsHistoryTableContainer extends React.Component {
               <TableHead>
                 <TableRow>
                   {names.map((typeName, index) => {
-                    return this.chooseTableCell(index, classes);
+                    return this.chooseTableCellHeader(index, classes);
                   })}
                 </TableRow>
               </TableHead>
