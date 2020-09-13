@@ -15,11 +15,15 @@ import {
   changePassword,
 } from "../../utils/UserUtil";
 
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import { withStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+
 import PasswordTextField from "../../components/TextField/PasswordTextField";
 import NormalTextField from "../../components/TextField/NormalTextField";
-
-import { withStyles } from "@material-ui/core/styles";
-import { Paper, Typography, Button, Grid, Container } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {

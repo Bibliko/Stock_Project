@@ -7,7 +7,7 @@ import SpaceDivMainPages from "../Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { Grid } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
 
 const styles = (theme) => ({
   gridContainer: {

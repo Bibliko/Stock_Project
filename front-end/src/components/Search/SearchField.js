@@ -3,13 +3,13 @@ import { isEmpty } from "lodash";
 import clsx from "clsx";
 import { ComponentWithForwardedRef } from "../../utils/low-dependency/ComponentUtil";
 
+import TextField from "@material-ui/core/TextField";
 import { withStyles } from "@material-ui/core/styles";
-import { TextField, InputAdornment, IconButton } from "@material-ui/core";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import IconButton from "@material-ui/core/IconButton";
 
-import {
-  ClearRounded as ClearRoundedIcon,
-  SearchRounded as SearchRoundedIcon,
-} from "@material-ui/icons";
+import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
+import SearchRoundedIcon from "@material-ui/icons/SearchRounded";
 
 const styles = (theme) => ({
   textField: {

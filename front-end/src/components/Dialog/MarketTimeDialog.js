@@ -3,12 +3,10 @@ import { isEqual, pick, isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Dialog,
-  DialogTitle,
-  Typography,
-  CircularProgress,
-} from "@material-ui/core";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { Typography } from "@material-ui/core";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const styles = (theme) => ({
   textInsideDialog: {
