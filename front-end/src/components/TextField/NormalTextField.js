@@ -6,7 +6,7 @@ import { TextField, InputAdornment, IconButton } from "@material-ui/core";
 import {
   MailOutlineRounded as MailOutlineRoundedIcon,
   VpnKeyRounded as VpnKeyRoundedIcon,
-} from "@material-ui/icons/MailOutlineRounded";
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   textField: {
