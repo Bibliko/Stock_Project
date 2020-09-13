@@ -7,10 +7,14 @@ import {
   redirectToPage,
 } from "../../../utils/low-dependency/PageRedirectUtil";
 
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
 import { withStyles } from "@material-ui/core/styles";
-import { Paper, Typography, Button, Grid, Container } from "@material-ui/core";
+import Container from "@material-ui/core/Container";
 
-import { HighlightOffRounded as HighlightOffRoundedIcon } from "@material-ui/icons";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
 const styles = (theme) => ({
   root: {
@@ -126,7 +130,7 @@ class Fail extends React.Component {
                 container
                 direction="column"
               >
-                <HighlightOffRoundedIcon className={classes.failIcon} />
+                <HighlightOffIcon className={classes.failIcon} />
                 <Typography color="error" className={classes.title}>
                   Email Verified Failed
                 </Typography>

@@ -8,17 +8,15 @@ import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import HoldingsTableRow from "./HoldingsTableRow";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  TableRow,
-  TableCell,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  Snackbar,
-} from "@material-ui/core";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
+import TableBody from "@material-ui/core/TableBody";
+import Snackbar from "@material-ui/core/Snackbar";
 
-import { Alert as MuiAlert } from "@material-ui/lab";
+import MuiAlert from "@material-ui/lab/Alert";
 
 const styles = (theme) => ({
   table: {

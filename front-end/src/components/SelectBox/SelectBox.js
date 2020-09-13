@@ -1,13 +1,12 @@
 import React from "react";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Typography,
-  Container,
-  MenuItem,
-  FormControl,
-  Select,
-} from "@material-ui/core";
+
+import { Typography } from "@material-ui/core";
+import Container from "@material-ui/core/Container";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
 
 const styles = (theme) => ({
   selectBoxContainer: {

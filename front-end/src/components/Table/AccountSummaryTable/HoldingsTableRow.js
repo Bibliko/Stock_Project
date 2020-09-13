@@ -12,16 +12,17 @@ import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import { TableRow, TableCell, IconButton, Typography } from "@material-ui/core";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
 
-import {
-  AddBoxRounded as AddBoxRoundedIcon,
-  ArrowDropUpRounded as ArrowDropUpRoundedIcon,
-  ArrowDropDownRounded as ArrowDropDownRoundedIcon,
-  AttachMoneyRounded as AttachMoneyRoundedIcon,
-  DeleteForeverRounded as DeleteForeverRoundedIcon,
-  AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
-} from "@material-ui/icons";
+import AddBoxRoundedIcon from "@material-ui/icons/AddBoxRounded";
+import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
+import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
+import AttachMoneyRoundedIcon from "@material-ui/icons/AttachMoneyRounded";
+import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
+import AddCircleOutlineRoundedIcon from "@material-ui/icons/AddCircleOutlineRounded";
 
 const styles = (theme) => ({
   tableCell: {

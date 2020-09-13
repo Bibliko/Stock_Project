@@ -14,7 +14,7 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 
-import { CloudUpload as CloudUploadIcon } from "@material-ui/icons";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 // Use Ref to toggle on Dialog and set [loading, fail, success] feedback
 

@@ -1,24 +1,20 @@
 import React from "react";
-import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 import clsx from "clsx";
 
 import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  TableRow,
-  TableCell,
-  TableContainer,
-  Table,
-  TableBody,
-  Typography,
-} from "@material-ui/core";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import Typography from "@material-ui/core/Typography";
 
-import {
-  ArrowDropUpRounded as ArrowDropUpRoundedIcon,
-  ArrowDropDownRounded as ArrowDropDownRoundedIcon,
-} from "@material-ui/icons";
+import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
+import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
+import { isEqual } from "lodash";
 
 const styles = (theme) => ({
   table: {
