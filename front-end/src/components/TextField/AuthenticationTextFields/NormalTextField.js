@@ -3,7 +3,10 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { TextField, InputAdornment, IconButton } from "@material-ui/core";
 
-import { Visibility, VisibilityOff } from "@material-ui/icons";
+import {
+  MailOutlineRounded as MailOutlineRoundedIcon,
+  VpnKeyRounded as VpnKeyRoundedIcon,
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   textField: {
@@ -28,64 +31,62 @@ const styles = (theme) => ({
     "&:hover": {
       backgroundColor: "rgba(225,225,225,0.5)",
     },
+    "& input": {
+      backgroundColor: "rgba(225,225,225,0)",
+    },
   },
+  iconButton: {
+    "&$disabled": {
+      color: "rgba(0, 0, 0, 0.54)",
+    },
+  },
+  disabled: {}, // dummy css for styling disabled Material UI buttons
 });
 
 /**
  * props required:
  * name
- * function changePassword
- * function enterPassword
+ * function changeData
+ * function enterData
  */
 
-class PasswordTextField extends React.Component {
-  state = {
-    visibility: false,
-  };
-
-  seePassword = () => {
-    this.setState({
-      visibility: !this.state.visibility,
-    });
-  };
-
-  mouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
+class NormalTextField extends React.Component {
   render() {
-    const { classes } = this.props;
+    const { classes, name, changeData, enterData } = this.props;
 
     return (
       <TextField
-        id={this.props.name}
-        name={this.props.name}
-        label={this.props.name}
-        type={!this.state.visibility ? "password" : "text"}
+        id={name}
+        name={name}
+        label={name}
         variant="filled"
         margin="normal"
         required
+        autoComplete="email"
         className={classes.textField}
         InputProps={{
+          className: classes.input,
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                aria-label="toggle password visibility"
-                onClick={this.seePassword}
-                onMouseDown={this.mouseDownPassword}
+                disabled
                 edge="end"
+                classes={{
+                  root: classes.iconButton,
+                  disabled: classes.disabled,
+                }}
               >
-                {this.state.visibility ? <Visibility /> : <VisibilityOff />}
+                {name === "Email" && <MailOutlineRoundedIcon />}
+                {name === "Code" && <VpnKeyRoundedIcon />}
               </IconButton>
             </InputAdornment>
           ),
-          className: classes.input,
         }}
-        onChange={this.props.changePassword}
-        onKeyDown={this.props.enterPassword}
+        onChange={changeData}
+        onKeyDown={enterData}
       />
     );
   }
 }
 
-export default withStyles(styles)(PasswordTextField);
+export default withStyles(styles)(NormalTextField);

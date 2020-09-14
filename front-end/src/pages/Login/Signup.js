@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
@@ -9,8 +10,8 @@ import {
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { signupUser } from "../../utils/UserUtil";
 
-import NormalTextField from "../../components/TextField/NormalTextField";
-import PasswordTextField from "../../components/TextField/PasswordTextField";
+import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
+import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
 
 import { withStyles } from "@material-ui/core/styles";
 import { Paper, Typography, Button, Grid, Container } from "@material-ui/core";
@@ -94,6 +95,10 @@ const styles = (theme) => ({
   },
   announcementText: {
     fontSize: "small",
+  },
+  form: {
+    flexDirection: "column",
+    marginBottom: "10px",
   },
 });
 
@@ -188,6 +193,8 @@ class Signup extends React.Component {
   render() {
     const { classes } = this.props;
 
+    const { error, success } = this.state;
+
     if (shouldRedirectToLandingPage(this.props)) {
       return null;
     }
@@ -218,46 +225,49 @@ class Signup extends React.Component {
                 xs
                 className={classes.center}
               >
-                <Grid item xs className={classes.center}>
+                <form
+                  className={clsx(classes.center, classes.form)}
+                  noValidate
+                  autoComplete="on"
+                >
                   <NormalTextField
                     name="Email"
                     changeData={this.changeEmail}
                     enterData={this.handleKeyDown}
                   />
-                </Grid>
-                <Grid item xs className={classes.center}>
                   <PasswordTextField
                     name="Password"
                     changePassword={this.changePassword}
                     enterPassword={this.handleKeyDown}
+                    createOrLogin="create"
                   />
-                </Grid>
-                <Grid item xs className={classes.center}>
                   <PasswordTextField
                     name="Confirm Password"
                     changePassword={this.changeConfirmPassword}
                     enterPassword={this.handleKeyDown}
+                    createOrLogin="create"
                   />
-                </Grid>
-                {!isEmpty(this.state.error) && (
+                </form>
+
+                {!isEmpty(error) && (
                   <Grid item xs className={classes.announcement}>
                     <Typography
                       color="error"
                       align="center"
                       className={classes.announcementText}
                     >
-                      Error: {this.state.error}
+                      Error: {error}
                     </Typography>
                   </Grid>
                 )}
-                {!isEmpty(this.state.success) && (
+                {!isEmpty(success) && (
                   <Grid item xs className={classes.announcement}>
                     <Typography
                       color="primary"
                       align="center"
                       className={classes.announcementText}
                     >
-                      Success: {this.state.success}
+                      Success: {success}
                     </Typography>
                   </Grid>
                 )}
