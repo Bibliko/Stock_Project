@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
@@ -19,8 +18,8 @@ import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
-import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
+import NormalTextField from "../../components/TextField/NormalTextField";
+import PasswordTextField from "../../components/TextField/PasswordTextField";
 
 const styles = (theme) => ({
   root: {
@@ -143,9 +142,6 @@ const styles = (theme) => ({
       },
     },
   },
-  form: {
-    flexDirection: "column",
-  },
 });
 
 class Login extends React.Component {
@@ -216,7 +212,6 @@ class Login extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { error } = this.state;
 
     if (shouldRedirectToLandingPage(this.props)) {
       return null;
@@ -248,31 +243,28 @@ class Login extends React.Component {
                 xs
                 className={classes.center}
               >
-                <form
-                  className={clsx(classes.center, classes.form)}
-                  noValidate
-                  autoComplete="on"
-                >
+                <Grid item xs className={classes.center}>
                   <NormalTextField
                     name="Email"
                     changeData={this.changeEmail}
                     enterData={this.handleKeyDown}
                   />
+                </Grid>
+                <Grid item xs className={classes.center}>
                   <PasswordTextField
                     name="Password"
                     changePassword={this.changePassword}
                     enterPassword={this.handleKeyDown}
-                    createOrLogin="login"
                   />
-                </form>
-                {!isEmpty(error) && (
+                </Grid>
+                {!isEmpty(this.state.error) && (
                   <Grid item xs className={classes.error}>
                     <Typography
                       color="error"
                       align="center"
                       className={classes.errorText}
                     >
-                      Error: {error}
+                      Error: {this.state.error}
                     </Typography>
                   </Grid>
                 )}

@@ -2,8 +2,8 @@ import React from "react";
 
 import clsx from "clsx";
 
-import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
-import SettingPasswordTextField from "../TextField/SettingTextFields/SettingPasswordTextField";
+import SettingNormalTextField from "../TextField/SettingNormalTextField";
+import SettingPasswordTextField from "../TextField/SettingPasswordTextField";
 
 import { withStyles } from "@material-ui/core/styles";
 
