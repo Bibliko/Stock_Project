@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                        String                    @default(cuid()) @id
+  email                     String?                   @unique
+  password                  String?
+  firstName                 String?
+  lastName                  String?
+  hasFinishedSettingUp      Boolean                   @default(false)
+  avatarUrl                 String?
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @default(now()) @updatedAt
+  dateOfBirth               DateTime?
+  gender                    String?
+  region                    String?
+  regionalRanking           Int?                      @default(0)
+  occupation                String?
+  ranking                   Int?                      @default(0)
+  cash                      Float?                    @default(100000)
+  totalPortfolio            Float?                    @default(100000)
+  totalPortfolioLastClosure Float?                    @default(100000)
+  watchlist                 String[]
+  transactions              UserTransaction[]
+  shares                    Share[]
+  accountSummaryChartInfo   AccountSummaryTimestamp[]
+}
+
+model AccountSummaryTimestamp {
+  id             String @default(cuid()) @id
+  UTCDateString  String
+  UTCDateKey     String
+  year           Int
+  portfolioValue Float
+  user           User   @relation(fields: [userID], references: [id])
+  userID         String
+
+  @@unique([UTCDateKey, userID])
+}
+
+model Share {
+  id          String   @default(cuid()) @id
+  companyCode String?
+  quantity    Int?
+  buyPriceAvg Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  user        User     @relation(fields: [userID], references: [id])
+  userID      String
+}
+
+model UserTransaction {
+  id                 String    @default(cuid()) @id
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+  companyCode        String?
+  quantity           Int?
+  priceAtTransaction Float? // price at the moment transactions are made
+  limitPrice         Float?
+  brokerage          Float?
+  spendOrGain        Float? // totalValue = priceAtTransaction * quantity + (buy) or - (sell) brokerage;
+  isFinished         Boolean?
+  finishedTime       DateTime?
+  isTypeBuy          Boolean?
+  note               String?
+  user               User      @relation(fields: [userID], references: [id])
+  userID             String
+}
+
+model MarketHolidays {
+  id                    String  @default(cuid()) @id
+  year                  Int?    @unique
+  newYearsDay           String?
+  martinLutherKingJrDay String?
+  washingtonBirthday    String?
+  goodFriday            String?
+  memorialDay           String?
+  independenceDay       String?
+  laborDay              String?
+  thanksgivingDay       String?
+  christmas             String?
+}
+
+model UserVerification {
+  id        String  @default(cuid()) @id
+  email     String?
+  password  String?
+  expiredAt String? //handle specially -> don't need to use DateTime type
+}

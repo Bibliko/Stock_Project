@@ -33,9 +33,13 @@ const {
   updateRankingList
 } = require("./utils/top-layer/UserUtil");
 
-const { checkMarketClosed } = require("./utils/top-layer/SocketUtil");
+const {
+  checkMarketClosed
+} = require("./utils/top-layer/SocketUtil");
 
-const { deletePrismaMarketHolidays } = require("./utils/MarketHolidaysUtil");
+const {
+  deletePrismaMarketHolidays
+} = require("./utils/MarketHolidaysUtil");
 
 const {
   updateMarketHolidaysFromFMP
@@ -50,13 +54,25 @@ const {
   // updateCachedShareProfilesUsingCache
 } = require("./utils/RedisUtil");
 
-const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const {
+  PORT: port,
+  NODE_ENV,
+  FRONTEND_HOST,
+  SENDGRID_API_KEY
+} = process.env;
 const express = require("express");
 const app = express();
-const { PrismaClient } = require("@prisma/client");
+const {
+  PrismaClient
+} = require("@prisma/client");
 const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("./redis/redis-client");
-const { isEmpty } = require("lodash");
+const {
+  keysAsync,
+  delAsync
+} = require("./redis/redis-client");
+const {
+  isEmpty
+} = require("lodash");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -72,7 +88,9 @@ const io = socketIO(server);
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require("passport");
-const { setupPassport } = require("./passport");
+const {
+  setupPassport
+} = require("./passport");
 const session = require("express-session");
 
 /* cors: for example, if front-end sends request to back-end,
@@ -154,7 +172,9 @@ setInterval(updateRankingList, 10 * oneMinute);
 
 app.get(
   "/auth/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
+  passport.authenticate("facebook", {
+    scope: ["email"]
+  })
 );
 app.get(
   "/auth/facebook/callback",
@@ -166,7 +186,9 @@ app.get(
 
 app.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"]
+  })
 );
 app.get(
   "/auth/google/callback",
@@ -186,7 +208,10 @@ app.post("/auth/signup", (req, res, next) => {
       return res.status(401).send(info);
     }
 
-    const { email, password } = info;
+    const {
+      email,
+      password
+    } = info;
 
     /* month+1 because Date() counts month from 0 to 11, date+1 because
      * we want this verification token to expire the next day
@@ -317,7 +342,9 @@ app.get("/logout", (req, res) => {
 // verification APIs are listed below:
 
 app.get("/passwordVerification", (req, res) => {
-  const { email } = req.query;
+  const {
+    email
+  } = req.query;
   const timestampNowOfRequest = Math.round(Date.now() / 1000);
 
   getParsedCachedPasswordVerificationCode(email)
@@ -330,7 +357,9 @@ app.get("/passwordVerification", (req, res) => {
         ]);
       }
 
-      const { timestamp } = redisCachedCode;
+      const {
+        timestamp
+      } = redisCachedCode;
       if (timestampNowOfRequest < timestamp + 15) {
         res
           .status(429)
@@ -388,10 +417,15 @@ app.get("/passwordVerification", (req, res) => {
 });
 
 app.get("/checkPasswordVerificationCode", (req, res) => {
-  const { email, code } = req.query;
+  const {
+    email,
+    code
+  } = req.query;
   getParsedCachedPasswordVerificationCode(email)
     .then((redisCachedCode) => {
-      const { secretCode } = redisCachedCode;
+      const {
+        secretCode
+      } = redisCachedCode;
       if (code !== secretCode) {
         res.status(404).send("Your verification code does not match.");
       } else {
