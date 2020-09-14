@@ -175,7 +175,7 @@ class LandingPage extends React.Component {
               <Typography
                 className={clsx(classes.gridTitle, classes.marketWatch)}
               >
-                MARKET WATCH
+                MARKET WATCH TESTING
               </Typography>
               <Paper
                 className={clsx(classes.fullHeightWidth, classes.paperColor)}
