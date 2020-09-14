@@ -2,7 +2,7 @@ import React from "react";
 
 import clsx from "clsx";
 
-import SettingNormalTextField from "../TextField/SettingNormalTextField";
+import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
 import DatePickerTextField from "../TextField/DatePickerTextField";
 import SelectBox from "../SelectBox/SelectBox";
 

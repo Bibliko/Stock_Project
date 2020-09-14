@@ -2,11 +2,23 @@ import React from "react";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { TextField, InputAdornment, IconButton } from "@material-ui/core";
+import {
+  TextField,
+  Typography,
+  Container,
+  InputAdornment,
+  IconButton,
+} from "@material-ui/core";
 
 import { EditRounded as EditRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
+  textFieldContainer: {
+    maxWidth: "none",
+    minWidth: "150px",
+    marginLeft: "10px",
+    marginRight: "10px",
+  },
   textField: {
     width: "100%",
     marginTop: "5px",
@@ -39,53 +51,65 @@ const styles = (theme) => ({
       height: "35px",
     },
   },
+  title: {
+    color: "white",
+    fontSize: "20px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+    },
+    paddingLeft: "5px",
+    fontWeight: "bold",
+  },
 });
 
-class DatePickerTextField extends React.Component {
-  state = {
-    onHover: false,
-  };
+class SettingNormalTextField extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      onHover: false,
+    };
+    this.onMouseOver = this.onMouseOver.bind(this);
+    this.onMouseOut = this.onMouseOut.bind(this);
+  }
 
-  onMouseOver = () => {
+  onMouseOver() {
     this.setState({
       onHover: true,
     });
-  };
+  }
 
-  onMouseOut = () => {
+  onMouseOut() {
     this.setState({
       onHover: false,
     });
-  };
+  }
+
   render() {
     const {
       classes,
-      onClick,
-      id,
-      inputRef,
-      error,
-      helperText,
+      name,
       value,
+      isInvalid,
+      helper,
+      onChange,
       disabled,
-      inputProps,
-      InputProps,
     } = this.props;
-
     const { onHover } = this.state;
 
     return (
-      <div>
+      <Container className={classes.textFieldContainer}>
+        <Typography className={classes.title}>{name}</Typography>
         <TextField
+          fullWidth
+          disabled={disabled}
+          value={value}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.onMouseOut}
-          onClick={onClick}
-          id={id}
-          ref={inputRef}
-          error={error}
-          helperText={helperText}
-          value={value}
-          disabled={disabled}
+          id={name}
+          name={name}
           variant="outlined"
+          error={isInvalid}
+          helperText={isInvalid && helper}
           className={classes.textField}
           InputProps={{
             className: classes.input,
@@ -96,13 +120,12 @@ class DatePickerTextField extends React.Component {
                 </IconButton>
               </InputAdornment>
             ),
-            ...InputProps,
           }}
-          {...inputProps}
+          onChange={onChange}
         />
-      </div>
+      </Container>
     );
   }
 }
 
-export default withStyles(styles)(DatePickerTextField);
+export default withStyles(styles)(SettingNormalTextField);

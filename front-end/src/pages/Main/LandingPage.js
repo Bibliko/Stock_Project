@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -9,13 +10,9 @@ import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { Typography } from "@material-ui/core";
+import { Container, Grid, Paper, Typography } from "@material-ui/core";
 
-import SettingsRoundedIcon from "@material-ui/icons/SettingsRounded";
-import { isEqual } from "lodash";
+import { SettingsRounded as SettingsRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
@@ -178,7 +175,7 @@ class LandingPage extends React.Component {
               <Typography
                 className={clsx(classes.gridTitle, classes.marketWatch)}
               >
-                MARKET WATCH
+                MARKET WATCH TESTING
               </Typography>
               <Paper
                 className={clsx(classes.fullHeightWidth, classes.paperColor)}

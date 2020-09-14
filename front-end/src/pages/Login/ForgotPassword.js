@@ -15,15 +15,11 @@ import {
   changePassword,
 } from "../../utils/UserUtil";
 
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
+import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
+import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
 
-import PasswordTextField from "../../components/TextField/PasswordTextField";
-import NormalTextField from "../../components/TextField/NormalTextField";
+import { withStyles } from "@material-ui/core/styles";
+import { Paper, Typography, Button, Grid, Container } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -138,6 +134,9 @@ const styles = (theme) => ({
     borderRadius: "40px",
     color: "white",
     fontWeight: "bold",
+  },
+  form: {
+    flexDirection: "column",
   },
 });
 
@@ -393,16 +392,25 @@ class ForgotPassword extends React.Component {
                       direction="column"
                       className={classes.textFieldGrid}
                     >
-                      <PasswordTextField
-                        name="Password"
-                        changePassword={this.changePassword}
-                        enterPassword={this.enterPassword}
-                      />
-                      <PasswordTextField
-                        name="Confirm Password"
-                        changePassword={this.changeConfirmPassword}
-                        enterPassword={this.enterPassword}
-                      />
+                      <form
+                        className={clsx(classes.center, classes.form)}
+                        noValidate
+                        autoComplete="on"
+                      >
+                        <input type="text" autoComplete="email" hidden />
+                        <PasswordTextField
+                          name="Password"
+                          changePassword={this.changePassword}
+                          enterPassword={this.enterPassword}
+                          createOrLogin="create"
+                        />
+                        <PasswordTextField
+                          name="Confirm Password"
+                          changePassword={this.changeConfirmPassword}
+                          enterPassword={this.enterPassword}
+                          createOrLogin="create"
+                        />
+                      </form>
                       <Button
                         onClick={this.submit}
                         className={classes.buttonStyles}

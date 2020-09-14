@@ -1,25 +1,28 @@
 import React from "react";
+import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
-//import { socket } from '../../App';
 import {
   shouldRedirectToLandingPage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
 
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import Divider from "@material-ui/core/Divider";
+import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
+import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
+
 import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import NormalTextField from "../../components/TextField/NormalTextField";
-import PasswordTextField from "../../components/TextField/PasswordTextField";
+import {
+  Paper,
+  Typography,
+  Button,
+  Grid,
+  Divider,
+  Container,
+} from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -142,6 +145,9 @@ const styles = (theme) => ({
       },
     },
   },
+  form: {
+    flexDirection: "column",
+  },
 });
 
 class Login extends React.Component {
@@ -212,6 +218,7 @@ class Login extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const { error } = this.state;
 
     if (shouldRedirectToLandingPage(this.props)) {
       return null;
@@ -243,28 +250,31 @@ class Login extends React.Component {
                 xs
                 className={classes.center}
               >
-                <Grid item xs className={classes.center}>
+                <form
+                  className={clsx(classes.center, classes.form)}
+                  noValidate
+                  autoComplete="on"
+                >
                   <NormalTextField
                     name="Email"
                     changeData={this.changeEmail}
                     enterData={this.handleKeyDown}
                   />
-                </Grid>
-                <Grid item xs className={classes.center}>
                   <PasswordTextField
                     name="Password"
                     changePassword={this.changePassword}
                     enterPassword={this.handleKeyDown}
+                    createOrLogin="login"
                   />
-                </Grid>
-                {!isEmpty(this.state.error) && (
+                </form>
+                {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
                     <Typography
                       color="error"
                       align="center"
                       className={classes.errorText}
                     >
-                      Error: {this.state.error}
+                      Error: {error}
                     </Typography>
                   </Grid>
                 )}

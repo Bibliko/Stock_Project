@@ -25,9 +25,11 @@ import AppBar from "./AppBar";
 import Reminder from "../Reminder/Reminder";
 import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
-import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
-import Skeleton from "@material-ui/lab/Skeleton";
+
+import { CssBaseline } from "@material-ui/core";
+
+import { Skeleton } from "@material-ui/lab";
 
 const styles = (theme) => ({
   root: {

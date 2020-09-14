@@ -27,7 +27,7 @@ import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
 
 import { ThemeProvider } from "@material-ui/core/styles";
-import LinearProgress from "@material-ui/core/LinearProgress";
+import { LinearProgress } from "@material-ui/core";
 
 import { LocalizationProvider } from "@material-ui/pickers";
 
