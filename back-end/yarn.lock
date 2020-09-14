@@ -1342,15 +1342,15 @@
   dependencies:
     "@types/node" ">= 8"
 
-"@prisma/cli@^2.4.1":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.5.0.tgz#a6d8c0ebd79230900d44d2eebcf62f02b3612214"
-  integrity sha512-yqGhDYH8lxIfT/1gjg6VVb2THS+k0cAbnoR8UENNrAAUWGzroZSvz+ECMsVinKshTUHJkD69yzi9i/nDqAODSw==
+"@prisma/cli@^2.6.1":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.6.2.tgz#52fb447f702f159c9a218f720b0b809581815a0b"
+  integrity sha512-aDzA1kWwmfyt1FeTzayZ6fDc9uXRo+gt+KFsR9bNqHtdge2aZLA9N/ft9+1627HOADIQgfTFw41K0GOMBJQ48w==
 
-"@prisma/client@^2.4.1":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.5.0.tgz#dba5ee40497f458dc0f1057fa4a0b6675548e443"
-  integrity sha512-rsgbImSVMBATLSSZEgP7pWpqV2iylDJWM2zjmL980IjTBgy63alDr0RyoOkdt8oVw4OyJW0uYpxAU2Z9bXZU9A==
+"@prisma/client@^2.6.1":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.6.2.tgz#842c8640a0cd5b7542522ac0645f7c8c9bd87254"
+  integrity sha512-SYbW6+Lcd/OcY6p9vjI845ERl77Z+rOcB0zh6RKQdxr8R6yZHc7aDUnjcp8fZr245HnLLRnCpfkAfqQ3lvLP8g==
   dependencies:
     pkg-up "^3.1.0"
 
@@ -4350,7 +4350,7 @@ node-environment-flags@^1.0.5:
     object.getownpropertydescriptors "^2.0.3"
     semver "^5.7.0"
 
-node-fetch@2.6.0, node-fetch@^2.3.0, node-fetch@^2.6.0:
+node-fetch@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
@@ -4362,6 +4362,11 @@ node-fetch@^1.0.1:
   dependencies:
     encoding "^0.1.11"
     is-stream "^1.0.1"
+
+node-fetch@^2.3.0, node-fetch@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
+  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 node-modules-regexp@^1.0.0:
   version "1.0.0"

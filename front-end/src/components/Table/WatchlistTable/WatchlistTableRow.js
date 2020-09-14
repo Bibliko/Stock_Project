@@ -15,13 +15,13 @@ import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import { TableRow, TableCell, Typography } from "@material-ui/core";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import Typography from "@material-ui/core/Typography";
 
-import {
-  ArrowDropUpRounded as ArrowDropUpRoundedIcon,
-  ArrowDropDownRounded as ArrowDropDownRoundedIcon,
-  DeleteForeverRounded as DeleteForeverRoundedIcon,
-} from "@material-ui/icons";
+import ArrowDropUpRoundedIcon from "@material-ui/icons/ArrowDropUpRounded";
+import ArrowDropDownRoundedIcon from "@material-ui/icons/ArrowDropDownRounded";
+import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 
 const styles = (theme) => ({
   tableCell: {

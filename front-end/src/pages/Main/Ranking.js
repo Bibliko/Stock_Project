@@ -11,13 +11,11 @@ import OverallTable from "../../components/Table/RankingTable/OverallTable";
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Container,
-  Grid,
-  Typography,
-  TextField,
-  MenuItem,
-} from "@material-ui/core";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import { Typography } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const styles = (theme) => ({
   root: {

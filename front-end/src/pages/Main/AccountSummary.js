@@ -15,9 +15,12 @@ import AccountSummaryChart from "../../components/Chart/AccountSummaryChart";
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Container, Grid, Typography, Paper } from "@material-ui/core";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import { Typography } from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
 
-import { StorefrontRounded as StorefrontRoundedIcon } from "@material-ui/icons";
+import StorefrontRoundedIcon from "@material-ui/icons/StorefrontRounded";
 
 const styles = (theme) => ({
   root: {

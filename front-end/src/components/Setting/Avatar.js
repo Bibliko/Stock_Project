@@ -3,9 +3,10 @@ import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { IconButton, Avatar as MuiAvatar } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import MuiAvatar from "@material-ui/core/Avatar";
 
-import { EditRounded as EditRoundedIcon } from "@material-ui/icons";
+import EditRoundedIcon from "@material-ui/icons/EditRounded";
 
 const styles = (theme) => ({
   avatar: {

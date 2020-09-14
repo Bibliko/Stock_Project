@@ -5,24 +5,22 @@ import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
+//import { socket } from '../../App';
 import {
   shouldRedirectToLandingPage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
 
-import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
-import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
-
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import Divider from "@material-ui/core/Divider";
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  Typography,
-  Button,
-  Grid,
-  Divider,
-  Container,
-} from "@material-ui/core";
+import Container from "@material-ui/core/Container";
+import NormalTextField from "../../components/TextField/NormalTextField";
+import PasswordTextField from "../../components/TextField/PasswordTextField";
 
 const styles = (theme) => ({
   root: {

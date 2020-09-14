@@ -10,7 +10,9 @@ import { parseRedisAccountSummaryChartItem } from "../../utils/low-dependency/Pa
 import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
-import { Typography, CircularProgress } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import CircularProgress from "@material-ui/core/CircularProgress";
+// import ImportExportRoundedIcon from '@material-ui/icons/ImportExportRounded';
 
 const styles = (theme) => ({
   mainDiv: {
