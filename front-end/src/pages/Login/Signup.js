@@ -15,8 +15,8 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import { withStyles } from "@material-ui/core/styles";
-import NormalTextField from "../../components/TextField/NormalTextField";
-import PasswordTextField from "../../components/TextField/PasswordTextField";
+import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
+import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
 import { Container } from "@material-ui/core";
 
 const styles = (theme) => ({

@@ -19,8 +19,8 @@ import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import NormalTextField from "../../components/TextField/NormalTextField";
-import PasswordTextField from "../../components/TextField/PasswordTextField";
+import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
+import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
 
 const styles = (theme) => ({
   root: {
