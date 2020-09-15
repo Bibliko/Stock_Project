@@ -63,6 +63,10 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
         }
       })
       .then((marketHoursJSON) => {
+        if (marketHoursJSON["Error Message"]) {
+          reject(marketHoursJSON["Error Message"]);
+          return;
+        }
         if (marketHoursJSON) {
           let nyseMarket;
 
