@@ -4,10 +4,18 @@ const {
   getYearUTCString
 } = require("../low-dependency/DayTimeUtil");
 
-const { PrismaClient } = require("@prisma/client");
+const {
+  PrismaClient
+} = require("@prisma/client");
 const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("../../redis/redis-client");
-const { isEqual, isEmpty } = require("lodash");
+const {
+  keysAsync,
+  delAsync
+} = require("../../redis/redis-client");
+const {
+  isEqual,
+  isEmpty
+} = require("lodash");
 
 const {
   isMarketClosedCheck,
@@ -71,6 +79,43 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
   });
 };
 
+const createRankingTimeStampIfNecessary = (user) => {
+  return new Promise((resolve, reject) => {
+    prisma.RankingTimeStamp.findOne({
+        where: {
+          UTCDateKey_userID: {
+            UTCDateKey: getFullDateUTCString(newDate()),
+            userID: user.id
+          }
+        }
+      }).then((timestamp) => {
+        if (!timestamp) {
+          prisma.RankingTimeStamp.create({
+            data: {
+              UTCDateString: newDate(),
+              UTCDateKey: getFullDateUTCString(newDate()),
+              year: getYearUTCString(newDate()),
+              ranking: user.ranking,
+              regionalRanking: user.regionalRanking,
+              user: {
+                connect: {
+                  id: user.id
+                }
+              }
+            }
+          })
+        }
+      })
+      .then(() => {
+        console.log("Finished finding and creating timestamp");
+        resolve("Finished finding and creating timestamp");
+      })
+      .catch((err) => {
+        reject(err);
+      })
+  });
+}
+
 const updateRankingList = () => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
@@ -92,11 +137,9 @@ const updateRankingList = () => {
           totalPortfolio: true,
           region: true
         },
-        orderBy: [
-          {
-            totalPortfolio: "desc"
-          }
-        ]
+        orderBy: [{
+          totalPortfolio: "desc"
+        }]
       });
     })
     .then((usersArray) => {
@@ -151,11 +194,9 @@ const updateAllUsers = () => {
         id: true,
         totalPortfolio: true
       },
-      orderBy: [
-        {
-          totalPortfolio: "desc"
-        }
-      ]
+      orderBy: [{
+        totalPortfolio: "desc"
+      }]
     })
     .then((usersArray) => {
       console.log(
@@ -171,11 +212,11 @@ const updateAllUsers = () => {
             totalPortfolioLastClosure: user.totalPortfolio
           }
         });
-        const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
-          user
-        );
 
-        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise]);
+        const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(user);
+        const accountRankingPromise = createRankingTimeStampIfNecessary(user)
+
+        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise, accountRankingPromise]);
       });
       return Promise.all(updateAllUsersPromise);
     })
@@ -248,7 +289,9 @@ const getChunkUserTransactionsHistoryForRedisM5RU = (
       isFinished: true
     };
     if (isEqual(searchBy, "companyCode")) {
-      filtering.companyCode = { contains: searchQuery };
+      filtering.companyCode = {
+        contains: searchQuery
+      };
     }
     if (isEqual(searchBy, "type")) {
       filtering.isTypeBuy = isEqual(searchQuery, "buy");
@@ -294,7 +337,9 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (
       isFinished: true
     };
     if (isEqual(searchBy, "companyCode")) {
-      filtering.companyCode = { contains: searchQuery };
+      filtering.companyCode = {
+        contains: searchQuery
+      };
     }
     if (isEqual(searchBy, "type")) {
       filtering.isTypeBuy = isEqual(searchQuery, "buy");
@@ -317,6 +362,8 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (
       });
   });
 };
+
+
 
 module.exports = {
   deleteExpiredVerification,
