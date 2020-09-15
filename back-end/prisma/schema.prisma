@@ -33,7 +33,7 @@ model User {
   transactions              UserTransaction[]
   shares                    Share[]
   accountSummaryChartInfo   AccountSummaryTimestamp[]
-  RankingTimestamp          RankingTimestamp[]
+  rankingChartInfo          rankingTimestamp[]
 }
 
 model AccountSummaryTimestamp {
@@ -48,7 +48,7 @@ model AccountSummaryTimestamp {
   @@unique([UTCDateKey, userID])
 }
 
-model RankingTimestamp {
+model rankingTimestamp {
   id              String @default(cuid()) @id
   UTCDateString   String
   UTCDateKey      String

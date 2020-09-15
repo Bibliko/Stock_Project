@@ -79,9 +79,9 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
   });
 };
 
-const createRankingTimeStampIfNecessary = (user) => {
+const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
-    prisma.RankingTimeStamp.findOne({
+    prisma.rankingTimestamp.findOne({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
@@ -90,7 +90,7 @@ const createRankingTimeStampIfNecessary = (user) => {
         }
       }).then((timestamp) => {
         if (!timestamp) {
-          prisma.RankingTimeStamp.create({
+          prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
               UTCDateKey: getFullDateUTCString(newDate()),
@@ -214,7 +214,7 @@ const updateAllUsers = () => {
         });
 
         const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(user);
-        const accountRankingPromise = createRankingTimeStampIfNecessary(user)
+        const accountRankingPromise = createRankingTimestampIfNecessary(user)
 
         return Promise.all([updatePortfolioLastClosure, accountSummaryPromise, accountRankingPromise]);
       });
