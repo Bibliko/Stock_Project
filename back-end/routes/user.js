@@ -307,4 +307,29 @@ router.get("/getUserAccountSummaryChartTimestamps", (req, res) => {
     });
 });
 
+router.get("/getUserRankingTimestamp", (req, res) => {
+  const { email, afterOrEqualThisYear } = req.query;
+
+  const afterOrEqualThisYearInteger = parseInt(afterOrEqualThisYear, 10);
+
+  prisma.rankingTimestamp
+    .findMany({
+      where: {
+        user: {
+          email
+        },
+        year: {
+          gte: afterOrEqualThisYearInteger
+        }
+      }
+    })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get user's data.");
+    });
+});
+
 module.exports = router;
