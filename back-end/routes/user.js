@@ -307,7 +307,7 @@ router.get("/getUserAccountSummaryChartTimestamps", (req, res) => {
     });
 });
 
-router.get("/getUserRankingTimestamp", (req, res) => {
+router.get("/getUserRankingTimestamps", (req, res) => {
   const { email, afterOrEqualThisYear } = req.query;
 
   const afterOrEqualThisYearInteger = parseInt(afterOrEqualThisYear, 10);

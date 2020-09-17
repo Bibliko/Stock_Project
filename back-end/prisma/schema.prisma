@@ -48,7 +48,7 @@ model AccountSummaryTimestamp {
   @@unique([UTCDateKey, userID])
 }
 
-model rankingTimestamp {
+model RankingTimestamp {
   id              String @default(cuid()) @id
   UTCDateString   String
   UTCDateKey      String
