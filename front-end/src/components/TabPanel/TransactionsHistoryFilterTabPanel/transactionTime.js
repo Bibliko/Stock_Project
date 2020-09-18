@@ -1,13 +1,10 @@
 import React from "react";
 import clsx from "clsx";
+import { DateTime } from "luxon";
 import { isEqual, isEmpty, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
-import {
-  checkDateValidError,
-  compareTwoDates,
-} from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -117,24 +114,45 @@ class TransactionTimeFilter extends React.Component {
   };
 
   getError = (fromOrTo, from, to) => {
-    if (fromOrTo === "from" && !isEmpty(checkDateValidError(from))) {
-      return checkDateValidError(from);
+    let datetime;
+
+    if (fromOrTo === "from") {
+      if (from === "none") {
+        return;
+      }
+      datetime = DateTime.fromFormat(from, "M/d/yyyy");
+      return datetime.invalidExplanation;
     }
 
-    if (fromOrTo === "to" && !isEmpty(checkDateValidError(to))) {
-      return checkDateValidError(to);
+    if (fromOrTo === "to") {
+      if (to === "none") {
+        return;
+      }
+      datetime = DateTime.fromFormat(to, "M/d/yyyy");
+      return datetime.invalidExplanation;
     }
 
-    if (from !== "none" && to !== "none" && compareTwoDates(from, to) === 1) {
+    if (new Date(from) > new Date(to)) {
       return "From must < To";
     }
 
     return "";
   };
 
+  helpFormatDateInput = (dateInput) => {
+    if (dateInput === "") {
+      return "none";
+    }
+
+    if (dateInput.length > 10) {
+      return dateInput.substring(0, 10);
+    }
+    return dateInput;
+  };
+
   handleChangeValue = (event, fromOrTo) => {
     const { from, to, errorText } = this.state;
-    const value = event.target.value === "" ? "none" : event.target.value;
+    const value = this.helpFormatDateInput(event.target.value);
     const newState = {};
     const newFilters = { ...this.props.filters };
 
@@ -241,7 +259,7 @@ class TransactionTimeFilter extends React.Component {
           />
           <TextField
             error={!isEmpty(errorText)}
-            helperText="mm/dd/yyyy or m/dd/yyyy or m/d/yyyy"
+            helperText="M/d/yyyy"
             type="text"
             placeholder="To"
             onChange={(event) => this.handleChangeValue(event, "to")}
