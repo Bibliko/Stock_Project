@@ -119,6 +119,10 @@ export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
   });
 };
 
+export const isLeapYear = (year) => {
+  return year % 100 === 0 ? year % 400 === 0 : year % 4 === 0;
+};
+
 export default {
   oneSecond,
   oneMinute,
@@ -133,4 +137,5 @@ export default {
   convertToLocalTimeString,
   newDate,
   marketCountdownUpdate,
+  isLeapYear,
 };

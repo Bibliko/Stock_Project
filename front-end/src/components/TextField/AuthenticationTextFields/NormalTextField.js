@@ -33,6 +33,7 @@ const styles = (theme) => ({
     },
     "& input": {
       backgroundColor: "rgba(225,225,225,0)",
+      paddingRight: "12px",
     },
   },
   iconButton: {

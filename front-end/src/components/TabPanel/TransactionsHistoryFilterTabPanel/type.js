@@ -15,7 +15,7 @@ const styles = (theme) => ({
   },
   mainSelect: {
     width: "100%",
-    marginBottom: "5px",
+    marginBottom: theme.customMargin.dialogItemsTransactionsHistoryFilters,
   },
   select: {
     color: theme.palette.primary.main,
@@ -29,10 +29,14 @@ const styles = (theme) => ({
   },
 });
 
+/**
+  Props: 
+  filters={filters}
+  handleChangeFilters={handleChangeFilters}
+ */
 class TypeFilter extends React.Component {
   state = {
     open: false,
-    type: "",
   };
 
   handleOpen = (event) => {
@@ -48,13 +52,14 @@ class TypeFilter extends React.Component {
   };
 
   handleChange = (event) => {
-    this.setState({
-      type: event.target.value,
+    this.props.handleChangeFilters({
+      ...this.props.filters,
+      type: event.target.value === "" ? "none" : event.target.value,
     });
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = [];
+    const compareKeys = ["filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
@@ -65,9 +70,9 @@ class TypeFilter extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, filters } = this.props;
 
-    const { open, type } = this.state;
+    const { open } = this.state;
 
     return (
       <React.Fragment>
@@ -78,18 +83,18 @@ class TypeFilter extends React.Component {
           open={open}
           onClose={this.handleClose}
           onOpen={this.handleOpen}
-          value={type}
+          value={isEqual(filters.type, "none") ? "" : filters.type}
           onChange={this.handleChange}
           className={classes.mainSelect}
           classes={{
             select: classes.select,
           }}
         >
-          <MenuItem value="">
+          <MenuItem value="none">
             <em>None</em>
           </MenuItem>
-          <MenuItem value="Buy">Buy_Spend</MenuItem>
-          <MenuItem value="Sell">Sell_Gain</MenuItem>
+          <MenuItem value="buy">Buy_Spend</MenuItem>
+          <MenuItem value="sell">Sell_Gain</MenuItem>
         </Select>
       </React.Fragment>
     );

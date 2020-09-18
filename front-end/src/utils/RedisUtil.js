@@ -189,7 +189,7 @@ export const getFullStockInfo = (companyCode) => {
   });
 };
 
-export const getManyStockInfos = (prismaShares) => {
+export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
   // prismaShares means: shares with companyCode attribute
   // prismaShares won't be empty since you need to eliminate that case before using this function
 
@@ -218,5 +218,5 @@ export default {
   updateCachedSharesList, // Layout.js
 
   getFullStockInfo,
-  getManyStockInfos,
+  getManyStockInfosUsingPrismaShares,
 };

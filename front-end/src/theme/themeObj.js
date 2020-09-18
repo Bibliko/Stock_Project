@@ -19,7 +19,9 @@ const theme = {
     topLayoutSmall: "70px",
 
     topFloatingToolButton: "110px",
-    smallTopFloatingToolButton: '100px'
+    smallTopFloatingToolButton: "100px",
+
+    dialogItemsTransactionsHistoryFilters: "20px",
   },
   customZIndex: {
     reminder: 10,
@@ -78,6 +80,14 @@ const theme = {
 
     fail: {
       main: "#DC3D4A",
+      backgroundColor: "rgba(220, 61, 74, 0.2)",
+      backgroundColorHover: "rgba(220, 61, 74, 0.3)",
+    },
+
+    bigTitle: {
+      purple: "rgba(110, 80, 240, 1)",
+      blue: "rgba(47, 128, 237, 1)",
+      red: "rgba(220, 61, 74, 1)",
     },
 
     gradientPaper: {

@@ -1,7 +1,9 @@
 import React from "react";
 import clsx from "clsx";
-import { isEqual, isEmpty, pick } from "lodash";
+import { isEqual, pick, isEmpty } from "lodash";
 import { withRouter } from "react-router";
+
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -22,7 +24,7 @@ const styles = (theme) => ({
   },
   mainTextField: {
     width: "100%",
-    marginBottom: "10px",
+    marginBottom: theme.customMargin.dialogItemsTransactionsHistoryFilters,
   },
   inputBase: {
     color: "white",
@@ -45,25 +47,110 @@ const styles = (theme) => ({
   },
 });
 
+/**
+  Props: 
+  reportError={this.reportError}
+  clearFlag={clearTemporaryValuesFlag}
+  handleChangeFilters={handleChangeFilters}
+  filters={filters}
+ */
 class CodeFilter extends React.Component {
   state = {
-    codeFilterQuery: "",
+    codeValue: "none",
+    errorCodeText: "",
   };
 
-  handleChange = (event) => {
-    this.setState({
-      codeFilterQuery: event.target.value,
+  timeoutToUpdateFilterCode;
+
+  /**
+    Ticker Symbol Basics
+    Stock or equity symbols are the most known type of ticker symbol. 
+    Stocks listed and traded on U.S. exchanges such as 
+    ...the New York Stock Exchange (NYSE) have ticker symbols with up to three letters. 
+    Nasdaq-listed stocks have four-letter ticker symbols. 
+
+    stock ticker symbol maximum length: 5 characters (search Google)
+   */
+  checkErrorCode = (codeValue) => {
+    if (codeValue.indexOf(";") >= 0) {
+      return "No ';' in Code is allowed";
+    } else if (codeValue.length >= 6) {
+      return "No more than 6 characters";
+    } else {
+      return "";
+    }
+  };
+
+  setTimeoutChangeCode = () => {
+    this.timeoutToUpdateFilterCode = setTimeout(() => {
+      this.props.handleChangeFilters({
+        ...this.props.filters,
+        code:
+          this.state.codeValue === ""
+            ? "none"
+            : this.state.codeValue.toUpperCase(),
+      });
+    }, oneSecond / 3);
+  };
+
+  handleChangeCode = (event) => {
+    const { errorCodeText } = this.state;
+
+    if (this.timeoutToUpdateFilterCode) {
+      clearTimeout(this.timeoutToUpdateFilterCode);
+    }
+
+    this.setState(
+      {
+        codeValue: event.target.value,
+      },
+      () => {
+        // check error
+        const error = this.checkErrorCode(this.state.codeValue);
+        if (isEmpty(error)) {
+          if (!isEmpty(errorCodeText)) {
+            this.props.reportError(false);
+          }
+          this.setState({ errorCodeText: "" });
+
+          this.setTimeoutChangeCode();
+        } else {
+          if (isEmpty(errorCodeText)) {
+            this.props.reportError(true);
+          }
+          this.setState({ errorCodeText: error });
+        }
+      }
+    );
+  };
+
+  clearCodeFilter = () => {
+    this.setState({ codeValue: "none", errorCodeText: "" });
+    this.props.reportError(false);
+
+    this.props.handleChangeFilters({
+      ...this.props.filters,
+      code: "none",
     });
   };
 
-  clearCodeFilterQuery = () => {
+  componentDidMount() {
     this.setState({
-      codeFilterQuery: "",
+      codeValue: this.props.filters.code,
     });
-  };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.clearFlag !== this.props.clearFlag) {
+      this.setState({
+        codeValue: this.props.filters.code,
+        errorCodeText: "",
+      });
+    }
+  }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = [];
+    const compareKeys = ["clearFlag", "filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
@@ -76,7 +163,7 @@ class CodeFilter extends React.Component {
   render() {
     const { classes } = this.props;
 
-    const { codeFilterQuery } = this.state;
+    const { codeValue, errorCodeText } = this.state;
 
     return (
       <React.Fragment>
@@ -84,8 +171,10 @@ class CodeFilter extends React.Component {
           Code
         </Button>
         <TextField
-          onChange={this.handleChange}
-          value={codeFilterQuery}
+          error={!isEmpty(errorCodeText)}
+          helperText={!isEmpty(errorCodeText) ? errorCodeText : ""}
+          onChange={this.handleChangeCode}
+          value={codeValue === "none" ? "" : codeValue}
           className={classes.mainTextField}
           InputProps={{
             className: classes.inputBase,
@@ -95,9 +184,9 @@ class CodeFilter extends React.Component {
                   disableRipple
                   edge="end"
                   className={clsx(classes.iconButton, {
-                    [classes.hide]: isEmpty(codeFilterQuery),
+                    [classes.hide]: codeValue === "none" || codeValue === "",
                   })}
-                  onClick={this.clearCodeFilterQuery}
+                  onClick={this.clearCodeFilter}
                 >
                   <ClearRoundedIcon />
                 </IconButton>

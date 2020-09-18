@@ -24,7 +24,7 @@ export const socketCheckMarketClosed = (
 
 /**
  * options are listed at the beginning of front-end/src/utils/SocketUtil
- * Off All Listeners
+ * Remove All Listeners on That Event
  */
 export const offSocketListeners = (socket, option) => {
   socket.off(option);

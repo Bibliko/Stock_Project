@@ -156,7 +156,7 @@ class SearchFieldLayout extends React.Component {
   setTimeoutForSearch = () => {
     this.timeoutForSearch = setTimeout(
       () => this.searchCompanyFn(),
-      oneSecond / 2
+      oneSecond / 3
     );
   };
 
@@ -197,13 +197,14 @@ class SearchFieldLayout extends React.Component {
       clearTimeout(this.timeoutForSearch);
     }
 
-    this.setState({
-      searchCompany: event.target.value,
-      companiesNASDAQ: [],
-      companiesNYSE: [],
-    });
-
-    this.setTimeoutForSearch();
+    this.setState(
+      {
+        searchCompany: event.target.value,
+        companiesNASDAQ: [],
+        companiesNYSE: [],
+      },
+      () => this.setTimeoutForSearch()
+    );
   };
 
   clearSearchCompany = () => {
