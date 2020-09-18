@@ -33,7 +33,7 @@ model User {
   transactions              UserTransaction[]
   shares                    Share[]
   accountSummaryChartInfo   AccountSummaryTimestamp[]
-  rankingChartInfo          rankingTimestamp[]
+  rankingChartInfo          RankingTimestamp[]
 }
 
 model AccountSummaryTimestamp {
