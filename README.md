@@ -1,7 +1,9 @@
 # Bibliko
 Stock Market Game
 
-<img src="/front-end/public/bibOfficial.jpg" width="250" height="250" />
+<p align="center">
+  <img src="/front-end/public/bibOfficial.jpg" width="250" height="250"/>
+</p>
 
 This is a website simulating stock market trading that allows users to buy and sell stocks using in-game money provided by the website.
 
