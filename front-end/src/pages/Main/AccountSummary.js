@@ -77,13 +77,13 @@ const styles = (theme) => ({
     marginBottom: "20px",
   },
   summary: {
-    color: "#DC3D4A",
+    color: theme.palette.bigTitle.red,
   },
   holdings: {
-    color: "#4d36ff",
+    color: theme.palette.bigTitle.purple,
   },
   portfolioChart: {
-    color: "#2F80ED",
+    color: theme.palette.bigTitle.blue,
   },
   paperAccountSummary: {
     display: "flex",

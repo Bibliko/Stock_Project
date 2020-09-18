@@ -1,11 +1,17 @@
 import React from "react";
 import clsx from "clsx";
-import { isEmpty, isEqual, pick } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
 import TransactionsHistoryFilterDialog from "../../Dialog/TransactionsHistoryFilterDialog";
+import {
+  chooseTableCellHeader,
+  paperWhenHistoryEmpty,
+  tablePagination,
+} from "./helperComponents";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { parseRedisTransactionsHistoryListItem } from "../../../utils/low-dependency/ParserUtil";
 import { getUserTransactionsHistory } from "../../../utils/UserUtil";
@@ -13,23 +19,16 @@ import { getUserTransactionsHistory } from "../../../utils/UserUtil";
 import { withStyles } from "@material-ui/core/styles";
 import {
   TableRow,
-  TableCell,
   TableContainer,
   Table,
   TableHead,
   TableBody,
-  TablePagination,
-  TableSortLabel,
   Fab,
-  Typography,
-  Paper,
   Container,
+  Typography,
 } from "@material-ui/core";
 
-import {
-  AssignmentRounded as AssignmentRoundedIcon,
-  FilterList as FilterListIcon,
-} from "@material-ui/icons";
+import { FilterList as FilterListIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   table: {
@@ -48,8 +47,8 @@ const styles = (theme) => ({
     borderColor: theme.palette.tableHeader.main,
     borderStyle: "solid",
   },
-  tableCellName: {
-    minWidth: "150px",
+  tableCellTransactionTime: {
+    minWidth: "200px",
   },
   cellDiv: {
     display: "flex",
@@ -174,7 +173,7 @@ const styles = (theme) => ({
     },
   },
   filterIconMargin: {
-    marginLeft: "5px",
+    marginRight: "5px",
   },
   filteringContainer: {
     width: "100%",
@@ -184,14 +183,24 @@ const styles = (theme) => ({
     padding: 0,
     marginBottom: 24,
   },
-});
-
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: theme.palette.tableHeader.main,
+  filterWord: {
+    width: "100%",
+    opacity: 1,
     color: "white",
+    fontSize: "medium",
+    transition: "opacity 0.5s",
   },
-}))(TableCell);
+  filterWordHidden: {
+    opacity: 0,
+    width: 0,
+  },
+  title: {
+    marginBottom: "30px",
+    fontSize: "x-large",
+    color: theme.palette.bigTitle.purple,
+    fontWeight: "bold",
+  },
+});
 
 class TransactionsHistoryTableContainer extends React.Component {
   state = {
@@ -199,12 +208,20 @@ class TransactionsHistoryTableContainer extends React.Component {
     loading: true,
     openFilterDialog: false,
     isScrollingUp: true,
+    isFirstInitializationEmpty: true,
 
     rowsLengthChoices: [1, 5, 10], // min to max
     rowsPerPage: 5,
     pageBase0: 0,
-    searchBy: "none",
-    searchQuery: "none",
+    filters: {
+      type: "none", // buy, sell, OR none
+      code: "none", // none OR random string with NO String ";"
+      quantity: "none_to_none", // (int/none)_to_(int/none)
+      price: "none_to_none", // (int/none)_to_(int/none)
+      brokerage: "none_to_none", // (int/none)_to_(int/none)
+      spendOrGain: "none_to_none", // (int/none)_to_(int/none)
+      transactionTime: "none_to_none", // (DateTime/none)_to_(DateTime/none)
+    },
     orderBy: "finishedTime",
     orderQuery: "desc",
 
@@ -233,12 +250,13 @@ class TransactionsHistoryTableContainer extends React.Component {
 
   scrollPosition;
 
+  timeoutToChangePage;
+
   hoverPaper = () => {
     this.setState({
       hoverPaper: true,
     });
   };
-
   notHoverPaper = () => {
     this.setState({
       hoverPaper: false,
@@ -271,42 +289,9 @@ class TransactionsHistoryTableContainer extends React.Component {
     this.handleRequestSort(event, property);
   };
 
-  chooseTableCellHeader = (indexInNamesState, classes) => {
-    const { orderBy, orderQuery, names, prismaNames } = this.state;
-    const type = names[indexInNamesState];
-    const prismaType = prismaNames[indexInNamesState];
+  setStateTransactions = (redisTransactions, needScrollToTop) => {
+    const { loading } = this.state;
 
-    return (
-      <StyledTableCell
-        key={indexInNamesState}
-        align={type === "Type" ? "left" : "right"}
-        className={clsx(classes.tableCell, {
-          [classes.firstElementTopLeftRounded]: type === "Type",
-          [classes.lastElementTopRightRounded]: type === "Transaction Time",
-        })}
-        sortDirection={orderBy === prismaType ? orderQuery : false}
-      >
-        <TableSortLabel
-          active={orderBy === prismaType}
-          direction={orderBy === prismaType ? orderQuery : "asc"}
-          onClick={this.createSortHandler(prismaType)}
-          className={clsx(classes.cellDiv, {
-            [classes.cellDivSpecialForType]: type === "Type",
-          })}
-          disabled={type === "Type"}
-        >
-          {type}
-          {orderBy === prismaType ? (
-            <span className={classes.visuallyHidden}>
-              {orderQuery === "desc" ? "sorted descending" : "sorted ascending"}
-            </span>
-          ) : null}
-        </TableSortLabel>
-      </StyledTableCell>
-    );
-  };
-
-  setStateTransactions = (redisTransactions) => {
     let newTransactions = [];
 
     const { transactions, transactionsLength } = redisTransactions;
@@ -315,21 +300,33 @@ class TransactionsHistoryTableContainer extends React.Component {
       newTransactions.push(parseRedisTransactionsHistoryListItem(transaction));
       return "dummy value";
     });
-    this.setState({
-      transactions: newTransactions,
-      transactionsLength,
-      loading: false,
-    });
+    this.setState(
+      {
+        transactions: newTransactions,
+        transactionsLength,
+        isFirstInitializationEmpty:
+          transactionsLength === 0 && loading ? true : false,
+        loading: false,
+      },
+      () => {
+        if (needScrollToTop) {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+          });
+        }
+      }
+    );
   };
 
-  getUserTransactionsHistoryPageData = () => {
+  getUserTransactionsHistoryPageData = (needScrollToTop) => {
     const { email } = this.props.userSession;
     const {
       rowsLengthChoices,
       pageBase0,
       rowsPerPage,
-      searchBy,
-      searchQuery,
+      filters,
       orderBy,
       orderQuery,
     } = this.state;
@@ -339,13 +336,12 @@ class TransactionsHistoryTableContainer extends React.Component {
       rowsLengthChoices,
       pageBase0 + 1,
       rowsPerPage,
-      searchBy,
-      searchQuery,
+      filters,
       orderBy,
       orderQuery
     )
       .then((redisTransactions) => {
-        this.setStateTransactions(redisTransactions);
+        this.setStateTransactions(redisTransactions, needScrollToTop);
       })
       .catch((err) => {
         console.log(err);
@@ -353,8 +349,15 @@ class TransactionsHistoryTableContainer extends React.Component {
   };
 
   handleChangePage = (event, newPage) => {
+    if (this.timeoutToChangePage) {
+      clearTimeout(this.timeoutToChangePage);
+    }
+
     this.setState({ pageBase0: newPage }, () => {
-      this.getUserTransactionsHistoryPageData();
+      this.timeoutToChangePage = setTimeout(
+        () => this.getUserTransactionsHistoryPageData(false),
+        oneSecond / 3
+      );
     });
   };
 
@@ -362,6 +365,23 @@ class TransactionsHistoryTableContainer extends React.Component {
     this.setState(
       {
         rowsPerPage: parseInt(event.target.value, 10),
+        pageBase0: 0,
+      },
+      () => {
+        this.getUserTransactionsHistoryPageData(true);
+      }
+    );
+  };
+
+  handleChangeFilters = (newFilters) => {
+    this.setState({
+      filters: newFilters,
+    });
+  };
+
+  handleDoneFilters = () => {
+    this.setState(
+      {
         pageBase0: 0,
       },
       () => {
@@ -374,13 +394,13 @@ class TransactionsHistoryTableContainer extends React.Component {
     const window = event.currentTarget;
     const { isScrollingUp } = this.state;
 
-    if (this.scrollPosition > window.scrollY + 5) {
+    if (this.scrollPosition > window.scrollY + 4) {
       if (!isScrollingUp) {
         this.setState({
           isScrollingUp: true,
         });
       }
-    } else if (this.scrollPosition + 5 < window.scrollY) {
+    } else if (this.scrollPosition + 4 < window.scrollY) {
       if (isScrollingUp) {
         this.setState({
           isScrollingUp: false,
@@ -419,95 +439,98 @@ class TransactionsHistoryTableContainer extends React.Component {
     const {
       hoverPaper,
       loading,
+      isFirstInitializationEmpty,
       openFilterDialog,
       isScrollingUp,
 
-      rowsPerPage,
-      pageBase0,
       transactions,
       transactionsLength,
+
       rowsLengthChoices,
+      pageBase0,
+      rowsPerPage,
+      filters,
 
       names,
     } = this.state;
 
     return (
       <div className={classes.transactionsHistoryContainerDiv}>
-        {isEmpty(transactions) && !loading && (
-          <Paper
-            className={classes.emptyRowsPaper}
-            onMouseEnter={this.hoverPaper}
-            onMouseLeave={this.notHoverPaper}
-          >
-            <AssignmentRoundedIcon
-              className={clsx(classes.assignmentIcon, {
-                [classes.assignmentIconAnimation]: hoverPaper,
-              })}
-            />
-            <Typography className={classes.assignmentWord}>
-              Start by making some transactions by selling or buying stocks!
-            </Typography>
-          </Paper>
-        )}
-        {!isEmpty(transactions) && !loading && (
-          <Container className={classes.filteringContainer}>
-            <Fab
-              variant="extended"
-              size="medium"
-              className={clsx(classes.filterButton, {
-                [classes.filterButtonNotExtended]: !isScrollingUp,
-              })}
-              onClick={this.openFilterDialog}
-            >
-              {isScrollingUp ? "Filter" : null}
-              <FilterListIcon
-                className={isScrollingUp ? classes.filterIconMargin : null}
-              />
-            </Fab>
-            <TransactionsHistoryFilterDialog
-              openFilterDialog={openFilterDialog}
-              handleClose={this.closeFilterDialog}
-            />
-          </Container>
-        )}
-        {!isEmpty(transactions) && !loading && (
-          <TableContainer className={classes.tableContainer}>
-            <Table className={classes.table} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  {names.map((typeName, index) => {
-                    return this.chooseTableCellHeader(index, classes);
+        {isFirstInitializationEmpty &&
+          !loading &&
+          paperWhenHistoryEmpty(
+            classes,
+            hoverPaper,
+            this.hoverPaper,
+            this.notHoverPaper
+          )}
+        {!isFirstInitializationEmpty && !loading && (
+          <React.Fragment>
+            <Container className={classes.filteringContainer}>
+              <Fab
+                variant="extended"
+                size="medium"
+                className={clsx(classes.filterButton, {
+                  [classes.filterButtonNotExtended]: !isScrollingUp,
+                })}
+                onClick={this.openFilterDialog}
+              >
+                <FilterListIcon
+                  className={isScrollingUp ? classes.filterIconMargin : null}
+                />
+                <Typography
+                  className={clsx(classes.filterWord, {
+                    [classes.filterWordHidden]: !isScrollingUp,
                   })}
-                </TableRow>
-              </TableHead>
-              <TableBody className={classes.tableBody}>
-                {transactions.map((row, index) => (
-                  <TransactionsHistoryTableRow
-                    key={index}
-                    transactionInfo={row}
-                    rowIndex={index}
-                    rowsLength={transactions.length}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-        {!isEmpty(transactions) && !loading && (
-          <TablePagination
-            classes={{
-              selectIcon: classes.tablePaginationSelectIcon,
-              actions: classes.tablePaginationActions,
-            }}
-            className={classes.tablePagination}
-            rowsPerPageOptions={rowsLengthChoices}
-            component="div"
-            count={transactionsLength}
-            rowsPerPage={rowsPerPage}
-            page={pageBase0}
-            onChangePage={this.handleChangePage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
-          />
+                >
+                  Filter
+                </Typography>
+              </Fab>
+              <TransactionsHistoryFilterDialog
+                filters={filters}
+                openFilterDialog={openFilterDialog}
+                handleChangeFilters={this.handleChangeFilters}
+                handleDoneFilters={this.handleDoneFilters}
+                handleClose={this.closeFilterDialog}
+              />
+            </Container>
+            <Typography className={classes.title}>Trading History</Typography>
+            <TableContainer className={classes.tableContainer}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    {names.map((typeName, index) => {
+                      return chooseTableCellHeader(
+                        index,
+                        this.createSortHandler,
+                        classes,
+                        this.state
+                      );
+                    })}
+                  </TableRow>
+                </TableHead>
+                <TableBody className={classes.tableBody}>
+                  {transactions.map((row, index) => (
+                    <TransactionsHistoryTableRow
+                      key={index}
+                      transactionInfo={row}
+                      rowIndex={index}
+                      rowsLength={transactions.length}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {tablePagination(
+              rowsLengthChoices,
+              transactionsLength,
+              rowsPerPage,
+              pageBase0,
+              this.handleChangePage,
+              this.handleChangeRowsPerPage,
+              classes
+            )}
+          </React.Fragment>
         )}
       </div>
     );

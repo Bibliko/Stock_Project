@@ -1,12 +1,10 @@
 import React from "react";
-import clsx from "clsx";
 import { withRouter } from "react-router";
 
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
-import { convertToLocalTimeString } from "../../../utils/low-dependency/DayTimeUtil";
+import { chooseTableCell } from "./helperComponents";
 
 import { withStyles } from "@material-ui/core/styles";
-import { TableRow, TableCell, Typography } from "@material-ui/core";
+import { TableRow } from "@material-ui/core";
 
 const styles = (theme) => ({
   tableCell: {
@@ -56,88 +54,53 @@ class TransactionsHistoryTableRow extends React.Component {
     return rowIndex === rowsLength - 1;
   };
 
-  chooseTableCell = (type, classes) => {
-    const { isTypeBuy } = this.props.transactionInfo;
-
-    return (
-      <TableCell
-        align="center"
-        className={clsx(classes.tableCell, {
-          [classes.lastRow]: this.isTableRowTheLast(),
-          [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Type",
-          [classes.lastRightCell]:
-            this.isTableRowTheLast() && type === "Transaction Time",
-        })}
-      >
-        <div
-          className={clsx(classes.cellDiv, {
-            [classes.cellDivSpecialForType]: type === "Type",
-          })}
-        >
-          <Typography
-            className={clsx(classes.watchlistRowItem, {
-              [classes.buyIcon]: type === "Type" && isTypeBuy,
-              [classes.sellIcon]: type === "Type" && !isTypeBuy,
-            })}
-            noWrap
-          >
-            {this.chooseTableCellValue(type)}
-          </Typography>
-        </div>
-      </TableCell>
-    );
-  };
-
-  chooseTableCellValue = (type, classes) => {
-    const {
-      isTypeBuy,
-      companyCode,
-      quantity,
-      priceAtTransaction,
-      brokerage,
-      spendOrGain,
-      finishedTime,
-    } = this.props.transactionInfo;
-
-    switch (type) {
-      case "Type":
-        return isTypeBuy ? "Buy_Spend" : "Sell_Gain";
-
-      case "Code":
-        return `${companyCode}`;
-
-      case "Quantity":
-        return `${numberWithCommas(quantity)}`;
-
-      case "Price":
-        return `$${numberWithCommas(priceAtTransaction.toFixed(2))}`;
-
-      case "Brokerage":
-        return `$${numberWithCommas(brokerage.toFixed(2))}`;
-
-      case "Spend/Gain":
-        return `$${numberWithCommas(spendOrGain.toFixed(2))}`;
-
-      case "Transaction Time":
-        return convertToLocalTimeString(finishedTime);
-
-      default:
-        return;
-    }
-  };
-
   render() {
-    const { classes } = this.props;
+    const { classes, transactionInfo } = this.props;
 
     return (
       <TableRow className={classes.tableRow}>
-        {this.chooseTableCell("Type", classes)}
-        {this.chooseTableCell("Code", classes)}
-        {this.chooseTableCell("Quantity", classes)}
-        {this.chooseTableCell("Price", classes)}
-        {this.chooseTableCell("Brokerage", classes)}
-        {this.chooseTableCell("Spend/Gain", classes)}
-        {this.chooseTableCell("Transaction Time", classes)}
+        {chooseTableCell(
+          "Type",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
+        {chooseTableCell(
+          "Code",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
+        {chooseTableCell(
+          "Quantity",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
+        {chooseTableCell(
+          "Price",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
+        {chooseTableCell(
+          "Brokerage",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
+        {chooseTableCell(
+          "Spend/Gain",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
+        {chooseTableCell(
+          "Transaction Time",
+          this.isTableRowTheLast,
+          classes,
+          transactionInfo
+        )}
       </TableRow>
     );
   }

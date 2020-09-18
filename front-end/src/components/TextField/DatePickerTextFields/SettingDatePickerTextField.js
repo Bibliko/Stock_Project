@@ -41,7 +41,7 @@ const styles = (theme) => ({
   },
 });
 
-class DatePickerTextField extends React.Component {
+class SettingDatePickerTextField extends React.Component {
   state = {
     onHover: false,
   };
@@ -105,4 +105,4 @@ class DatePickerTextField extends React.Component {
   }
 }
 
-export default withStyles(styles)(DatePickerTextField);
+export default withStyles(styles)(SettingDatePickerTextField);

@@ -10,7 +10,7 @@ const {
  * Keys list:
  * - '${email}|transactionsHistoryList': list
  * - '${email}|transactionsHistoryM5RU': list -> Most 5 recently used
- * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy|orderQuery': list
+ * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|filters|orderBy|orderQuery': list
  * - '${email}|passwordVerification': value
  * - '${email}|accountSummaryChart': list
  * - '${email}|sharesList': list

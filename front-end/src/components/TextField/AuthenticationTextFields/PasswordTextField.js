@@ -28,6 +28,10 @@ const styles = (theme) => ({
     "&:hover": {
       backgroundColor: "rgba(225,225,225,0.5)",
     },
+    "& input": {
+      backgroundColor: "rgba(225,225,225,0)",
+      paddingRight: "12px",
+    },
   },
 });
 
