@@ -1,3 +1,5 @@
+const { isEqual } = require("lodash");
+
 /**
  * 'cachedMarketHoliday': 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
  */
@@ -96,6 +98,117 @@ const createRedisValueFromFinishedTransaction = (finishedTransaction) => {
     userID
   } = finishedTransaction;
   return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${isTypeBuy}|${userID}`;
+};
+
+/**
+ * filters: {
+ *    type: buy, sell, OR none
+ *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
+ *    quantity: (int/none)_to_(int/none)
+ *    price: (int/none)_to_(int/none)
+ *    brokerage: (int/none)_to_(int/none)
+ *    spendOrGain: (int/none)_to_(int/none)
+ *    transactionTime: (DateTime/none)_to_(DateTime/none)
+ * }
+ */
+const createRedisValueFromTransactionsHistoryFilters = (filters) => {
+  const {
+    type,
+    code,
+    quantity,
+    price,
+    brokerage,
+    spendOrGain,
+    transactionTime
+  } = filters;
+  return `${type};${code};${quantity};${price};${brokerage};${spendOrGain};${transactionTime}`;
+};
+/**
+ * `${type};${code};${quantity};${price};${brokerage};${spendOrGain};${transactionTime}`
+ */
+const parseRedisTransactionsHistoryFilters = (redisValue) => {
+  const values = redisValue.split(";");
+  return {
+    type: values[0],
+    code: values[1],
+    quantity: values[2].split("_to_"),
+    price: values[3].split("_to_"),
+    brokerage: values[4].split("_to_"),
+    spendOrGain: values[5].split("_to_"),
+    transactionTime: values[6].split("_to_")
+  };
+};
+
+/**
+ * filters: {
+ *    type: buy, sell, OR none
+ *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
+ *    quantity: (int/none)_to_(int/none)
+ *    price: (int/none)_to_(int/none)
+ *    brokerage: (int/none)_to_(int/none)
+ *    spendOrGain: (int/none)_to_(int/none)
+ *    transactionTime: (DateTime/none)_to_(DateTime/none)
+ * }
+ */
+const createPrismaFiltersObject = (filters) => {
+  const { type, code, price, transactionTime } = filters;
+  const filtering = {
+    isFinished: true
+    // isTypeBuy
+    // companyCode
+    // priceAtTransaction
+    // finishedTime
+    // quantity
+    // brokerage
+    // spendOrGain
+  };
+
+  // type
+  if (!isEqual(type, "none")) {
+    filtering.isTypeBuy = isEqual(type, "buy");
+  }
+
+  // code
+  if (!isEqual(code, "none")) {
+    filtering.companyCode = { contains: code };
+  }
+
+  // price
+  const priceValues = price.split("_to_");
+  if (!isEqual(priceValues[0], "none")) {
+    filtering.priceAtTransaction.gte = parseInt(priceValues[0], 10);
+  }
+  if (!isEqual(priceValues[1], "none")) {
+    filtering.priceAtTransaction.lte = parseInt(priceValues[1], 10);
+  }
+
+  // transactionTime
+  const timeValues = transactionTime.split("_to_");
+  filtering.finishedTime = {};
+  if (!isEqual(timeValues[0], "none")) {
+    filtering.finishedTime.gte = new Date(timeValues[0]);
+  }
+  if (!isEqual(timeValues[1], "none")) {
+    filtering.finishedTime.lte = new Date(timeValues[1]);
+  }
+
+  // quantity, brokerage, spendOrGain
+  const forLoopItems = ["quantity", "brokerage", "spendOrGain"];
+  for (let i = 0; i < 3; i++) {
+    const item = forLoopItems[i];
+    const values = filters[item].split("_to_");
+
+    filtering[item] = {};
+
+    if (!isEqual(values[0], "none")) {
+      filtering[item].gte = parseInt(values[0], 10);
+    }
+    if (!isEqual(values[1], "none")) {
+      filtering[item].lte = parseInt(values[1], 10);
+    }
+  }
+
+  return filtering;
 };
 
 const createRedisValueFromMarketHoliday = (marketHoliday) => {
@@ -198,6 +311,13 @@ module.exports = {
   parseCachedShareProfile,
 
   createRedisValueFromFinishedTransaction,
+
+  // Transactions History Filters
+  createRedisValueFromTransactionsHistoryFilters,
+  parseRedisTransactionsHistoryFilters,
+  //
+
+  createPrismaFiltersObject,
 
   createRedisValueFromMarketHoliday,
 

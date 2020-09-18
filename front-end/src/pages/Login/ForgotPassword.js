@@ -15,15 +15,11 @@ import {
   changePassword,
 } from "../../utils/UserUtil";
 
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
+import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
+import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
 
-import PasswordTextField from "../../components/TextField/PasswordTextField";
-import NormalTextField from "../../components/TextField/NormalTextField";
+import { withStyles } from "@material-ui/core/styles";
+import { Paper, Typography, Button, Grid, Container } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -138,6 +134,9 @@ const styles = (theme) => ({
     borderRadius: "40px",
     color: "white",
     fontWeight: "bold",
+  },
+  form: {
+    flexDirection: "column",
   },
 });
 
@@ -331,40 +330,17 @@ class ForgotPassword extends React.Component {
                 alt="Bibliko"
               />
               {!this.shouldShowSuccessOnly() && (
-                <Typography className={classes.instruction}>
-                  Please enter your email and we’ll send you a code.
-                </Typography>
-              )}
-              {!this.shouldShowSuccessOnly() && (
-                <Grid
-                  item
-                  xs
-                  container
-                  direction="column"
-                  className={classes.mainGridOfPaper}
-                >
+                <React.Fragment>
+                  <Typography className={classes.instruction}>
+                    Please enter your email and we’ll send you a code.
+                  </Typography>
                   <Grid
                     item
                     xs
-                    className={classes.textFieldGrid}
                     container
                     direction="column"
+                    className={classes.mainGridOfPaper}
                   >
-                    <NormalTextField
-                      name="Email"
-                      changeData={this.changeEmail}
-                      enterData={this.enterEmail}
-                    />
-                    {allowButtonSendCode && (
-                      <Button
-                        onClick={this.sendCode}
-                        className={classes.buttonStyles}
-                      >
-                        Send
-                      </Button>
-                    )}
-                  </Grid>
-                  {allowCode && (
                     <Grid
                       item
                       xs
@@ -373,45 +349,77 @@ class ForgotPassword extends React.Component {
                       direction="column"
                     >
                       <NormalTextField
-                        name="Code"
-                        changeData={this.changeCode}
-                        enterData={this.enterCode}
+                        name="Email"
+                        changeData={this.changeEmail}
+                        enterData={this.enterEmail}
                       />
-                      <Button
-                        onClick={this.verifyCode}
-                        className={classes.buttonStyles}
-                      >
-                        Confirm
-                      </Button>
+                      {allowButtonSendCode && (
+                        <Button
+                          onClick={this.sendCode}
+                          className={classes.buttonStyles}
+                        >
+                          Send
+                        </Button>
+                      )}
                     </Grid>
-                  )}
-                  {allowPassword && (
-                    <Grid
-                      item
-                      xs
-                      container
-                      direction="column"
-                      className={classes.textFieldGrid}
-                    >
-                      <PasswordTextField
-                        name="Password"
-                        changePassword={this.changePassword}
-                        enterPassword={this.enterPassword}
-                      />
-                      <PasswordTextField
-                        name="Confirm Password"
-                        changePassword={this.changeConfirmPassword}
-                        enterPassword={this.enterPassword}
-                      />
-                      <Button
-                        onClick={this.submit}
-                        className={classes.buttonStyles}
+                    {allowCode && (
+                      <Grid
+                        item
+                        xs
+                        className={classes.textFieldGrid}
+                        container
+                        direction="column"
                       >
-                        Submit
-                      </Button>
-                    </Grid>
-                  )}
-                </Grid>
+                        <NormalTextField
+                          name="Code"
+                          changeData={this.changeCode}
+                          enterData={this.enterCode}
+                        />
+                        <Button
+                          onClick={this.verifyCode}
+                          className={classes.buttonStyles}
+                        >
+                          Confirm
+                        </Button>
+                      </Grid>
+                    )}
+                    {allowPassword && (
+                      <Grid
+                        item
+                        xs
+                        container
+                        direction="column"
+                        className={classes.textFieldGrid}
+                      >
+                        <form
+                          className={clsx(classes.center, classes.form)}
+                          noValidate
+                          autoComplete="on"
+                        >
+                          <input type="text" autoComplete="email" hidden />
+                          <PasswordTextField
+                            name="Password"
+                            changePassword={this.changePassword}
+                            enterPassword={this.enterPassword}
+                            createOrLogin="create"
+                          />
+                          <PasswordTextField
+                            name="Confirm Password"
+                            changePassword={this.changeConfirmPassword}
+                            enterPassword={this.enterPassword}
+                            createOrLogin="create"
+                          />
+                        </form>
+                        <Button
+                          onClick={this.submit}
+                          className={classes.buttonStyles}
+                        >
+                          Submit
+                        </Button>
+                      </Grid>
+                    )}
+                  </Grid>
+                </React.Fragment>
               )}
               {!isEmpty(error) && (
                 <Grid item xs className={classes.center}>

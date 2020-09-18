@@ -8,8 +8,7 @@ import WatchlistTableContainer from "../../components/Table/WatchlistTable/Watch
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
+import { Container, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {

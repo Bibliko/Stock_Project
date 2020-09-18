@@ -149,11 +149,12 @@ router.get("/getUserTransactionsHistory", (req, res) => {
     rowsLengthChoices, // required, min to max
     page, // required
     rowsPerPage, // required
-    searchBy, // 'none' or 'type' or 'companyCode'
-    searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+    filters, // Example in ParserUtil createRedisValueFromTransactionsHistoryFilters
     orderBy, // 'none' or '...'
     orderQuery // 'none' or 'desc' or 'asc'
   } = req.query;
+
+  const filtersJSON = JSON.parse(filters);
 
   const pageInteger = parseInt(page, 10);
   const rowsPerPageInteger = parseInt(rowsPerPage, 10);
@@ -180,8 +181,7 @@ router.get("/getUserTransactionsHistory", (req, res) => {
   searchAndUpdateTransactionsHistoryM5RU(
     email,
     numberOfChunksSkipped,
-    searchBy,
-    searchQuery,
+    filtersJSON,
     orderBy,
     orderQuery
   )
@@ -191,8 +191,7 @@ router.get("/getUserTransactionsHistory", (req, res) => {
           email,
           chunkSize,
           numberOfChunksSkipped,
-          searchBy,
-          searchQuery,
+          filtersJSON,
           orderBy,
           orderQuery
         );
@@ -204,17 +203,12 @@ router.get("/getUserTransactionsHistory", (req, res) => {
           createOrOverwriteTransactionsHistoryM5RUItemRedisKey(
             email,
             numberOfChunksSkipped,
-            searchBy,
-            searchQuery,
+            filtersJSON,
             orderBy,
             orderQuery,
             new100TransactionsFromPrisma
           ),
-          getLengthUserTransactionsHistoryForRedisM5RU(
-            email,
-            searchBy,
-            searchQuery
-          )
+          getLengthUserTransactionsHistoryForRedisM5RU(email, filtersJSON)
         ]);
       }
     })
@@ -224,8 +218,7 @@ router.get("/getUserTransactionsHistory", (req, res) => {
         return addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey(
           email,
           numberOfChunksSkipped,
-          searchBy,
-          searchQuery,
+          filtersJSON,
           orderBy,
           orderQuery,
           transactionsHistoryLength
@@ -236,8 +229,7 @@ router.get("/getUserTransactionsHistory", (req, res) => {
       return getTransactionsHistoryItemInM5RU(
         email,
         numberOfChunksSkipped,
-        searchBy,
-        searchQuery,
+        filtersJSON,
         orderBy,
         orderQuery
       );

@@ -3,16 +3,18 @@ import { isEmpty } from "lodash";
 
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
-import Popper from "@material-ui/core/Popper";
-import Fade from "@material-ui/core/Fade";
-import Paper from "@material-ui/core/Paper";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import MenuList from "@material-ui/core/MenuList";
-import MenuItem from "@material-ui/core/MenuItem";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
+import {
+  Popper,
+  Fade,
+  Paper,
+  ClickAwayListener,
+  MenuList,
+  MenuItem,
+  LinearProgress,
+  Typography,
+  Grid,
+} from "@material-ui/core";
 
 const styles = (theme) => ({
   popperSearch: {

@@ -15,12 +15,9 @@ import AccountSummaryChart from "../../components/Chart/AccountSummaryChart";
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import { Typography } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
+import { Container, Grid, Typography, Paper } from "@material-ui/core";
 
-import StorefrontRoundedIcon from "@material-ui/icons/StorefrontRounded";
+import { StorefrontRounded as StorefrontRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
@@ -80,13 +77,13 @@ const styles = (theme) => ({
     marginBottom: "20px",
   },
   summary: {
-    color: "#DC3D4A",
+    color: theme.palette.bigTitle.red,
   },
   holdings: {
-    color: "#4d36ff",
+    color: theme.palette.bigTitle.purple,
   },
   portfolioChart: {
-    color: "#2F80ED",
+    color: theme.palette.bigTitle.blue,
   },
   paperAccountSummary: {
     display: "flex",

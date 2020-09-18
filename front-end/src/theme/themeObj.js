@@ -17,10 +17,15 @@ const theme = {
   customMargin: {
     topLayout: "80px",
     topLayoutSmall: "70px",
+
+    topFloatingToolButton: "110px",
+    smallTopFloatingToolButton: "100px",
+
+    dialogItemsTransactionsHistoryFilters: "20px",
   },
   customZIndex: {
     reminder: 10,
-    countdown: 5,
+    floatingToolButton: 5,
     floatingActionButton: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchFieldContainer: 1000,
@@ -75,6 +80,12 @@ const theme = {
 
     fail: {
       main: "#DC3D4A",
+    },
+
+    bigTitle: {
+      purple: "rgba(110, 80, 240, 1)",
+      blue: "rgba(47, 128, 237, 1)",
+      red: "rgba(220, 61, 74, 1)",
     },
 
     gradientPaper: {

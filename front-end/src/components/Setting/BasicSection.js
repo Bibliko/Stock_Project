@@ -2,8 +2,8 @@ import React from "react";
 
 import clsx from "clsx";
 
-import SettingNormalTextField from "../TextField/SettingNormalTextField";
-import DatePickerTextField from "../TextField/DatePickerTextField";
+import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
+import DatePickerTextField from "../TextField/DatePickerTextFields/SettingDatePickerTextField";
 import SelectBox from "../SelectBox/SelectBox";
 
 import { withStyles } from "@material-ui/core/styles";

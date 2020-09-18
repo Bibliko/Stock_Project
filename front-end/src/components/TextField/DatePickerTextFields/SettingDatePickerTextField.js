@@ -2,11 +2,9 @@ import React from "react";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
+import { TextField, InputAdornment, IconButton } from "@material-ui/core";
 
-import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import { EditRounded as EditRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   textField: {
@@ -43,7 +41,7 @@ const styles = (theme) => ({
   },
 });
 
-class DatePickerTextField extends React.Component {
+class SettingDatePickerTextField extends React.Component {
   state = {
     onHover: false,
   };
@@ -107,4 +105,4 @@ class DatePickerTextField extends React.Component {
   }
 }
 
-export default withStyles(styles)(DatePickerTextField);
+export default withStyles(styles)(SettingDatePickerTextField);

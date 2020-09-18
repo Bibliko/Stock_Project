@@ -2,7 +2,10 @@ import axios from "axios";
 import { isEmpty, isEqual } from "lodash";
 
 import { getBackendHost } from "./low-dependency/NetworkUtil";
-import { getParsedCachedSharesList, getManyStockInfos } from "./RedisUtil";
+import {
+  getParsedCachedSharesList,
+  getManyStockInfosUsingPrismaShares,
+} from "./RedisUtil";
 
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
@@ -208,8 +211,7 @@ export const getUserTransactionsHistory = (
   rowsLengthChoices,
   page,
   rowsPerPage,
-  searchBy,
-  searchQuery,
+  filters,
   orderBy,
   orderQuery
 ) => {
@@ -229,8 +231,7 @@ export const getUserTransactionsHistory = (
         rowsLengthChoices, // required, min to max
         page, // required
         rowsPerPage, // required
-        searchBy, // 'none' or 'type' or 'companyCode'
-        searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+        filters,
         orderBy, // 'none' or '...'
         orderQuery, // 'none' or 'desc' or 'asc
       },
@@ -320,7 +321,10 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
           return [[], []];
         } else {
           if (!isMarketClosed) {
-            return Promise.all([getManyStockInfos(shares), shares]);
+            return Promise.all([
+              getManyStockInfosUsingPrismaShares(shares),
+              shares,
+            ]);
           } else {
             return [shares, shares];
           }

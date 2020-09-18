@@ -12,14 +12,14 @@ import {
 
 import { withStyles } from "@material-ui/core/styles";
 
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@material-ui/lab";
 
-import MenuRoundedIcon from "@material-ui/icons/MenuRounded";
-import CloseRoundedIcon from "@material-ui/icons/CloseRounded";
-import TimerIcon from "@material-ui/icons/Timer";
-import TimerOffIcon from "@material-ui/icons/TimerOff";
+import {
+  MenuRounded as MenuRoundedIcon,
+  CloseRounded as CloseRoundedIcon,
+  Timer as TimerIcon,
+  TimerOff as TimerOffIcon,
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   speedDial: {
@@ -27,25 +27,21 @@ const styles = (theme) => ({
     bottom: "16px",
     right: "16px",
     zIndex: theme.customZIndex.floatingActionButton,
-    [theme.breakpoints.down("xs")]: {
-      width: "40px",
-    },
     "& .MuiFab-primary": {
       backgroundColor: theme.palette.layoutSpeedDial.main,
-      [theme.breakpoints.down("xs")]: {
-        height: "50px",
-        width: "50px",
+      height: "45px",
+      width: "45px",
+    },
+    "&.MuiSpeedDial-directionUp": {
+      "& .MuiSpeedDial-actions": {
+        paddingBottom: "40px",
       },
     },
   },
   speedDialButton: {
     color: "white",
-    height: "56px",
-    width: "56px",
-    [theme.breakpoints.down("xs")]: {
-      height: "50px",
-      width: "50px",
-    },
+    height: "40px",
+    width: "40px",
     backgroundColor: theme.palette.layoutSpeedDial.main,
     "&:hover": {
       backgroundColor: theme.palette.layoutSpeedDial.onHover,
@@ -64,14 +60,16 @@ class LayoutSpeedDial extends React.Component {
   marketCountdownInterval;
 
   handleOpen = (event, reason) => {
-    if (!isEqual(reason, "mouseEnter")) {
-      this.setState({ open: true });
-    }
+    // if (!isEqual(reason, "mouseEnter")) {
+    //   this.setState({ open: true });
+    // }
+    this.setState({ open: true });
   };
   handleClose = (event, reason) => {
-    if (!isEqual(reason, "mouseLeave")) {
-      this.setState({ open: false });
-    }
+    // if (!isEqual(reason, "mouseLeave")) {
+    //   this.setState({ open: false });
+    // }
+    this.setState({ open: false });
   };
 
   openMarketTimeDialog = () => {

@@ -34,14 +34,15 @@ const {
   createSymbolsStringFromCachedSharesList,
   createRedisValueFromMarketHoliday,
   createRedisValueFromFinishedTransaction,
-  combineFMPStockQuoteAndProfile
+  combineFMPStockQuoteAndProfile,
+  createRedisValueFromTransactionsHistoryFilters
 } = require("./low-dependency/ParserUtil");
 
 /**
  * Keys list:
  * - '${email}|transactionsHistoryList': list
  * - '${email}|transactionsHistoryM5RU': list -> Most 5 recently used
- * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy|orderQuery': list
+ * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery': list
  * - '${email}|passwordVerification': value
  * - '${email}|accountSummaryChart': list
  * - '${email}|sharesList': list
@@ -154,13 +155,12 @@ const updateTransactionsHistoryListWholeList = (
 
 /**
  * 'doanhtu07@gmail.com|transactionsHistoryM5RU' :
- * List -> "numberOfChunksSkipped|searchBy|searchQuery|orderBy"
+ * List -> "numberOfChunksSkipped|filtersString|orderBy|orderQuery"
  */
 const isInTransactionsHistoryM5RU = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery // 'none' or 'desc' or 'asc'
 ) => {
@@ -169,7 +169,10 @@ const isInTransactionsHistoryM5RU = (
 
     listRangeAsync(redisKey, 0, -1)
       .then((M5RUList) => {
-        const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+        const filtersString = createRedisValueFromTransactionsHistoryFilters(
+          filters
+        );
+        const valueString = `${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
         resolve(M5RUList.indexOf(valueString));
       })
       .catch((err) => {
@@ -180,14 +183,16 @@ const isInTransactionsHistoryM5RU = (
 const pushNewestItemAndDeleteOldItemToTransactionsHistoryM5RU = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery // 'none' or 'desc' or 'asc'
 ) => {
   return new Promise((resolve, reject) => {
     const redisKey = `${email}|transactionsHistoryM5RU`;
-    const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+    const filtersString = createRedisValueFromTransactionsHistoryFilters(
+      filters
+    );
+    const valueString = `${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
 
     listLeftPushAsync(redisKey, valueString)
       .then((M5RUListLength) => {
@@ -213,15 +218,17 @@ const pushNewestItemAndDeleteOldItemToTransactionsHistoryM5RU = (
 const reorganizeTransactionsHistoryM5RU = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery, // 'none' or 'desc' or 'asc'
   M5RUList // required
 ) => {
   return new Promise((resolve, reject) => {
     const redisKey = `${email}|transactionsHistoryM5RU`;
-    const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+    const filtersString = createRedisValueFromTransactionsHistoryFilters(
+      filters
+    );
+    const valueString = `${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
 
     delAsync(redisKey)
       .then((finishedDeletingOldTransactionsHistoryM5RU) => {
@@ -255,8 +262,7 @@ const reorganizeTransactionsHistoryM5RU = (
 const searchAndUpdateTransactionsHistoryM5RU = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery // 'none' or 'desc' or 'asc'
 ) => {
@@ -264,7 +270,11 @@ const searchAndUpdateTransactionsHistoryM5RU = (
     const redisKey = `${email}|transactionsHistoryM5RU`;
     listRangeAsync(redisKey, 0, -1)
       .then((M5RUList) => {
-        const valueString = `${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+        const filtersString = createRedisValueFromTransactionsHistoryFilters(
+          filters
+        );
+
+        const valueString = `${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
         const index = M5RUList.indexOf(valueString);
 
         if (index !== 0) {
@@ -273,8 +283,7 @@ const searchAndUpdateTransactionsHistoryM5RU = (
               pushNewestItemAndDeleteOldItemToTransactionsHistoryM5RU(
                 email,
                 numberOfChunksSkipped,
-                searchBy,
-                searchQuery,
+                filters,
                 orderBy,
                 orderQuery
               ),
@@ -285,8 +294,7 @@ const searchAndUpdateTransactionsHistoryM5RU = (
               reorganizeTransactionsHistoryM5RU(
                 email,
                 numberOfChunksSkipped,
-                searchBy,
-                searchQuery,
+                filters,
                 orderBy,
                 orderQuery,
                 M5RUList
@@ -311,22 +319,24 @@ const searchAndUpdateTransactionsHistoryM5RU = (
 };
 
 /**
- * 'doanhtu07@gmail.com|transactionsHistoryM5RU|numberOfChunksSkipped|searchBy|searchQuery|orderBy' :
+ * 'doanhtu07@gmail.com|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' :
  * List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID"
  *
- * - Special Note: First element of the list is length of transactions history that fits the description attributes (searchBy, searchQuery, ...)
+ * - Special Note: First element of the list is length of transactions history that fits the description attributes
  */
 const createOrOverwriteTransactionsHistoryM5RUItemRedisKey = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery, // 'none' or 'desc' or 'asc'
   prismaTransactionsHistory // array of prisma finished transactions, required
 ) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+    const filtersString = createRedisValueFromTransactionsHistoryFilters(
+      filters
+    );
+    const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
     delAsync(redisKey)
       .then((finishedDeletingOldTransactionsHistoryM5RUItem) => {
         const tasksList = [];
@@ -356,25 +366,27 @@ const createOrOverwriteTransactionsHistoryM5RUItemRedisKey = (
 const addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery, // 'none' or 'desc' or 'asc'
   transactionsHistoryLength
 ) => {
-  const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+  const filtersString = createRedisValueFromTransactionsHistoryFilters(filters);
+  const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
   return listLeftPushAsync(redisKey, transactionsHistoryLength);
 };
 const getTransactionsHistoryItemInM5RU = (
   email,
   numberOfChunksSkipped, // required
-  searchBy, // 'none' or 'type' or 'companyCode'
-  searchQuery, // 'none' or 'buy'/'sell' or RANDOM
+  filters, // example in ParserUtil createRedisValueFromTransactionsHistoryFilters
   orderBy, // 'none' or '...'
   orderQuery // 'none' or 'desc' or 'asc'
 ) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${searchBy}|${searchQuery}|${orderBy}|${orderQuery}`;
+    const filtersString = createRedisValueFromTransactionsHistoryFilters(
+      filters
+    );
+    const redisKey = `${email}|transactionsHistoryM5RU|${numberOfChunksSkipped}|${filtersString}|${orderBy}|${orderQuery}`;
     listRangeAsync(redisKey, 0, -1)
       .then((transactionsHistoryM5RUItem) => {
         resolve(transactionsHistoryM5RUItem);
