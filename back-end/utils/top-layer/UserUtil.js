@@ -81,7 +81,7 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
-    prisma.RankingTimestamp.findOne({
+    prisma.rankingTimestamp.findOne({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
@@ -90,7 +90,7 @@ const createRankingTimestampIfNecessary = (user) => {
         }
       }).then((timestamp) => {
         if (!timestamp) {
-          prisma.RankingTimestamp.create({
+          prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
               UTCDateKey: getFullDateUTCString(newDate()),
