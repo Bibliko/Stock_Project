@@ -4,10 +4,18 @@ const {
   getYearUTCString
 } = require("../low-dependency/DayTimeUtil");
 
-const { PrismaClient } = require("@prisma/client");
+const {
+  PrismaClient
+} = require("@prisma/client");
 const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("../../redis/redis-client");
-const { isEqual, isEmpty } = require("lodash");
+const {
+  keysAsync,
+  delAsync
+} = require("../../redis/redis-client");
+const {
+  isEqual,
+  isEmpty
+} = require("lodash");
 
 const {
   isMarketClosedCheck,
@@ -72,6 +80,43 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
   });
 };
 
+const createRankingTimestampIfNecessary = (user) => {
+  return new Promise((resolve, reject) => {
+    prisma.rankingTimestamp.findOne({
+        where: {
+          UTCDateKey_userID: {
+            UTCDateKey: getFullDateUTCString(newDate()),
+            userID: user.id
+          }
+        }
+      }).then((timestamp) => {
+        if (!timestamp) {
+          prisma.rankingTimestamp.create({
+            data: {
+              UTCDateString: newDate(),
+              UTCDateKey: getFullDateUTCString(newDate()),
+              year: getYearUTCString(newDate()),
+              ranking: user.ranking,
+              regionalRanking: user.regionalRanking,
+              user: {
+                connect: {
+                  id: user.id
+                }
+              }
+            }
+          })
+        }
+      })
+      .then(() => {
+        console.log("Finished finding and creating timestamp");
+        resolve("Finished finding and creating timestamp");
+      })
+      .catch((err) => {
+        reject(err);
+      })
+  });
+}
+
 const updateRankingList = () => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
@@ -93,11 +138,9 @@ const updateRankingList = () => {
           totalPortfolio: true,
           region: true
         },
-        orderBy: [
-          {
-            totalPortfolio: "desc"
-          }
-        ]
+        orderBy: [{
+          totalPortfolio: "desc"
+        }]
       });
     })
     .then((usersArray) => {
@@ -152,11 +195,9 @@ const updateAllUsers = () => {
         id: true,
         totalPortfolio: true
       },
-      orderBy: [
-        {
-          totalPortfolio: "desc"
-        }
-      ]
+      orderBy: [{
+        totalPortfolio: "desc"
+      }]
     })
     .then((usersArray) => {
       console.log(
@@ -172,11 +213,11 @@ const updateAllUsers = () => {
             totalPortfolioLastClosure: user.totalPortfolio
           }
         });
-        const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
-          user
-        );
 
-        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise]);
+        const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(user);
+        const accountRankingPromise = createRankingTimestampIfNecessary(user)
+
+        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise, accountRankingPromise]);
       });
       return Promise.all(updateAllUsersPromise);
     })
@@ -238,7 +279,6 @@ const getChunkUserTransactionsHistoryForRedisM5RU = (
 ) => {
   // Each transactions history page has 10 items, but we cache beforehand 100 items
   return new Promise((resolve, reject) => {
-    // Filter
     const filtering = createPrismaFiltersObject(filters);
 
     // Order
@@ -293,6 +333,8 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
       });
   });
 };
+
+
 
 module.exports = {
   deleteExpiredVerification,
