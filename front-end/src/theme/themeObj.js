@@ -99,6 +99,11 @@ const theme = {
       whiteColor: "rgba(255, 255, 255, 0.3)",
     },
 
+    refreshSnackbar: {
+      main: "rgba(80, 60, 210, 1)",
+      reloadButton: "rgba(40, 180, 260, 1)",
+    },
+
     layoutSpeedDial: {
       main: "rgba(74, 50, 209, 1)",
       onHover: "rgba(90, 70, 220, 1)",

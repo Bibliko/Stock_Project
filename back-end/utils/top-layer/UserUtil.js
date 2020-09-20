@@ -1,28 +1,19 @@
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const { keysAsync, delAsync } = require("../../redis/redis-client");
+const { isEqual, isEmpty } = require("lodash");
+
+const {
+  redisUpdateOverallRankingList,
+  redisUpdateRegionalRankingList
+} = require("../redis-utils/RedisUtil");
+
 const {
   newDate,
   getFullDateUTCString,
   getYearUTCString
 } = require("../low-dependency/DayTimeUtil");
 
-const {
-  PrismaClient
-} = require("@prisma/client");
-const prisma = new PrismaClient();
-const {
-  keysAsync,
-  delAsync
-} = require("../../redis/redis-client");
-const {
-  isEqual,
-  isEmpty
-} = require("lodash");
-
-const {
-  isMarketClosedCheck,
-
-  redisUpdateOverallRankingList,
-  redisUpdateRegionalRankingList
-} = require("../RedisUtil");
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
 
 const deleteExpiredVerification = () => {
@@ -71,8 +62,8 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
         }
       })
       .then(() => {
-        console.log("Finished finding and creating timestamp");
-        resolve("Finished finding and creating timestamp");
+        console.log("Finished finding and creating account summary timestamp");
+        resolve("Finished finding and creating account summary timestamp");
       })
       .catch((err) => {
         reject(err);
@@ -82,14 +73,16 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
-    prisma.rankingTimestamp.findOne({
+    prisma.rankingTimestamp
+      .findOne({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
             userID: user.id
           }
         }
-      }).then((timestamp) => {
+      })
+      .then((timestamp) => {
         if (!timestamp) {
           prisma.rankingTimestamp.create({
             data: {
@@ -104,20 +97,26 @@ const createRankingTimestampIfNecessary = (user) => {
                 }
               }
             }
-          })
+          });
         }
       })
       .then(() => {
-        console.log("Finished finding and creating timestamp");
-        resolve("Finished finding and creating timestamp");
+        console.log("Finished finding and creating ranking timestamp");
+        resolve("Finished finding and creating ranking timestamp");
       })
       .catch((err) => {
         reject(err);
-      })
+      });
   });
-}
+};
 
-const updateRankingList = () => {
+/**
+ * @description_1 Update ranking and regional of each user in server.
+ * @description_2 Update both data in database and in cache.
+ * @description_3 Switch globalBackendVariables updatedRankingList flag whenever finished.
+ * @param globalBackendVariables Is in back-end/index.js
+ */
+const updateRankingList = (globalBackendVariables) => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
       if (!isEmpty(keysList)) {
@@ -138,9 +137,11 @@ const updateRankingList = () => {
           totalPortfolio: true,
           region: true
         },
-        orderBy: [{
-          totalPortfolio: "desc"
-        }]
+        orderBy: [
+          {
+            totalPortfolio: "desc"
+          }
+        ]
       });
     })
     .then((usersArray) => {
@@ -176,6 +177,7 @@ const updateRankingList = () => {
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
+      globalBackendVariables.updatedRankingListFlag = !globalBackendVariables.updatedRankingListFlag;
       console.log("Successfully updated all users ranking\n");
     })
     .catch((err) => {
@@ -183,9 +185,14 @@ const updateRankingList = () => {
     });
 };
 
-const updateAllUsers = () => {
-  // update portfolioLastClosure and ranking for all users
-
+//
+/**
+ * @description_1 Update portfolioLastClosure and ranking for all users in server
+ * @description_2 Update data in database.
+ * @description_3 Switch globalBackendVariables updatedAllUsers flag whenever finished.
+ * @param globalBackendVariables Is in back-end/index.js
+ */
+const updateAllUsers = (globalBackendVariables) => {
   prisma.user
     .findMany({
       where: {
@@ -195,9 +202,11 @@ const updateAllUsers = () => {
         id: true,
         totalPortfolio: true
       },
-      orderBy: [{
-        totalPortfolio: "desc"
-      }]
+      orderBy: [
+        {
+          totalPortfolio: "desc"
+        }
+      ]
     })
     .then((usersArray) => {
       console.log(
@@ -214,14 +223,21 @@ const updateAllUsers = () => {
           }
         });
 
-        const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(user);
-        const accountRankingPromise = createRankingTimestampIfNecessary(user)
+        const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
+          user
+        );
+        const accountRankingPromise = createRankingTimestampIfNecessary(user);
 
-        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise, accountRankingPromise]);
+        return Promise.all([
+          updatePortfolioLastClosure,
+          accountSummaryPromise,
+          accountRankingPromise
+        ]);
       });
       return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
+      globalBackendVariables.updatedAllUsersFlag = !globalBackendVariables.updatedAllUsersFlag;
       console.log(
         "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp\n"
       );
@@ -232,41 +248,31 @@ const updateAllUsers = () => {
 };
 
 /**
- * objVariables: object passed in from back-end/index
+ * @description_1 Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @param globalBackendVariables object passed in from back-end/index
  */
-const checkAndUpdateAllUsers = (objVariables) => {
-  if (!objVariables.isPrismaMarketHolidaysInitialized) {
+const checkAndUpdateAllUsers = (globalBackendVariables) => {
+  if (!globalBackendVariables.isPrismaMarketHolidaysInitialized) {
     return;
   }
 
-  isMarketClosedCheck()
-    .then((checkResult) => {
-      // check if market is closed and update the status of objVariables
-      if (!isEqual(checkResult, objVariables.isMarketClosed)) {
-        objVariables.isMarketClosed = checkResult;
-      }
+  // if market is closed but flag hasUpdatedAllUsersToday is still false
+  // -> change it to true AND updatePortfolioLastClosure
+  if (
+    globalBackendVariables.isMarketClosed &&
+    !globalBackendVariables.hasUpdatedAllUsersToday
+  ) {
+    globalBackendVariables.hasUpdatedAllUsersToday = true;
+    updateAllUsers(globalBackendVariables);
+  }
 
-      // if market is closed but flag isAlreadyUpdate is still false
-      // -> change it to true AND updatePortfolioLastClosure
-      if (
-        objVariables.isMarketClosed &&
-        !objVariables.isAlreadyUpdateAllUsers
-      ) {
-        objVariables.isAlreadyUpdateAllUsers = true;
-        updateAllUsers();
-      }
-
-      // if market is opened but flag isAlreadyUpdate not switch to false yet -> change it to false
-      if (
-        !objVariables.isMarketClosed &&
-        objVariables.isAlreadyUpdateAllUsers
-      ) {
-        objVariables.isAlreadyUpdateAllUsers = false;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  // if market is opened but flag hasUpdatedAllUsersToday not switch to false yet -> change it to false
+  if (
+    !globalBackendVariables.isMarketClosed &&
+    globalBackendVariables.hasUpdatedAllUsersToday
+  ) {
+    globalBackendVariables.hasUpdatedAllUsersToday = false;
+  }
 };
 
 const getChunkUserTransactionsHistoryForRedisM5RU = (
@@ -333,8 +339,6 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
       });
   });
 };
-
-
 
 module.exports = {
   deleteExpiredVerification,

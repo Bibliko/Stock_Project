@@ -340,9 +340,12 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
   });
 };
 
-/** Usage setupSocketToCheckStockQuotes
- * Set up Socket Check Stock Quotes for user
- * Use in front-end/src/pages/Main/AccountSummary
+/**
+ * @description_1 Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
+ * @description_2 mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
+ * @param isMarketClosed redux boolean check if market is closed
+ * @param userSession redux userSession -> user data initialized using back-end
+ * @param mutateUser redux function to mutate redux userSession
  */
 export const checkStockQuotesToCalculateSharesValue = (
   isMarketClosed,

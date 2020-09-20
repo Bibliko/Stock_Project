@@ -11,7 +11,8 @@ const {
   getTransactionsHistoryItemInM5RU,
   createOrOverwriteTransactionsHistoryM5RUItemRedisKey,
   addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey
-} = require("../utils/RedisUtil");
+} = require("../utils/redis-utils/TransactionsHistoryMost5RecentlyUsed");
+
 const {
   getChunkUserTransactionsHistoryForRedisM5RU,
   getLengthUserTransactionsHistoryForRedisM5RU

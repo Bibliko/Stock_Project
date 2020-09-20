@@ -27,7 +27,7 @@ const { FINANCIAL_MODELING_PREP_API_KEY } = process.env;
  *      }
  *  ]
  */
-const updateMarketHolidaysFromFMP = (objVariables) => {
+const updateMarketHolidaysFromFMP = (globalBackendVariables) => {
   var timeNow = newDate();
 
   var year = getYearUTCString(timeNow);
@@ -96,7 +96,7 @@ const updateMarketHolidaysFromFMP = (objVariables) => {
           "prisma market holidays updated FinancialModelingPrepUtil updateMarketHolidaysFromFMP.\n"
         );
 
-        objVariables.isPrismaMarketHolidaysInitialized = true;
+        globalBackendVariables.isPrismaMarketHolidaysInitialized = true;
 
         resolve("Successfully updated prisma market holidays");
       })

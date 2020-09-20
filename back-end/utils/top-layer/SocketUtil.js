@@ -1,25 +1,9 @@
-const { isMarketClosedCheck } = require("../RedisUtil");
-
 const checkMarketClosedString = "checkMarketClosed";
-
-const checkMarketClosed = (socket, objVariables) => {
-  if (!objVariables.isPrismaMarketHolidaysInitialized) {
-    console.log("SocketUtil, 70");
-    return;
-  }
-
-  isMarketClosedCheck()
-    .then((checkResult) => {
-      // console.log(checkResult);
-
-      socket.emit(checkMarketClosedString, checkResult);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+const updatedAllUsersFlag = "updatedAllUsersFlag";
+const updatedRankingListFlag = "updatedRankingListFlag";
 
 module.exports = {
   checkMarketClosedString,
-  checkMarketClosed
+  updatedAllUsersFlag,
+  updatedRankingListFlag
 };
