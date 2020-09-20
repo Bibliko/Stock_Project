@@ -16,10 +16,18 @@ import { oneMinute, newDate } from "../../utils/low-dependency/DayTimeUtil";
 import {
   checkMarketClosed,
   socketCheckMarketClosed,
+  updatedAllUsersFlag,
+  updatedRankingListFlag,
   offSocketListeners,
+  checkIsDifferentFromSocketUpdatedAllUsersFlag,
+  checkIsDifferentFromSocketUpdatedRankingListFlag,
 } from "../../utils/SocketUtil";
 
 import { updateCachedAccountSummaryChartInfoOneItem } from "../../utils/RedisUtil";
+
+import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
+
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import AppBar from "./AppBar";
 import Reminder from "../Reminder/Reminder";
@@ -27,9 +35,11 @@ import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { CssBaseline } from "@material-ui/core";
+import { CssBaseline, Snackbar, Button, IconButton } from "@material-ui/core";
 
 import { Skeleton } from "@material-ui/lab";
+
+import { Close as CloseIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
@@ -84,16 +94,39 @@ const styles = (theme) => ({
     height: "100vh",
     backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
+  refreshCard: {
+    "& .MuiSnackbarContent-root": {
+      backgroundColor: theme.palette.refreshSnackbar.main,
+    },
+  },
+  reloadButton: {
+    color: theme.palette.refreshSnackbar.reloadButton,
+    fontWeight: "bold",
+  },
 });
 
 class Layout extends React.Component {
   state = {
     hideReminder: false,
     finishedSettingUp: false,
+
+    updatedAllUsersFlagFromLayout: false,
+    updatedRankingListFlagFromLayout: false,
+    openRefreshCard: false,
   };
 
   checkStockQuotesInterval;
   accountSummaryChartSeriesInterval;
+
+  handleCloseRefreshCard = () => {
+    this.setState({
+      openRefreshCard: false,
+    });
+  };
+
+  reloadLayout = () => {
+    window.location.reload();
+  };
 
   updateCachedAccountSummaryChartSeries = () => {
     const { email, totalPortfolio } = this.props.userSession;
@@ -125,6 +158,64 @@ class Layout extends React.Component {
     }
   };
 
+  setupUpdatedFlagsSocketListeners = () => {
+    const {
+      updatedAllUsersFlagFromLayout,
+      updatedRankingListFlagFromLayout,
+      openRefreshCard,
+    } = this.state;
+
+    const { hasFinishedSettingUp } = this.props.userSession;
+
+    socketCheckMarketClosed(
+      socket,
+      this.props.isMarketClosed,
+      this.props.mutateMarket
+    );
+
+    checkIsDifferentFromSocketUpdatedAllUsersFlag(
+      socket,
+      updatedAllUsersFlagFromLayout,
+      openRefreshCard,
+      hasFinishedSettingUp,
+      this.setState.bind(this)
+    );
+
+    checkIsDifferentFromSocketUpdatedRankingListFlag(
+      socket,
+      updatedRankingListFlagFromLayout,
+      openRefreshCard,
+      hasFinishedSettingUp,
+      this.setState.bind(this)
+    );
+  };
+
+  clearIntervalsAndListeners = () => {
+    clearInterval(this.checkStockQuotesInterval);
+    clearInterval(this.accountSummaryChartSeriesInterval);
+
+    offSocketListeners(socket, checkMarketClosed);
+    offSocketListeners(socket, updatedAllUsersFlag);
+    offSocketListeners(socket, updatedRankingListFlag);
+  };
+
+  resetIntervalsAndListeners = () => {
+    this.clearIntervalsAndListeners();
+    this.setupIntervals();
+    this.setupUpdatedFlagsSocketListeners();
+  };
+
+  afterSettingUpDataFromBackendCache = () => {
+    this.setState(
+      {
+        finishedSettingUp: true,
+      },
+      () => {
+        this.setupIntervals();
+      }
+    );
+  };
+
   componentDidMount() {
     console.log(this.props.userSession);
 
@@ -133,51 +224,55 @@ class Layout extends React.Component {
       return;
     }
 
-    if (this.props.userSession.hasFinishedSettingUp) {
-      mainSetup(
-        this.props.isMarketClosed,
-        this.props.userSession,
-        this.props.mutateUser
-      )
-        .then((finishedSettingUp) => {
-          this.setState({
-            finishedSettingUp: true,
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      this.setState({
-        finishedSettingUp: true,
+    getGlobalBackendVariablesFlags()
+      .then((flags) => {
+        const { updatedAllUsersFlag, updatedRankingListFlag } = flags;
+
+        this.setupUpdatedFlagsSocketListeners();
+
+        this.setState(
+          {
+            updatedAllUsersFlagFromLayout: updatedAllUsersFlag,
+            updatedRankingListFlagFromLayout: updatedRankingListFlag,
+          },
+          () => {
+            if (this.props.userSession.hasFinishedSettingUp) {
+              mainSetup(
+                this.props.isMarketClosed,
+                this.props.userSession,
+                this.props.mutateUser
+              )
+                .then((finishedSettingUp) => {
+                  this.afterSettingUpDataFromBackendCache();
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            } else {
+              this.afterSettingUpDataFromBackendCache();
+            }
+          }
+        );
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    }
-
-    socketCheckMarketClosed(
-      socket,
-      this.props.isMarketClosed,
-      this.props.mutateMarket
-    );
-
-    this.setupIntervals();
   }
 
   componentDidUpdate() {
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
     }
+    this.resetIntervalsAndListeners();
   }
 
   componentWillUnmount() {
-    clearInterval(this.checkStockQuotesInterval);
-    clearInterval(this.accountSummaryChartSeriesInterval);
-
-    offSocketListeners(socket, checkMarketClosed);
+    this.clearIntervalsAndListeners();
   }
 
   render() {
     const { classes } = this.props;
-    const { finishedSettingUp } = this.state;
+    const { finishedSettingUp, openRefreshCard } = this.state;
 
     if (shouldRedirectToLogin(this.props)) {
       return null;
@@ -203,6 +298,33 @@ class Layout extends React.Component {
             <div className={classes.bottomSpace} />
           </div>
         </main>
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={openRefreshCard}
+          className={classes.refreshCard}
+          autoHideDuration={10 * oneSecond}
+          onClose={this.handleCloseRefreshCard}
+          message="New Data. Refresh Page."
+          action={
+            <React.Fragment>
+              <Button
+                className={classes.reloadButton}
+                size="small"
+                onClick={this.reloadLayout}
+              >
+                RELOAD
+              </Button>
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={this.handleCloseRefreshCard}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </React.Fragment>
+          }
+        />
       </div>
     );
   }

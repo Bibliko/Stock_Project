@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { listPushAsync, listRangeAsync } = require("../redis/redis-client");
-const { getSingleCachedShareInfo } = require("../utils/RedisUtil");
+const {
+  getSingleCachedShareInfo
+} = require("../utils/redis-utils/SharesInfoBank");
 const {
   SequentialPromisesWithResultsArray
 } = require("../utils/low-dependency/PromisesUtil");

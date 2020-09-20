@@ -23,7 +23,7 @@ const {
   oneSecond,
   oneDay,
   oneMinute,
-  clearIntervals,
+  // clearIntervals,
   clearIntervalsIfIntervalsNotEmpty
 } = require("./utils/low-dependency/DayTimeUtil");
 
@@ -33,7 +33,15 @@ const {
   updateRankingList
 } = require("./utils/top-layer/UserUtil");
 
-const { checkMarketClosed } = require("./utils/top-layer/SocketUtil");
+const {
+  checkMarketClosedString,
+  updatedAllUsersFlag,
+  updatedRankingListFlag
+} = require("./utils/top-layer/SocketUtil");
+
+const {
+  checkMarketClosed
+} = require("./utils/top-layer/MainBackendIndexHelperUtil");
 
 const { deletePrismaMarketHolidays } = require("./utils/MarketHolidaysUtil");
 
@@ -44,19 +52,24 @@ const {
 const {
   cachePasswordVerificationCode,
   getParsedCachedPasswordVerificationCode,
-  removeCachedPasswordVerificationCode
+  removeCachedPasswordVerificationCode,
 
-  // updateCachedShareQuotesUsingCache,
-  // updateCachedShareProfilesUsingCache
-} = require("./utils/RedisUtil");
+  cleanUserCache
+} = require("./utils/redis-utils/RedisUtil");
+
+/*
+const {
+  updateCachedShareQuotesUsingCache,
+  updateCachedShareProfilesUsingCache
+} = require("./utils/redis-utils/SharesInfoBank");
+*/
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
 const express = require("express");
 const app = express();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { keysAsync, delAsync } = require("./redis/redis-client");
-const { isEmpty } = require("lodash");
+const { pick } = require("lodash");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -119,34 +132,48 @@ app.use(passport.session());
 setupPassport(passport);
 
 /**
- * objVariables allow us to change variables inside the object by using
+ * globalBackendVariables allow us to change variables inside the object by using
  * functions and passing in object as parameter
  */
-var objVariables = {
+var globalBackendVariables = {
   isMarketClosed: false,
-  isAlreadyUpdateAllUsers: false,
-  isPrismaMarketHolidaysInitialized: false
+  hasUpdatedAllUsersToday: false,
+  isPrismaMarketHolidaysInitialized: false,
+
+  updatedAllUsersFlag: false, // value true or false does not mean anything. This is just a flag
+  updatedRankingListFlag: false // value true or false does not mean anything. This is just a flag
 };
 
 setInterval(deleteExpiredVerification, oneDay);
 
 // This function to help initialize prisma market holidays at first run
-updateMarketHolidaysFromFMP(objVariables);
+updateMarketHolidaysFromFMP(globalBackendVariables);
 
 // Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
-setInterval(() => updateMarketHolidaysFromFMP(objVariables), oneDay);
+setInterval(() => updateMarketHolidaysFromFMP(globalBackendVariables), oneDay);
 setInterval(deletePrismaMarketHolidays, oneDay);
 
-// Check if market closed to update users portfolio last closure
-setInterval(() => checkAndUpdateAllUsers(objVariables), oneSecond);
+// Check Market Closed
+setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
 
-// Update Cached Shares
-// setInterval(() => updateCachedShareQuotesUsingCache(), 2 * oneSecond);
-// setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
+/* 
+Check if market closed to update users portfolio last closure.
+This interval will be moved to socket at the end of this file.
+*/
+setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
 
-// Update Ranking List after 10 minutes
-updateRankingList();
-setInterval(updateRankingList, 10 * oneMinute);
+/*
+Update Ranking List after 10 minutes
+This interval will be moved to socket at the end of this file.
+*/
+updateRankingList(globalBackendVariables);
+setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+
+/*
+Update Cached Shares
+setInterval(() => updateCachedShareQuotesUsingCache(), 2 * oneSecond);
+setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
+*/
 
 // All app routes are written below this comment:
 
@@ -257,7 +284,8 @@ app.post("/auth/signup", (req, res, next) => {
       .then((emailVerification) => {
         if (emailVerification) {
           const notification = {
-            message: "Processing (Can take a while). Check your inboxes."
+            message:
+              "Processing (Can take a while). Check your inboxes... and spams."
           };
           return res.status(202).send(notification);
         }
@@ -294,17 +322,8 @@ app.use("/user", (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  keysAsync(`${req.user.email}*`)
-    .then((values) => {
-      console.log(values);
-      if (!isEmpty(values)) {
-        return delAsync(values);
-      }
-    })
-    .then((numberOfKeysDeleted) => {
-      console.log(
-        `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys\n`
-      );
+  cleanUserCache(req.user.email)
+    .then((successful) => {
       req.logout();
       res.send("Successful");
     })
@@ -463,28 +482,53 @@ app.use("/marketHolidaysData", require("./routes/marketHolidays"));
 app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 
+app.use("/getGlobalBackendVariablesFlags", (_, res) => {
+  const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];
+  const flagsResult = pick(globalBackendVariables, flags);
+  res.send(flagsResult);
+});
+
 // set up socket.io server
-var intervalCheckMarketClosed;
 
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  console.log("New client connected\n");
+
+  let intervalSendMarketClosed = null;
+  let intervalSendUpdatedAllUsersFlag = null;
+  let intervalSendUpdatedRankingListFlag = null;
 
   // Join socket by user ID
-  socket.on("userConnected", socket.join);
-  socket.on("userDisconnected", socket.leave);
+  socket.on("userConnected\n", socket.join);
+  socket.on("userDisconnected\n", socket.leave);
 
   // disconnect
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
-    clearIntervals([intervalCheckMarketClosed]);
+    console.log("Client disconnected\n");
   });
 
-  clearIntervalsIfIntervalsNotEmpty([intervalCheckMarketClosed]);
+  clearIntervalsIfIntervalsNotEmpty([
+    intervalSendMarketClosed,
+    intervalSendUpdatedAllUsersFlag,
+    intervalSendUpdatedRankingListFlag
+  ]);
 
-  intervalCheckMarketClosed = setInterval(
-    () => checkMarketClosed(socket, objVariables),
-    oneSecond
-  );
+  intervalSendMarketClosed = setInterval(() => {
+    socket.emit(checkMarketClosedString, globalBackendVariables.isMarketClosed);
+  }, oneSecond);
+
+  intervalSendUpdatedAllUsersFlag = setInterval(() => {
+    socket.emit(
+      updatedAllUsersFlag,
+      globalBackendVariables.updatedAllUsersFlag
+    );
+  }, oneSecond);
+
+  intervalSendUpdatedRankingListFlag = setInterval(() => {
+    socket.emit(
+      updatedRankingListFlag,
+      globalBackendVariables.updatedRankingListFlag
+    );
+  }, oneSecond);
 });
 
 // back-end server listen
