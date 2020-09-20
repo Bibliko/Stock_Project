@@ -42,8 +42,7 @@ const {
  */
 
 /**
- * return true if market closed
- * else return false if market opened
+ * @returns true if market is closed, false if market is opened
  */
 const isMarketClosedCheck = () => {
   var timeNow = newDate();
@@ -89,7 +88,10 @@ const isMarketClosedCheck = () => {
 };
 
 /**
- * 'doanhtu07@gmail.com|passwordVerification' : 'secretCode|timestamp'
+ * @use Redis key 'email|passwordVerification' : 'secretCode|timestamp'
+ * @description Put verification code of user into cache section of that user
+ * @param email User email
+ * @param secretCode User randomly generated verification code
  */
 const cachePasswordVerificationCode = (email, secretCode) => {
   return new Promise((resolve, reject) => {
@@ -107,6 +109,10 @@ const cachePasswordVerificationCode = (email, secretCode) => {
   });
 };
 
+/**
+ * @description Get verification code from cache section of user
+ * @param email User email
+ */
 const getParsedCachedPasswordVerificationCode = (email) => {
   return new Promise((resolve, reject) => {
     const redisKey = `${email}|passwordVerification`;
@@ -129,20 +135,37 @@ const getParsedCachedPasswordVerificationCode = (email) => {
   });
 };
 
+/**
+ * @description Remove verification code cache section of user
+ * @param email User email
+ */
 const removeCachedPasswordVerificationCode = (email) => {
   const redisKey = `${email}|passwordVerification`;
   return delAsync(redisKey);
 };
 
+/**
+ * @description Add user into users ranking list
+ * @param user User object containing attributes as in Prisma User Model
+ */
 const redisUpdateOverallRankingList = (user) => {
   const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
   return listPushAsync("RANKING_LIST", value);
 };
+
+/**
+ * @description Add user into users ranking list of a specific region
+ * @param region Region: Africa, Asia, The Caribbean, Central America, Europe, North America, Oceania, South America
+ * @param user User object containing attributes as in Prisma User Model
+ */
 const redisUpdateRegionalRankingList = (region, user) => {
   const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
   return listPushAsync(`RANKING_LIST_${region}`, value);
 };
 
+/**
+ * @returns Market Holiday Object obtained from Cache
+ */
 const getCachedMarketHoliday = () => {
   return new Promise((resolve, reject) => {
     const redisKey = "cachedMarketHoliday";
@@ -158,6 +181,11 @@ const getCachedMarketHoliday = () => {
       });
   });
 };
+
+/**
+ * @description Cache market holiday object
+ * @param marketHoliday Market Holiday Object obtained from Database
+ */
 const updateCachedMarketHoliday = (marketHoliday) => {
   return new Promise((resolve, reject) => {
     const redisKey = "cachedMarketHoliday";
@@ -172,6 +200,10 @@ const updateCachedMarketHoliday = (marketHoliday) => {
   });
 };
 
+/**
+ * @description Clean all user's cache sections
+ * @param email User email
+ */
 const cleanUserCache = (email) => {
   return new Promise((resolve, reject) => {
     keysAsync(`${email}*`)
