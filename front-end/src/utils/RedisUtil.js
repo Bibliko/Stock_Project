@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getBackendHost } from "./low-dependency/NetworkUtil";
 import { parseRedisSharesListItem } from "./low-dependency/ParserUtil";
+import { newDate } from "./low-dependency/DayTimeUtil";
 
 const BACKEND_HOST = getBackendHost();
 
@@ -40,18 +41,20 @@ export const getLatestCachedAccountSummaryChartInfoItem = (email) => {
   });
 };
 
-export const updateCachedAccountSummaryChartInfoOneItem = (
-  email,
-  timestamp,
-  portfolioValue
-) => {
+/**
+ * @description Add new account summary timestamp to cache in back-end
+ * @param thisComponent reference of component (this) - in this case Layout.js
+ */
+export const updateCachedAccountSummaryChartInfoOneItem = (thisComponent) => {
   return new Promise((resolve, reject) => {
+    const { email, totalPortfolio } = thisComponent.props.userSession;
+
     axios(`${BACKEND_HOST}/redis/updateAccountSummaryChartOneItem`, {
       method: "put",
       data: {
         email,
-        timestamp,
-        portfolioValue,
+        timestamp: newDate(),
+        portfolioValue: totalPortfolio,
       },
       withCredentials: true,
     })

@@ -7,15 +7,12 @@ export const updatedRankingListFlag = "updatedRankingListFlag";
 /**
  * @description listen to socket from back-end and update redux isMarketClosed boolean
  * @param socket Initialized in App.js
- * @param mutateMarket redux function to change redux isMarketClosed boolean
+ * @param thisComponent reference of component (this)  - in this case Layout.js
  */
-export const socketCheckMarketClosed = (
-  socket,
-  isMarketClosedInReduxStore,
-  mutateMarket
-) => {
+export const socketCheckMarketClosed = (socket, thisComponent) => {
   socket.on(checkMarketClosed, (ifClosed) => {
-    if (!isEqual(ifClosed, isMarketClosedInReduxStore)) {
+    const { mutateMarket, isMarketClosed } = thisComponent.props;
+    if (!isEqual(ifClosed, isMarketClosed)) {
       if (ifClosed) {
         mutateMarket("closeMarket");
       } else {
@@ -28,23 +25,25 @@ export const socketCheckMarketClosed = (
 /**
  * @description listen to socket from back-end and check against Layout.js updatedAllUsersFlag
  * @param socket Initialized in App.js
- * @param openRefreshCard boolean from Layout state showing whether Refresh Card is shown or not
- * @param hasFinishedSettingUp boolean whether user has finished setting up account
- * @param setState allow after check, open notification in Layout for user to reset the page
+ * @param thisComponent reference of component (this) - in this case Layout.js
  */
 export const checkIsDifferentFromSocketUpdatedAllUsersFlag = (
   socket,
-  updatedAllUsersFlagFromLayoutState,
-  openRefreshCard,
-  hasFinishedSettingUp,
-  setState
+  thisComponent
 ) => {
   socket.on(updatedAllUsersFlag, (flagFromBackend) => {
+    const {
+      updatedAllUsersFlagFromLayout,
+      openRefreshCard,
+    } = thisComponent.state;
+    const { hasFinishedSettingUp } = thisComponent.props.userSession;
+
     if (
-      !isEqual(flagFromBackend, updatedAllUsersFlagFromLayoutState) &&
-      !openRefreshCard
+      !isEqual(flagFromBackend, updatedAllUsersFlagFromLayout) &&
+      !openRefreshCard &&
+      hasFinishedSettingUp
     ) {
-      setState({
+      thisComponent.setState({
         updatedAllUsersFlagFromLayout: flagFromBackend,
         openRefreshCard: true,
       });
@@ -55,23 +54,25 @@ export const checkIsDifferentFromSocketUpdatedAllUsersFlag = (
 /**
  * @description listen to socket from back-end and check against Layout.js updatedRankingFlag
  * @param socket Initialized in App.js
- * @param openRefreshCard boolean from Layout state showing whether Refresh Card is shown or not
- * @param hasFinishedSettingUp boolean whether user has finished setting up account
- * @param setState allow after check, open notification in Layout for user to reset the page
+ * @param thisComponent reference of component (this)  - in this case Layout.js
  */
 export const checkIsDifferentFromSocketUpdatedRankingListFlag = (
   socket,
-  updatedRankingListFlagFromLayoutState,
-  openRefreshCard,
-  hasFinishedSettingUp,
-  setState
+  thisComponent
 ) => {
   socket.on(updatedRankingListFlag, (flagFromBackend) => {
+    const {
+      updatedRankingListFlagFromLayout,
+      openRefreshCard,
+    } = thisComponent.state;
+    const { hasFinishedSettingUp } = thisComponent.props.userSession;
+
     if (
-      !isEqual(flagFromBackend, updatedRankingListFlagFromLayoutState) &&
-      !openRefreshCard
+      !isEqual(flagFromBackend, updatedRankingListFlagFromLayout) &&
+      !openRefreshCard &&
+      hasFinishedSettingUp
     ) {
-      setState({
+      thisComponent.setState({
         updatedRankingListFlagFromLayout: flagFromBackend,
         openRefreshCard: true,
       });

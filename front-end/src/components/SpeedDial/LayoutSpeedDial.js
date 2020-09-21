@@ -81,11 +81,7 @@ class LayoutSpeedDial extends React.Component {
 
   componentDidMount() {
     this.marketCountdownInterval = setInterval(
-      () =>
-        marketCountdownUpdate(
-          this.setState.bind(this),
-          this.props.isMarketClosed
-        ),
+      () => marketCountdownUpdate(this),
       oneSecond
     );
   }

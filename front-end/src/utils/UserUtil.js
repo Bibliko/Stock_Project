@@ -343,17 +343,14 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
 /**
  * @description_1 Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
  * @description_2 mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
- * @param isMarketClosed redux boolean check if market is closed
- * @param userSession redux userSession -> user data initialized using back-end
- * @param mutateUser redux function to mutate redux userSession
+ * @param thisComponent reference of component (this) - in this case Layout.js
  */
-export const checkStockQuotesToCalculateSharesValue = (
-  isMarketClosed,
-  userSession,
-  mutateUser
-) => {
+export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
+  const { isMarketClosed, mutateUser } = thisComponent.props;
+  const { email, cash, totalPortfolio } = thisComponent.props.userSession;
+
   // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-  checkStockQuotesForUser(isMarketClosed, userSession.email)
+  checkStockQuotesForUser(isMarketClosed, email)
     .then(([stockQuotesJSON, cachedShares]) => {
       const totalSharesValue = calculateTotalSharesValue(
         isMarketClosed,
@@ -361,7 +358,7 @@ export const checkStockQuotesToCalculateSharesValue = (
         cachedShares
       );
 
-      const newTotalPortfolioValue = userSession.cash + totalSharesValue;
+      const newTotalPortfolioValue = cash + totalSharesValue;
 
       /**
        * changeData so that when we reload page or go to other page, the data
@@ -374,9 +371,9 @@ export const checkStockQuotesToCalculateSharesValue = (
 
       if (
         newTotalPortfolioValue &&
-        !isEqual(newTotalPortfolioValue, userSession.totalPortfolio)
+        !isEqual(newTotalPortfolioValue, totalPortfolio)
       ) {
-        return changeUserData(dataNeedChange, userSession.email, mutateUser);
+        return changeUserData(dataNeedChange, email, mutateUser);
       } else {
         //console.log("No need to update user data.");
       }

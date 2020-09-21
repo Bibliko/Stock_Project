@@ -41,6 +41,12 @@ const {
  * - 'RANKING_LIST_${region}': list
  */
 
+const transactionsHistoryList = "transactionsHistoryList";
+const transactionsHistoryM5RU = "transactionsHistoryM5RU";
+const passwordVerification = "passwordVerification";
+const accountSummaryChart = "accountSummaryChart";
+const sharesList = "sharesList";
+
 /**
  * @returns true if market is closed, false if market is opened
  */
@@ -224,7 +230,26 @@ const cleanUserCache = (email) => {
   });
 };
 
+const cleanChosenUserCache = (email, chosenKey) => {
+  return new Promise((resolve, reject) => {
+    delAsync(`${email}|${chosenKey}`)
+      .then((successfullyCleanKey) => {
+        resolve("Successful");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 module.exports = {
+  // Keys
+  transactionsHistoryList,
+  transactionsHistoryM5RU,
+  passwordVerification,
+  accountSummaryChart,
+  sharesList,
+
   // Market Time
   isMarketClosedCheck,
 
@@ -241,5 +266,6 @@ module.exports = {
   getCachedMarketHoliday,
   updateCachedMarketHoliday,
 
-  cleanUserCache
+  cleanUserCache,
+  cleanChosenUserCache
 };
