@@ -15,31 +15,31 @@ import {
   newDate,
 } from "../../utils/low-dependency/DayTimeUtil";
 
-const setupSharesListForCaching = (isMarketClosed, userSession, mutateUser) => {
+const setupSharesListForCaching = (thisComponent) => {
+  const { email } = thisComponent.props.userSession;
+
   return new Promise((resolve, reject) => {
-    getCachedSharesList(userSession.email)
+    getCachedSharesList(email)
       .then((res) => {
         const { data: cachedShares } = res;
         if (isEmpty(cachedShares)) {
           const dataNeeded = {
             shares: true,
           };
-          return getUserData(dataNeeded, userSession.email);
+          return getUserData(dataNeeded, email);
         }
       })
       .then((sharesData) => {
         if (sharesData) {
           const { shares } = sharesData;
           if (shares && !isEmpty(shares)) {
-            return updateCachedSharesList(userSession.email, shares);
+            return updateCachedSharesList(email, shares);
           }
         }
       })
       .then((afterUpdatingCachedSharesList) => {
         // checkStockQuotesToCalculateSharesValue(
-        //   isMarketClosed,
-        //   userSession,
-        //   mutateUser
+        //   thisComponent
         // );
         resolve("Finished setting up Redis Shares List.");
       })
@@ -49,22 +49,24 @@ const setupSharesListForCaching = (isMarketClosed, userSession, mutateUser) => {
   });
 };
 
-const setupAccountSummaryChartForCaching = (userSession) => {
+const setupAccountSummaryChartForCaching = (thisComponent) => {
+  const { email } = thisComponent.props.userSession;
+
   return new Promise((resolve, reject) => {
-    getCachedAccountSummaryChartInfo(userSession.email)
+    getCachedAccountSummaryChartInfo(email)
       .then((res) => {
         const { data: chartInfo } = res;
         if (isEmpty(chartInfo)) {
           return getUserAccountSummaryChartTimestamps(
             getYearUTCString(newDate()) - 2,
-            userSession.email
+            email
           );
         }
       })
       .then((chartInfoFromDatabase) => {
         if (chartInfoFromDatabase && !isEmpty(chartInfoFromDatabase)) {
           return updateCachedAccountSummaryChartInfoWholeList(
-            userSession.email,
+            email,
             chartInfoFromDatabase
           );
         }
@@ -78,10 +80,13 @@ const setupAccountSummaryChartForCaching = (userSession) => {
   });
 };
 
-export const mainSetup = (isMarketClosed, userSession, mutateUser) => {
+/**
+ * @param thisComponent reference of component (this) - in this case Layout.js
+ */
+export const mainSetup = (thisComponent) => {
   return Promise.all([
-    setupSharesListForCaching(isMarketClosed, userSession, mutateUser),
-    setupAccountSummaryChartForCaching(userSession),
+    setupSharesListForCaching(thisComponent),
+    setupAccountSummaryChartForCaching(thisComponent),
   ]);
 };
 

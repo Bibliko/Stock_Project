@@ -82,7 +82,11 @@ export const newDate = () => {
   return timeNow;
 };
 
-export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
+/**
+ * @param thisComponent reference of component (this) - in this case LayoutSpeedDial.js
+ */
+export const marketCountdownUpdate = (thisComponent) => {
+  const { isMarketClosed } = thisComponent.props;
   if (isMarketClosed) {
     return;
   }
@@ -114,7 +118,7 @@ export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
 
   //console.log(countdown);
 
-  setStateFn({
+  thisComponent.setState({
     countdown,
   });
 };

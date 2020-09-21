@@ -97,6 +97,7 @@ const styles = (theme) => ({
     "&:hover": {
       backgroundColor: theme.palette.fail.backgroundColorHover,
     },
+    zIndex: theme.customZIndex.floatingActionButton,
   },
   hide: {
     display: "none",

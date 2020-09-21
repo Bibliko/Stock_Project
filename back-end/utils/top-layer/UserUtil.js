@@ -5,7 +5,9 @@ const { isEqual, isEmpty } = require("lodash");
 
 const {
   redisUpdateOverallRankingList,
-  redisUpdateRegionalRankingList
+  redisUpdateRegionalRankingList,
+  cleanChosenUserCache,
+  accountSummaryChart
 } = require("../redis-utils/RedisUtil");
 
 const {
@@ -188,7 +190,10 @@ const updateRankingList = (globalBackendVariables) => {
 //
 /**
  * @description_1 Update portfolioLastClosure and ranking for all users in server
- * @description_2 Update data in database.
+ * @description_2 Update data in database only.
+ * @description_3
+ * - Clean cache for account summary chart timestamps of each user
+ * - On front-end, Layout.js will check updated...Flag and update front-end account summary timestamps of user
  * @description_3 Switch globalBackendVariables updatedAllUsers flag whenever finished.
  * @param globalBackendVariables Is in back-end/index.js
  */
@@ -200,6 +205,7 @@ const updateAllUsers = (globalBackendVariables) => {
       },
       select: {
         id: true,
+        email: true,
         totalPortfolio: true
       },
       orderBy: [
@@ -226,12 +232,14 @@ const updateAllUsers = (globalBackendVariables) => {
         const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
           user
         );
+
         const accountRankingPromise = createRankingTimestampIfNecessary(user);
 
         return Promise.all([
           updatePortfolioLastClosure,
           accountSummaryPromise,
-          accountRankingPromise
+          accountRankingPromise,
+          cleanChosenUserCache(user.email, accountSummaryChart)
         ]);
       });
       return Promise.all(updateAllUsersPromise);
@@ -248,7 +256,7 @@ const updateAllUsers = (globalBackendVariables) => {
 };
 
 /**
- * @description_1 Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @description Switch flag hasUpdatedAllUsersToday according to isMarketClosed
  * @param globalBackendVariables object passed in from back-end/index
  */
 const checkAndUpdateAllUsers = (globalBackendVariables) => {

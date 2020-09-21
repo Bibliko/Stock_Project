@@ -1,4 +1,5 @@
 import React from "react";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
@@ -11,7 +12,9 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneMinute, newDate } from "../../utils/low-dependency/DayTimeUtil";
+import { oneSecond, oneMinute } from "../../utils/low-dependency/DayTimeUtil";
+
+import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
 import {
   checkMarketClosed,
@@ -26,8 +29,6 @@ import {
 import { updateCachedAccountSummaryChartInfoOneItem } from "../../utils/RedisUtil";
 
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
-
-import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import AppBar from "./AppBar";
 import Reminder from "../Reminder/Reminder";
@@ -118,76 +119,39 @@ class Layout extends React.Component {
   checkStockQuotesInterval;
   accountSummaryChartSeriesInterval;
 
-  handleCloseRefreshCard = () => {
-    this.setState({
-      openRefreshCard: false,
-    });
+  handleCloseRefreshCard = (event, reason) => {
+    if (reason !== "clickaway") {
+      this.setState({
+        openRefreshCard: false,
+      });
+    }
   };
 
   reloadLayout = () => {
     window.location.reload();
   };
 
-  updateCachedAccountSummaryChartSeries = () => {
-    const { email, totalPortfolio } = this.props.userSession;
-    updateCachedAccountSummaryChartInfoOneItem(
-      email,
-      newDate(),
-      totalPortfolio
-    ).catch((err) => {
-      console.log(err);
-    });
-  };
-
   setupIntervals = () => {
     if (this.props.userSession.hasFinishedSettingUp) {
       // this.checkStockQuotesInterval = setInterval(
-      //   () =>
-      //     checkStockQuotesToCalculateSharesValue(
-      //       this.props.isMarketClosed,
-      //       this.props.userSession,
-      //       this.props.mutateUser
-      //     ),
+      //   () => checkStockQuotesToCalculateSharesValue(this),
       //   30 * oneSecond
       // );
 
-      this.accountSummaryChartSeriesInterval = setInterval(
-        () => this.updateCachedAccountSummaryChartSeries(),
-        oneMinute
-      );
+      this.accountSummaryChartSeriesInterval = setInterval(() => {
+        updateCachedAccountSummaryChartInfoOneItem(this).catch((err) => {
+          console.log(err);
+        });
+      }, oneMinute);
     }
   };
 
-  setupUpdatedFlagsSocketListeners = () => {
-    const {
-      updatedAllUsersFlagFromLayout,
-      updatedRankingListFlagFromLayout,
-      openRefreshCard,
-    } = this.state;
+  setupSocketListeners = () => {
+    socketCheckMarketClosed(socket, this);
 
-    const { hasFinishedSettingUp } = this.props.userSession;
+    checkIsDifferentFromSocketUpdatedAllUsersFlag(socket, this);
 
-    socketCheckMarketClosed(
-      socket,
-      this.props.isMarketClosed,
-      this.props.mutateMarket
-    );
-
-    checkIsDifferentFromSocketUpdatedAllUsersFlag(
-      socket,
-      updatedAllUsersFlagFromLayout,
-      openRefreshCard,
-      hasFinishedSettingUp,
-      this.setState.bind(this)
-    );
-
-    checkIsDifferentFromSocketUpdatedRankingListFlag(
-      socket,
-      updatedRankingListFlagFromLayout,
-      openRefreshCard,
-      hasFinishedSettingUp,
-      this.setState.bind(this)
-    );
+    checkIsDifferentFromSocketUpdatedRankingListFlag(socket, this);
   };
 
   clearIntervalsAndListeners = () => {
@@ -197,12 +161,6 @@ class Layout extends React.Component {
     offSocketListeners(socket, checkMarketClosed);
     offSocketListeners(socket, updatedAllUsersFlag);
     offSocketListeners(socket, updatedRankingListFlag);
-  };
-
-  resetIntervalsAndListeners = () => {
-    this.clearIntervalsAndListeners();
-    this.setupIntervals();
-    this.setupUpdatedFlagsSocketListeners();
   };
 
   afterSettingUpDataFromBackendCache = () => {
@@ -228,7 +186,7 @@ class Layout extends React.Component {
       .then((flags) => {
         const { updatedAllUsersFlag, updatedRankingListFlag } = flags;
 
-        this.setupUpdatedFlagsSocketListeners();
+        this.setupSocketListeners();
 
         this.setState(
           {
@@ -237,11 +195,7 @@ class Layout extends React.Component {
           },
           () => {
             if (this.props.userSession.hasFinishedSettingUp) {
-              mainSetup(
-                this.props.isMarketClosed,
-                this.props.userSession,
-                this.props.mutateUser
-              )
+              mainSetup(this)
                 .then((finishedSettingUp) => {
                   this.afterSettingUpDataFromBackendCache();
                 })
@@ -259,11 +213,26 @@ class Layout extends React.Component {
       });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
     }
-    this.resetIntervalsAndListeners();
+
+    const { finishedSettingUp } = this.state;
+
+    const keys = [
+      "updatedAllUsersFlagFromLayout",
+      "updatedRankingListFlagFromLayout",
+    ];
+    const prevStateKeys = pick(prevState, keys);
+    const thisStateKeys = pick(this.state, keys);
+
+    // This means back-end has just updated data!
+    if (finishedSettingUp && !isEqual(prevStateKeys, thisStateKeys)) {
+      mainSetup(this).catch((err) => {
+        console.log(err);
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -302,7 +271,6 @@ class Layout extends React.Component {
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openRefreshCard}
           className={classes.refreshCard}
-          autoHideDuration={10 * oneSecond}
           onClose={this.handleCloseRefreshCard}
           message="New Data. Refresh Page."
           action={
