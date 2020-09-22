@@ -2,7 +2,7 @@ const { isMarketClosedCheck } = require("../redis-utils/RedisUtil");
 
 const checkMarketClosed = (globalBackendVariables) => {
   if (!globalBackendVariables.isPrismaMarketHolidaysInitialized) {
-    console.log("MainIndexUtil, checkMarketClosed");
+    console.log("MainBackendIndexHelperUtil, checkMarketClosed");
     return;
   }
 
