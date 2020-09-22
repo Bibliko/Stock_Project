@@ -244,7 +244,7 @@ class AccountSummary extends React.Component {
               Portfolio Chart
             </Typography>
             <Typography className={classes.gridSubtitle}>
-              Chart tooltips are best supported on Chrome!
+              Chart tools are best supported on Chrome!
             </Typography>
             <Typography className={classes.titleChart}>
               ${numberWithCommas(totalPortfolio.toFixed(2))}

@@ -10,8 +10,8 @@ import {
 } from "../../utils/low-dependency/PageRedirectUtil";
 import {
   loginUser,
-  sendPasswordVerificationCode,
-  checkPasswordVerificationCode,
+  sendVerificationCode,
+  checkVerificationCode,
   changePassword,
 } from "../../utils/UserUtil";
 
@@ -205,7 +205,7 @@ class ForgotPassword extends React.Component {
         error: this.errorTypes[1],
       });
     } else {
-      sendPasswordVerificationCode(this.email)
+      sendVerificationCode(this.email, "password")
         .then(() => {
           this.setState({
             success: "Password Verification Code has been sent",
@@ -226,7 +226,7 @@ class ForgotPassword extends React.Component {
         error: this.errorTypes[1],
       });
     } else {
-      checkPasswordVerificationCode(this.email, this.code)
+      checkVerificationCode(this.email, this.code, "password")
         .then(() => {
           this.setState({
             allowButtonSendCode: false,
@@ -350,6 +350,7 @@ class ForgotPassword extends React.Component {
                     >
                       <NormalTextField
                         name="Email"
+                        disabled={allowCode || allowPassword}
                         changeData={this.changeEmail}
                         enterData={this.enterEmail}
                       />

@@ -102,6 +102,16 @@ export const marketCountdownUpdate = (thisComponent) => {
   var min = 60 - UTCMinutes;
   var sec = 60 - UTCSeconds;
 
+  if (sec === 60) {
+    sec = 0;
+    min++;
+  }
+
+  if (min === 60) {
+    min = 0;
+    hours++;
+  }
+
   if ((hours + "").length === 1) {
     hours = "0" + hours;
   }
@@ -115,8 +125,6 @@ export const marketCountdownUpdate = (thisComponent) => {
   }
 
   var countdown = hours + ":" + min + ":" + sec;
-
-  //console.log(countdown);
 
   thisComponent.setState({
     countdown,

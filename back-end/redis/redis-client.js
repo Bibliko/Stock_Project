@@ -15,6 +15,7 @@ module.exports = {
   getAsync: promisify(client.get).bind(client),
   setAsync: promisify(client.set).bind(client),
   delAsync: promisify(client.del).bind(client),
+  renameAsync: promisify(client.rename).bind(client),
 
   keysAsync: promisify(client.keys).bind(client),
   listLeftPushAsync: promisify(client.lpush).bind(client),

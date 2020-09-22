@@ -18,7 +18,23 @@ const {
   getLengthUserTransactionsHistoryForRedisM5RU
 } = require("../utils/top-layer/UserUtil");
 
+const { changeNameUserCacheKeys } = require("../utils/redis-utils/RedisUtil");
+
 // const { indices } = require('../algolia');
+
+/*
+
+Routes List:
+- changeData
+- changeEmail
+- getData
+- getOverallRanking
+- getRegionalRanking
+- getUerTransactionsHistory
+- getUserAccountSummaryChartTimestamps
+- getUserRankingTimestamps
+
+*/
 
 router.put("/changeData", (req, res) => {
   const { dataNeedChange, email } = req.body;
@@ -43,6 +59,30 @@ router.put("/changeData", (req, res) => {
     })
     .then((user) => {
       res.send(user);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to change user's data");
+    });
+});
+
+router.put("/changeEmail", (req, res) => {
+  const { email, newEmail } = req.body;
+
+  prisma.user
+    .update({
+      where: {
+        email
+      },
+      data: {
+        email: newEmail
+      }
+    })
+    .then((user) => {
+      res.send(user);
+    })
+    .then(() => {
+      return changeNameUserCacheKeys(newEmail, email);
     })
     .catch((err) => {
       console.log(err);
