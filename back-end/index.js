@@ -15,7 +15,6 @@ try {
 }
 
 const {
-  getFrontendHost,
   getPassportCallbackHost
 } = require("./utils/low-dependency/NetworkUtil");
 
@@ -49,13 +48,7 @@ const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
-const {
-  cachePasswordVerificationCode,
-  getParsedCachedPasswordVerificationCode,
-  removeCachedPasswordVerificationCode,
-
-  cleanUserCache
-} = require("./utils/redis-utils/RedisUtil");
+const { cleanUserCache } = require("./utils/redis-utils/RedisUtil");
 
 /*
 const {
@@ -75,7 +68,6 @@ const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const fs = require("fs-extra");
-const randomKey = require("random-key");
 
 const http = require("http");
 const server = http.createServer(app);
@@ -270,7 +262,7 @@ app.post("/auth/signup", (req, res, next) => {
         // by the string 'something else'...
         file = file.replace(
           "{{ formAction }}",
-          `${PASSPORT_CALLBACK_HOST}/verification/${verificationToken.id}`
+          `${PASSPORT_CALLBACK_HOST}/verificationSession/verification/${verificationToken.id}`
         );
 
         const msg = {
@@ -335,152 +327,12 @@ app.get("/logout", (req, res) => {
 
 // verification APIs are listed below:
 
-app.get("/passwordVerification", (req, res) => {
-  const { email } = req.query;
-  const timestampNowOfRequest = Math.round(Date.now() / 1000);
-
-  getParsedCachedPasswordVerificationCode(email)
-    .then((redisCachedCode) => {
-      if (!redisCachedCode) {
-        const passwordVerificationCode = randomKey.generate(6);
-        return Promise.all([
-          cachePasswordVerificationCode(email, passwordVerificationCode),
-          passwordVerificationCode
-        ]);
-      }
-
-      const { timestamp } = redisCachedCode;
-      if (timestampNowOfRequest < timestamp + 15) {
-        res
-          .status(429)
-          .send(
-            `Wait ${
-              timestamp + 15 - timestampNowOfRequest
-            }  seconds to send code again.`
-          );
-      } else {
-        const passwordVerificationCode = randomKey.generate(6);
-        return Promise.all([
-          cachePasswordVerificationCode(email, passwordVerificationCode),
-          passwordVerificationCode
-        ]);
-      }
-    })
-    .then((resultArray) => {
-      if (resultArray) {
-        const passwordVerificationCode = resultArray[1];
-
-        return fs
-          .readFile("./verificationHTML/verifyPassword.html", "utf8")
-          .then((dataHTML) => {
-            const htmlFile = dataHTML.replace(
-              "{{ verificationKey }}",
-              passwordVerificationCode
-            );
-
-            const msg = {
-              to: `${email}`,
-              from: "Bibliko <biblikoorg@gmail.com>",
-              subject: "Password Reset Code",
-              html: htmlFile
-            };
-
-            // return mg.messages().send(msg);
-            return sgMail.send(msg);
-          })
-          .catch((err) => {
-            console.log(err);
-            res.sendStatus(500);
-          });
-      }
-    })
-    .then((passwordVerificationCodeSent) => {
-      if (passwordVerificationCodeSent) {
-        console.log(`Sent password verification code for ${email}.`);
-        res.sendStatus(200);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-
-app.get("/checkPasswordVerificationCode", (req, res) => {
-  const { email, code } = req.query;
-  getParsedCachedPasswordVerificationCode(email)
-    .then((redisCachedCode) => {
-      const { secretCode } = redisCachedCode;
-      if (code !== secretCode) {
-        res.status(404).send("Your verification code does not match.");
-      } else {
-        res.sendStatus(200);
-        return removeCachedPasswordVerificationCode(email);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-
-app.use("/verification/:tokenId", (req, res) => {
-  const tokenId = req.params.tokenId;
-  prisma.userVerification
-    .findOne({
-      where: {
-        id: tokenId
-      }
-    })
-    .then((token) => {
-      if (token) {
-        return prisma.user.create({
-          data: {
-            email: token.email,
-            password: token.password
-          }
-        });
-      }
-
-      const FRONTEND_HOST_HERE = getFrontendHost();
-
-      res.redirect(`${FRONTEND_HOST_HERE}/verificationFail`);
-    })
-    .then((newUser) => {
-      if (newUser) {
-        const deletePromise = prisma.userVerification.delete({
-          where: {
-            id: tokenId
-          }
-        });
-
-        return Promise.all([newUser, deletePromise]);
-      }
-    })
-    .then(([newUser, doneDelete]) => {
-      if (doneDelete) {
-        req.logIn(newUser, (err) => {
-          if (err) {
-            return res.sendStatus(500);
-          }
-
-          const FRONTEND_HOST_HERE = getFrontendHost();
-
-          return res.redirect(`${FRONTEND_HOST_HERE}/verificationSucceed`);
-        });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-
 // other APIs
 app.use("/userData", require("./routes/user"));
 app.use("/marketHolidaysData", require("./routes/marketHolidays"));
 app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
+app.use("/verificationSession", require("./routes/verification"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];

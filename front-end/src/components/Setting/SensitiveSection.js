@@ -1,9 +1,15 @@
 import React from "react";
-
+import validator from "email-validator";
 import clsx from "clsx";
 
 import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
 import SettingPasswordTextField from "../TextField/SettingTextFields/SettingPasswordTextField";
+
+import {
+  sendVerificationCode,
+  checkVerificationCode,
+  changeUserEmail,
+} from "../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -15,6 +21,8 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Button,
+  Container,
 } from "@material-ui/core";
 
 const styles = (theme) => ({
@@ -39,6 +47,7 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
     minWidth: "150px",
+    marginBottom: "10px",
   },
   passwordGridContainer: {
     marginTop: "20px",
@@ -71,6 +80,25 @@ const styles = (theme) => ({
       fontSize: "small",
     },
   },
+  emailSendCodeButton: {
+    color: theme.palette.primary.main,
+  },
+  codeButtonContainer: {
+    maxWidth: "none",
+    minWidth: "150px",
+    margin: "10px",
+  },
+  hide: {
+    display: "none",
+  },
+  emailSuccess: {
+    color: theme.palette.succeed.main,
+    fontSize: "small",
+    marginBottom: "8px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "smaller",
+    },
+  },
 });
 
 const PasswordAccordion = withStyles((theme) => ({
@@ -88,6 +116,21 @@ const PasswordAccordionSummary = withStyles((theme) => ({
     backgroundColor: "rgba(225,225,225,0.6)",
     "&:hover": {
       backgroundColor: "rgba(225,225,225,0.7)",
+    },
+    "&:focus": {
+      backgroundColor: "rgba(225,225,225,0.7)",
+    },
+    minHeight: theme.customHeight.settingTextFieldSmall,
+    height: theme.customHeight.settingTextField,
+    [theme.breakpoints.down("xs")]: {
+      height: theme.customHeight.settingTextFieldSmall,
+    },
+    "&.Mui-expanded": {
+      minHeight: theme.customHeight.settingTextFieldSmall,
+      height: theme.customHeight.settingTextField,
+      [theme.breakpoints.down("xs")]: {
+        height: theme.customHeight.settingTextFieldSmall,
+      },
     },
   },
   expanded: {},
@@ -107,6 +150,13 @@ class SensitiveSection extends React.Component {
         newPassword: "",
         confirmedPassword: "",
       },
+
+      verificationCode: "",
+      verificationCodeError: "",
+
+      showSendVerificationCode: false,
+      emailSuccess: "",
+      emailError: "",
     };
     this.newPassword = this.props.oldPassword;
     this.hasError = false;
@@ -134,12 +184,99 @@ class SensitiveSection extends React.Component {
         newPassword: "",
         confirmedPassword: "",
       },
+      verificationCode: "",
+      verificationCodeError: "",
+      showSendVerificationCode: false,
+      emailSuccess: "",
+      emailError: "",
     });
   }
 
   createChangeLog() {
     return { password: this.newPassword };
   }
+
+  recordNewEmail = (event) => {
+    const input = { ...this.state.input, email: event.target.value };
+    this.email = event.target.value;
+
+    if (this.email === this.props.email) {
+      this.setState({
+        input: input,
+        emailSuccess: "",
+        emailError: "",
+        showSendVerificationCode: false,
+        verificationCode: "",
+      });
+      return;
+    }
+
+    if (!validator.validate(this.email)) {
+      this.setState({
+        input: input,
+        emailSuccess: "",
+        emailError: "Invalid email",
+        showSendVerificationCode: false,
+        verificationCode: "",
+      });
+    } else {
+      this.setState({
+        input: input,
+        emailSuccess: "",
+        emailError: "",
+        showSendVerificationCode: true,
+        verificationCode: "",
+      });
+    }
+  };
+
+  recordVerificationCode = (event) => {
+    this.setState({
+      verificationCode: event.target.value,
+    });
+  };
+
+  sendVerificationCode = () => {
+    sendVerificationCode(this.email, "email")
+      .then(() => {
+        this.setState({
+          emailSuccess: "Email Verification Code has been sent",
+          emailError: "",
+        });
+      })
+      .catch((err) => {
+        this.setState({ emailSuccess: "", emailError: err });
+      });
+  };
+
+  confirmVerificationCode = () => {
+    checkVerificationCode(this.email, this.state.verificationCode, "email")
+      .then(() => {
+        this.setState(
+          {
+            emailSuccess: "",
+            emailError: "",
+            showSendVerificationCode: false,
+            verificationCode: "",
+            verificationCodeError: "",
+          },
+          () => {
+            changeUserEmail(
+              this.props.email,
+              this.email,
+              this.props.mutateUser
+            ).catch((err) => {
+              console.log(err);
+            });
+          }
+        );
+      })
+      .catch((err) => {
+        this.setState({
+          verificationCodeError: err,
+        });
+      });
+  };
 
   checkOldPassword = (event) => {
     const input = { ...this.state.input, oldPassword: event.target.value };
@@ -217,13 +354,19 @@ class SensitiveSection extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, email } = this.props;
     const {
       show,
       wrongPassword,
       invalidPassword,
       unmatchedPassword,
       input,
+
+      showSendVerificationCode,
+      emailError,
+      emailSuccess,
+      verificationCode,
+      verificationCodeError,
     } = this.state;
 
     return (
@@ -232,17 +375,56 @@ class SensitiveSection extends React.Component {
           container
           spacing={2}
           direction="row"
-          className={clsx(classes.fullHeightWidth, classes.gridContainer)}
+          className={clsx(classes.fullWidth, classes.gridContainer)}
         >
           <Grid item xs={12} className={classes.itemGrid}>
             <SettingNormalTextField
               name="Email"
-              disabled={true}
+              disabled={emailSuccess !== ""}
+              defaultValue={email}
               value={input.email}
-              isInvalid={!input.email}
-              helper="Cannot be empty"
-              // onChange={}
+              isInvalid={emailError !== ""}
+              helper={emailError}
+              onChange={this.recordNewEmail}
             />
+            <Container
+              className={clsx(classes.codeButtonContainer, {
+                [classes.hide]: !showSendVerificationCode,
+              })}
+            >
+              {emailSuccess !== "" && (
+                <Typography className={classes.emailSuccess}>
+                  {emailSuccess}
+                </Typography>
+              )}
+              <Button
+                className={classes.emailSendCodeButton}
+                onClick={this.sendVerificationCode}
+              >
+                Send Verification Code
+              </Button>
+            </Container>
+            {emailSuccess !== "" && (
+              <SettingNormalTextField
+                name="Code"
+                value={verificationCode}
+                isInvalid={verificationCodeError !== ""}
+                helper={verificationCodeError}
+                onChange={this.recordVerificationCode}
+              />
+            )}
+            <Container
+              className={clsx(classes.codeButtonContainer, {
+                [classes.hide]: emailSuccess === "",
+              })}
+            >
+              <Button
+                className={classes.emailSendCodeButton}
+                onClick={this.confirmVerificationCode}
+              >
+                Confirm
+              </Button>
+            </Container>
           </Grid>
 
           <Grid

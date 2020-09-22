@@ -39,8 +39,8 @@ const styles = (theme) => ({
   },
   divider: {
     width: "95%",
-    marginTop: "30px",
-    marginBottom: "10px",
+    marginTop: "15px",
+    marginBottom: "15px",
     background: "white",
   },
   reminderButton: {
@@ -60,7 +60,6 @@ class AccountSetting extends React.Component {
     this.hasChanges = false;
 
     this.changes = pick(this.props.userSession, [
-      "email",
       "password",
       "firstName",
       "lastName",
@@ -102,7 +101,6 @@ class AccountSetting extends React.Component {
 
   reset = () => {
     this.changes = pick(this.props.userSession, [
-      "email",
       "password",
       "firstName",
       "lastName",
@@ -201,6 +199,7 @@ class AccountSetting extends React.Component {
           oldPassword={userSession.password}
           email={userSession.email}
           recordChanges={this.recordChanges}
+          mutateUser={this.props.mutateUser}
         />
 
         <Divider variant="middle" className={classes.divider} />

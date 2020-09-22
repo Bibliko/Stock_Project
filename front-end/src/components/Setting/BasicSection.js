@@ -21,10 +21,6 @@ const styles = (theme) => ({
       marginTop: "10px",
     },
   },
-  fullHeightWidth: {
-    height: "100%",
-    width: "100%",
-  },
   fullWidth: {
     width: "100%",
   },
@@ -34,6 +30,7 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
     minWidth: "150px",
+    marginBottom: "10px",
   },
   textFieldContainer: {
     maxWidth: "none",
@@ -166,7 +163,7 @@ class BasicSection extends React.Component {
           container
           spacing={2}
           direction="row"
-          className={clsx(classes.fullHeightWidth, classes.gridContainer)}
+          className={clsx(classes.fullWidth, classes.gridContainer)}
         >
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SettingNormalTextField

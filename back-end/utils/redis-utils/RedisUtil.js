@@ -7,7 +7,8 @@ const {
   setAsync,
   listPushAsync,
   delAsync,
-  keysAsync
+  keysAsync,
+  renameAsync
 } = require("../../redis/redis-client");
 
 const { newDate, getYearUTCString } = require("../low-dependency/DayTimeUtil");
@@ -28,6 +29,7 @@ const {
  * - '${email}|transactionsHistoryM5RU': list -> Most 5 recently used
  * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery': list
  * - '${email}|passwordVerification': value
+ * - '${email}|changeEmailVerification': value
  * - '${email}|accountSummaryChart': list
  * - '${email}|sharesList': list
  *
@@ -44,6 +46,7 @@ const {
 const transactionsHistoryList = "transactionsHistoryList";
 const transactionsHistoryM5RU = "transactionsHistoryM5RU";
 const passwordVerification = "passwordVerification";
+const changeEmailVerification = "changeEmailVerification";
 const accountSummaryChart = "accountSummaryChart";
 const sharesList = "sharesList";
 
@@ -98,16 +101,17 @@ const isMarketClosedCheck = () => {
  * @description Put verification code of user into cache section of that user
  * @param email User email
  * @param secretCode User randomly generated verification code
+ * @param cacheKey Redis key for caching verification code listed in this file as Keys
  */
-const cachePasswordVerificationCode = (email, secretCode) => {
+const cacheVerificationCode = (email, secretCode, cacheKey) => {
   return new Promise((resolve, reject) => {
     const timestamp = Math.round(Date.now() / 1000);
-    const redisKey = `${email}|passwordVerification`;
+    const redisKey = `${email}|${cacheKey}`;
     const redisValue = `${secretCode}|${timestamp}`;
 
     setAsync(redisKey, redisValue)
       .then((finishedCachingSecretCode) => {
-        resolve(`Finished caching password verification code for ${email}`);
+        resolve(`Finished caching ${cacheKey} verification code for ${email}`);
       })
       .catch((err) => {
         reject(err);
@@ -118,10 +122,11 @@ const cachePasswordVerificationCode = (email, secretCode) => {
 /**
  * @description Get verification code from cache section of user
  * @param email User email
+ * @param cacheKey Redis key for caching verification code listed in this file as Keys
  */
-const getParsedCachedPasswordVerificationCode = (email) => {
+const getParsedCachedVerificationCode = (email, cacheKey) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `${email}|passwordVerification`;
+    const redisKey = `${email}|${cacheKey}`;
 
     getAsync(redisKey)
       .then((redisString) => {
@@ -144,9 +149,10 @@ const getParsedCachedPasswordVerificationCode = (email) => {
 /**
  * @description Remove verification code cache section of user
  * @param email User email
+ * @param cacheKey Redis key for caching verification code listed in this file as Keys
  */
-const removeCachedPasswordVerificationCode = (email) => {
-  const redisKey = `${email}|passwordVerification`;
+const removeCachedVerificationCode = (email, cacheKey) => {
+  const redisKey = `${email}|${cacheKey}`;
   return delAsync(redisKey);
 };
 
@@ -213,9 +219,9 @@ const updateCachedMarketHoliday = (marketHoliday) => {
 const cleanUserCache = (email) => {
   return new Promise((resolve, reject) => {
     keysAsync(`${email}*`)
-      .then((values) => {
-        if (!isEmpty(values)) {
-          return delAsync(values);
+      .then((keys) => {
+        if (!isEmpty(keys)) {
+          return delAsync(keys);
         }
       })
       .then((numberOfKeysDeleted) => {
@@ -242,11 +248,42 @@ const cleanChosenUserCache = (email, chosenKey) => {
   });
 };
 
+/**
+ * @description Change names of cache keys
+ * @param newEmail User new email
+ * @param oldEmail User old email
+ */
+const changeNameUserCacheKeys = (newEmail, oldEmail) => {
+  return new Promise((resolve, reject) => {
+    keysAsync(`${oldEmail}*`)
+      .then((keys) => {
+        if (keys) {
+          const changeNameKeys = keys.map((key) => {
+            const indexSplitLine = key.indexOf("|");
+            const extraInfoInKey = key.substring(indexSplitLine + 1);
+            const newKey = `${newEmail}|${extraInfoInKey}`;
+
+            return renameAsync(key, newKey);
+          });
+          return Promise.all(changeNameKeys);
+        }
+      })
+      .then(() => {
+        console.log(`Successfully change names of user's keys.\n`);
+        resolve("Successful");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 module.exports = {
   // Keys
   transactionsHistoryList,
   transactionsHistoryM5RU,
   passwordVerification,
+  changeEmailVerification,
   accountSummaryChart,
   sharesList,
 
@@ -254,9 +291,9 @@ module.exports = {
   isMarketClosedCheck,
 
   // User Related
-  cachePasswordVerificationCode,
-  getParsedCachedPasswordVerificationCode,
-  removeCachedPasswordVerificationCode,
+  cacheVerificationCode,
+  getParsedCachedVerificationCode,
+  removeCachedVerificationCode,
 
   // Ranking Update
   redisUpdateOverallRankingList,
@@ -267,5 +304,7 @@ module.exports = {
   updateCachedMarketHoliday,
 
   cleanUserCache,
-  cleanChosenUserCache
+  cleanChosenUserCache,
+
+  changeNameUserCacheKeys
 };

@@ -13,6 +13,9 @@ const theme = {
     appBarHeightSmall: "50px",
 
     redirectingPaper: "200px",
+
+    settingTextField: "45px",
+    settingTextFieldSmall: "35px"
   },
   customMargin: {
     topLayout: "80px",
