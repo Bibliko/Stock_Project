@@ -27,6 +27,7 @@ const styles = (theme) => ({
     }
   },
   tableHeader: {
+    color: "white",
     fontSize: "20px",
     fontWeight: "bold",
     textAlign: "left",
@@ -36,7 +37,7 @@ const styles = (theme) => ({
     },
   },
   tableHeaderRow: {
-    backgroundColor: "#9ED2EF",
+    backgroundColor: theme.palette.tableHeader.main,
   },
   tableRow: {
     cursor: "pointer",
@@ -178,7 +179,6 @@ class VirtualizedTable extends React.Component {
       <AutoSizer onResize={resetCache}>
         {({ height, width }) => (
           <Table
-            deferredMeasurementCache={cache}
             height={height}
             width={Math.max(width, minWidth)}
             // rowHeight={rowHeight}

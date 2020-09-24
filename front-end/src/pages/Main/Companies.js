@@ -6,12 +6,16 @@ import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
 import { withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import { Typography } from "@material-ui/core";
+import {
+  Container,
+  Grid,
+  Typography,
+} from "@material-ui/core";
 
 import CompanyDialog from "../../components/CompanyDetail/CompanyDialog";
 import CompaniesListTable from "../../components/Table/CompaniesListTable/CompaniesListTable"
+import Filter from "../../components/StockScreener/Filter";
+import ProgressButton from "../../components/Button/ProgressButton";
 
 const styles = (theme) => ({
   root: {
@@ -30,13 +34,6 @@ const styles = (theme) => ({
     justifyContent: "center",
     maxWidth: "none",
   },
-  center: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: "auto",
-    flexBasis: "unset",
-  },
   fullHeightWidth: {
     height: "100%",
     width: "100%",
@@ -44,12 +41,6 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       padding: 0,
     },
-  },
-  itemGrid: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    flexDirection: "column",
   },
   gridTitle: {
     fontSize: "x-large",
@@ -59,12 +50,27 @@ const styles = (theme) => ({
     fontWeight: "bold",
     marginBottom: "1px",
     color: "white",
+    marginBottom: "5px",
+  },
+  reloadButton: {
+    marginTop: "10px",
+    marginBottom: "10px",
+    marginLeft: "-10px",
   },
 });
 
 class Companies extends React.Component {
   state = {
     openDialog: false,
+    price: [0,260000],
+    marketCap: [0,1000],
+    sector: "All",
+    industry: "All",
+
+    success: false,
+    fail: false,
+    loading: false,
+    debounce: false,
   };
 
   handleOpenDialog = (companyName) => {
@@ -80,9 +86,47 @@ class Companies extends React.Component {
     });
   };
 
+  getMarketCap = (value) => {
+    return value**4;
+  };
+
+  handleFilterChange = (key, value) => {
+    this.setState({
+      [key]: value,
+    });
+  };
+
+  setSuccess = () => {
+    this.setState({
+      loading: false,
+      success: true,
+    });
+  };
+
+  handleReload = () => {
+    this.setState({
+      loading: true,
+      debounce: true,
+    });
+    setTimeout(this.setSuccess,2000);
+    setTimeout(()=>{this.setState({debounce:false})},5000);
+  };
+
   render() {
     const { classes } = this.props;
-    const { openDialog, companyName } = this.state;
+    const {
+      openDialog,
+      companyName,
+      price,
+      marketCap,
+      sector,
+      industry,
+
+      debounce,
+      success,
+      fail,
+      loading,
+    } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
@@ -92,15 +136,37 @@ class Companies extends React.Component {
           direction="row"
           className={classes.fullHeightWidth}
         >
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle)}>
+          <Grid item xs={12} sm={4}>
+            <ProgressButton
+              containerClass={classes.reloadButton}
+              disabled={debounce}
+              size={"medium"}
+              success={success}
+              fail={fail}
+              loading={loading}
+              handleClick={this.handleReload}
+            >
+              Reload
+            </ProgressButton>
+            <Filter
+              price={price}
+              marketCap={marketCap}
+              sector={sector}
+              industry={industry}
+              getMarketCap={this.getMarketCap}
+              handleChange={this.handleFilterChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Typography className={clsx(classes.gridTitle)} component="div">
               Companies List
             </Typography>
-          </Grid>
+
             <CompaniesListTable
-              height={500}
+              height={600}
               handleOpenCompanyDetail={this.handleOpenDialog}
             />
+          </Grid>
         </Grid>
 
         <CompanyDialog

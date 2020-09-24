@@ -47,11 +47,11 @@ const styles = (theme) => ({
     },
   },
   passwordGridItem: {
-    paddingLeft: "40px !important",
-    paddingRight: "20px !important",
+    paddingLeft: "30px !important",
+    paddingRight: "10px !important",
     [theme.breakpoints.down("xs")]: {
-      paddingLeft: "30px !important",
-      paddingRight: "10px !important",
+      paddingLeft: "25px !important",
+      paddingRight: "5px !important",
     },
   },
   passwordTitle: {
@@ -230,7 +230,7 @@ class SensitiveSection extends React.Component {
       <div className={classes.fullWidth}>
         <Grid
           container
-          spacing={2}
+          spacing={4}
           direction="row"
           className={clsx(classes.fullHeightWidth, classes.gridContainer)}
         >

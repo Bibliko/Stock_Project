@@ -40,6 +40,8 @@ const styles = (theme) => ({
     minWidth: "150px",
     marginLeft: "10px",
     marginRight: "10px",
+    paddingLeft: "0px",
+    paddingRight: "0px",
   },
   title: {
     color: "white",
@@ -164,7 +166,7 @@ class BasicSection extends React.Component {
       <div className={classes.fullWidth}>
         <Grid
           container
-          spacing={2}
+          spacing={4}
           direction="row"
           className={clsx(classes.fullHeightWidth, classes.gridContainer)}
         >

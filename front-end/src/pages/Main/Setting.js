@@ -38,7 +38,7 @@ const styles = (theme) => ({
     maxWidth: "none",
   },
   divider: {
-    width: "95%",
+    width: "98%",
     marginTop: "30px",
     marginBottom: "10px",
     background: "white",

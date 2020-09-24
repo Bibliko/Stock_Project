@@ -97,7 +97,7 @@ class SelectSection extends React.Component {
       <div className={classes.fullWidth}>
         <Grid
           container
-          spacing={2}
+          spacing={4}
           direction="row"
           className={clsx(classes.fullHeightWidth, classes.gridContainer)}
         >

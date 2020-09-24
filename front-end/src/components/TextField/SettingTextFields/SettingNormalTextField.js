@@ -18,6 +18,8 @@ const styles = (theme) => ({
     minWidth: "150px",
     marginLeft: "10px",
     marginRight: "10px",
+    paddingLeft: "0px",
+    paddingRight: "0px",
   },
   textField: {
     width: "100%",
