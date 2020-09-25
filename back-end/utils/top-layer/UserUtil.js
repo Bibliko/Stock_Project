@@ -5,10 +5,12 @@ const { isEqual, isEmpty } = require("lodash");
 
 const {
   redisUpdateOverallRankingList,
-  redisUpdateRegionalRankingList,
-  cleanChosenUserCache,
-  accountSummaryChart
+  redisUpdateRegionalRankingList
 } = require("../redis-utils/RedisUtil");
+
+const {
+  resetUserCachedAccountSummaryTimestamps
+} = require("../redis-utils/UserCachedDataUtil");
 
 const {
   newDate,
@@ -239,7 +241,7 @@ const updateAllUsers = (globalBackendVariables) => {
           updatePortfolioLastClosure,
           accountSummaryPromise,
           accountRankingPromise,
-          cleanChosenUserCache(user.email, accountSummaryChart)
+          resetUserCachedAccountSummaryTimestamps(user.email)
         ]);
       });
       return Promise.all(updateAllUsersPromise);

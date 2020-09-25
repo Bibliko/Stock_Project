@@ -1,22 +1,21 @@
 import React from "react";
-import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
 
 import { socket } from "../../App";
-import { mainSetup } from "./setupForCachingInLayout";
 
 import {
   shouldRedirectToLogin,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneSecond, oneMinute } from "../../utils/low-dependency/DayTimeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
 import {
+  joinUserRoom,
   checkMarketClosed,
   socketCheckMarketClosed,
   updatedAllUsersFlag,
@@ -24,9 +23,8 @@ import {
   offSocketListeners,
   checkIsDifferentFromSocketUpdatedAllUsersFlag,
   checkIsDifferentFromSocketUpdatedRankingListFlag,
+  checkHasFinishedSettingUpUserCacheSession,
 } from "../../utils/SocketUtil";
-
-import { updateCachedAccountSummaryChartInfoOneItem } from "../../utils/RedisUtil";
 
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
 
@@ -117,7 +115,6 @@ class Layout extends React.Component {
   };
 
   checkStockQuotesInterval;
-  accountSummaryChartSeriesInterval;
 
   handleCloseRefreshCard = (event, reason) => {
     if (reason !== "clickaway") {
@@ -137,33 +134,23 @@ class Layout extends React.Component {
       //   () => checkStockQuotesToCalculateSharesValue(this),
       //   30 * oneSecond
       // );
-
-      this.accountSummaryChartSeriesInterval = setInterval(() => {
-        updateCachedAccountSummaryChartInfoOneItem(this).catch((err) => {
-          console.log(err);
-        });
-      }, oneMinute);
     }
   };
 
   setupSocketListeners = () => {
     socketCheckMarketClosed(socket, this);
-
     checkIsDifferentFromSocketUpdatedAllUsersFlag(socket, this);
-
     checkIsDifferentFromSocketUpdatedRankingListFlag(socket, this);
   };
 
   clearIntervalsAndListeners = () => {
     clearInterval(this.checkStockQuotesInterval);
-    clearInterval(this.accountSummaryChartSeriesInterval);
-
     offSocketListeners(socket, checkMarketClosed);
     offSocketListeners(socket, updatedAllUsersFlag);
     offSocketListeners(socket, updatedRankingListFlag);
   };
 
-  afterSettingUpDataFromBackendCache = () => {
+  afterSettingUpUserCacheSession = () => {
     this.setState(
       {
         finishedSettingUp: true,
@@ -186,25 +173,15 @@ class Layout extends React.Component {
       .then((flags) => {
         const { updatedAllUsersFlag, updatedRankingListFlag } = flags;
 
-        this.setupSocketListeners();
-
         this.setState(
           {
             updatedAllUsersFlagFromLayout: updatedAllUsersFlag,
             updatedRankingListFlagFromLayout: updatedRankingListFlag,
           },
           () => {
-            if (this.props.userSession.hasFinishedSettingUp) {
-              mainSetup(this)
-                .then((finishedSettingUp) => {
-                  this.afterSettingUpDataFromBackendCache();
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            } else {
-              this.afterSettingUpDataFromBackendCache();
-            }
+            socket.emit(joinUserRoom, this.props.userSession);
+            this.setupSocketListeners();
+            checkHasFinishedSettingUpUserCacheSession(socket, this);
           }
         );
       })
@@ -216,22 +193,6 @@ class Layout extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
-    }
-
-    const { finishedSettingUp } = this.state;
-
-    const keys = [
-      "updatedAllUsersFlagFromLayout",
-      "updatedRankingListFlagFromLayout",
-    ];
-    const prevStateKeys = pick(prevState, keys);
-    const thisStateKeys = pick(this.state, keys);
-
-    // This means back-end has just updated data!
-    if (finishedSettingUp && !isEqual(prevStateKeys, thisStateKeys)) {
-      mainSetup(this).catch((err) => {
-        console.log(err);
-      });
     }
   }
 
@@ -272,7 +233,7 @@ class Layout extends React.Component {
           open={openRefreshCard}
           className={classes.refreshCard}
           onClose={this.handleCloseRefreshCard}
-          message="New Data. Refresh Page."
+          message="New Data / Refresh Page"
           action={
             <React.Fragment>
               <Button

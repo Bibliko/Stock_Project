@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getBackendHost } from "./low-dependency/NetworkUtil";
 import { parseRedisSharesListItem } from "./low-dependency/ParserUtil";
-import { newDate } from "./low-dependency/DayTimeUtil";
 
 const BACKEND_HOST = getBackendHost();
 
@@ -11,72 +10,6 @@ export const getCachedAccountSummaryChartInfo = (email) => {
       method: "get",
       params: {
         email,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-export const getLatestCachedAccountSummaryChartInfoItem = (email) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getAccountSummaryChartLatestItem`, {
-      method: "get",
-      params: {
-        email,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-/**
- * @description Add new account summary timestamp to cache in back-end
- * @param thisComponent reference of component (this) - in this case Layout.js
- */
-export const updateCachedAccountSummaryChartInfoOneItem = (thisComponent) => {
-  return new Promise((resolve, reject) => {
-    const { email, totalPortfolio } = thisComponent.props.userSession;
-
-    axios(`${BACKEND_HOST}/redis/updateAccountSummaryChartOneItem`, {
-      method: "put",
-      data: {
-        email,
-        timestamp: newDate(),
-        portfolioValue: totalPortfolio,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-export const updateCachedAccountSummaryChartInfoWholeList = (
-  email,
-  prismaTimestamps
-) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateAccountSummaryChartWholeList`, {
-      method: "put",
-      data: {
-        email,
-        prismaTimestamps,
       },
       withCredentials: true,
     })
@@ -121,25 +54,6 @@ export const getParsedCachedSharesList = (email) => {
       })
       .catch((err) => {
         reject(err);
-      });
-  });
-};
-
-export const updateCachedSharesList = (email, shares) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateSharesList`, {
-      method: "put",
-      data: {
-        email,
-        shares,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
       });
   });
 };
@@ -212,13 +126,9 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
 
 export default {
   getCachedAccountSummaryChartInfo,
-  getLatestCachedAccountSummaryChartInfoItem,
-  updateCachedAccountSummaryChartInfoOneItem,
-  updateCachedAccountSummaryChartInfoWholeList,
 
   getCachedSharesList, // Layout.js
   getParsedCachedSharesList, // AccountSummary, UserUtil
-  updateCachedSharesList, // Layout.js
 
   getFullStockInfo,
   getManyStockInfosUsingPrismaShares,

@@ -94,7 +94,8 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    socket = socketIOClient(BACKEND_HOST_FOR_SOCKET);
+    socket = socketIOClient(BACKEND_HOST_FOR_SOCKET, { secure: true });
+
     this.changePath();
     this.setupReduxStoreState();
   }

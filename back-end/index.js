@@ -15,15 +15,9 @@ try {
 }
 
 const {
-  getPassportCallbackHost
-} = require("./utils/low-dependency/NetworkUtil");
-
-const {
   oneSecond,
   oneDay,
-  oneMinute,
-  // clearIntervals,
-  clearIntervalsIfIntervalsNotEmpty
+  oneMinute
 } = require("./utils/low-dependency/DayTimeUtil");
 
 const {
@@ -31,12 +25,6 @@ const {
   checkAndUpdateAllUsers,
   updateRankingList
 } = require("./utils/top-layer/UserUtil");
-
-const {
-  checkMarketClosedString,
-  updatedAllUsersFlag,
-  updatedRankingListFlag
-} = require("./utils/top-layer/SocketUtil");
 
 const {
   checkMarketClosed
@@ -48,7 +36,7 @@ const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
-const { cleanUserCache } = require("./utils/redis-utils/RedisUtil");
+const { startSocketIO } = require("./socketIO");
 
 /*
 const {
@@ -60,19 +48,13 @@ const {
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
 const express = require("express");
 const app = express();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 const { pick } = require("lodash");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-const fs = require("fs-extra");
-
 const http = require("http");
 const server = http.createServer(app);
-const socketIO = require("socket.io");
-const io = socketIO(server);
 
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -171,158 +153,15 @@ setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
 
 // APIs for Passport are listed below:
 
-app.get(
-  "/auth/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
-);
-app.get(
-  "/auth/facebook/callback",
-  passport.authenticate("facebook", {
-    successRedirect: `${FRONTEND_HOST}/`,
-    failureRedirect: `${FRONTEND_HOST}/login`
-  })
-);
-
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    successRedirect: `${FRONTEND_HOST}/`,
-    failureRedirect: `${FRONTEND_HOST}/login`
-  })
-);
-
-app.post("/auth/signup", (req, res, next) => {
-  passport.authenticate("local-signup", (err, user, info) => {
-    if (err) {
-      return res.sendStatus(500);
-    }
-
-    if (user) {
-      return res.status(401).send(info);
-    }
-
-    const { email, password } = info;
-
-    /* month+1 because Date() counts month from 0 to 11, date+1 because
-     * we want this verification token to expire the next day
-     */
-    let date = new Date();
-    date =
-      date.getMonth() +
-      1 +
-      "/" +
-      (date.getDate() + 1) +
-      "/" +
-      date.getFullYear();
-
-    // If there is no user, send verification email to sign up email!
-
-    const file = new Promise((resolve, reject) => {
-      fs.readFile(
-        "./verificationHTML/verifyEmail.html",
-        "utf8",
-        (err, data) => {
-          if (err) {
-            reject(err);
-          }
-          console.log("read html file (verify email) successfully");
-          resolve(data);
-        }
-      );
-    });
-
-    const verificationToken = new Promise((resolve, reject) => {
-      prisma.userVerification
-        .create({
-          data: {
-            email,
-            password,
-            expiredAt: date
-          }
-        })
-        .then((res) => {
-          console.log("create verification successfully");
-          resolve(res);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-
-    Promise.all([file, verificationToken])
-      .then(([file, verificationToken]) => {
-        const PASSPORT_CALLBACK_HOST = getPassportCallbackHost();
-        // console.log(PASSPORT_CALLBACK_HOST);
-
-        // file is a string of the html file, we replace substring {{ formAction }}
-        // by the string 'something else'...
-        file = file.replace(
-          "{{ formAction }}",
-          `${PASSPORT_CALLBACK_HOST}/verificationSession/verification/${verificationToken.id}`
-        );
-
-        const msg = {
-          to: `${email}`,
-          from: "Bibliko <biblikoorg@gmail.com>",
-          subject: "Email Verification",
-          html: file
-        };
-        return sgMail.send(msg);
-      })
-      .then((emailVerification) => {
-        if (emailVerification) {
-          const notification = {
-            message:
-              "Processing (Can take a while). Check your inboxes... and spams."
-          };
-          return res.status(202).send(notification);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.sendStatus(500);
-      });
-  })(req, res, next);
-});
-
-app.post("/auth/login", (req, res, next) => {
-  passport.authenticate("local-login", (err, user, info) => {
-    if (err) {
-      return res.sendStatus(500);
-    }
-
-    if (!user) {
-      return res.status(401).send(info);
-    }
-
-    req.logIn(user, (err) => {
-      if (err) {
-        return res.sendStatus(500);
-      }
-
-      return res.sendStatus(200);
-    });
-  })(req, res, next);
-});
+app.use("/auth", require("./routes/auth"));
 
 app.use("/user", (req, res) => {
   res.send(req.user);
 });
 
 app.get("/logout", (req, res) => {
-  cleanUserCache(req.user.email)
-    .then((successful) => {
-      req.logout();
-      res.send("Successful");
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
+  req.logout();
+  res.send("Successful");
 });
 
 // verification APIs are listed below:
@@ -342,46 +181,9 @@ app.use("/getGlobalBackendVariablesFlags", (_, res) => {
 
 // set up socket.io server
 
-io.on("connection", (socket) => {
-  console.log("New client connected\n");
-
-  let intervalSendMarketClosed = null;
-  let intervalSendUpdatedAllUsersFlag = null;
-  let intervalSendUpdatedRankingListFlag = null;
-
-  // Join socket by user ID
-  socket.on("userConnected\n", socket.join);
-  socket.on("userDisconnected\n", socket.leave);
-
-  // disconnect
-  socket.on("disconnect", () => {
-    console.log("Client disconnected\n");
-  });
-
-  clearIntervalsIfIntervalsNotEmpty([
-    intervalSendMarketClosed,
-    intervalSendUpdatedAllUsersFlag,
-    intervalSendUpdatedRankingListFlag
-  ]);
-
-  intervalSendMarketClosed = setInterval(() => {
-    socket.emit(checkMarketClosedString, globalBackendVariables.isMarketClosed);
-  }, oneSecond);
-
-  intervalSendUpdatedAllUsersFlag = setInterval(() => {
-    socket.emit(
-      updatedAllUsersFlag,
-      globalBackendVariables.updatedAllUsersFlag
-    );
-  }, oneSecond);
-
-  intervalSendUpdatedRankingListFlag = setInterval(() => {
-    socket.emit(
-      updatedRankingListFlag,
-      globalBackendVariables.updatedRankingListFlag
-    );
-  }, oneSecond);
-});
+// user id <-> hasSetupCache
+const hasRoomSetupCache = new Set();
+startSocketIO(server, hasRoomSetupCache, globalBackendVariables);
 
 // back-end server listen
 server.listen(port, () => {

@@ -1,4 +1,4 @@
-const { isEqual, isEmpty } = require("lodash");
+const { isEqual } = require("lodash");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
@@ -6,9 +6,7 @@ const {
   getAsync,
   setAsync,
   listPushAsync,
-  delAsync,
-  keysAsync,
-  renameAsync
+  delAsync
 } = require("../../redis/redis-client");
 
 const { newDate, getYearUTCString } = require("../low-dependency/DayTimeUtil");
@@ -32,6 +30,7 @@ const {
  * - '${email}|changeEmailVerification': value
  * - '${email}|accountSummaryChart': list
  * - '${email}|sharesList': list
+ * - '${email}|clientTimestampLastJoinInSocketRoom': value
  *
  * - 'cachedMarketHoliday': value
  *
@@ -49,6 +48,12 @@ const passwordVerification = "passwordVerification";
 const changeEmailVerification = "changeEmailVerification";
 const accountSummaryChart = "accountSummaryChart";
 const sharesList = "sharesList";
+const clientTimestampLastJoinInSocketRoom =
+  "clientTimestampLastJoinInSocketRoom";
+
+const cachedMarketHoliday = "cachedMarketHoliday";
+const cachedShares = "cachedShares";
+const rankingList = "RANKING_LIST";
 
 /**
  * @returns true if market is closed, false if market is opened
@@ -162,7 +167,7 @@ const removeCachedVerificationCode = (email, cacheKey) => {
  */
 const redisUpdateOverallRankingList = (user) => {
   const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
-  return listPushAsync("RANKING_LIST", value);
+  return listPushAsync(rankingList, value);
 };
 
 /**
@@ -172,7 +177,7 @@ const redisUpdateOverallRankingList = (user) => {
  */
 const redisUpdateRegionalRankingList = (region, user) => {
   const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
-  return listPushAsync(`RANKING_LIST_${region}`, value);
+  return listPushAsync(`${rankingList}_${region}`, value);
 };
 
 /**
@@ -180,7 +185,7 @@ const redisUpdateRegionalRankingList = (region, user) => {
  */
 const getCachedMarketHoliday = () => {
   return new Promise((resolve, reject) => {
-    const redisKey = "cachedMarketHoliday";
+    const redisKey = cachedMarketHoliday;
     getAsync(redisKey)
       .then((redisMarketHoliday) => {
         if (!redisMarketHoliday) {
@@ -200,7 +205,7 @@ const getCachedMarketHoliday = () => {
  */
 const updateCachedMarketHoliday = (marketHoliday) => {
   return new Promise((resolve, reject) => {
-    const redisKey = "cachedMarketHoliday";
+    const redisKey = cachedMarketHoliday;
     const redisValue = createRedisValueFromMarketHoliday(marketHoliday);
     setAsync(redisKey, redisValue)
       .then((redisMarketHoliday) => {
@@ -213,63 +218,21 @@ const updateCachedMarketHoliday = (marketHoliday) => {
 };
 
 /**
- * @description Clean all user's cache sections
+ * @description Update timestamp if client joins in socket room
+ * @change Redis value "numberOfClients|timestamp"
  * @param email User email
  */
-const cleanUserCache = (email) => {
+const updateClientTimestampLastJoinInSocketRoom = (email) => {
   return new Promise((resolve, reject) => {
-    keysAsync(`${email}*`)
-      .then((keys) => {
-        if (!isEmpty(keys)) {
-          return delAsync(keys);
-        }
-      })
-      .then((numberOfKeysDeleted) => {
-        console.log(
-          `User Logout - Delete ${numberOfKeysDeleted} Redis Relating Keys\n`
-        );
-        resolve("Successful");
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
+    const redisKey = `${email}|${clientTimestampLastJoinInSocketRoom}`;
 
-const cleanChosenUserCache = (email, chosenKey) => {
-  return new Promise((resolve, reject) => {
-    delAsync(`${email}|${chosenKey}`)
-      .then((successfullyCleanKey) => {
-        resolve("Successful");
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
+    getAsync(redisKey)
+      .then((numberOfClients) => {
+        const time = new Date().getTime();
 
-/**
- * @description Change names of cache keys
- * @param newEmail User new email
- * @param oldEmail User old email
- */
-const changeNameUserCacheKeys = (newEmail, oldEmail) => {
-  return new Promise((resolve, reject) => {
-    keysAsync(`${oldEmail}*`)
-      .then((keys) => {
-        if (keys) {
-          const changeNameKeys = keys.map((key) => {
-            const indexSplitLine = key.indexOf("|");
-            const extraInfoInKey = key.substring(indexSplitLine + 1);
-            const newKey = `${newEmail}|${extraInfoInKey}`;
-
-            return renameAsync(key, newKey);
-          });
-          return Promise.all(changeNameKeys);
-        }
+        return setAsync(redisKey, time);
       })
-      .then(() => {
-        console.log(`Successfully change names of user's keys.\n`);
+      .then((finished) => {
         resolve("Successful");
       })
       .catch((err) => {
@@ -286,6 +249,11 @@ module.exports = {
   changeEmailVerification,
   accountSummaryChart,
   sharesList,
+  clientTimestampLastJoinInSocketRoom,
+
+  cachedMarketHoliday,
+  cachedShares,
+  rankingList,
 
   // Market Time
   isMarketClosedCheck,
@@ -303,8 +271,5 @@ module.exports = {
   getCachedMarketHoliday,
   updateCachedMarketHoliday,
 
-  cleanUserCache,
-  cleanChosenUserCache,
-
-  changeNameUserCacheKeys
+  updateClientTimestampLastJoinInSocketRoom
 };

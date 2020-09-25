@@ -342,6 +342,17 @@ const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
   };
 };
 
+/**
+ * @param redisString `email|accountSummaryChart` -> 'UTCDateString|portfolioValue'
+ */
+const parseAccountSummaryTimestamp = (redisString) => {
+  const valuesArray = redisString.split("|");
+  return {
+    UTCDateString: valuesArray[0],
+    portfolioValue: parseFloat(valuesArray[1])
+  };
+};
+
 module.exports = {
   parseCachedMarketHoliday,
   createRedisValueFromMarketHoliday,
@@ -357,5 +368,7 @@ module.exports = {
 
   createPrismaFiltersObject,
   createRedisValueFromTransactionsHistoryFilters,
-  parseRedisTransactionsHistoryFilters
+  parseRedisTransactionsHistoryFilters,
+
+  parseAccountSummaryTimestamp
 };

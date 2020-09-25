@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+
 const FacebookStrategy = require("passport-facebook").Strategy;
 const prisma = new PrismaClient();
 const {
