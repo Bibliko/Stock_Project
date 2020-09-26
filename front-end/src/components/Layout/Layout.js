@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
+import { isEqual } from "lodash";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
 
 import { socket } from "../../App";
@@ -24,6 +25,7 @@ import {
   checkIsDifferentFromSocketUpdatedAllUsersFlag,
   checkIsDifferentFromSocketUpdatedRankingListFlag,
   checkHasFinishedSettingUpUserCacheSession,
+  checkFinishedUpdatingUserSession,
 } from "../../utils/SocketUtil";
 
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
@@ -131,7 +133,7 @@ class Layout extends React.Component {
   setupIntervals = () => {
     if (this.props.userSession.hasFinishedSettingUp) {
       // this.checkStockQuotesInterval = setInterval(
-      //   () => checkStockQuotesToCalculateSharesValue(this),
+      //   () => checkStockQuotesToCalculateSharesValue(this, socket),
       //   30 * oneSecond
       // );
     }
@@ -141,6 +143,7 @@ class Layout extends React.Component {
     socketCheckMarketClosed(socket, this);
     checkIsDifferentFromSocketUpdatedAllUsersFlag(socket, this);
     checkIsDifferentFromSocketUpdatedRankingListFlag(socket, this);
+    checkFinishedUpdatingUserSession(socket, this);
   };
 
   clearIntervalsAndListeners = () => {

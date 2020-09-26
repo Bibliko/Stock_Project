@@ -89,7 +89,14 @@ router.put("/changeEmail", (req, res) => {
       }
     })
     .then((user) => {
-      res.send(user);
+      req.logout();
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.sendStatus(500);
+        }
+
+        return res.send(user);
+      });
     })
     .then(() => {
       return changeNameUserCacheKeys(newEmail, email);

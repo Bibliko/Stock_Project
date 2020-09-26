@@ -7,6 +7,11 @@ import {
   getManyStockInfosUsingPrismaShares,
 } from "./RedisUtil";
 
+import {
+  updateUserSession,
+  updateUserSessionInitialMessage,
+} from "./SocketUtil";
+
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
 
@@ -162,7 +167,7 @@ export const changePassword = (password, email) => {
 
 // User Data Related:
 
-export const changeUserData = (dataNeedChange, email, mutateUser) => {
+export const changeUserData = (dataNeedChange, email, mutateUser, socket) => {
   /**
    * dataNeedChange in form:
    *  dataNeedChange: {
@@ -186,6 +191,11 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
           userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
         }
         mutateUser(userDataRes.data);
+        socket.emit(
+          updateUserSession,
+          userDataRes.data,
+          updateUserSessionInitialMessage
+        );
         resolve("Successfully changed data");
       })
       .catch((err) => {
@@ -194,7 +204,7 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
   });
 };
 
-export const changeUserEmail = (email, newEmail, mutateUser) => {
+export const changeUserEmail = (email, newEmail, mutateUser, socket) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/changeEmail`, {
       method: "put",
@@ -209,6 +219,11 @@ export const changeUserEmail = (email, newEmail, mutateUser) => {
           userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
         }
         mutateUser(userDataRes.data);
+        socket.emit(
+          updateUserSession,
+          userDataRes.data,
+          updateUserSessionInitialMessage
+        );
         resolve("Successfully changed data");
       })
       .catch((err) => {
@@ -386,8 +401,12 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
  * @description_1 Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
  * @description_2 mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
  * @param thisComponent reference of component (this) - in this case Layout.js
+ * @param socket socket client exported from App.js
  */
-export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
+export const checkStockQuotesToCalculateSharesValue = (
+  thisComponent,
+  socket
+) => {
   const { isMarketClosed, mutateUser } = thisComponent.props;
   const { email, cash, totalPortfolio } = thisComponent.props.userSession;
 
@@ -415,7 +434,7 @@ export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
         newTotalPortfolioValue &&
         !isEqual(newTotalPortfolioValue, totalPortfolio)
       ) {
-        return changeUserData(dataNeedChange, email, mutateUser);
+        return changeUserData(dataNeedChange, email, mutateUser, socket);
       } else {
         //console.log("No need to update user data.");
       }

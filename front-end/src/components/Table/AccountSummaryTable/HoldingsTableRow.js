@@ -2,6 +2,7 @@ import React from "react";
 import { isEqual, pick } from "lodash";
 import clsx from "clsx";
 import { withRouter } from "react-router";
+import { socket } from "../../../App";
 
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
@@ -22,6 +23,7 @@ import {
   DeleteForeverRounded as DeleteForeverRoundedIcon,
   AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
 } from "@material-ui/icons";
+
 
 const styles = (theme) => ({
   tableCell: {
@@ -210,7 +212,7 @@ class HoldingsTableRow extends React.Component {
         set: newWatchlist,
       },
     };
-    changeUserData(dataNeedChange, email, this.props.mutateUser)
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket)
       .then(() => {
         this.setState({
           isInWatchlist: true,
@@ -238,7 +240,7 @@ class HoldingsTableRow extends React.Component {
         set: newWatchlist,
       },
     };
-    changeUserData(dataNeedChange, email, this.props.mutateUser)
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket)
       .then(() => {
         this.setState({
           isInWatchlist: false,

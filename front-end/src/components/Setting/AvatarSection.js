@@ -1,6 +1,8 @@
 import React from "react";
 import storage from "../../firebase/firebaseStorage.js";
 
+import { socket } from "../../App.js";
+
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
@@ -8,6 +10,7 @@ import { changeUserData } from "../../utils/UserUtil";
 
 import UploadFileDialog from "../Dialog/UploadFileDialog";
 import Avatar from "./Avatar";
+
 
 class AvatarSection extends React.Component {
   constructor(props) {
@@ -80,7 +83,8 @@ class AvatarSection extends React.Component {
           return changeUserData(
             { avatarUrl: downloadURL },
             this.props.userSession.email,
-            this.props.mutateUser
+            this.props.mutateUser,
+            socket
           );
         })
         .then(() => {

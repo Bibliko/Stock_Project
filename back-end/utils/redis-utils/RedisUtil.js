@@ -110,7 +110,7 @@ const isMarketClosedCheck = () => {
  */
 const cacheVerificationCode = (email, secretCode, cacheKey) => {
   return new Promise((resolve, reject) => {
-    const timestamp = Math.round(Date.now() / 1000);
+    const timestamp = new Date().getTime();
     const redisKey = `${email}|${cacheKey}`;
     const redisValue = `${secretCode}|${timestamp}`;
 

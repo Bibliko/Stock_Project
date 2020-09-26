@@ -182,8 +182,7 @@ app.use("/getGlobalBackendVariablesFlags", (_, res) => {
 // set up socket.io server
 
 // user id <-> hasSetupCache
-const hasRoomSetupCache = new Set();
-startSocketIO(server, hasRoomSetupCache, globalBackendVariables);
+startSocketIO(server, globalBackendVariables);
 
 // back-end server listen
 server.listen(port, () => {

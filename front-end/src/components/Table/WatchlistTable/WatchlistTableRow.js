@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { withRouter } from "react-router";
 import { isEqual, pick } from "lodash";
+import { socket } from "../../../App";
 
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
@@ -206,7 +207,7 @@ class WatchlistTableRow extends React.Component {
         set: newWatchlist,
       },
     };
-    changeUserData(dataNeedChange, email, this.props.mutateUser)
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket)
       .then((res) => {
         this.props.openSnackbar(companyCode);
       })

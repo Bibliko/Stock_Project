@@ -1,6 +1,7 @@
 import React from "react";
 import validator from "email-validator";
 import clsx from "clsx";
+import { socket } from '../../App';
 
 import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
 import SettingPasswordTextField from "../TextField/SettingTextFields/SettingPasswordTextField";
@@ -264,7 +265,8 @@ class SensitiveSection extends React.Component {
             changeUserEmail(
               this.props.email,
               this.email,
-              this.props.mutateUser
+              this.props.mutateUser,
+              socket
             ).catch((err) => {
               console.log(err);
             });
