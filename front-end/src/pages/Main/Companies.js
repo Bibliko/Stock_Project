@@ -4,6 +4,11 @@ import clsx from "clsx";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
+import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
+
+import {
+  SortDirection,
+} from "react-virtualized";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -48,7 +53,6 @@ const styles = (theme) => ({
       fontSize: "large",
     },
     fontWeight: "bold",
-    marginBottom: "1px",
     color: "white",
     marginBottom: "5px",
   },
@@ -59,18 +63,55 @@ const styles = (theme) => ({
   },
 });
 
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === SortDirection.DESC
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
 class Companies extends React.Component {
   state = {
     openDialog: false,
-    price: [0,260000],
+    stockData: [],
+    sortBy: "id",
+    sortDirection: SortDirection.ASC,
+    price: [0,320000],
     marketCap: [0,1000],
     sector: "All",
     industry: "All",
-
     success: false,
     fail: false,
     loading: false,
     debounce: false,
+  };
+
+  handleSort = (sortDirection, sortBy) => {
+    let { stockData } = this.state;
+    this.setState({
+      stockData: stableSort(stockData, getComparator(sortDirection, sortBy)),
+      sortBy: sortBy,
+      sortDirection: sortDirection
+    });
   };
 
   handleOpenDialog = (companyName) => {
@@ -100,29 +141,69 @@ class Companies extends React.Component {
     this.setState({
       loading: false,
       success: true,
+      fail: false,
+    });
+  };
+
+  setError = () => {
+    this.setState({
+      loading: false,
+      success: false,
+      fail: true,
     });
   };
 
   handleReload = () => {
+    if (this.state.debounce) return;
+
     this.setState({
       loading: true,
       debounce: true,
     });
-    setTimeout(this.setSuccess,2000);
-    setTimeout(()=>{this.setState({debounce:false})},5000);
+    this.updateStockScreener(this.setSuccess, this.setError);
+    setTimeout(() => {this.setState({debounce:false})}, 5000);
   };
+
+  updateStockScreener = (callback = ()=>{}, errorCallback = ()=>{}) => {
+    const {
+      price,
+      marketCap,
+      sector,
+      industry,
+    } = this.state;
+
+    getStockScreener({
+      priceFilter: price,
+      marketCapFilter: this.getMarketCap(marketCap),
+      sectorFilter: sector,
+      industryFilter: industry,
+    })
+    .then((stockData) => {
+      this.setState({stockData: stockData});
+      callback();
+    })
+    .catch(() => {
+      console.log("error");
+      errorCallback();
+    });
+  };
+
+  componentDidMount() {
+    this.updateStockScreener();
+  }
 
   render() {
     const { classes } = this.props;
     const {
       openDialog,
       companyName,
+      sortBy,
+      sortDirection,
+      stockData,
       price,
       marketCap,
       sector,
       industry,
-
-      debounce,
       success,
       fail,
       loading,
@@ -139,7 +220,6 @@ class Companies extends React.Component {
           <Grid item xs={12} sm={4}>
             <ProgressButton
               containerClass={classes.reloadButton}
-              disabled={debounce}
               size={"medium"}
               success={success}
               fail={fail}
@@ -164,6 +244,10 @@ class Companies extends React.Component {
 
             <CompaniesListTable
               height={600}
+              rows={stockData}
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              handleSort={this.handleSort}
               handleOpenCompanyDetail={this.handleOpenDialog}
             />
           </Grid>

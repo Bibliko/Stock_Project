@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+
+import { simplifyNumber } from "../../../utils/low-dependency/NumberUtil";
+
 import { withStyles } from "@material-ui/core/styles";
 import TableCell from "@material-ui/core/TableCell";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
@@ -19,15 +22,12 @@ const styles = (theme) => ({
     boxSizing: "border-box"
   },
   table: {
-    // temporary right-to-left patch, waiting for
-    // https://github.com/bvaughn/react-virtualized/issues/454
     "& .ReactVirtualized__Table__headerRow": {
       flip: false,
       paddingRight: theme.direction === "rtl" ? "0 !important" : undefined
     }
   },
   tableHeader: {
-    color: "white",
     fontSize: "20px",
     fontWeight: "bold",
     textAlign: "left",
@@ -35,13 +35,23 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "15px",
     },
+    "& .MuiTableSortLabel-active": {
+      color: theme.palette.primary.main,
+    },
+    "& .MuiTableSortLabel-icon": {
+      color: "inherit",
+    },
+    flexDirection: "row",
+    alignItems: "center",
   },
   tableHeaderRow: {
+    borderBottom: "1px solid #9ED2EF",
     backgroundColor: theme.palette.tableHeader.main,
   },
   tableRow: {
     cursor: "pointer",
     borderBottom: "1px solid #9ED2EF",
+    background: theme.palette.tableBackground.gradient,
   },
   tableNameCell: {
     "&:hover": {
@@ -53,6 +63,8 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "12px",
     },
+    flexDirection: "column",
+    alignItems: "initial",
   },
   tableNormalCell: {
     paddingLeft: "0.4em",
@@ -61,14 +73,15 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "12px",
     },
+    flexDirection: "column",
+    alignItems: "initial",
   },
   tableCell: {
+    color: "white",
     flex: 1,
     width: "100%",
     height: "100%",
     display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
   },
   noClick: {
     cursor: "initial"
@@ -100,7 +113,7 @@ class VirtualizedTable extends React.Component {
   getRowClassName = ({ index }) => {
     const { classes } = this.props;
 
-    return clsx(index === -1 && classes.tableHeaderRow, classes.tableRow, classes.flexContainer);
+    return clsx(index === -1 ? classes.tableHeaderRow : classes.tableRow, classes.flexContainer);
   };
 
   cellRenderer = ({ cellData, dataKey, parent, columnIndex, rowIndex }) => {
@@ -114,15 +127,15 @@ class VirtualizedTable extends React.Component {
         rowIndex={rowIndex}>
         <div
           className={clsx(classes.tableCell, {
-            [clsx(classes.noClick, classes.tableNormalCell)]: columnIndex !== 0,
-            [classes.tableNameCell]: columnIndex === 0
+            [clsx(classes.noClick, classes.tableNormalCell)]: dataKey != "name",
+            [classes.tableNameCell]: dataKey == "name",
           })}
           style={{
             whiteSpace: 'normal',
           }}
           onClick={columnIndex === 0 ? () => onCompanyClick(cellData) : ()=>{}}
         >
-          {cellData}
+          {dataKey == "marketCap" ? simplifyNumber(cellData) : cellData}
         </div>
       </CellMeasurer>
     );
@@ -181,7 +194,6 @@ class VirtualizedTable extends React.Component {
           <Table
             height={height}
             width={Math.max(width, minWidth)}
-            // rowHeight={rowHeight}
             rowHeight={cache.rowHeight}
             gridStyle={{
               direction: "inherit"

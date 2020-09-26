@@ -43,6 +43,10 @@ const styles = (theme) => ({
     backgroundColor: "#000033",
     color: "white",
   },
+
+  dialogAction: {
+    backgroundColor: "#000033",
+  },
 });
 
 function TabPanel(props) {
@@ -150,7 +154,7 @@ class CompanyDialog extends React.Component {
             </SwipeableViews>
           </DialogContent>
 
-          <DialogActions>
+          <DialogActions className={classes.dialogAction}>
             <Button onClick={handleClose} color="primary">
               Buy
             </Button>
