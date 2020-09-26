@@ -84,7 +84,6 @@ class Filter extends React.Component {
   };
 
   render () {
-    // const { } = this.state;
     const {
       classes,
       price,
@@ -102,8 +101,8 @@ class Filter extends React.Component {
           label: "$0",
         },
         {
-          value: 260000,
-          label: "$260K",
+          value: 320000,
+          label: "$320K",
         },
       ],
       marketCap: [
@@ -111,14 +110,6 @@ class Filter extends React.Component {
           value: 0,
           label: "$0",
         },
-        // {
-        //   value: 1e6**(1.0/4.0),
-        //   label: "$1M",
-        // },
-        // {
-        //   value: 1e9**(1.0/4.0),
-        //   label: "$1B",
-        // },
         {
           value: 1e3,
           label: "$1T",
@@ -169,7 +160,7 @@ class Filter extends React.Component {
           <CustomSlider
             value={price}
             min={0}
-            max={260000}
+            max={320000}
             onChange={(event, value) => handleChange("price", value)}
             valueLabelDisplay="auto"
             getAriaValueText={this.valueLabelFormat}
@@ -204,7 +195,7 @@ class Filter extends React.Component {
             items={sectors}
             value={sector}
             emptyLabel={"All"}
-            onChange={(event) => this.handleChange("sector", event.target.value)}
+            onChange={(event) => handleChange("sector", event.target.value)}
           />
         </Grid>
         <Grid item xs={6} sm={12} className={clsx(classes.selectBox, classes.itemGrid)}>
@@ -213,7 +204,7 @@ class Filter extends React.Component {
             items={industries}
             value={industry}
             emptyLabel={"All"}
-            onChange={(event) => this.handleChange("industry", event.target.value)}
+            onChange={(event) => handleChange("industry", event.target.value)}
           />
         </Grid>
       </Grid>

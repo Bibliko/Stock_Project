@@ -39,7 +39,7 @@ model AccountSummaryTimestamp {
   id             String @default(cuid()) @id
   UTCDateString  String
   UTCDateKey     String
-  year           Int?
+  year           Int
   portfolioValue Float
   user           User   @relation(fields: [userID], references: [id])
   userID         String

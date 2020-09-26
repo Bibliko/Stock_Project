@@ -66,6 +66,32 @@ export const searchCompanyTickers = (searchQuery) => {
   });
 };
 
+export const getStockScreener = ( {marketCapFilter, sectorFilter, industryFilter, priceFilter} ) => {
+  const sectorString = (sectorFilter !== "All") ? "&sector="+sectorFilter : "";
+  const industryString = (industryFilter !== "All") ? "&sindustry="+industryFilter : "";
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${marketCapFilter[0]}&marketCapLowerThan=${marketCapFilter[1]}${sectorString}${industryString}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stockScreener) => {
+        return stockScreener.json();
+      })
+      .then((stockScreenerJSON) => {
+        resolve(stockScreenerJSON.map(({companyName, symbol, price, marketCap, industry, sector}) => {
+            return {
+              name: companyName,
+              code: symbol,
+              price: price,
+              marketCap: marketCap,
+          }})
+          .filter(({price}) => priceFilter[0] <= price && price <= priceFilter[1]));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const shortenCompanyNameToFourWords = (companyName) => {
   let resultName = "";
   let numberOfSpaces = 0;
@@ -85,5 +111,6 @@ export default {
   searchNYSETickers,
   searchNASDAQTickers,
   searchCompanyTickers,
+  getStockScreener,
   shortenCompanyNameToFourWords,
 };
