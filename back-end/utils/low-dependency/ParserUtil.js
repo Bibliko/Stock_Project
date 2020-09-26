@@ -1,7 +1,7 @@
 const { isEqual } = require("lodash");
 
 /**
- * 'cachedMarketHoliday': 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
+ * @param redisString From 'cachedMarketHoliday' -> 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
  */
 const parseCachedMarketHoliday = (redisString) => {
   const valuesArray = redisString.split("|");
@@ -21,8 +21,7 @@ const parseCachedMarketHoliday = (redisString) => {
 };
 
 /**
- *    'cachedShares|AAPL|quote': 'name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
- *    'cachedShares|AAPL|profile': 'price|beta|volAvg|mktCap|lastDiv|range|changes|companyName|exchange|exchangeShortName|industry|website|description|ceo|sector|country|fullTimeEmployees|phone|address|city|state|zip|dcfDiff|dcf|image|ipoDate'
+ * @param redisString From 'cachedShares|AAPL|quote' -> 'name|price|changesPercentage|change|dayLow|dayHigh|yearHigh|yearLow|marketCap|priceAvg50|priceAvg200|volume|avgVolume|exchange|open|previousClose|eps|pe|earningsAnnouncement|sharesOutstanding|timestamp'
  */
 const parseCachedShareQuote = (redisString) => {
   const valuesArray = redisString.split("|");
@@ -51,6 +50,10 @@ const parseCachedShareQuote = (redisString) => {
     timestamp: parseInt(valuesArray[20], 10)
   };
 };
+
+/**
+ * @param redisString From 'cachedShares|AAPL|profile': 'price|beta|volAvg|mktCap|lastDiv|range|changes|companyName|exchange|exchangeShortName|industry|website|description|ceo|sector|country|fullTimeEmployees|phone|address|city|state|zip|dcfDiff|dcf|image|ipoDate'
+ */
 const parseCachedShareProfile = (redisString) => {
   const valuesArray = redisString.split("|");
 
@@ -84,6 +87,10 @@ const parseCachedShareProfile = (redisString) => {
   };
 };
 
+/**
+ * @param finishedTransaction Prisma Model Transaction with isFinished attribute == TRUE
+ * @returns Finished Transaction redis string
+ */
 const createRedisValueFromFinishedTransaction = (finishedTransaction) => {
   const {
     id,
@@ -101,7 +108,8 @@ const createRedisValueFromFinishedTransaction = (finishedTransaction) => {
 };
 
 /**
- * filters: {
+ * @param filters
+ * {
  *    type: buy, sell, OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
@@ -110,6 +118,7 @@ const createRedisValueFromFinishedTransaction = (finishedTransaction) => {
  *    spendOrGain: (int/none)_to_(int/none)
  *    transactionTime: (DateTime/none)_to_(DateTime/none)
  * }
+ * @returns Transactions History filters redis string
  */
 const createRedisValueFromTransactionsHistoryFilters = (filters) => {
   const {
@@ -123,8 +132,10 @@ const createRedisValueFromTransactionsHistoryFilters = (filters) => {
   } = filters;
   return `${type};${code};${quantity};${price};${brokerage};${spendOrGain};${transactionTime}`;
 };
+
 /**
- * `${type};${code};${quantity};${price};${brokerage};${spendOrGain};${transactionTime}`
+ * @param redisValue `type;code;quantity;price;brokerage;spendOrGain;transactionTime`
+ * @returns Transactions History filter object
  */
 const parseRedisTransactionsHistoryFilters = (redisValue) => {
   const values = redisValue.split(";");
@@ -140,7 +151,8 @@ const parseRedisTransactionsHistoryFilters = (redisValue) => {
 };
 
 /**
- * filters: {
+ * @param filters
+ * {
  *    type: buy, sell, OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
@@ -211,6 +223,10 @@ const createPrismaFiltersObject = (filters) => {
   return filtering;
 };
 
+/**
+ * @param marketHoliday Market Holiday object obtained from Database
+ * @returns Redis market holiday value used for cache
+ */
 const createRedisValueFromMarketHoliday = (marketHoliday) => {
   const {
     id,
@@ -229,6 +245,10 @@ const createRedisValueFromMarketHoliday = (marketHoliday) => {
   return `${id}|${year}|${newYearsDay}|${martinLutherKingJrDay}|${washingtonBirthday}|${goodFriday}|${memorialDay}|${independenceDay}|${laborDay}|${thanksgivingDay}|${christmas}`;
 };
 
+/**
+ * @param stockQuoteJSON Stock quote similar to Financial Modeling Prep '/quote' API
+ * @returns Redis stock quote value used for cache
+ */
 const createRedisValueFromStockQuoteJSON = (stockQuoteJSON) => {
   const {
     name,
@@ -257,6 +277,10 @@ const createRedisValueFromStockQuoteJSON = (stockQuoteJSON) => {
   return `${name}|${price}|${changesPercentage}|${change}|${dayLow}|${dayHigh}|${yearHigh}|${yearLow}|${marketCap}|${priceAvg50}|${priceAvg200}|${volume}|${avgVolume}|${exchange}|${open}|${previousClose}|${eps}|${pe}|${earningsAnnouncement}|${sharesOutstanding}|${timestamp}`;
 };
 
+/**
+ * @param stockProfileJSON Stock profile similar to Financial Modeling Prep '/profile' API
+ * @returns Redis stock profile value used for cache
+ */
 const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
   const {
     price,
@@ -291,12 +315,18 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
 };
 
 /**
- * 'AAPL,FB,GOOGL'
+ * @param cachedSharesList Shares list of symbols ['AAPL', 'GOOGL', 'FB', ...]
+ * @returns Redis symbols string value used for cache
  */
 const createSymbolsStringFromCachedSharesList = (cachedSharesList) => {
   return cachedSharesList.join();
 };
 
+/**
+ * @param stockQuoteJSON Stock quote similar to Financial Modeling Prep '/quote' API
+ * @param stockProfileJSON Stock profile similar to Financial Modeling Prep '/profile' API
+ * @returns Combined Stock Info Object (includes both quote and profile)
+ */
 const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
   return {
     ...stockQuoteJSON,
@@ -304,26 +334,33 @@ const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
   };
 };
 
+/**
+ * @param redisString `email|accountSummaryChart` -> 'UTCDateString|portfolioValue'
+ */
+const parseAccountSummaryTimestamp = (redisString) => {
+  const valuesArray = redisString.split("|");
+  return {
+    UTCDateString: valuesArray[0],
+    portfolioValue: parseFloat(valuesArray[1])
+  };
+};
+
 module.exports = {
   parseCachedMarketHoliday,
+  createRedisValueFromMarketHoliday,
 
   parseCachedShareQuote,
   parseCachedShareProfile,
+  createRedisValueFromStockQuoteJSON,
+  createRedisValueFromStockProfileJSON,
+  combineFMPStockQuoteAndProfile,
+  createSymbolsStringFromCachedSharesList,
 
   createRedisValueFromFinishedTransaction,
 
-  // Transactions History Filters
+  createPrismaFiltersObject,
   createRedisValueFromTransactionsHistoryFilters,
   parseRedisTransactionsHistoryFilters,
-  //
 
-  createPrismaFiltersObject,
-
-  createRedisValueFromMarketHoliday,
-
-  createRedisValueFromStockQuoteJSON,
-  createRedisValueFromStockProfileJSON,
-  createSymbolsStringFromCachedSharesList,
-
-  combineFMPStockQuoteAndProfile
+  parseAccountSummaryTimestamp
 };

@@ -4,22 +4,29 @@ import { connect } from "react-redux";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
 
 import { socket } from "../../App";
-import { mainSetup } from "./setupForCachingInLayout";
 
 import {
   shouldRedirectToLogin,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneMinute, newDate } from "../../utils/low-dependency/DayTimeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+
+import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
 import {
+  joinUserRoom,
   checkMarketClosed,
   socketCheckMarketClosed,
+  updatedAllUsersFlag,
+  updatedRankingListFlag,
   offSocketListeners,
+  checkIsDifferentFromSocketUpdatedAllUsersFlag,
+  checkIsDifferentFromSocketUpdatedRankingListFlag,
+  checkHasFinishedSettingUpUserCacheSession,
 } from "../../utils/SocketUtil";
 
-import { updateCachedAccountSummaryChartInfoOneItem } from "../../utils/RedisUtil";
+import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
 
 import AppBar from "./AppBar";
 import Reminder from "../Reminder/Reminder";
@@ -27,9 +34,11 @@ import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { CssBaseline } from "@material-ui/core";
+import { CssBaseline, Snackbar, Button, IconButton } from "@material-ui/core";
 
 import { Skeleton } from "@material-ui/lab";
+
+import { Close as CloseIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
@@ -84,45 +93,72 @@ const styles = (theme) => ({
     height: "100vh",
     backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
+  refreshCard: {
+    "& .MuiSnackbarContent-root": {
+      backgroundColor: theme.palette.refreshSnackbar.main,
+    },
+  },
+  reloadButton: {
+    color: theme.palette.refreshSnackbar.reloadButton,
+    fontWeight: "bold",
+  },
 });
 
 class Layout extends React.Component {
   state = {
     hideReminder: false,
     finishedSettingUp: false,
+
+    updatedAllUsersFlagFromLayout: false,
+    updatedRankingListFlagFromLayout: false,
+    openRefreshCard: false,
   };
 
   checkStockQuotesInterval;
-  accountSummaryChartSeriesInterval;
 
-  updateCachedAccountSummaryChartSeries = () => {
-    const { email, totalPortfolio } = this.props.userSession;
-    updateCachedAccountSummaryChartInfoOneItem(
-      email,
-      newDate(),
-      totalPortfolio
-    ).catch((err) => {
-      console.log(err);
-    });
+  handleCloseRefreshCard = (event, reason) => {
+    if (reason !== "clickaway") {
+      this.setState({
+        openRefreshCard: false,
+      });
+    }
+  };
+
+  reloadLayout = () => {
+    window.location.reload();
   };
 
   setupIntervals = () => {
     if (this.props.userSession.hasFinishedSettingUp) {
       // this.checkStockQuotesInterval = setInterval(
-      //   () =>
-      //     checkStockQuotesToCalculateSharesValue(
-      //       this.props.isMarketClosed,
-      //       this.props.userSession,
-      //       this.props.mutateUser
-      //     ),
+      //   () => checkStockQuotesToCalculateSharesValue(this),
       //   30 * oneSecond
       // );
-
-      this.accountSummaryChartSeriesInterval = setInterval(
-        () => this.updateCachedAccountSummaryChartSeries(),
-        oneMinute
-      );
     }
+  };
+
+  setupSocketListeners = () => {
+    socketCheckMarketClosed(socket, this);
+    checkIsDifferentFromSocketUpdatedAllUsersFlag(socket, this);
+    checkIsDifferentFromSocketUpdatedRankingListFlag(socket, this);
+  };
+
+  clearIntervalsAndListeners = () => {
+    clearInterval(this.checkStockQuotesInterval);
+    offSocketListeners(socket, checkMarketClosed);
+    offSocketListeners(socket, updatedAllUsersFlag);
+    offSocketListeners(socket, updatedRankingListFlag);
+  };
+
+  afterSettingUpUserCacheSession = () => {
+    this.setState(
+      {
+        finishedSettingUp: true,
+      },
+      () => {
+        this.setupIntervals();
+      }
+    );
   };
 
   componentDidMount() {
@@ -133,51 +169,40 @@ class Layout extends React.Component {
       return;
     }
 
-    if (this.props.userSession.hasFinishedSettingUp) {
-      mainSetup(
-        this.props.isMarketClosed,
-        this.props.userSession,
-        this.props.mutateUser
-      )
-        .then((finishedSettingUp) => {
-          this.setState({
-            finishedSettingUp: true,
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      this.setState({
-        finishedSettingUp: true,
+    getGlobalBackendVariablesFlags()
+      .then((flags) => {
+        const { updatedAllUsersFlag, updatedRankingListFlag } = flags;
+
+        this.setState(
+          {
+            updatedAllUsersFlagFromLayout: updatedAllUsersFlag,
+            updatedRankingListFlagFromLayout: updatedRankingListFlag,
+          },
+          () => {
+            socket.emit(joinUserRoom, this.props.userSession);
+            this.setupSocketListeners();
+            checkHasFinishedSettingUpUserCacheSession(socket, this);
+          }
+        );
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    }
-
-    socketCheckMarketClosed(
-      socket,
-      this.props.isMarketClosed,
-      this.props.mutateMarket
-    );
-
-    this.setupIntervals();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
     }
   }
 
   componentWillUnmount() {
-    clearInterval(this.checkStockQuotesInterval);
-    clearInterval(this.accountSummaryChartSeriesInterval);
-
-    offSocketListeners(socket, checkMarketClosed);
+    this.clearIntervalsAndListeners();
   }
 
   render() {
     const { classes } = this.props;
-    const { finishedSettingUp } = this.state;
+    const { finishedSettingUp, openRefreshCard } = this.state;
 
     if (shouldRedirectToLogin(this.props)) {
       return null;
@@ -203,6 +228,32 @@ class Layout extends React.Component {
             <div className={classes.bottomSpace} />
           </div>
         </main>
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={openRefreshCard}
+          className={classes.refreshCard}
+          onClose={this.handleCloseRefreshCard}
+          message="New Data / Refresh Page"
+          action={
+            <React.Fragment>
+              <Button
+                className={classes.reloadButton}
+                size="small"
+                onClick={this.reloadLayout}
+              >
+                RELOAD
+              </Button>
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={this.handleCloseRefreshCard}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </React.Fragment>
+          }
+        />
       </div>
     );
   }

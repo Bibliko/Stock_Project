@@ -1,6 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Learn more about prisma middlewares
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -33,6 +35,7 @@ model User {
   transactions              UserTransaction[]
   shares                    Share[]
   accountSummaryChartInfo   AccountSummaryTimestamp[]
+  rankingChartInfo          RankingTimestamp[]
 }
 
 model AccountSummaryTimestamp {
@@ -43,6 +46,19 @@ model AccountSummaryTimestamp {
   portfolioValue Float
   user           User   @relation(fields: [userID], references: [id])
   userID         String
+
+  @@unique([UTCDateKey, userID])
+}
+
+model RankingTimestamp {
+  id              String @default(cuid()) @id
+  UTCDateString   String
+  UTCDateKey      String
+  year            Int
+  ranking         Int
+  regionalRanking Int
+  user            User   @relation(fields: [userID], references: [id])
+  userID          String
 
   @@unique([UTCDateKey, userID])
 }

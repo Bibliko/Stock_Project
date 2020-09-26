@@ -22,70 +22,6 @@ export const getCachedAccountSummaryChartInfo = (email) => {
   });
 };
 
-export const getLatestCachedAccountSummaryChartInfoItem = (email) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getAccountSummaryChartLatestItem`, {
-      method: "get",
-      params: {
-        email,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-export const updateCachedAccountSummaryChartInfoOneItem = (
-  email,
-  timestamp,
-  portfolioValue
-) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateAccountSummaryChartOneItem`, {
-      method: "put",
-      data: {
-        email,
-        timestamp,
-        portfolioValue,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
-export const updateCachedAccountSummaryChartInfoWholeList = (
-  email,
-  prismaTimestamps
-) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateAccountSummaryChartWholeList`, {
-      method: "put",
-      data: {
-        email,
-        prismaTimestamps,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
-      });
-  });
-};
-
 export const getCachedSharesList = (email) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/redis/getSharesList`, {
@@ -118,25 +54,6 @@ export const getParsedCachedSharesList = (email) => {
       })
       .catch((err) => {
         reject(err);
-      });
-  });
-};
-
-export const updateCachedSharesList = (email, shares) => {
-  return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/updateSharesList`, {
-      method: "put",
-      data: {
-        email,
-        shares,
-      },
-      withCredentials: true,
-    })
-      .then((res) => {
-        resolve(res);
-      })
-      .catch((e) => {
-        reject(e);
       });
   });
 };
@@ -209,13 +126,9 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
 
 export default {
   getCachedAccountSummaryChartInfo,
-  getLatestCachedAccountSummaryChartInfoItem,
-  updateCachedAccountSummaryChartInfoOneItem,
-  updateCachedAccountSummaryChartInfoWholeList,
 
   getCachedSharesList, // Layout.js
   getParsedCachedSharesList, // AccountSummary, UserUtil
-  updateCachedSharesList, // Layout.js
 
   getFullStockInfo,
   getManyStockInfosUsingPrismaShares,

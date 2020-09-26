@@ -47,17 +47,19 @@ const styles = (theme) => ({
 /**
  * props required:
  * name
+ * disabled
  * function changeData
  * function enterData
  */
 
 class NormalTextField extends React.Component {
   render() {
-    const { classes, name, changeData, enterData } = this.props;
+    const { classes, name, disabled, changeData, enterData } = this.props;
 
     return (
       <TextField
         id={name}
+        disabled={disabled}
         name={name}
         label={name}
         variant="filled"

@@ -39,11 +39,6 @@ var socket;
 const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    socket = socketIOClient(BACKEND_HOST_FOR_SOCKET);
-  }
-
   // variables
   specialLinks = [
     "/login",
@@ -100,6 +95,8 @@ class App extends React.Component {
   };
 
   componentDidMount() {
+    socket = socketIOClient(BACKEND_HOST_FOR_SOCKET, { secure: true });
+
     this.changePath();
     this.setupReduxStoreState();
   }

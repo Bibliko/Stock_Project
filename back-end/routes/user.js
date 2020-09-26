@@ -11,13 +11,40 @@ const {
   getTransactionsHistoryItemInM5RU,
   createOrOverwriteTransactionsHistoryM5RUItemRedisKey,
   addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey
-} = require("../utils/RedisUtil");
+} = require("../utils/redis-utils/TransactionsHistoryMost5RecentlyUsed");
+
 const {
   getChunkUserTransactionsHistoryForRedisM5RU,
   getLengthUserTransactionsHistoryForRedisM5RU
 } = require("../utils/top-layer/UserUtil");
 
+const { rankingList } = require("../utils/redis-utils/RedisUtil");
+
+const {
+  changeNameUserCacheKeys
+} = require("../utils/redis-utils/UserCachedDataUtil");
+
+const {
+  getUserAccountSummaryChartTimestamps,
+  getUserRankingTimestamps,
+  getUserData
+} = require("../utils/low-dependency/PrismaUserDataUtil");
+
 // const { indices } = require('../algolia');
+
+/*
+
+Routes List:
+- changeData
+- changeEmail
+- getData
+- getOverallRanking
+- getRegionalRanking
+- getUerTransactionsHistory
+- getUserAccountSummaryChartTimestamps
+- getUserRankingTimestamps
+
+*/
 
 router.put("/changeData", (req, res) => {
   const { dataNeedChange, email } = req.body;
@@ -49,39 +76,36 @@ router.put("/changeData", (req, res) => {
     });
 });
 
+router.put("/changeEmail", (req, res) => {
+  const { email, newEmail } = req.body;
+
+  prisma.user
+    .update({
+      where: {
+        email
+      },
+      data: {
+        email: newEmail
+      }
+    })
+    .then((user) => {
+      res.send(user);
+    })
+    .then(() => {
+      return changeNameUserCacheKeys(newEmail, email);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to change user's data");
+    });
+});
+
 router.get("/getData", (req, res) => {
   const { email, dataNeeded } = req.query;
 
   var dataJSON = JSON.parse(dataNeeded);
 
-  if (dataJSON.shares) {
-    dataJSON = {
-      ...dataJSON,
-      shares: {
-        orderBy: [
-          {
-            companyCode: "asc"
-          }
-        ]
-      }
-    };
-  }
-
-  /**
-   *  dataNeeded in form of:
-   *      dataNeeded: {
-   *          cash: true,
-   *          region: true,
-   *          ...
-   *      }
-   */
-  prisma.user
-    .findOne({
-      where: {
-        email
-      },
-      select: dataJSON
-    })
+  getUserData(email, dataJSON)
     .then((data) => {
       res.send(data);
     })
@@ -94,7 +118,7 @@ router.get("/getData", (req, res) => {
 router.get("/getOverallRanking", (req, res) => {
   const { page } = req.query;
 
-  listRangeAsync("RANKING_LIST", 8 * (page - 1), 8 * page - 1)
+  listRangeAsync(rankingList, 8 * (page - 1), 8 * page - 1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
         const data = user.split("|");
@@ -117,7 +141,7 @@ router.get("/getOverallRanking", (req, res) => {
 router.get("/getRegionalRanking", (req, res) => {
   const { region, page } = req.query;
 
-  listRangeAsync(`RANKING_LIST_${region}`, 8 * (page - 1), 8 * page - 1)
+  listRangeAsync(`${rankingList}_${region}`, 8 * (page - 1), 8 * page - 1)
     .then((usersList) => {
       const usersListJson = usersList.map((user) => {
         const data = user.split("|");
@@ -271,25 +295,22 @@ router.get("/getUserAccountSummaryChartTimestamps", (req, res) => {
 
   const afterOrEqualThisYearInteger = parseInt(afterOrEqualThisYear, 10);
 
-  /**
-   * filtering in form:
-   *    filtering = {
-   *      isFinished: true, -> prisma relation filtering
-   *      ...
-   *    }
-   */
-
-  prisma.accountSummaryTimestamp
-    .findMany({
-      where: {
-        user: {
-          email
-        },
-        year: {
-          gte: afterOrEqualThisYearInteger
-        }
-      }
+  getUserAccountSummaryChartTimestamps(email, afterOrEqualThisYearInteger)
+    .then((data) => {
+      res.send(data);
     })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get user's data.");
+    });
+});
+
+router.get("/getUserRankingTimestamps", (req, res) => {
+  const { email, afterOrEqualThisYear } = req.query;
+
+  const afterOrEqualThisYearInteger = parseInt(afterOrEqualThisYear, 10);
+
+  getUserRankingTimestamps(email, afterOrEqualThisYearInteger)
     .then((data) => {
       res.send(data);
     })

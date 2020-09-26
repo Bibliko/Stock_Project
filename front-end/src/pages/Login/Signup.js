@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import validator from "email-validator";
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
@@ -111,14 +112,17 @@ class Signup extends React.Component {
   errorTypes = [
     "Confirm Password does not match Password.",
     "Missing some fields",
+    "Invalid email",
   ];
 
   email = "";
   password = "";
   confirmPassword = "";
 
-  setStateErrorPassword = () => {
-    if (!isEqual(this.password, this.confirmPassword)) {
+  setStateError = () => {
+    if (!validator.validate(this.email)) {
+      this.setState({ error: this.errorTypes[2] });
+    } else if (!isEqual(this.password, this.confirmPassword)) {
       if (!isEqual(this.state.error, this.errorTypes[0])) {
         this.setState({ error: this.errorTypes[0] });
       }
@@ -131,22 +135,17 @@ class Signup extends React.Component {
 
   changeEmail = (event) => {
     this.email = event.target.value;
-    if (
-      isEqual(this.password, this.confirmPassword) &&
-      !isEmpty(this.state.error)
-    ) {
-      this.setState({ error: "" });
-    }
+    this.setStateError();
   };
 
   changePassword = (event) => {
     this.password = event.target.value;
-    this.setStateErrorPassword();
+    this.setStateError();
   };
 
   changeConfirmPassword = (event) => {
     this.confirmPassword = event.target.value;
-    this.setStateErrorPassword();
+    this.setStateError();
   };
 
   submit = () => {

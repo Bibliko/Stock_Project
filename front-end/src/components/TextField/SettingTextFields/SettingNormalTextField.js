@@ -1,5 +1,5 @@
 import React from "react";
-
+import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 
 import {
@@ -10,7 +10,10 @@ import {
   IconButton,
 } from "@material-ui/core";
 
-import { EditRounded as EditRoundedIcon } from "@material-ui/icons";
+import {
+  EditRounded as EditRoundedIcon,
+  ReplayRounded as ReplayRoundedIcon,
+} from "@material-ui/icons";
 
 const styles = (theme) => ({
   textFieldContainer: {
@@ -47,10 +50,18 @@ const styles = (theme) => ({
       backgroundColor: "rgba(225,225,225,0)",
     },
     fontSize: "18px",
-    height: "45px",
+    height: theme.customHeight.settingTextField,
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
-      height: "35px",
+      height: theme.customHeight.settingTextFieldSmall,
+    },
+    "& .MuiOutlinedInput-input": {
+      paddingTop: "10px",
+      paddingBottom: "10px",
+      [theme.breakpoints.down("xs")]: {
+        paddingTop: "6px",
+        paddingBottom: "6px",
+      },
     },
   },
   title: {
@@ -61,6 +72,18 @@ const styles = (theme) => ({
     },
     paddingLeft: "5px",
     fontWeight: "bold",
+  },
+  iconButton: {
+    color: "white",
+    fontSize: "20px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+    },
+    padding: 0,
+    margin: "5px",
+  },
+  hide: {
+    display: "none",
   },
 });
 
@@ -86,6 +109,16 @@ class SettingNormalTextField extends React.Component {
     });
   }
 
+  resetValue = () => {
+    const { defaultValue } = this.props;
+    const event = {
+      target: {
+        value: defaultValue,
+      },
+    };
+    this.props.onChange(event);
+  };
+
   render() {
     const {
       classes,
@@ -100,7 +133,17 @@ class SettingNormalTextField extends React.Component {
 
     return (
       <Container className={classes.textFieldContainer}>
-        <Typography className={classes.title}>{name}</Typography>
+        <Typography className={classes.title}>
+          {name}
+          <IconButton
+            onClick={this.resetValue}
+            className={clsx(classes.iconButton, {
+              [classes.hide]: name !== "Email",
+            })}
+          >
+            <ReplayRoundedIcon />
+          </IconButton>
+        </Typography>
         <TextField
           fullWidth
           disabled={disabled}

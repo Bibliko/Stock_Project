@@ -1,5 +1,3 @@
-import { isInteger } from "lodash";
-
 export const oneSecond = 1000; // 1000 ms = 1 second
 export const oneMinute = 60 * oneSecond;
 export const oneHour = 60 * oneMinute;
@@ -84,7 +82,11 @@ export const newDate = () => {
   return timeNow;
 };
 
-export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
+/**
+ * @param thisComponent reference of component (this) - in this case LayoutSpeedDial.js
+ */
+export const marketCountdownUpdate = (thisComponent) => {
+  const { isMarketClosed } = thisComponent.props;
   if (isMarketClosed) {
     return;
   }
@@ -100,6 +102,16 @@ export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
   var min = 60 - UTCMinutes;
   var sec = 60 - UTCSeconds;
 
+  if (sec === 60) {
+    sec = 0;
+    min++;
+  }
+
+  if (min === 60) {
+    min = 0;
+    hours++;
+  }
+
   if ((hours + "").length === 1) {
     hours = "0" + hours;
   }
@@ -114,143 +126,13 @@ export const marketCountdownUpdate = (setStateFn, isMarketClosed) => {
 
   var countdown = hours + ":" + min + ":" + sec;
 
-  //console.log(countdown);
-
-  setStateFn({
+  thisComponent.setState({
     countdown,
   });
 };
 
 export const isLeapYear = (year) => {
   return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
-};
-
-/**
- * dateInput: mm/dd/yyyy
- *
- * *. Check for none or empty string -> return no error
- * 1. Check length (must fall in 8, 9, 10) and number of slashes
- * 2. Check if date contains only numbers and slashes
- * 3. Check if missing date, month, year and ensure year must be 4 digits
- * 4. Check range of date, month, year
- */
-export const checkDateValidError = (dateInput) => {
-  // General Check
-  if (dateInput === "none" || dateInput === "") {
-    return "";
-  }
-
-  const numberOfSlash = dateInput.split("/").length - 1;
-
-  if (
-    (dateInput.length !== 8 &&
-      dateInput.length !== 9 &&
-      dateInput.length !== 10) ||
-    numberOfSlash !== 2
-  ) {
-    return "Not a valid date.";
-  }
-
-  for (let i = 0; i < dateInput.length; i++) {
-    let char = dateInput.substring(i, i + 1);
-    if (!isInteger(parseInt(char, 10)) && char !== "/") {
-      return "Only numbers and / are allowed.";
-    }
-  }
-
-  const date = dateInput.split("/");
-
-  let month = date[0];
-  if (month === "" || !month) {
-    return "Missing Month.";
-  }
-  month = parseInt(month, 10);
-
-  let dd = parseInt(date[1], 10);
-  if (dd === "" || !dd) {
-    return "Missing Date.";
-  }
-  dd = parseInt(dd, 10);
-
-  let year = parseInt(date[2], 10);
-  if (year === "" || !year) {
-    return "Missing Year.";
-  }
-  year = parseInt(year, 10);
-  if (parseInt(year / 1000, 10) === 0) {
-    return "Year must be 4 digits.";
-  }
-
-  // Range Check
-
-  if (month < 0 || month > 12) {
-    return "Month is out of range.";
-  }
-
-  if (dd < 0 || dd > 31) {
-    return "Date is out of range.";
-  }
-
-  if (year < 0 || year > new Date().getFullYear()) {
-    return "Year is out of range.";
-  }
-
-  // Specific Check
-  const oddMaxDays = 31;
-  const evenMaxDays = 30;
-  const FebMaxDays = isLeapYear(year) ? 29 : 28;
-
-  if (
-    (month === 2 && dd > FebMaxDays) ||
-    ((month === 8 || month === 10 || month === 12) && dd > 31)
-  ) {
-    return "Date is out of range for this month.";
-  } else {
-    if (
-      (month % 2 === 0 && dd > evenMaxDays) ||
-      (month % 2 === 1 && dd > oddMaxDays)
-    ) {
-      return "Date is out of range for this month.";
-    }
-  }
-
-  return "";
-};
-
-/**
- * dateInput: mm/dd/yyyy
- * return 0 if equal, 1 if larger, -1 if smaller
- */
-export const compareTwoDates = (dateInput1, dateInput2) => {
-  const date1 = dateInput1.split("/");
-  const month1 = parseInt(date1[0], 10);
-  const dd1 = date1.length >= 1 ? parseInt(date1[1], 10) : 0;
-  const year1 = date1.length >= 2 ? parseInt(date1[2], 10) : 0;
-
-  const date2 = dateInput2.split("/");
-  const month2 = parseInt(date2[0], 10);
-  const dd2 = date2.length >= 1 ? parseInt(date2[1], 10) : 0;
-  const year2 = date2.length >= 2 ? parseInt(date2[2], 10) : 0;
-
-  if (year1 > year2) {
-    return 1;
-  } else if (year1 < year2) {
-    return -1;
-  } else {
-    if (month1 > month2) {
-      return 1;
-    } else if (month1 < month2) {
-      return -1;
-    } else {
-      if (dd1 > dd2) {
-        return 1;
-      } else if (dd1 < dd2) {
-        return -1;
-      } else {
-        return 0;
-      }
-    }
-  }
 };
 
 export default {
@@ -268,6 +150,4 @@ export default {
   newDate,
   marketCountdownUpdate,
   isLeapYear,
-  checkDateValidError,
-  compareTwoDates,
 };

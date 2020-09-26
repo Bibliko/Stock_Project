@@ -13,6 +13,9 @@ const theme = {
     appBarHeightSmall: "50px",
 
     redirectingPaper: "200px",
+
+    settingTextField: "45px",
+    settingTextFieldSmall: "35px"
   },
   customMargin: {
     topLayout: "80px",
@@ -80,6 +83,8 @@ const theme = {
 
     fail: {
       main: "#DC3D4A",
+      backgroundColor: "rgba(220, 61, 74, 0.2)",
+      backgroundColorHover: "rgba(220, 61, 74, 0.3)",
     },
 
     bigTitle: {
@@ -95,6 +100,11 @@ const theme = {
 
     disabled: {
       whiteColor: "rgba(255, 255, 255, 0.3)",
+    },
+
+    refreshSnackbar: {
+      main: "rgba(80, 60, 210, 1)",
+      reloadButton: "rgba(40, 180, 260, 1)",
     },
 
     layoutSpeedDial: {

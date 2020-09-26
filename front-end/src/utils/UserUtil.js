@@ -82,12 +82,19 @@ export const signupUser = (credentials) => {
 
 // Forgot password process includes 3 functions below:
 
-export const sendPasswordVerificationCode = (email) => {
+/**
+ * @param email User email
+ * @param credentialNeedVerification -
+ * - "password"
+ * - "email"
+ */
+export const sendVerificationCode = (email, credentialNeedVerification) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/passwordVerification`, {
+    axios(`${BACKEND_HOST}/verificationSession/sendVerificationCode`, {
       method: "get",
       params: {
         email,
+        credentialNeedVerification,
       },
       withCredentials: true,
     })
@@ -100,13 +107,25 @@ export const sendPasswordVerificationCode = (email) => {
   });
 };
 
-export const checkPasswordVerificationCode = (email, code) => {
+/**
+ * @param email User email
+ * @param code Verification code input
+ * @param credentialNeedVerification -
+ * - "password"
+ * - "email"
+ */
+export const checkVerificationCode = (
+  email,
+  code,
+  credentialNeedVerification
+) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/checkPasswordVerificationCode`, {
+    axios(`${BACKEND_HOST}/verificationSession/checkVerificationCode`, {
       method: "get",
       params: {
         email,
         code,
+        credentialNeedVerification,
       },
       withCredentials: true,
     })
@@ -159,6 +178,29 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
       data: {
         email,
         dataNeedChange,
+      },
+      withCredentials: true,
+    })
+      .then((userDataRes) => {
+        if (userDataRes.data.dateOfBirth) {
+          userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
+        }
+        mutateUser(userDataRes.data);
+        resolve("Successfully changed data");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const changeUserEmail = (email, newEmail, mutateUser) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/changeEmail`, {
+      method: "put",
+      data: {
+        email,
+        newEmail,
       },
       withCredentials: true,
     })
@@ -340,17 +382,17 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
   });
 };
 
-/** Usage setupSocketToCheckStockQuotes
- * Set up Socket Check Stock Quotes for user
- * Use in front-end/src/pages/Main/AccountSummary
+/**
+ * @description_1 Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
+ * @description_2 mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
+ * @param thisComponent reference of component (this) - in this case Layout.js
  */
-export const checkStockQuotesToCalculateSharesValue = (
-  isMarketClosed,
-  userSession,
-  mutateUser
-) => {
+export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
+  const { isMarketClosed, mutateUser } = thisComponent.props;
+  const { email, cash, totalPortfolio } = thisComponent.props.userSession;
+
   // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-  checkStockQuotesForUser(isMarketClosed, userSession.email)
+  checkStockQuotesForUser(isMarketClosed, email)
     .then(([stockQuotesJSON, cachedShares]) => {
       const totalSharesValue = calculateTotalSharesValue(
         isMarketClosed,
@@ -358,7 +400,7 @@ export const checkStockQuotesToCalculateSharesValue = (
         cachedShares
       );
 
-      const newTotalPortfolioValue = userSession.cash + totalSharesValue;
+      const newTotalPortfolioValue = cash + totalSharesValue;
 
       /**
        * changeData so that when we reload page or go to other page, the data
@@ -371,9 +413,9 @@ export const checkStockQuotesToCalculateSharesValue = (
 
       if (
         newTotalPortfolioValue &&
-        !isEqual(newTotalPortfolioValue, userSession.totalPortfolio)
+        !isEqual(newTotalPortfolioValue, totalPortfolio)
       ) {
-        return changeUserData(dataNeedChange, userSession.email, mutateUser);
+        return changeUserData(dataNeedChange, email, mutateUser);
       } else {
         //console.log("No need to update user data.");
       }
@@ -392,11 +434,12 @@ export default {
   loginUser,
   signupUser,
 
-  sendPasswordVerificationCode,
-  checkPasswordVerificationCode,
+  sendVerificationCode,
+  checkVerificationCode,
 
   changePassword,
   changeUserData,
+  changeUserEmail,
   getUserData,
   getUserTransactionsHistory,
   getUserAccountSummaryChartTimestamps,

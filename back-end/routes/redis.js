@@ -1,29 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { listPushAsync, listRangeAsync } = require("../redis/redis-client");
-const { getSingleCachedShareInfo } = require("../utils/RedisUtil");
+const {
+  getSingleCachedShareInfo
+} = require("../utils/redis-utils/SharesInfoBank");
 const {
   SequentialPromisesWithResultsArray
 } = require("../utils/low-dependency/PromisesUtil");
-
-/**
- * Keys list:
- * - '${email}|transactionsHistoryList': list
- * - '${email}|transactionsHistoryM5RU': list -> Most 5 recently used
- * - '${email}|transactionsHistoryM5RU|numberOfChunksSkipped|filters|orderBy|orderQuery': list
- * - '${email}|passwordVerification': value
- * - '${email}|accountSummaryChart': list
- * - '${email}|sharesList': list
- *
- * - 'cachedMarketHoliday': value
- *
- * - 'cachedShares': list
- * - 'cachedShares|${companyCode}|quote': value
- * - 'cachedShares|${companyCode}|profile': value
- *
- * - 'RANKING_LIST': list
- * - 'RANKING_LIST_${region}': list
- */
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...

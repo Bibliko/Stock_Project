@@ -1,11 +1,16 @@
 import React, { createRef } from "react";
 import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
+
+import { socket } from "../../App";
+
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
+
+import { leaveUserRoom } from "../../utils/SocketUtil";
 
 import SearchFieldLayout from "../Search/SearchFieldLayout";
 
@@ -174,6 +179,7 @@ class PersistentAppBar extends React.Component {
   logout = () => {
     logoutUser()
       .then(() => {
+        socket.emit(leaveUserRoom, this.props.userSession);
         this.props.mutateUser();
       })
       .catch((err) => {

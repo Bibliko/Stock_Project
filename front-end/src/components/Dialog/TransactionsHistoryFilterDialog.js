@@ -60,6 +60,7 @@ const styles = (theme) => ({
   },
   views: {
     width: "100%",
+    paddingTop: "25px",
     paddingBottom: "0px",
   },
   viewsAtChange: {
@@ -86,12 +87,17 @@ const styles = (theme) => ({
     color: theme.palette.succeed.main,
   },
   clearAll: {
-    alignSelf: "flex-start",
+    alignSelf: "flex-end",
     position: "absolute",
-    bottom: "5px",
-    left: "5px",
+    top: "calc((100% - 70%) / 2)",
+    right: "10px",
     color: theme.palette.fail.main,
     fontWeight: "bold",
+    backgroundColor: theme.palette.fail.backgroundColor,
+    "&:hover": {
+      backgroundColor: theme.palette.fail.backgroundColorHover,
+    },
+    zIndex: theme.customZIndex.floatingActionButton,
   },
   hide: {
     display: "none",
@@ -244,10 +250,18 @@ class TransactionsHistoryFilterDialog extends React.Component {
             variant="fullWidth"
             aria-label="full width tabs example"
           >
-            <Tab label="Non-Numbers" {...tabProps(0)} className={classes.tab} />
+            <Tab label="Strings" {...tabProps(0)} className={classes.tab} />
             <Tab label="Numbers" {...tabProps(1)} className={classes.tab} />
           </Tabs>
         </AppBar>
+        <Button
+          className={clsx(classes.clearAll, {
+            [classes.hide]: isEqual(filters, this.defaultFilters),
+          })}
+          onClick={this.clearAllFilters}
+        >
+          Clear All
+        </Button>
         <SwipeableViews
           axis={theme.direction === "rtl" ? "x-reverse" : "x"}
           index={tabPage}
@@ -320,14 +334,6 @@ class TransactionsHistoryFilterDialog extends React.Component {
             </IconButton>
           </React.Fragment>
         )}
-        <Button
-          className={clsx(classes.clearAll, {
-            [classes.hide]: isEqual(filters, this.defaultFilters),
-          })}
-          onClick={this.clearAllFilters}
-        >
-          Clear All
-        </Button>
       </Dialog>
     );
   }

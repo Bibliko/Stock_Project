@@ -16,6 +16,7 @@ const styles = (theme) => ({
     width: "90%",
     margin: "5%",
     minWidth: "190px",
+    zIndex: theme.customZIndex.reminder,
   },
   alert: {
     [theme.breakpoints.down("xs")]: {

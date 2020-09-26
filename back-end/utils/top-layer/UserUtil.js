@@ -1,20 +1,23 @@
-const {
-  newDate,
-  getFullDateUTCString,
-  getYearUTCString
-} = require("../low-dependency/DayTimeUtil");
-
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const { keysAsync, delAsync } = require("../../redis/redis-client");
 const { isEqual, isEmpty } = require("lodash");
 
 const {
-  isMarketClosedCheck,
-
   redisUpdateOverallRankingList,
   redisUpdateRegionalRankingList
-} = require("../RedisUtil");
+} = require("../redis-utils/RedisUtil");
+
+const {
+  resetUserCachedAccountSummaryTimestamps
+} = require("../redis-utils/UserCachedDataUtil");
+
+const {
+  newDate,
+  getFullDateUTCString,
+  getYearUTCString
+} = require("../low-dependency/DayTimeUtil");
+
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
 
 const deleteExpiredVerification = () => {
@@ -63,8 +66,8 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
         }
       })
       .then(() => {
-        console.log("Finished finding and creating timestamp");
-        resolve("Finished finding and creating timestamp");
+        console.log("Finished finding and creating account summary timestamp");
+        resolve("Finished finding and creating account summary timestamp");
       })
       .catch((err) => {
         reject(err);
@@ -72,7 +75,52 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
   });
 };
 
-const updateRankingList = () => {
+const createRankingTimestampIfNecessary = (user) => {
+  return new Promise((resolve, reject) => {
+    prisma.rankingTimestamp
+      .findOne({
+        where: {
+          UTCDateKey_userID: {
+            UTCDateKey: getFullDateUTCString(newDate()),
+            userID: user.id
+          }
+        }
+      })
+      .then((timestamp) => {
+        if (!timestamp) {
+          prisma.rankingTimestamp.create({
+            data: {
+              UTCDateString: newDate(),
+              UTCDateKey: getFullDateUTCString(newDate()),
+              year: getYearUTCString(newDate()),
+              ranking: user.ranking,
+              regionalRanking: user.regionalRanking,
+              user: {
+                connect: {
+                  id: user.id
+                }
+              }
+            }
+          });
+        }
+      })
+      .then(() => {
+        console.log("Finished finding and creating ranking timestamp");
+        resolve("Finished finding and creating ranking timestamp");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * @description_1 Update ranking and regional of each user in server.
+ * @description_2 Update both data in database and in cache.
+ * @description_3 Switch globalBackendVariables updatedRankingList flag whenever finished.
+ * @param globalBackendVariables Is in back-end/index.js
+ */
+const updateRankingList = (globalBackendVariables) => {
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
       if (!isEmpty(keysList)) {
@@ -133,6 +181,7 @@ const updateRankingList = () => {
       return Promise.all(updateAllUsersRanking);
     })
     .then(() => {
+      globalBackendVariables.updatedRankingListFlag = !globalBackendVariables.updatedRankingListFlag;
       console.log("Successfully updated all users ranking\n");
     })
     .catch((err) => {
@@ -140,9 +189,17 @@ const updateRankingList = () => {
     });
 };
 
-const updateAllUsers = () => {
-  // update portfolioLastClosure and ranking for all users
-
+//
+/**
+ * @description_1 Update portfolioLastClosure and ranking for all users in server
+ * @description_2 Update data in database only.
+ * @description_3
+ * - Clean cache for account summary chart timestamps of each user
+ * - On front-end, Layout.js will check updated...Flag and update front-end account summary timestamps of user
+ * @description_3 Switch globalBackendVariables updatedAllUsers flag whenever finished.
+ * @param globalBackendVariables Is in back-end/index.js
+ */
+const updateAllUsers = (globalBackendVariables) => {
   prisma.user
     .findMany({
       where: {
@@ -150,6 +207,7 @@ const updateAllUsers = () => {
       },
       select: {
         id: true,
+        email: true,
         totalPortfolio: true
       },
       orderBy: [
@@ -172,15 +230,24 @@ const updateAllUsers = () => {
             totalPortfolioLastClosure: user.totalPortfolio
           }
         });
+
         const accountSummaryPromise = createAccountSummaryChartTimestampIfNecessary(
           user
         );
 
-        return Promise.all([updatePortfolioLastClosure, accountSummaryPromise]);
+        const accountRankingPromise = createRankingTimestampIfNecessary(user);
+
+        return Promise.all([
+          updatePortfolioLastClosure,
+          accountSummaryPromise,
+          accountRankingPromise,
+          resetUserCachedAccountSummaryTimestamps(user.email)
+        ]);
       });
       return Promise.all(updateAllUsersPromise);
     })
     .then(() => {
+      globalBackendVariables.updatedAllUsersFlag = !globalBackendVariables.updatedAllUsersFlag;
       console.log(
         "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp\n"
       );
@@ -191,41 +258,31 @@ const updateAllUsers = () => {
 };
 
 /**
- * objVariables: object passed in from back-end/index
+ * @description Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @param globalBackendVariables object passed in from back-end/index
  */
-const checkAndUpdateAllUsers = (objVariables) => {
-  if (!objVariables.isPrismaMarketHolidaysInitialized) {
+const checkAndUpdateAllUsers = (globalBackendVariables) => {
+  if (!globalBackendVariables.isPrismaMarketHolidaysInitialized) {
     return;
   }
 
-  isMarketClosedCheck()
-    .then((checkResult) => {
-      // check if market is closed and update the status of objVariables
-      if (!isEqual(checkResult, objVariables.isMarketClosed)) {
-        objVariables.isMarketClosed = checkResult;
-      }
+  // if market is closed but flag hasUpdatedAllUsersToday is still false
+  // -> change it to true AND updatePortfolioLastClosure
+  if (
+    globalBackendVariables.isMarketClosed &&
+    !globalBackendVariables.hasUpdatedAllUsersToday
+  ) {
+    globalBackendVariables.hasUpdatedAllUsersToday = true;
+    updateAllUsers(globalBackendVariables);
+  }
 
-      // if market is closed but flag isAlreadyUpdate is still false
-      // -> change it to true AND updatePortfolioLastClosure
-      if (
-        objVariables.isMarketClosed &&
-        !objVariables.isAlreadyUpdateAllUsers
-      ) {
-        objVariables.isAlreadyUpdateAllUsers = true;
-        updateAllUsers();
-      }
-
-      // if market is opened but flag isAlreadyUpdate not switch to false yet -> change it to false
-      if (
-        !objVariables.isMarketClosed &&
-        objVariables.isAlreadyUpdateAllUsers
-      ) {
-        objVariables.isAlreadyUpdateAllUsers = false;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  // if market is opened but flag hasUpdatedAllUsersToday not switch to false yet -> change it to false
+  if (
+    !globalBackendVariables.isMarketClosed &&
+    globalBackendVariables.hasUpdatedAllUsersToday
+  ) {
+    globalBackendVariables.hasUpdatedAllUsersToday = false;
+  }
 };
 
 const getChunkUserTransactionsHistoryForRedisM5RU = (
@@ -238,7 +295,6 @@ const getChunkUserTransactionsHistoryForRedisM5RU = (
 ) => {
   // Each transactions history page has 10 items, but we cache beforehand 100 items
   return new Promise((resolve, reject) => {
-    // Filter
     const filtering = createPrismaFiltersObject(filters);
 
     // Order
