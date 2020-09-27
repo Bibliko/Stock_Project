@@ -1,7 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
-import { isEqual } from "lodash";
 import { userAction, marketAction } from "../../redux/storeActions/actions";
 
 import { socket } from "../../App";

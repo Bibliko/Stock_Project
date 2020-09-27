@@ -30,9 +30,10 @@ import {
 } from "@material-ui/core";
 
 import {
+  DashboardRounded as DashboardRoundedIcon,
   AccountCircleRounded as AccountCircleRoundedIcon,
-  MenuBookRounded as MenuBookRoundedIcon,
-  BarChartRounded as BarChartRoundedIcon,
+  BookRounded as BookRoundedIcon,
+  CategoryRounded as CategoryRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -67,11 +68,11 @@ const styles = (theme) => ({
     },
   },
   normalIcon: {
-    height: "40px",
-    width: "40px",
+    height: "30px",
+    width: "30px",
     [theme.breakpoints.down("xs")]: {
-      height: "30px",
-      width: "30px",
+      height: "25px",
+      width: "25px",
     },
     color: "white",
     "&:hover": {
@@ -83,8 +84,8 @@ const styles = (theme) => ({
     height: "40px",
     width: "40px",
     [theme.breakpoints.down("xs")]: {
-      height: "30px",
-      width: "30px",
+      height: "35px",
+      width: "35px",
     },
     color: "white",
     "&:hover": {
@@ -246,7 +247,7 @@ class PersistentAppBar extends React.Component {
               onClick={this.toggleGameMenu}
               disableRipple
             >
-              <BarChartRoundedIcon className={classes.normalIcon} />
+              <CategoryRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <Popper
               open={openGameMenu}
@@ -321,7 +322,17 @@ class PersistentAppBar extends React.Component {
               className={classes.secondaryMenuButton}
               disableRipple
             >
-              <MenuBookRoundedIcon className={classes.normalIcon} />
+              <BookRoundedIcon className={classes.normalIcon} />
+            </IconButton>
+            <IconButton
+              title="Portfolio"
+              className={classes.secondaryMenuButton}
+              onClick={() => {
+                redirectToPage("/accountSummary", this.props);
+              }}
+              disableRipple
+            >
+              <DashboardRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
               className={classes.menuButton}
@@ -370,15 +381,6 @@ class PersistentAppBar extends React.Component {
                           }}
                         >
                           Account Settings
-                        </MenuItem>
-                        <MenuItem
-                          className={classes.accountMenuItem}
-                          onClick={() => {
-                            redirectToPage("/accountSummary", this.props);
-                          }}
-                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
-                        >
-                          Portfolio
                         </MenuItem>
                         <MenuItem
                           className={classes.accountMenuItem}
