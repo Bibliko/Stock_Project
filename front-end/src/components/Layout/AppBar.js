@@ -48,50 +48,61 @@ const styles = (theme) => ({
       height: theme.customHeight.appBarHeightSmall,
     },
   },
-  menuButton: {
+  accountButton: {
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: "8px",
-    marginRight: "16px",
+    margin: "6px",
+    marginRight: "12px",
+    [theme.breakpoints.down("xs")]: {
+      margin: "2px",
+      marginRight: "8px",
+    },
     "& .MuiIconButton-colorPrimary": {
       color: "white",
+    },
+    "& .MuiTouchRipple-root": {
+      color: "white",
+    },
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
     },
   },
   secondaryMenuButton: {
     height: "fit-content",
     width: "fit-content",
-    padding: 0,
-    margin: "8px",
+    padding: "4px",
+    margin: "6px",
+    [theme.breakpoints.down("xs")]: {
+      margin: "2px",
+    },
     "& .MuiIconButton-colorPrimary": {
       color: "white",
+    },
+    "& .MuiTouchRipple-root": {
+      color: "white",
+    },
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
     },
   },
   normalIcon: {
     height: "30px",
     width: "30px",
     [theme.breakpoints.down("xs")]: {
-      height: "25px",
-      width: "25px",
+      height: "20px",
+      width: "20px",
     },
     color: "white",
-    "&:hover": {
-      background: "rgba(255, 255, 255, 0.3)",
-      borderRadius: "50%",
-    },
   },
   avatarIcon: {
     height: "40px",
     width: "40px",
     [theme.breakpoints.down("xs")]: {
-      height: "35px",
-      width: "35px",
+      height: "30px",
+      width: "30px",
     },
     color: "white",
-    "&:hover": {
-      background: "rgba(255, 255, 255, 0.3)",
-      borderRadius: "50%",
-    },
   },
   toolbar: {
     display: "flex",
@@ -240,12 +251,12 @@ class PersistentAppBar extends React.Component {
           <Grid className={classes.rightNavbarGrid}>
             <IconButton
               title="Game"
+              disabled={openGameMenu}
               className={classes.secondaryMenuButton}
               ref={this.gameAnchorRef}
               aria-controls={openGameMenu ? "menu-list-grow" : undefined}
               aria-haspopup="true"
               onClick={this.toggleGameMenu}
-              disableRipple
             >
               <CategoryRoundedIcon className={classes.normalIcon} />
             </IconButton>
@@ -320,7 +331,6 @@ class PersistentAppBar extends React.Component {
             <IconButton
               title="Education"
               className={classes.secondaryMenuButton}
-              disableRipple
             >
               <BookRoundedIcon className={classes.normalIcon} />
             </IconButton>
@@ -330,18 +340,17 @@ class PersistentAppBar extends React.Component {
               onClick={() => {
                 redirectToPage("/accountSummary", this.props);
               }}
-              disableRipple
             >
               <DashboardRoundedIcon className={classes.normalIcon} />
             </IconButton>
             <IconButton
-              className={classes.menuButton}
+              className={classes.accountButton}
+              disabled={openAccountMenu}
               ref={this.accountAnchorRef}
               aria-label="Account Menu"
               aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
               aria-haspopup="true"
               onClick={this.toggleAccountMenu}
-              disableRipple
             >
               {isEmpty(userSession.avatarUrl) ? (
                 <AccountCircleRoundedIcon className={classes.avatarIcon} />

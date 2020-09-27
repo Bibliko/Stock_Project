@@ -52,9 +52,18 @@ const styles = (theme) => ({
       },
     },
   },
-  input: { color: "white", fontSize: "medium" },
-  iconButton: { color: "rgba(255, 255, 255, 0.8)" },
-  searchIcon: { color: theme.palette.searchField.main },
+  input: {
+    color: "white",
+    fontSize: "medium",
+  },
+  iconButton: {
+    color: "rgba(255, 255, 255, 0.8)",
+    padding: 0,
+    paddingRight: "8px",
+  },
+  searchIcon: {
+    color: theme.palette.searchField.main,
+  },
   hide: {
     display: "none",
   },
@@ -114,6 +123,7 @@ class SearchField extends React.Component {
                   [classes.hide]: isEmpty(searchCompany),
                 })}
                 onClick={clearSearchCompany}
+                disableRipple
               >
                 <ClearRoundedIcon />
               </IconButton>

@@ -24,23 +24,22 @@ const styles = (theme) => ({
     justifyContent: "flex-end",
     width: theme.customWidth.maxSearchFieldWithLogo,
     [theme.breakpoints.down("xs")]: {
-      width: "unset",
+      width: "100%",
     },
     paddingLeft: "10px",
   },
   searchFieldContainer: {
+    width: theme.customWidth.maxSearchFieldWidth,
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
     padding: 0,
-    width: theme.customWidth.maxSearchFieldWidth,
     opacity: 1,
     transition: "width 0.3s, opacity 0.25s ease-in 0.1s",
     zIndex: theme.customZIndex.searchFieldContainer,
   },
   extendWidthSearchField: {
     width: "100%",
-    opacity: 1,
   },
   searchIcon: {
     color: theme.palette.searchFieldButtonSmallScreen.searchIcon,
@@ -54,6 +53,7 @@ const styles = (theme) => ({
     "& .MuiTouchRipple-root span": {
       backgroundColor: theme.palette.searchFieldButtonSmallScreen.rippleSpan,
     },
+    padding: 0,
     position: "absolute",
     height: "40px",
     width: "40px",
@@ -82,7 +82,7 @@ const styles = (theme) => ({
     left: "5px",
   },
   hideSearchBar: {
-    width: "0%",
+    width: "50%",
     opacity: 0,
     padding: 0,
     position: "absolute",
