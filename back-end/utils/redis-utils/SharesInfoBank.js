@@ -31,7 +31,10 @@ const {
  * Every second, update stock quote of every company in 'cachedShares'
  * Every minute, update stock profile of every company in 'cachedShares'
  * If user gets in and see no company fitting his/her wish, get directly from FMP and update cache
- *
+ */
+
+/**
+ * @description Get array of stock symbols that all users in server are currently needing
  */
 const getCachedShares = () => {
   return new Promise((resolve, reject) => {
@@ -46,6 +49,12 @@ const getCachedShares = () => {
   });
 };
 
+/**
+ * @description
+ * - Get information of a stock from cache based on the stock symbol (quote + profile)
+ * - If not from cache: Get information from FMP -> send to user and update cache
+ * @param companyCode Stock symbol. E.g: "AAPL"
+ */
 const getSingleCachedShareInfo = (companyCode) => {
   return new Promise((resolve, reject) => {
     const redisKeyQuote = `cachedShares|${companyCode}|quote`;
@@ -97,7 +106,9 @@ const getSingleCachedShareInfo = (companyCode) => {
 };
 
 /**
- * When push, this function already ensures code is in upper case.
+ * @description Push all company codes in the parameter array to Redis 'cachedShares'
+ * @note This function will ensure all codes pushed to cache in upper case
+ * @param companyCodes Array of company codes
  */
 const pushManyCodesToCachedShares = (companyCodes) => {
   return new Promise((resolve, reject) => {
@@ -122,6 +133,12 @@ const pushManyCodesToCachedShares = (companyCodes) => {
   });
 };
 
+/**
+ * @description
+ * - Change cache data of a symbol
+ * - Use redis key 'cachedShares|symbol|quote'
+ * @param stockQuoteJSON stock QUOTE information obtained from FMP (json object)
+ */
 const updateSingleCachedShareQuote = (stockQuoteJSON) => {
   return new Promise((resolve, reject) => {
     const { symbol } = stockQuoteJSON;
@@ -139,6 +156,12 @@ const updateSingleCachedShareQuote = (stockQuoteJSON) => {
   });
 };
 
+/**
+ * @description
+ * - Change cache data of a symbol
+ * - Use redis key 'cachedShares|symbol|profile'
+ * @param stockQuoteJSON stock PROFILE information obtained from FMP (json object)
+ */
 const updateSingleCachedShareProfile = (stockProfileJSON) => {
   return new Promise((resolve, reject) => {
     const { symbol } = stockProfileJSON;
@@ -157,10 +180,16 @@ const updateSingleCachedShareProfile = (stockProfileJSON) => {
 };
 
 /**
+ * @important_note
  * Maximum Parallel Queries:
  * - 10 queries/sec since there are maximum of only about 8000
  * companies right now in NYSE and NASDAQ combined.
  * - We can call 800 companies in 1 query.
+ *
+ * @description
+ * 1. Divide array of stock symbols into chunks of 800 symbols. Each chunk, get stock QUOTE information from FMP
+ * 2. Update cache of each symbol using redis key 'cachedShares|symbol|quote'
+ * @param shareSymbols Array of stock symbols. E.g: ["AAPL", "GOOGL"]
  */
 const updateCachedShareQuotes = (shareSymbols) => {
   return new Promise((resolve, reject) => {
@@ -202,11 +231,17 @@ const updateCachedShareQuotes = (shareSymbols) => {
 };
 
 /**
+ * @important_note
  * Maximum Parallel Queries: 0
  * - We will use Sequential Promises for updating profiles
  * - No parallel since profile query allows only up to 50 companies
  * -> If we do parellel queries, there could be more than 100 queries/sec since there are
  * at most 8000 companies in NYSE and NASDAQ combined!
+ *
+ * * @description
+ * 1. Divide array of stock symbols into chunks of 50 symbols. Each chunk, get stock PROFILE information from FMP
+ * 2. Update cache of each symbol using redis key 'cachedShares|symbol|profile'
+ * @param shareSymbols Array of stock symbols. E.g: ["AAPL", "GOOGL"]
  */
 const updateCachedShareProfiles = (shareSymbols) => {
   return new Promise((resolve, reject) => {
@@ -248,6 +283,11 @@ const updateCachedShareProfiles = (shareSymbols) => {
   });
 };
 
+/**
+ * @description
+ * - Update cache of all stock symbols stored in 'cachedShares'
+ * - Update each stock symbol using redis key 'cachedShares|symbol|quote'
+ */
 const updateCachedShareQuotesUsingCache = () => {
   return new Promise((resolve, reject) => {
     getCachedShares()
@@ -263,6 +303,11 @@ const updateCachedShareQuotesUsingCache = () => {
   });
 };
 
+/**
+ * @description
+ * - Update cache of all stock symbols stored in 'cachedShares'
+ * - Update each stock symbol using redis key 'cachedShares|symbol|profile'
+ */
 const updateCachedShareProfilesUsingCache = () => {
   return new Promise((resolve, reject) => {
     getCachedShares()
