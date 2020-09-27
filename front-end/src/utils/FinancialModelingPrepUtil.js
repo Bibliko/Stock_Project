@@ -66,6 +66,14 @@ export const searchCompanyTickers = (searchQuery) => {
   });
 };
 
+/** param
+{
+  marketCapFilter: [lower bound, upper bound],
+  priceFilter: [lower bound, upper bound],
+  sectorFilter: string,
+  industryFilter: string,
+}
+**/
 export const getStockScreener = ( {marketCapFilter, sectorFilter, industryFilter, priceFilter} ) => {
   const sectorString = (sectorFilter !== "All") ? "&sector="+sectorFilter : "";
   const industryString = (industryFilter !== "All") ? "&sindustry="+industryFilter : "";

@@ -39,7 +39,11 @@ class CompaniesListTable extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextProps.rows, this.props.rows);
+    return (
+      !isEqual(nextProps.rows, this.props.rows) ||
+      nextProps.sortBy !== this.props.sortBy ||
+      nextProps.sortDirection !== this.props.sortDirection
+    );
   }
 
   render() {
@@ -47,7 +51,6 @@ class CompaniesListTable extends React.Component {
       classes,
       sortBy,
       sortDirection,
-      handleSort,
       rows,
       handleOpenCompanyDetail,
       height,
@@ -62,7 +65,7 @@ class CompaniesListTable extends React.Component {
           sortBy={sortBy}
           sortDirection={sortDirection}
           sort={this.handleSort}
-          onCompanyClick={handleOpenCompanyDetail}
+          onRowClick={handleOpenCompanyDetail}
           flexGrow={1}
           cache={this.tableCache}
           resetCache={this.resetTableCache}

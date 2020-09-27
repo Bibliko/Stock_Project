@@ -14,8 +14,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-import CompanyDetail from "./CompanyDetail";
-import CompanyGraph from "./CompanyGraph";
+// import CompanyDetail from "./CompanyDetail";
+// import CompanyGraph from "./CompanyGraph";
 
 const styles = (theme) => ({
   root: {
@@ -145,10 +145,8 @@ class CompanyDialog extends React.Component {
               onChangeIndex={this.handleChangeIndex}
             >
               <TabPanel value={value} index={0}>
-                <CompanyDetail />
               </TabPanel>
               <TabPanel value={value} index={1}>
-                <CompanyGraph />
               </TabPanel>
               <TabPanel value={value} index={2}></TabPanel>
             </SwipeableViews>

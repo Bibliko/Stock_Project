@@ -54,7 +54,7 @@ const styles = (theme) => ({
     },
     fontWeight: "bold",
     color: "white",
-    marginBottom: "5px",
+    marginBottom: "10px",
   },
   reloadButton: {
     marginTop: "10px",
@@ -114,10 +114,10 @@ class Companies extends React.Component {
     });
   };
 
-  handleOpenDialog = (companyName) => {
+  handleOpenDialog = ({ rowData }) => {
     this.setState({
       openDialog: true,
-      companyName: companyName,
+      companyName: rowData.name,
     });
   };
 
@@ -127,6 +127,7 @@ class Companies extends React.Component {
     });
   };
 
+  // MarketCap scale: y=x^4
   getMarketCap = (value) => {
     return value**4;
   };
@@ -174,7 +175,7 @@ class Companies extends React.Component {
 
     getStockScreener({
       priceFilter: price,
-      marketCapFilter: this.getMarketCap(marketCap),
+      marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
       sectorFilter: sector,
       industryFilter: industry,
     })
@@ -183,7 +184,6 @@ class Companies extends React.Component {
       callback();
     })
     .catch(() => {
-      console.log("error");
       errorCallback();
     });
   };

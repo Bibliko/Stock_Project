@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+import { isEqual } from "lodash";
 
 import { simplifyNumber } from "../../../utils/low-dependency/NumberUtil";
 
@@ -12,7 +13,6 @@ import {
   AutoSizer,
   Column,
   Table,
-  SortIndicator
 } from "react-virtualized";
 
 const styles = (theme) => ({
@@ -28,18 +28,25 @@ const styles = (theme) => ({
     }
   },
   tableHeader: {
-    fontSize: "20px",
+    fontSize: "18px",
     fontWeight: "bold",
     textAlign: "left",
     padding: "0.5em",
     [theme.breakpoints.down("xs")]: {
       fontSize: "15px",
     },
+    color: "white",
     "& .MuiTableSortLabel-active": {
-      color: theme.palette.primary.main,
+      color: theme.palette.succeed.tableSorted,
+      "& .MuiTableSortLabel-icon": {
+        color: theme.palette.succeed.tableSortIcon + " !important",
+      },
+    },
+    "& .MuiTableSortLabel-root:hover": {
+      color: theme.palette.succeed.tableSorted,
     },
     "& .MuiTableSortLabel-icon": {
-      color: "inherit",
+      color: theme.palette.succeed.tableSortIcon,
     },
     flexDirection: "row",
     alignItems: "center",
@@ -51,12 +58,14 @@ const styles = (theme) => ({
   tableRow: {
     cursor: "pointer",
     borderBottom: "1px solid #9ED2EF",
-    background: theme.palette.tableBackground.gradient,
-  },
-  tableNameCell: {
+    // background: theme.palette.tableBackground.gradient,
+    backgroundColor: "transparent",
+    color: "white",
     "&:hover": {
       color: "blue"
     },
+  },
+  tableNameCell: {
     padding: "0.5em",
     textAlign: "left",
     fontSize: "15px",
@@ -77,26 +86,11 @@ const styles = (theme) => ({
     alignItems: "initial",
   },
   tableCell: {
-    color: "white",
     flex: 1,
     width: "100%",
     height: "100%",
     display: "flex",
   },
-  noClick: {
-    cursor: "initial"
-  },
-  visuallyHidden: {
-    border: 0,
-    clip: "rect(0 0 0 0)",
-    height: 1,
-    margin: -1,
-    overflow: "hidden",
-    padding: 0,
-    position: "absolute",
-    top: 20,
-    width: 1
-  }
 });
 
 class VirtualizedTable extends React.Component {
@@ -116,8 +110,8 @@ class VirtualizedTable extends React.Component {
     return clsx(index === -1 ? classes.tableHeaderRow : classes.tableRow, classes.flexContainer);
   };
 
-  cellRenderer = ({ cellData, dataKey, parent, columnIndex, rowIndex }) => {
-    const { classes, cache, onCompanyClick } = this.props;
+  cellRenderer = ({ cellData, dataKey, parent, rowIndex }) => {
+    const { classes, cache } = this.props;
     return (
       <CellMeasurer
         cache={cache}
@@ -127,15 +121,14 @@ class VirtualizedTable extends React.Component {
         rowIndex={rowIndex}>
         <div
           className={clsx(classes.tableCell, {
-            [clsx(classes.noClick, classes.tableNormalCell)]: dataKey != "name",
-            [classes.tableNameCell]: dataKey == "name",
+            [classes.tableNormalCell]: dataKey !== "name",
+            [classes.tableNameCell]: dataKey === "name",
           })}
           style={{
             whiteSpace: 'normal',
           }}
-          onClick={columnIndex === 0 ? () => onCompanyClick(cellData) : ()=>{}}
         >
-          {dataKey == "marketCap" ? simplifyNumber(cellData) : cellData}
+          {dataKey === "marketCap" ? simplifyNumber(cellData) : cellData}
         </div>
       </CellMeasurer>
     );
@@ -152,24 +145,23 @@ class VirtualizedTable extends React.Component {
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
       >
-        {columnIndex > -1 ? (
-          <TableSortLabel
-            active={sortBy === dataKey}
-            direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
-          >
-            {label}
-          </TableSortLabel>
-        ) : (
-          <React.Fragment>
-            <span> {label} </span>
-            {sortBy === dataKey && (
-              <SortIndicator sortDirection={sortDirection} />
-            )}
-          </React.Fragment>
-        )}
+        <TableSortLabel
+          active={sortBy === dataKey}
+          direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
+        >
+          {label}
+        </TableSortLabel>
       </TableCell>
     );
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      nextProps.sortBy !== this.props.sortBy ||
+      nextProps.sortDirection !== this.props.sortDirection ||
+      !isEqual(nextProps.cache, this.props.cache)
+    );
+  }
 
   render() {
     const {
