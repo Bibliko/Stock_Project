@@ -1,22 +1,10 @@
 import React from "react";
-//import { isEqual } from "lodash";
-import clsx from "clsx";
 
-import { TextField } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-//import Grid from "@material-ui/core/Grid";
 import {
   DatePicker,
-  TimePicker,
-  DateTimePicker,
 } from "@material-ui/pickers";
-import { MobileDatePicker } from "@material-ui/pickers";
 import DatePickerTextField from "./DatePickerTextField";
-import {
-  DateRangePicker,
-  DateRangeDelimiter,
-} from "@material-ui/pickers";
-import { Grid, Container, Typography } from "@material-ui/core";
 
 const styles = (theme) => ({
   gridContainer: {

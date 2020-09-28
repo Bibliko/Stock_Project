@@ -44,30 +44,46 @@ const styles = (theme) => ({
     width: "100%",
     padding: "24px",
     [theme.breakpoints.down("xs")]: {
-      padding: 0,
+      padding: "0px",
     },
+  },
+  itemGrid: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    flexDirection: "column",
   },
   gridTitle: {
     fontSize: "x-large",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "large",
-    },
     fontWeight: "bold",
     color: "white",
     marginBottom: "10px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "large",
+      marginTop: "20px",
+    },
   },
   reloadButton: {
     marginTop: "10px",
-    marginBottom: "10px",
+    marginBottom: "20px",
     marginLeft: "-10px",
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "-8px",
+    },
   },
 });
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+  let items = [a[orderBy], b[orderBy]];
+
+  if (typeof(items[0]) === "string") {
+    items = items.map((value) => value.toLowerCase());
+  }
+
+  if (items[1] < items[0]) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (items[1] > items[0]) {
     return 1;
   }
   return 0;
@@ -93,7 +109,7 @@ class Companies extends React.Component {
   state = {
     openDialog: false,
     stockData: [],
-    sortBy: "id",
+    sortBy: "code",
     sortDirection: SortDirection.ASC,
     price: [0,320000],
     marketCap: [0,1000],
@@ -180,7 +196,11 @@ class Companies extends React.Component {
       industryFilter: industry,
     })
     .then((stockData) => {
-      this.setState({stockData: stockData});
+      const { sortDirection, sortBy } = this.state;
+
+      this.setState({
+        stockData: stableSort(stockData, getComparator(sortDirection, sortBy)),
+      });
       callback();
     })
     .catch(() => {
@@ -217,7 +237,7 @@ class Companies extends React.Component {
           direction="row"
           className={classes.fullHeightWidth}
         >
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={4} className={classes.itemGrid}>
             <ProgressButton
               containerClass={classes.reloadButton}
               size={"medium"}

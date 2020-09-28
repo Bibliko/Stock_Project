@@ -9,6 +9,8 @@ export const shortenNumber = (number) => {
 };
 
 export const simplifyNumber = (number) => {
+  if (typeof(number) !== "number") return number;
+  
   if (number >= 1e12)
   	return +(number/1e12).toFixed(1) + "T";
   if (number >= 1e9)

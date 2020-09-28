@@ -76,7 +76,7 @@ export const searchCompanyTickers = (searchQuery) => {
 **/
 export const getStockScreener = ( {marketCapFilter, sectorFilter, industryFilter, priceFilter} ) => {
   const sectorString = (sectorFilter !== "All") ? "&sector="+sectorFilter : "";
-  const industryString = (industryFilter !== "All") ? "&sindustry="+industryFilter : "";
+  const industryString = (industryFilter !== "All") ? "&industry="+industryFilter : "";
   return new Promise((resolve, reject) => {
     fetch(
       `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${marketCapFilter[0]}&marketCapLowerThan=${marketCapFilter[1]}${sectorString}${industryString}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`

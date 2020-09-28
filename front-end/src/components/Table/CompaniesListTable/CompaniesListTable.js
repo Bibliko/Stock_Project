@@ -36,7 +36,7 @@ class CompaniesListTable extends React.Component {
 
   resetTableCache = () => {
     this.tableCache.clearAll();
-  }
+  };
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
@@ -44,6 +44,10 @@ class CompaniesListTable extends React.Component {
       nextProps.sortBy !== this.props.sortBy ||
       nextProps.sortDirection !== this.props.sortDirection
     );
+  }
+
+  componentDidUpdate() {
+    this.resetTableCache();
   }
 
   render() {
@@ -59,6 +63,7 @@ class CompaniesListTable extends React.Component {
     return (
       <Paper className={classes.paper} style={{ height: `${height}px`, width: "100%"}}>
         <VirtualizedTable
+          rows={rows}
           minWidth={500}
           rowCount={rows.length}
           rowGetter={({ index }) => rows[index]}

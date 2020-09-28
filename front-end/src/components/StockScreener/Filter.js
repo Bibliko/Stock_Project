@@ -19,10 +19,7 @@ const styles = (theme) => ({
     width: "100%",
   },
   itemGrid: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    flexDirection: "column",
+    height: "fit-content"
   },
   container: {
     color: "white",
@@ -36,8 +33,17 @@ const styles = (theme) => ({
       fontSize: "15px",
     },
   },
-  selectBox: {
+  sectorSelectBox: {
     marginLeft: "-10px",
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "-15px",
+    },
+  },
+  industrySelectBox: {
+    marginLeft: "-10px",
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "1px",
+    },
   },
 });
 
@@ -189,7 +195,7 @@ class Filter extends React.Component {
             ValueLabelComponent={this.ValueLabelComponent}
           />
         </Grid>
-        <Grid item xs={6} sm={12} className={clsx(classes.selectBox, classes.itemGrid)}>
+        <Grid item xs={6} sm={12} className={clsx(classes.sectorSelectBox, classes.itemGrid)}>
           <SelectBox
             name={"Sector"}
             items={sectors}
@@ -198,7 +204,7 @@ class Filter extends React.Component {
             onChange={(event) => handleChange("sector", event.target.value)}
           />
         </Grid>
-        <Grid item xs={6} sm={12} className={clsx(classes.selectBox, classes.itemGrid)}>
+        <Grid item xs={6} sm={12} className={clsx(classes.industrySelectBox, classes.itemGrid)}>
           <SelectBox
             name={"Industry"}
             items={industries}

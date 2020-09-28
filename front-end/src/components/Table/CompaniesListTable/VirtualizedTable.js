@@ -28,12 +28,12 @@ const styles = (theme) => ({
     }
   },
   tableHeader: {
-    fontSize: "18px",
+    fontSize: "17px",
     fontWeight: "bold",
     textAlign: "left",
     padding: "0.5em",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
+      fontSize: "14px",
     },
     color: "white",
     "& .MuiTableSortLabel-active": {
@@ -76,7 +76,7 @@ const styles = (theme) => ({
     alignItems: "initial",
   },
   tableNormalCell: {
-    paddingLeft: "0.4em",
+    paddingRight: "20%",
     textAlign: "center",
     fontSize: "15px",
     [theme.breakpoints.down("xs")]: {
@@ -96,7 +96,9 @@ const styles = (theme) => ({
 class VirtualizedTable extends React.Component {
   constructor(props, context) {
     super(props, context);
-  
+
+    // Use ref to force update table
+    this.tableRef = React.createRef();
     this._lastRenderedWidth = this.props.width;
   }
 
@@ -157,10 +159,31 @@ class VirtualizedTable extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
+      !isEqual(nextProps.rows, this.props.rows) ||
       nextProps.sortBy !== this.props.sortBy ||
       nextProps.sortDirection !== this.props.sortDirection ||
       !isEqual(nextProps.cache, this.props.cache)
     );
+  }
+
+  componentDidUpdate() {
+    const {
+      width,
+      resetCache,
+    } = this.props;
+
+    this.tableRef.current.forceUpdateGrid();
+    if (this._lastRenderedWidth !== width) {
+      this._lastRenderedWidth = width;
+      resetCache();
+    }
+  }
+
+  componentDidMount() {
+    if (this._lastRenderedWidth !== this.props.width) {
+      this._lastRenderedWidth = this.props.width;
+      this.props.resetCache();
+    }
   }
 
   render() {
@@ -174,16 +197,15 @@ class VirtualizedTable extends React.Component {
       cache,
       minWidth,
       resetCache,
+      tableRef,
       ...tableProps
     } = this.props;
-    if (this._lastRenderedWidth !== this.props.width) {
-      this._lastRenderedWidth = this.props.width;
-      cache.clearAll();
-    }
+
     return (
       <AutoSizer onResize={resetCache}>
         {({ height, width }) => (
           <Table
+            ref={this.tableRef}
             height={height}
             width={Math.max(width, minWidth)}
             rowHeight={cache.rowHeight}
