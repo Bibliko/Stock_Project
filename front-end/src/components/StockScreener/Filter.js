@@ -10,7 +10,8 @@ import {
   Grid,
 } from "@material-ui/core";
 
-import number from "../../utils/low-dependency/NumberUtil";
+import { simplifyNumber } from "../../utils/low-dependency/NumberUtil";
+import { fmpSector, fmpIndustry } from "../../utils/low-dependency/FmpHelper";
 import SelectBox from "../SelectBox/SelectBox";
 
 const styles = (theme) => ({
@@ -70,7 +71,7 @@ const CustomSlider = withStyles((theme) => ({
 
 class Filter extends React.Component {
   valueLabelFormat = (value) => {
-    return number.simplifyNumber(value);
+    return simplifyNumber(value);
   };
 
   ValueLabelComponent = (props) => {
@@ -122,35 +123,8 @@ class Filter extends React.Component {
         },
       ],
     };
-    const sectors = [
-      "All",
-      "Basic Materials",
-      "Communication Services",
-      "Conglomerates",
-      "Consumer Cyclical",
-      "Consumer Defensive",
-      "Energy",
-      "Financial",
-      "Financial Services",
-      "Healthcare",
-      "Industrials",
-      "Industrial Goods",
-      "Real Estate",
-      "Services",
-      "Technology",
-      "Utilities",
-    ];
-    const industries = [
-      "All",
-      "Autos",
-      "Banks",
-      "Banks Diversified",
-      "Banks Regional",
-      "Beverages Alcoholic",
-      "Beverages Brewers",
-      "Beverages Non-Alcoholic",
-      "Software",
-    ];
+    const sectors = fmpSector;
+    const industries = fmpIndustry;
 
     return (
       <Grid

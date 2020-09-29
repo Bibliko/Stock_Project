@@ -70,8 +70,8 @@ export const searchCompanyTickers = (searchQuery) => {
 {
   marketCapFilter: [lower bound, upper bound],
   priceFilter: [lower bound, upper bound],
-  sectorFilter: string,
-  industryFilter: string,
+  sectorFilter: string (FmpHelper.fmpSector),
+  industryFilter: string (FmpHelper.fmpIndustry),
 }
 **/
 export const getStockScreener = ( {marketCapFilter, sectorFilter, industryFilter, priceFilter} ) => {
