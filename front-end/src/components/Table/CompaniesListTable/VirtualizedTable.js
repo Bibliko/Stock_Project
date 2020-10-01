@@ -27,29 +27,38 @@ const styles = (theme) => ({
       paddingRight: theme.direction === "rtl" ? "0 !important" : undefined
     }
   },
+  sortLabel: {
+    color: theme.palette.succeed.tableSorted + " !important",
+  },
   tableHeader: {
     fontSize: "17px",
     fontWeight: "bold",
-    textAlign: "left",
     padding: "0.5em",
+    paddingRight: "1em",
     [theme.breakpoints.down("xs")]: {
       fontSize: "14px",
     },
     color: "white",
+    "&:hover": {
+      color: theme.palette.succeed.tableSorted + " !important",
+    },
+    "& .MuiTableSortLabel-root:hover": {
+      color: theme.palette.succeed.tableSorted,
+    },
     "& .MuiTableSortLabel-active": {
       color: theme.palette.succeed.tableSorted,
       "& .MuiTableSortLabel-icon": {
         color: theme.palette.succeed.tableSortIcon + " !important",
       },
     },
-    "& .MuiTableSortLabel-root:hover": {
-      color: theme.palette.succeed.tableSorted,
-    },
     "& .MuiTableSortLabel-icon": {
       color: theme.palette.succeed.tableSortIcon,
     },
     flexDirection: "row",
     alignItems: "center",
+  },
+  tableHeaderAlignRight: {
+    justifyContent: "flex-end",
   },
   tableHeaderRow: {
     borderBottom: "1px solid #9ED2EF",
@@ -58,7 +67,6 @@ const styles = (theme) => ({
   tableRow: {
     cursor: "pointer",
     borderBottom: "1px solid #9ED2EF",
-    // background: theme.palette.tableBackground.gradient,
     backgroundColor: "transparent",
     color: "white",
     "&:hover": {
@@ -76,8 +84,8 @@ const styles = (theme) => ({
     alignItems: "initial",
   },
   tableNormalCell: {
-    paddingRight: "20%",
-    textAlign: "center",
+    paddingRight: "1em",
+    textAlign: "right",
     fontSize: "15px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "12px",
@@ -142,7 +150,14 @@ class VirtualizedTable extends React.Component {
     return (
       <TableCell
         component="div"
-        className={clsx(classes.tableCell, classes.flexContainer, classes.tableHeader)}
+        className={clsx({
+            [classes.sortLabel]: sortBy === dataKey,
+            [classes.tableHeaderAlignRight]: dataKey !== "name",
+          },
+          classes.tableCell,
+          classes.flexContainer,
+          classes.tableHeader,
+        )}
         variant="head"
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
@@ -151,8 +166,11 @@ class VirtualizedTable extends React.Component {
           active={sortBy === dataKey}
           direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
         >
-          {label}
+          {dataKey === "name" && label}
         </TableSortLabel>
+        {dataKey !== "name" &&
+          <span> {label} </span>
+        }
       </TableCell>
     );
   };

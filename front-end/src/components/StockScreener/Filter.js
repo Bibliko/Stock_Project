@@ -15,12 +15,14 @@ import { fmpSector, fmpIndustry } from "../../utils/low-dependency/FmpHelper";
 import SelectBox from "../SelectBox/SelectBox";
 
 const styles = (theme) => ({
-  fullHeightWidth: {
-    height: "100%",
+  fullWidth: {
     width: "100%",
   },
   itemGrid: {
-    height: "fit-content"
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    flexDirection: "column",
   },
   container: {
     color: "white",
@@ -118,8 +120,8 @@ class Filter extends React.Component {
           label: "$0",
         },
         {
-          value: 1e3,
-          label: "$1T",
+          value: 1189.207115,
+          label: "$2T",
         },
       ],
     };
@@ -131,7 +133,7 @@ class Filter extends React.Component {
         container
         spacing={4}
         direction="row"
-        className={clsx(classes.fullHeightWidth,classes.container)}
+        className={clsx(classes.fullWidth,classes.container)}
       >
         <Grid item xs={6} sm={12} className={classes.itemGrid}>
           <Typography className={classes.label}>
@@ -157,7 +159,7 @@ class Filter extends React.Component {
           <CustomSlider
             value={marketCap}
             min={0}
-            max={1e3}
+            max={1189.207115}
             step={10}
             scale={getMarketCap}
             onChange={(event, value) => handleChange("marketCap", value)}

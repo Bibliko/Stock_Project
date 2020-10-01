@@ -49,8 +49,8 @@ const styles = (theme) => ({
   },
   itemGrid: {
     display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    alignItems: "center",
     flexDirection: "column",
   },
   gridTitle: {
@@ -66,10 +66,6 @@ const styles = (theme) => ({
   reloadButton: {
     marginTop: "10px",
     marginBottom: "20px",
-    marginLeft: "-10px",
-    [theme.breakpoints.down("xs")]: {
-      marginLeft: "-8px",
-    },
   },
 });
 
@@ -112,7 +108,7 @@ class Companies extends React.Component {
     sortBy: "code",
     sortDirection: SortDirection.ASC,
     price: [0,320000],
-    marketCap: [0,1000],
+    marketCap: [0,1189.207115], // [$0, $2T]
     sector: "All",
     industry: "All",
     success: false,

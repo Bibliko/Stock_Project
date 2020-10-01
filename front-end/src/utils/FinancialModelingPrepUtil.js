@@ -73,6 +73,7 @@ export const searchCompanyTickers = (searchQuery) => {
   sectorFilter: string (FmpHelper.fmpSector),
   industryFilter: string (FmpHelper.fmpIndustry),
 }
+Path to FmpHelper: root/front-end/src/components/low-dependency/FmpHelper.js
 **/
 export const getStockScreener = ( {marketCapFilter, sectorFilter, industryFilter, priceFilter} ) => {
   const sectorString = (sectorFilter !== "All") ? "&sector="+sectorFilter : "";
