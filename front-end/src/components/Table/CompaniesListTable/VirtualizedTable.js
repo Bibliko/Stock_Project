@@ -8,24 +8,19 @@ import { simplifyNumber } from "../../../utils/low-dependency/NumberUtil";
 import { withStyles } from "@material-ui/core/styles";
 import TableCell from "@material-ui/core/TableCell";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import {
-  CellMeasurer,
-  AutoSizer,
-  Column,
-  Table,
-} from "react-virtualized";
+import { CellMeasurer, AutoSizer, Column, Table } from "react-virtualized";
 
 const styles = (theme) => ({
   flexContainer: {
     display: "flex",
     alignItems: "center",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   },
   table: {
     "& .ReactVirtualized__Table__headerRow": {
       flip: false,
-      paddingRight: theme.direction === "rtl" ? "0 !important" : undefined
-    }
+      paddingRight: theme.direction === "rtl" ? "0 !important" : undefined,
+    },
   },
   sortLabel: {
     color: theme.palette.succeed.tableSorted + " !important",
@@ -54,11 +49,7 @@ const styles = (theme) => ({
     "& .MuiTableSortLabel-icon": {
       color: theme.palette.succeed.tableSortIcon,
     },
-    flexDirection: "row",
     alignItems: "center",
-  },
-  tableHeaderAlignRight: {
-    justifyContent: "flex-end",
   },
   tableHeaderRow: {
     borderBottom: "1px solid #9ED2EF",
@@ -70,7 +61,7 @@ const styles = (theme) => ({
     backgroundColor: "transparent",
     color: "white",
     "&:hover": {
-      color: "blue"
+      color: theme.palette.primary.main,
     },
   },
   tableNameCell: {
@@ -99,6 +90,17 @@ const styles = (theme) => ({
     height: "100%",
     display: "flex",
   },
+  visuallyHidden: {
+    border: 0,
+    clip: "rect(0 0 0 0)",
+    height: 1,
+    margin: -1,
+    overflow: "hidden",
+    padding: 0,
+    position: "absolute",
+    top: 20,
+    width: 1,
+  },
 });
 
 class VirtualizedTable extends React.Component {
@@ -117,7 +119,10 @@ class VirtualizedTable extends React.Component {
   getRowClassName = ({ index }) => {
     const { classes } = this.props;
 
-    return clsx(index === -1 ? classes.tableHeaderRow : classes.tableRow, classes.flexContainer);
+    return clsx(
+      index === -1 ? classes.tableHeaderRow : classes.tableRow,
+      classes.flexContainer
+    );
   };
 
   cellRenderer = ({ cellData, dataKey, parent, rowIndex }) => {
@@ -128,14 +133,15 @@ class VirtualizedTable extends React.Component {
         columnIndex={0}
         key={dataKey}
         parent={parent}
-        rowIndex={rowIndex}>
+        rowIndex={rowIndex}
+      >
         <div
           className={clsx(classes.tableCell, {
             [classes.tableNormalCell]: dataKey !== "name",
             [classes.tableNameCell]: dataKey === "name",
           })}
           style={{
-            whiteSpace: 'normal',
+            whiteSpace: "normal",
           }}
         >
           {dataKey === "marketCap" ? simplifyNumber(cellData) : cellData}
@@ -149,16 +155,15 @@ class VirtualizedTable extends React.Component {
 
     return (
       <TableCell
-        component="div"
-        className={clsx({
+        align={dataKey === "name" ? "left" : "right"}
+        className={clsx(
+          {
             [classes.sortLabel]: sortBy === dataKey,
-            [classes.tableHeaderAlignRight]: dataKey !== "name",
           },
           classes.tableCell,
           classes.flexContainer,
-          classes.tableHeader,
+          classes.tableHeader
         )}
-        variant="head"
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
       >
@@ -166,11 +171,15 @@ class VirtualizedTable extends React.Component {
           active={sortBy === dataKey}
           direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
         >
-          {dataKey === "name" && label}
+          {label}
+          {sortBy === dataKey ? (
+            <span className={classes.visuallyHidden}>
+              {sortDirection.toLowerCase() === "desc"
+                ? "sorted descending"
+                : "sorted ascending"}
+            </span>
+          ) : null}
         </TableSortLabel>
-        {dataKey !== "name" &&
-          <span style={{cursor: "pointer"}}> {label} </span>
-        }
       </TableCell>
     );
   };
@@ -185,10 +194,7 @@ class VirtualizedTable extends React.Component {
   }
 
   componentDidUpdate() {
-    const {
-      width,
-      resetCache,
-    } = this.props;
+    const { width, resetCache } = this.props;
 
     this.tableRef.current.forceUpdateGrid();
     if (this._lastRenderedWidth !== width) {
@@ -228,7 +234,7 @@ class VirtualizedTable extends React.Component {
             width={Math.max(width, minWidth)}
             rowHeight={cache.rowHeight}
             gridStyle={{
-              direction: "inherit"
+              direction: "inherit",
             }}
             headerHeight={headerHeight}
             className={classes.table}
@@ -246,7 +252,7 @@ class VirtualizedTable extends React.Component {
                     this.headerRenderer({
                       ...headerProps,
                       columnIndex: index,
-                      dataKey: dataKey
+                      dataKey: dataKey,
                     })
                   }
                   className={clsx(classes.flexContainer, classes.tableColumn)}
@@ -272,12 +278,12 @@ VirtualizedTable.propTypes = {
       dataKey: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
       numeric: PropTypes.bool,
-      width: PropTypes.number.isRequired
+      width: PropTypes.number.isRequired,
     })
   ).isRequired,
   headerHeight: PropTypes.number,
   onRowClick: PropTypes.func,
-  rowHeight: PropTypes.number
+  rowHeight: PropTypes.number,
 };
 
 export default withStyles(styles)(VirtualizedTable);

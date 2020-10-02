@@ -3,9 +3,7 @@ import { isEqual } from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import {
-  CellMeasurerCache,
-} from "react-virtualized";
+import { CellMeasurerCache } from "react-virtualized";
 
 import VirtualizedTable from "./VirtualizedTable";
 
@@ -32,7 +30,7 @@ class CompaniesListTable extends React.Component {
     const { handleSort } = this.props;
     handleSort(sortDirection, sortBy);
     this.resetTableCache();
-  }
+  };
 
   resetTableCache = () => {
     this.tableCache.clearAll();
@@ -61,7 +59,10 @@ class CompaniesListTable extends React.Component {
     } = this.props;
 
     return (
-      <Paper className={classes.paper} style={{ height: `${height}px`, width: "100%"}}>
+      <Paper
+        className={classes.paper}
+        style={{ height: `${height}px`, width: "100%" }}
+      >
         <VirtualizedTable
           rows={rows}
           minWidth={500}
@@ -79,28 +80,28 @@ class CompaniesListTable extends React.Component {
               width: 100,
               minWidth: 30,
               label: "Name",
-              dataKey: "name"
+              dataKey: "name",
             },
             {
-              width: 40,
+              width: 60,
               label: "Code",
-              dataKey: "code"
+              dataKey: "code",
             },
             {
-              width: 40,
+              width: 60,
               label: "Price",
-              dataKey: "price"
+              dataKey: "price",
             },
             {
-              width: 90,
+              width: 130,
               label: "Market Cap",
-              dataKey: "marketCap"
+              dataKey: "marketCap",
             },
             {
-              width: 40,
+              width: 60,
               label: "Rating",
-              dataKey: "rating"
-            }
+              dataKey: "rating",
+            },
           ]}
         />
       </Paper>

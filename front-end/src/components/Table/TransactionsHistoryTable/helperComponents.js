@@ -47,9 +47,7 @@ export const chooseTableCellHeader = (
         active={orderBy === prismaType}
         direction={orderBy === prismaType ? orderQuery : "asc"}
         onClick={createSortHandler(prismaType)}
-        className={clsx(classes.cellDiv, {
-          [classes.cellDivSpecialForType]: type === "Type",
-        })}
+        className={classes.cellDiv}
         disabled={type === "Type"}
       >
         {type}
