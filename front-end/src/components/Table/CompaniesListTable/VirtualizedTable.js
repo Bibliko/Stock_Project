@@ -169,7 +169,7 @@ class VirtualizedTable extends React.Component {
           {dataKey === "name" && label}
         </TableSortLabel>
         {dataKey !== "name" &&
-          <span> {label} </span>
+          <span style={{cursor: "pointer"}}> {label} </span>
         }
       </TableCell>
     );
