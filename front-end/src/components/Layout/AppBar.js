@@ -309,7 +309,14 @@ class PersistentAppBar extends React.Component {
                         >
                           Watchlist
                         </MenuItem>
-                        <MenuItem dense>Companies</MenuItem>
+                        <MenuItem
+                          dense
+                          onClick={() => {
+                            redirectToPage("/companies", this.props);
+                          }}
+                        >
+                          Companies
+                        </MenuItem>
 
                         <MenuItem disabled>Explore</MenuItem>
                         <MenuItem dense>Charts</MenuItem>

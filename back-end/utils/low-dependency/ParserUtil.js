@@ -319,15 +319,7 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
  * @returns Redis symbols string value used for cache
  */
 const createSymbolsStringFromCachedSharesList = (cachedSharesList) => {
-  let symbolsString = "";
-  cachedSharesList.map((symbol, index) => {
-    if (index > 0) {
-      symbolsString = symbolsString.concat(",", symbol);
-    } else {
-      symbolsString = symbolsString.concat(symbol);
-    }
-  });
-  return symbolsString;
+  return cachedSharesList.join();
 };
 
 /**

@@ -74,11 +74,11 @@ class CodeFilter extends React.Component {
   checkErrorCode = (codeValue) => {
     if (codeValue.indexOf(";") >= 0) {
       return "No ';' in Code is allowed";
-    } else if (codeValue.length >= 6) {
-      return "No more than 6 characters";
-    } else {
-      return "";
     }
+    if (codeValue.length >= 6) {
+      return "No more than 6 characters";
+    }
+    return "";
   };
 
   setTimeoutChangeCode = () => {

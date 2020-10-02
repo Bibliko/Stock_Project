@@ -79,8 +79,6 @@ class NumberFromToFilter extends React.Component {
     if (from !== "none" && to !== "none") {
       if (parseFloat(from) > parseFloat(to)) {
         return "From must < To.";
-      } else {
-        return "";
       }
     }
     return "";

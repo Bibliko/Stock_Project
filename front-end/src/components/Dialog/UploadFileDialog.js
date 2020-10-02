@@ -1,22 +1,18 @@
 import React from "react";
-import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 
 import {
   Typography,
   Grid,
-  Button,
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
-  CircularProgress,
 } from "@material-ui/core";
 
 import { CloudUpload as CloudUploadIcon } from "@material-ui/icons";
-
-// Use Ref to toggle on Dialog and set [loading, fail, success] feedback
+import ProgressButton from "../Button/ProgressButton";
 
 const styles = (theme) => ({
   fullHeigthWidth: {
@@ -45,29 +41,6 @@ const styles = (theme) => ({
   dialogContent: {
     padding: "10px",
   },
-  buttonSuccess: {
-    backgroundColor: "rgb(50,205,50)",
-    "&:hover": {
-      backgroundColor: "rgb(34,139,34)",
-    },
-  },
-  buttonFail: {
-    backgroundColor: "red",
-    "&:hover": {
-      backgroundColor: "rgb(178,34,34)",
-    },
-  },
-  progress: {
-    color: "green",
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -12,
-    marginLeft: -12,
-  },
-  buttonWrapper: {
-    position: "relative",
-  },
   fileNameWrapper: {
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -88,10 +61,6 @@ function UploadFileDialog(props) {
     fail,
     fileName,
   } = props;
-  const buttonClassname = clsx({
-    [classes.buttonSuccess]: success,
-    [classes.buttonFail]: fail,
-  });
 
   return (
     <Dialog
@@ -147,26 +116,15 @@ function UploadFileDialog(props) {
             </div>
           </Grid>
           <Grid item xs={4} className={classes.itemGrid}>
-            <div
-              className={clsx(classes.buttonWrapper, classes.fullHeigthWidth)}
+            <ProgressButton
+              size={"medium"}
+              loading={loading}
+              success={success}
+              fail={fail}
+              handleClick={handleUpload}
             >
-              <Button
-                fullWidth
-                aria-label="save file"
-                color="primary"
-                size="medium"
-                variant="contained"
-                disableElevation
-                disabled={loading}
-                className={buttonClassname}
-                onClick={handleUpload}
-              >
-                Save
-              </Button>
-              {loading && (
-                <CircularProgress size={24} className={classes.progress} />
-              )}
-            </div>
+              Save
+            </ProgressButton>
           </Grid>
         </Grid>
       </DialogContent>

@@ -39,7 +39,7 @@ const styles = (theme) => ({
     maxWidth: "none",
   },
   divider: {
-    width: "95%",
+    width: "98%",
     marginTop: "15px",
     marginBottom: "15px",
     background: "white",
