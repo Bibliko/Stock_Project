@@ -82,14 +82,6 @@ const getSingleCachedShareInfo = (companyCode) => {
           resolve(shareInfoObject);
         }
       })
-      .then((finishedUpdating) => {
-        if (finishedUpdating) {
-          console.log(
-            finishedUpdating,
-            "RedisUtil.js getSingleCachedShareInfo"
-          );
-        }
-      })
       .catch((err) => {
         reject(err);
       });

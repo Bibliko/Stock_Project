@@ -318,32 +318,28 @@ export const getUserAccountSummaryChartTimestamps = (
 
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
 export const calculateTotalSharesValue = (
-  isMarketClosed,
   stockQuotesJSON,
-  shares
+  userPrismaShares
 ) => {
-  if (isEmpty(stockQuotesJSON) && isEmpty(shares)) {
+  if (isEmpty(stockQuotesJSON) && isEmpty(userPrismaShares)) {
     return 0;
   }
-
-  let totalValue = 0;
 
   /**
    * we use prices of stockQuotesJSON to calculate total shares value
    */
 
-  let hashSharesIndices = new Map();
-  shares.map((share, index) => {
+  let totalValue = 0;
+  const hashSharesIndices = new Map();
+  userPrismaShares.map((share, index) => {
     return hashSharesIndices.set(share.companyCode, index);
   });
 
   for (let stockQuote of stockQuotesJSON) {
-    const symbolOrCompanyCode = stockQuote.companyCode
-      ? stockQuote.companyCode
-      : stockQuote.symbol;
+    const symbol = stockQuote.symbol;
 
-    let shareWithSameStockQuoteSymbol =
-      shares[hashSharesIndices.get(symbolOrCompanyCode)];
+    const shareWithSameStockQuoteSymbol =
+      userPrismaShares[hashSharesIndices.get(symbol)];
 
     // add into total value this stock value: stock price * stock quantity
     totalValue += stockQuote.price * shareWithSameStockQuoteSymbol.quantity;
@@ -353,27 +349,24 @@ export const calculateTotalSharesValue = (
 };
 
 /**
- * return [stockQuotesJSON, parsedCachedShares]
+ * @return {object[]}
+ * 1. stockQuotesJSON
+ * 2. parsedCachedShares (userPrismaShares)
  */
-export const checkStockQuotesForUser = (isMarketClosed, email) => {
+export const checkStockQuotesForUser = (email) => {
   return new Promise((resolve, reject) => {
     getParsedCachedSharesList(email)
       .then((shares) => {
         if (isEmpty(shares)) {
           return [[], []];
-        } else {
-          if (!isMarketClosed) {
-            return Promise.all([
-              getManyStockInfosUsingPrismaShares(shares),
-              shares,
-            ]);
-          } else {
-            return [shares, shares];
-          }
         }
+
+        return Promise.all([
+          getManyStockInfosUsingPrismaShares(shares),
+          shares,
+        ]);
       })
       .then(([stockQuotesJSON, cachedShares]) => {
-        console.log(stockQuotesJSON);
         resolve([stockQuotesJSON, cachedShares]);
       })
       .catch((err) => {
@@ -383,22 +376,24 @@ export const checkStockQuotesForUser = (isMarketClosed, email) => {
 };
 
 /**
- * @description_1 Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
- * @description_2 mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
+ * @description
+ * - Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
+ * - mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
  * @param thisComponent reference of component (this) - in this case Layout.js
  */
 export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
-  const { isMarketClosed, mutateUser } = thisComponent.props;
+  const { mutateUser } = thisComponent.props;
   const { email, cash, totalPortfolio } = thisComponent.props.userSession;
 
   // example of stockQuotesJSON in back-end/utils/FinancialModelingPrepUtil.js
-  checkStockQuotesForUser(isMarketClosed, email)
+  checkStockQuotesForUser(email)
     .then(([stockQuotesJSON, cachedShares]) => {
       const totalSharesValue = calculateTotalSharesValue(
-        isMarketClosed,
         stockQuotesJSON,
         cachedShares
       );
+
+      console.log(totalSharesValue);
 
       const newTotalPortfolioValue = cash + totalSharesValue;
 
@@ -421,10 +416,7 @@ export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
       }
     })
     .catch((err) => {
-      console.log(
-        err,
-        "\n This error can be caused as when market is opened, we have not enabled getManyStockPricesFromFMP in UserUtil.js checkStockQuotesForUser."
-      );
+      console.log(err);
     });
 };
 
