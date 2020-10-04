@@ -7,6 +7,11 @@ import {
   getManyStockInfosUsingPrismaShares,
 } from "./RedisUtil";
 
+import {
+  updateUserSession,
+  updateUserSessionInitialMessage,
+} from "./SocketUtil";
+
 const typeLoginUtil = ["facebook", "google"];
 const BACKEND_HOST = getBackendHost();
 
@@ -162,7 +167,7 @@ export const changePassword = (password, email) => {
 
 // User Data Related:
 
-export const changeUserData = (dataNeedChange, email, mutateUser) => {
+export const changeUserData = (dataNeedChange, email, mutateUser, socket) => {
   /**
    * dataNeedChange in form:
    *  dataNeedChange: {
@@ -186,6 +191,11 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
           userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
         }
         mutateUser(userDataRes.data);
+        socket.emit(
+          updateUserSession,
+          userDataRes.data,
+          updateUserSessionInitialMessage
+        );
         resolve("Successfully changed data");
       })
       .catch((err) => {
@@ -194,7 +204,7 @@ export const changeUserData = (dataNeedChange, email, mutateUser) => {
   });
 };
 
-export const changeUserEmail = (email, newEmail, mutateUser) => {
+export const changeUserEmail = (email, newEmail, mutateUser, socket) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/changeEmail`, {
       method: "put",
@@ -209,6 +219,11 @@ export const changeUserEmail = (email, newEmail, mutateUser) => {
           userDataRes.data.dateOfBirth = new Date(userDataRes.data.dateOfBirth);
         }
         mutateUser(userDataRes.data);
+        socket.emit(
+          updateUserSession,
+          userDataRes.data,
+          updateUserSessionInitialMessage
+        );
         resolve("Successfully changed data");
       })
       .catch((err) => {
@@ -217,16 +232,19 @@ export const changeUserEmail = (email, newEmail, mutateUser) => {
   });
 };
 
+/**
+ *
+ * @param dataNeeded String or Object
+ * -  dataNeeded in form of:
+ *      dataNeeded: {
+ *      cash: true,
+ *      region: true,
+ *      ...
+ *    }
+ * - Special Note: If you want to get all scalar fields of user, use dataNeeded = "default"
+ * @param {string} email User email
+ */
 export const getUserData = (dataNeeded, email) => {
-  /**
-   *  dataNeeded in form of:
-   *      dataNeeded: {
-   *          cash: true,
-   *          region: true,
-   *          ...
-   *      }
-   */
-
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/getData`, {
       method: "get",
@@ -380,8 +398,12 @@ export const checkStockQuotesForUser = (email) => {
  * - Check stock info (quote, profile) for User -> Take from cached stock bank in back-end
  * - mutate userSession in Redux and update user data in database if totalPortfolio is new and updated.
  * @param thisComponent reference of component (this) - in this case Layout.js
+ * @param socket socket client exported from App.js
  */
-export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
+export const checkStockQuotesToCalculateSharesValue = (
+  thisComponent,
+  socket
+) => {
   const { mutateUser } = thisComponent.props;
   const { email, cash, totalPortfolio } = thisComponent.props.userSession;
 
@@ -410,7 +432,7 @@ export const checkStockQuotesToCalculateSharesValue = (thisComponent) => {
         newTotalPortfolioValue &&
         !isEqual(newTotalPortfolioValue, totalPortfolio)
       ) {
-        return changeUserData(dataNeedChange, email, mutateUser);
+        return changeUserData(dataNeedChange, email, mutateUser, socket);
       } else {
         //console.log("No need to update user data.");
       }

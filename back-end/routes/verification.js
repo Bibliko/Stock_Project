@@ -18,6 +18,7 @@ const {
   passwordVerification,
   changeEmailVerification
 } = require("../utils/redis-utils/RedisUtil");
+const { oneSecond } = require("../utils/low-dependency/DayTimeUtil");
 
 const passwordVerificationMailTopic = "Recovering Your Password";
 const changeEmailVerificationMailTopic = "Changing Your Email";
@@ -25,11 +26,13 @@ const changeEmailVerificationMailTopic = "Changing Your Email";
 router.get("/sendVerificationCode", (req, res) => {
   // credententialNeedVerication: "password" / "email"
   const { email, credentialNeedVerification } = req.query;
-  const timestampNowOfRequest = Math.round(Date.now() / 1000);
+  const timestampNowOfRequest = new Date().getTime();
+
   const verificationCacheKey =
     credentialNeedVerification === "password"
       ? passwordVerification
       : changeEmailVerification;
+
   const verificationTopic =
     credentialNeedVerification === "password"
       ? passwordVerificationMailTopic
@@ -47,13 +50,13 @@ router.get("/sendVerificationCode", (req, res) => {
       }
 
       const { timestamp } = redisCachedCode;
-      if (timestampNowOfRequest < timestamp + 15) {
+      if (timestampNowOfRequest < timestamp + 15 * oneSecond) {
         res
           .status(429)
           .send(
-            `Wait ${
-              timestamp + 15 - timestampNowOfRequest
-            }  seconds to send code again.`
+            `Wait ${Math.round(
+              (timestamp + 15 * oneSecond - timestampNowOfRequest) / 1000
+            )}  seconds to send code again.`
           );
       } else {
         const verificationCode = randomKey.generateDigits(6);

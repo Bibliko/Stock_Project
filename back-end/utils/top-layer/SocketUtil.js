@@ -19,11 +19,6 @@ const {
   parseAccountSummaryTimestamp
 } = require("../low-dependency/ParserUtil");
 
-const checkMarketClosedString = "checkMarketClosed";
-const updatedAllUsersFlag = "updatedAllUsersFlag";
-const updatedRankingListFlag = "updatedRankingListFlag";
-const finishedSettingUpUserCacheSession = "finishedSettingUpUserCacheSession";
-
 const setupCachedSharesListForUserIfNecessary = (email) => {
   return new Promise((resolve, reject) => {
     const redisKey = `${email}|${sharesList}`;
@@ -148,11 +143,6 @@ const updateUserCacheSession = (email) => {
 };
 
 module.exports = {
-  checkMarketClosedString,
-  updatedAllUsersFlag,
-  updatedRankingListFlag,
-  finishedSettingUpUserCacheSession,
-
   setupCachedSharesListForUserIfNecessary,
   setupCachedAccountSummaryTimestampsIfNecessary,
   setupAllCacheSession,

@@ -8,7 +8,7 @@ const {
 export const searchNYSETickers = (searchQuery, limit) => {
   return new Promise((resolve, reject) => {
     fetch(
-      `https://financialmodelingprep.com/api/v3/search-ticker?query=${searchQuery.toUpperCase()}&limit=${limit}&exchange=${"NYSE"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      `https://financialmodelingprep.com/api/v3/search?query=${searchQuery.toUpperCase()}&limit=${limit}&exchange=${"NYSE"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
       .then((NYSETickers) => {
         return NYSETickers.json();
@@ -25,7 +25,7 @@ export const searchNYSETickers = (searchQuery, limit) => {
 export const searchNASDAQTickers = (searchQuery, limit) => {
   return new Promise((resolve, reject) => {
     fetch(
-      `https://financialmodelingprep.com/api/v3/search-ticker?query=${searchQuery.toUpperCase()}&limit=${limit}&exchange=${"NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      `https://financialmodelingprep.com/api/v3/search?query=${searchQuery.toUpperCase()}&limit=${limit}&exchange=${"NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
       .then((NASDAQTickers) => {
         return NASDAQTickers.json();

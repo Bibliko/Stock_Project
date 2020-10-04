@@ -1,7 +1,7 @@
 const theme = {
   customWidth: {
     maxSearchFieldWithLogo: "360px",
-    maxSearchFieldWidth: "235px",
+    maxSearchFieldWidth: "240px",
 
     mainPageWidth: "90%",
     mainSkeletonWidth: "100%",
@@ -15,7 +15,7 @@ const theme = {
     redirectingPaper: "200px",
 
     settingTextField: "45px",
-    settingTextFieldSmall: "35px"
+    settingTextFieldSmall: "35px",
   },
   customMargin: {
     topLayout: "80px",

@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
+import { socket } from "../../App";
 
 import { isEqual, pick, extend } from "lodash";
 
@@ -143,7 +144,8 @@ class AccountSetting extends React.Component {
       changeUserData(
         this.changes,
         this.props.userSession.email,
-        this.props.mutateUser
+        this.props.mutateUser,
+        socket
       )
         .then(() => {
           this.updateReminder();
@@ -171,6 +173,7 @@ class AccountSetting extends React.Component {
     ];
     const nextPropsCompare = pick(nextProps.userSession, keysCompare);
     const propsCompare = pick(this.props.userSession, keysCompare);
+
     return !isEqual(nextPropsCompare, propsCompare);
   }
 

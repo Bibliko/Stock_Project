@@ -14,7 +14,7 @@ export const getBackendHostForSocket = () => {
   if (REACT_APP_NODE_ENV === "development") {
     // Special case for ngrok server
     if (window.location.hostname.indexOf(".ngrok.io") > -1) {
-      return "type_ngrok_server_4000_here!";
+      return "http://4037c5a2d78c.ngrok.io";
     }
     return `${window.location.hostname}:4000`;
   } else {

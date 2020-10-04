@@ -24,11 +24,13 @@ const styles = (theme) => ({
     marginTop: "20px",
   },
   chart: {
-    height: "65%",
-    width: "65%",
+    height: "auto",
+    width: "75%",
     [theme.breakpoints.up("md")]: {
-      height: "55%",
-      width: "55%",
+      width: "60%",
+    },
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
     },
   },
   note: {
@@ -169,50 +171,7 @@ class AccountSummaryChart extends React.Component {
     isChartReady: false,
   };
 
-  intervalCheckThemeBreakpoints;
   intervalUpdateChartSeries;
-
-  setStateChart = (enableSparkline, showLabelsXaxis, showLabelsYaxis) => {
-    this.setState({
-      options: {
-        ...this.state.options,
-        chart: {
-          ...this.state.options.chart,
-          sparkline: {
-            enabled: enableSparkline,
-          },
-        },
-        xaxis: {
-          ...this.state.options.xaxis,
-          labels: {
-            ...this.state.options.xaxis.labels,
-            show: showLabelsXaxis,
-          },
-        },
-        yaxis: {
-          ...this.state.options.yaxis,
-          labels: {
-            ...this.state.options.yaxis.labels,
-            show: showLabelsYaxis,
-          },
-        },
-      },
-    });
-  };
-
-  checkThemeBreakpointsToChangeChart = () => {
-    const { mediaQuery } = this.props;
-
-    const isScreenSmall = mediaQuery;
-
-    // mediaQuery in this case check if theme breakpoints is below sm (600px)
-    if (!isScreenSmall && this.state.options.chart.sparkline.enabled) {
-      this.setStateChart(false, true, true);
-    }
-    if (isScreenSmall && !this.state.options.chart.sparkline.enabled) {
-      this.setStateChart(true, false, false);
-    }
-  };
 
   initializeOrUpdateChartSeries = () => {
     let seriesData = [];
@@ -262,10 +221,6 @@ class AccountSummaryChart extends React.Component {
   componentDidMount() {
     this.initializeOrUpdateChartSeries();
 
-    this.intervalCheckThemeBreakpoints = setInterval(
-      () => this.checkThemeBreakpointsToChangeChart(),
-      oneSecond
-    );
     this.intervalUpdateChartSeries = setInterval(
       () => this.initializeOrUpdateChartSeries(),
       30 * oneSecond
@@ -273,7 +228,6 @@ class AccountSummaryChart extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.intervalCheckThemeBreakpoints);
     clearInterval(this.intervalUpdateChartSeries);
   }
 

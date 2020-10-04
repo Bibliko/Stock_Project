@@ -5,11 +5,6 @@ const {
 const { cleanUserCache } = require("../utils/redis-utils/UserCachedDataUtil");
 
 const {
-  checkMarketClosedString,
-  updatedAllUsersFlag,
-  updatedRankingListFlag,
-  finishedSettingUpUserCacheSession,
-
   setupAllCacheSession,
   updateUserCacheSession
 } = require("../utils/top-layer/SocketUtil");
@@ -23,156 +18,204 @@ const {
 
 const socketIO = require("socket.io");
 
-const clearAndCreateIntervalUpdateCacheSession = (intervalID, userSession) => {
+const connection = "connection";
+const disconnect = "disconnect";
+
+const joinUserRoom = "joinUserRoom";
+const leaveUserRoom = "leaveUserRoom";
+const updateUserSession = "updateUserSession";
+const finishedUpdatingUserSession = "finishedUpdatingUserSession";
+const updateUserSessionInitialMessage =
+  "I'm the first socket to update user session.";
+
+const checkMarketClosedString = "checkMarketClosed";
+const updatedAllUsersFlag = "updatedAllUsersFlag";
+const updatedRankingListFlag = "updatedRankingListFlag";
+const finishedSettingUpUserCacheSession = "finishedSettingUpUserCacheSession";
+
+const setupIntervalUpdateCacheSession = (intervalID, userEmail) => {
   if (intervalID) {
     clearInterval(intervalID);
   }
-  return setInterval(
-    () => updateUserCacheSession(userSession.email),
-    30 * oneSecond
-  );
+  return setInterval(() => updateUserCacheSession(userEmail), 30 * oneSecond);
 };
 
-const cleanUpTheRoom = (
-  hasRoomSetupCache,
-  userSession,
-  intervalsArrayNeedToBeCleaned
-) => {
-  clearIntervalsIfIntervalsNotEmpty(intervalsArrayNeedToBeCleaned);
-
-  hasRoomSetupCache.delete(userSession.id);
-  cleanUserCache(userSession.email).catch((err) => console.log(err));
+const cleanUpTheRoom = (userID, userEmail) => {
+  console.log("Cleaning up cache in the room!");
+  cleanUserCache(userEmail).catch((err) => console.log(err));
 };
 
 /**
  * @param server backend server
  * @param hasRoomSetupCache Global backend Set where we store userID with boolean hasRoomSetupCache
  * @param globalBackendVariables Global backend variables (in backend main index)
+ * @param userSessions Map containing userSession information for each room
  */
-const startSocketIO = (server, hasRoomSetupCache, globalBackendVariables) => {
+const startSocketIO = (server, globalBackendVariables) => {
   const io = socketIO(server);
 
-  io.on("connection", (socket) => {
-    console.log("New client connected\n");
+  let countSocketsInMainHall = 0;
 
-    let intervalCheckRoomEmpty = null;
+  let intervalSendMarketClosed = null;
+  let intervalSendUpdatedAllUsersFlag = null;
+  let intervalSendUpdatedRankingListFlag = null;
 
-    let intervalSendMarketClosed = null;
-    let intervalSendUpdatedAllUsersFlag = null;
-    let intervalSendUpdatedRankingListFlag = null;
+  io.on(connection, (socket) => {
+    console.log(`New client connected ${socket.id}\n`);
+    countSocketsInMainHall++;
+
+    // private intervals that use userSession email
     let intervalUpdateCacheSession = null;
 
     // Join socket room by key: user ID
-    socket.on("joinUserRoom", (userSession) => {
-      socket.userID = userSession.id;
-      socket.join(userSession.id);
+    socket.on(joinUserRoom, (userSession) => {
+      const {
+        id: userID,
+        email: userEmail,
+        hasFinishedSettingUp
+      } = userSession;
 
-      const clients = io.sockets.adapter.rooms[userSession.id].length;
+      socket.userID = userID;
+      socket.userEmail = userEmail;
+      socket.hasFinishedSettingUp = hasFinishedSettingUp;
+      socket.join(userID);
 
-      console.log(`Client joins room ${userSession.id}`);
-      console.log(`${clients} client(s) is/are in ${userSession.id} room.\n`);
+      const numberOfClients = io.sockets.adapter.rooms[userID].length;
 
-      intervalCheckRoomEmpty = setInterval(() => {
-        // This is to find room named "${userSession.id}" in socketIO
-        if (!io.sockets.adapter.rooms[userSession.id]) {
-          cleanUpTheRoom(hasRoomSetupCache, userSession, [
-            intervalCheckRoomEmpty,
-            intervalUpdateCacheSession
-          ]);
-        }
-      }, oneSecond);
+      console.log(`Client ${socket.id} joins room ${userID}`);
+      console.log(`${numberOfClients} client(s) is/are in ${userID} room.\n`);
 
-      updateClientTimestampLastJoinInSocketRoom(
-        userSession.email
-      ).catch((err) => console.log(err));
+      updateClientTimestampLastJoinInSocketRoom(userEmail).catch((err) =>
+        console.log(err)
+      );
 
-      if (hasRoomSetupCache.has(userSession.id)) {
-        intervalUpdateCacheSession = clearAndCreateIntervalUpdateCacheSession(
+      if (numberOfClients > 1) {
+        intervalUpdateCacheSession = setupIntervalUpdateCacheSession(
           intervalUpdateCacheSession,
-          userSession
+          userEmail
         );
         socket.emit(finishedSettingUpUserCacheSession, true);
       } else {
-        if (userSession.hasFinishedSettingUp) {
-          hasRoomSetupCache.add(userSession.id);
-
-          setupAllCacheSession(
-            userSession.email,
-            getYearUTCString(newDate()) - 2
-          )
+        if (hasFinishedSettingUp) {
+          setupAllCacheSession(userEmail, getYearUTCString(newDate()) - 2)
             .then(() => {
-              intervalUpdateCacheSession = clearAndCreateIntervalUpdateCacheSession(
+              intervalUpdateCacheSession = setupIntervalUpdateCacheSession(
                 intervalUpdateCacheSession,
-                userSession
+                userEmail
               );
               socket.emit(finishedSettingUpUserCacheSession, true);
             })
             .catch((err) => console.log(err));
+        } else {
+          socket.emit(finishedSettingUpUserCacheSession, true);
         }
       }
     });
 
-    socket.on("leaveUserRoom", (userSession) => {
-      socket.leave(userSession.id);
-      console.log(`Client leaves room ${userSession.id}\n`);
+    socket.on(leaveUserRoom, () => {
+      const { userID, userEmail } = socket;
+      console.log(`Client ${socket.id} leaves room ${userID}\n`);
 
-      if (io.sockets.adapter.rooms[userSession.id]) {
-        clearInterval(intervalCheckRoomEmpty);
+      socket.leave(userID);
+
+      if (!io.sockets.adapter.rooms[userID]) {
+        cleanUpTheRoom(userID, userEmail);
       }
       clearInterval(intervalUpdateCacheSession);
     });
 
-    // disconnect, socket automatically leaves all rooms it is in.
-    socket.on("disconnect", () => {
-      clearIntervalsIfIntervalsNotEmpty([
-        intervalSendMarketClosed,
-        intervalSendUpdatedAllUsersFlag,
-        intervalSendUpdatedRankingListFlag,
-        intervalUpdateCacheSession
-      ]);
+    socket.on(updateUserSession, (newUserSession, message) => {
+      const {
+        userID,
+        userEmail,
+        hasFinishedSettingUp: localHasFinishedSettingUp
+      } = socket;
+      const { email, hasFinishedSettingUp } = newUserSession;
 
-      if (io.sockets.adapter.rooms[socket.userID]) {
-        clearInterval(intervalCheckRoomEmpty);
+      if (email && userEmail !== email) {
+        socket.userEmail = email;
+
+        intervalUpdateCacheSession = setupIntervalUpdateCacheSession(
+          intervalUpdateCacheSession,
+          email
+        );
       }
 
-      console.log("Client disconnected\n");
+      if (
+        hasFinishedSettingUp &&
+        localHasFinishedSettingUp !== hasFinishedSettingUp
+      ) {
+        socket.hasFinishedSettingUp = hasFinishedSettingUp;
+
+        setupAllCacheSession(email, getYearUTCString(newDate()) - 2)
+          .then(() => {
+            intervalUpdateCacheSession = setupIntervalUpdateCacheSession(
+              intervalUpdateCacheSession,
+              email
+            );
+            socket.emit(finishedSettingUpUserCacheSession, true);
+          })
+          .catch((err) => console.log(err));
+      }
+
+      if (message === updateUserSessionInitialMessage) {
+        socket.to(userID).emit(finishedUpdatingUserSession, newUserSession);
+      }
+    });
+
+    // disconnect, socket automatically leaves all rooms it is in.
+    socket.on(disconnect, () => {
+      console.log(`Client disconnected ${socket.id}\n`);
+      countSocketsInMainHall--;
+
+      const { userID, userEmail } = socket;
+
+      if (userID && userEmail && !io.sockets.adapter.rooms[userID]) {
+        cleanUpTheRoom(userID, userEmail);
+      }
+      clearInterval(intervalUpdateCacheSession);
+
+      if (countSocketsInMainHall === 0) {
+        clearIntervalsIfIntervalsNotEmpty([
+          intervalSendMarketClosed,
+          intervalSendUpdatedAllUsersFlag,
+          intervalSendUpdatedRankingListFlag
+        ]);
+      }
     });
 
     /*
-
-    Set up 3 general intervals all sockets will use:
-    - Send boolean "Is market closed?"
-    - Send boolean flag "Has just updated all users (portfolioLastClosure, accountSummaryChartTimestamp)?"
-    - Send boolean flag "Has just updated ranking of all users?"
-
+      Set up 3 general intervals all sockets will use:
+      - Send boolean "Is market closed?"
+      - Send boolean flag "Has just updated all users (portfolioLastClosure, accountSummaryChartTimestamp)?"
+      - Send boolean flag "Has just updated ranking of all users?"
     */
 
-    clearIntervalsIfIntervalsNotEmpty([
-      intervalSendMarketClosed,
-      intervalSendUpdatedAllUsersFlag,
-      intervalSendUpdatedRankingListFlag
-    ]);
+    if (countSocketsInMainHall === 1) {
+      clearIntervalsIfIntervalsNotEmpty([
+        intervalSendMarketClosed,
+        intervalSendUpdatedAllUsersFlag,
+        intervalSendUpdatedRankingListFlag
+      ]);
 
-    intervalSendMarketClosed = setInterval(() => {
-      socket.emit(
-        checkMarketClosedString,
-        globalBackendVariables.isMarketClosed
-      );
-    }, oneSecond);
+      intervalSendMarketClosed = setInterval(() => {
+        io.emit(checkMarketClosedString, globalBackendVariables.isMarketClosed);
+      }, oneSecond);
 
-    intervalSendUpdatedAllUsersFlag = setInterval(() => {
-      socket.emit(
-        updatedAllUsersFlag,
-        globalBackendVariables.updatedAllUsersFlag
-      );
-    }, oneSecond);
+      intervalSendUpdatedAllUsersFlag = setInterval(() => {
+        io.emit(
+          updatedAllUsersFlag,
+          globalBackendVariables.updatedAllUsersFlag
+        );
+      }, oneSecond);
 
-    intervalSendUpdatedRankingListFlag = setInterval(() => {
-      socket.emit(
-        updatedRankingListFlag,
-        globalBackendVariables.updatedRankingListFlag
-      );
-    }, oneSecond);
+      intervalSendUpdatedRankingListFlag = setInterval(() => {
+        io.emit(
+          updatedRankingListFlag,
+          globalBackendVariables.updatedRankingListFlag
+        );
+      }, oneSecond);
+    }
   });
 };
 

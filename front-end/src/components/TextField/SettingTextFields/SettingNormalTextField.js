@@ -146,6 +146,7 @@ class SettingNormalTextField extends React.Component {
         </Typography>
         <TextField
           fullWidth
+          autoFocus={name === "Code"}
           disabled={disabled}
           value={value}
           onMouseOver={this.onMouseOver}

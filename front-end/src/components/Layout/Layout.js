@@ -24,6 +24,7 @@ import {
   checkIsDifferentFromSocketUpdatedAllUsersFlag,
   checkIsDifferentFromSocketUpdatedRankingListFlag,
   checkHasFinishedSettingUpUserCacheSession,
+  checkFinishedUpdatingUserSession,
 } from "../../utils/SocketUtil";
 
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
@@ -141,6 +142,7 @@ class Layout extends React.Component {
     socketCheckMarketClosed(socket, this);
     checkIsDifferentFromSocketUpdatedAllUsersFlag(socket, this);
     checkIsDifferentFromSocketUpdatedRankingListFlag(socket, this);
+    checkFinishedUpdatingUserSession(socket, this);
   };
 
   clearIntervalsAndListeners = () => {
