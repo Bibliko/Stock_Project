@@ -145,8 +145,18 @@ setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 
 /*
 Update Cached Shares
-setInterval(() => updateCachedShareQuotesUsingCache(), 2 * oneSecond);
-setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
+
+setInterval(() => {
+  if(!globalBackendVariables.isMarketClosed) {
+    updateCachedShareQuotesUsingCache();
+  }
+}, 2 * oneSecond);
+
+setInterval(() => {
+  if(!globalBackendVariables.isMarketClosed) {
+    updateCachedShareProfilesUsingCache();
+  }
+}, oneMinute);
 */
 
 // All app routes are written below this comment:

@@ -7,14 +7,29 @@ const {
 const {
   SequentialPromisesWithResultsArray
 } = require("../utils/low-dependency/PromisesUtil");
+const {
+  accountSummaryChart,
+  sharesList
+} = require("../utils/redis-utils/RedisUtil");
+
+const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
+const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
+const getAccountSummaryChartWholeList = "getAccountSummaryChartWholeList";
+const getAccountSummaryChartLatestItem = "getAccountSummaryChartLatestItem";
+
+const updateSharesList = "updateSharesList";
+const getSharesList = "getSharesList";
+
+const getCachedShareInfo = "getCachedShareInfo";
+const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
  */
-router.put("/updateAccountSummaryChartWholeList", (req, res) => {
+router.put(`/${updateAccountSummaryChartWholeList}`, (req, res) => {
   const { email, prismaTimestamps } = req.body;
 
-  const redisKey = `${email}|accountSummaryChart`;
+  const redisKey = `${email}|${accountSummaryChart}`;
 
   const tasksList = [];
 
@@ -34,10 +49,11 @@ router.put("/updateAccountSummaryChartWholeList", (req, res) => {
       res.sendStatus(500);
     });
 });
-router.put("/updateAccountSummaryChartOneItem", (req, res) => {
+
+router.put(`/${updateAccountSummaryChartOneItem}`, (req, res) => {
   const { email, timestamp, portfolioValue } = req.body;
 
-  const redisKey = `${email}|accountSummaryChart`;
+  const redisKey = `${email}|${accountSummaryChart}`;
   const newValue = `${timestamp}|${portfolioValue}`;
 
   listPushAsync(redisKey, newValue)
@@ -49,10 +65,11 @@ router.put("/updateAccountSummaryChartOneItem", (req, res) => {
       res.sendStatus(500);
     });
 });
-router.get("/getAccountSummaryChartWholeList", (req, res) => {
+
+router.get(`/${getAccountSummaryChartWholeList}`, (req, res) => {
   const { email } = req.query;
 
-  const redisKey = `${email}|accountSummaryChart`;
+  const redisKey = `${email}|${accountSummaryChart}`;
 
   listRangeAsync(redisKey, 0, -1)
     .then((timestampArray) => {
@@ -63,10 +80,11 @@ router.get("/getAccountSummaryChartWholeList", (req, res) => {
       res.sendStatus(500);
     });
 });
-router.get("/getAccountSummaryChartLatestItem", (req, res) => {
+
+router.get(`/${getAccountSummaryChartLatestItem}`, (req, res) => {
   const { email } = req.query;
 
-  const redisKey = `${email}|accountSummaryChart`;
+  const redisKey = `${email}|${accountSummaryChart}`;
 
   listRangeAsync(redisKey, -1, -1)
     .then((timestampArray) => {
@@ -82,10 +100,10 @@ router.get("/getAccountSummaryChartLatestItem", (req, res) => {
  * 'doanhtu07@gmail.com|sharesList' :
  * List -> "id1|companyCode1|quantity1|buyPriceAvg1|userID1", "..."
  */
-router.put("/updateSharesList", (req, res) => {
+router.put(`/${updateSharesList}`, (req, res) => {
   const { email, shares } = req.body;
 
-  const redisKey = `${email}|sharesList`;
+  const redisKey = `${email}|${sharesList}`;
 
   const tasksList = [];
 
@@ -105,10 +123,11 @@ router.put("/updateSharesList", (req, res) => {
       res.sendStatus(500);
     });
 });
-router.get("/getSharesList", (req, res) => {
+
+router.get(`/${getSharesList}`, (req, res) => {
   const { email } = req.query;
 
-  const redisKey = `${email}|sharesList`;
+  const redisKey = `${email}|${sharesList}`;
 
   listRangeAsync(redisKey, 0, -1)
     .then((sharesList) => {
@@ -123,11 +142,27 @@ router.get("/getSharesList", (req, res) => {
 /**
  * result sends ready-to-use json of stock info
  */
-router.get("/getCachedShareInfo", (req, res) => {
+router.get(`/${getCachedShareInfo}`, (req, res) => {
   const { companyCode } = req.query;
-  getSingleCachedShareInfo(companyCode)
+  getSingleCachedShareInfo(companyCode.toUpperCase())
     .then((shareInfoJSON) => {
       res.send(shareInfoJSON);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
+  const { companyCodes } = req.query;
+  const getAllSharesInfoPromise = companyCodes.map((companyCode) => {
+    return getSingleCachedShareInfo(companyCode.toUpperCase());
+  });
+
+  Promise.all(getAllSharesInfoPromise)
+    .then((sharesInfoJSON) => {
+      res.send(sharesInfoJSON);
     })
     .catch((err) => {
       console.log(err);

@@ -130,12 +130,12 @@ class Layout extends React.Component {
   };
 
   setupIntervals = () => {
-    if (this.props.userSession.hasFinishedSettingUp) {
-      // this.checkStockQuotesInterval = setInterval(
-      //   () => checkStockQuotesToCalculateSharesValue(this, socket),
-      //   30 * oneSecond
-      // );
-    }
+    // if (this.props.userSession.hasFinishedSettingUp) {
+    //   this.checkStockQuotesInterval = setInterval(
+    //     () => checkStockQuotesToCalculateSharesValue(this),
+    //     30 * oneSecond
+    //   );
+    // }
   };
 
   setupSocketListeners = () => {
