@@ -1,6 +1,8 @@
 const actionTypes = {
     USER: 'USER',
-    MARKET: 'MARKET'
+    MARKET: 'MARKET',
+    USEROVERALLRANKING: 'FETCH_USERRANKING',
+    USERREGIONALRANKING: 'FETCH_USERREGIONALRANKING'
 };
 
 export default actionTypes;
