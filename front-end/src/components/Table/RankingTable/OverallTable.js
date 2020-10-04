@@ -1,5 +1,8 @@
 import React from "react";
 import { withRouter } from "react-router";
+import {connect} from 'react-redux'
+import compose from 'recompose/compose'
+import {fetchUserOverallRanking} from '../../../redux/storeActions/actions'
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -68,6 +71,10 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 class OverallTable extends React.Component {
+    componentDidMount(){
+    this.props.fetchUserOverallRanking()
+    console.log(this.props.ranking)
+  }
   chooseTableRowValue = (type) => {
     switch (type) {
       case "":
@@ -169,4 +176,14 @@ class OverallTable extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(OverallTable));
+const mapStateToProps= state=>{
+  return {
+    ranking: state.overallRanking
+  }
+}
+
+
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps, {fetchUserOverallRanking} )
+)(withRouter(OverallTable));
