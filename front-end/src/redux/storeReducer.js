@@ -1,7 +1,7 @@
 import actionTypes from './storeActions/actionTypes';
 
-import userReducer from './storeReducers/user.reducer';
-import marketReducer from './storeReducers/market.reducer';
+import userReducer from './reducers/user.reducer';
+import marketReducer from './reducers/market.reducer';
 
 /** 
  * - variable action in addReducer will be obtained from 
