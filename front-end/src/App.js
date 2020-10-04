@@ -1,10 +1,10 @@
 import React from "react";
 import { withRouter, Switch, Route } from "react-router-dom";
-
+import Axios from 'axios'
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { createStore, applyMiddleware,compose } from "redux";
 import initializeStoreState from "./redux/storeReducer";
-
+import thunk from 'redux-thunk'
 import socketIOClient from "socket.io-client";
 
 import { getBackendHostForSocket } from "./utils/low-dependency/NetworkUtil";
@@ -32,7 +32,7 @@ import { LinearProgress } from "@material-ui/core";
 import { LocalizationProvider } from "@material-ui/pickers";
 
 import DateFnsUtils from "@material-ui/pickers/adapter/date-fns";
-
+const composeEnhancers= window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 var socket;
 
 const BACKEND_HOST_FOR_SOCKET = getBackendHostForSocket();
@@ -81,7 +81,13 @@ class App extends React.Component {
   getReduxStore = () => {
     if (this.reduxStore_USE_THE_ACCESSOR === undefined) {
       this.reduxStore_USE_THE_ACCESSOR = createStore(
-        initializeStoreState(this.reduxStoreInitialState)
+       reducers,
+        {storeReducer: this.reduxStoreInitialState},
+        compose(
+          composeEnhancers(applyMiddleware(thunk))
+        ),
+
+
       );
     }
     //console.log(this.reduxStoreInitialState);
