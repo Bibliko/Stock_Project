@@ -1,4 +1,6 @@
-const { isEqual } = require("lodash");
+const {
+  isEqual
+} = require("lodash");
 
 /**
  * @param redisString From 'cachedMarketHoliday' -> 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
@@ -163,7 +165,12 @@ const parseRedisTransactionsHistoryFilters = (redisValue) => {
  * }
  */
 const createPrismaFiltersObject = (filters) => {
-  const { type, code, price, transactionTime } = filters;
+  const {
+    type,
+    code,
+    price,
+    transactionTime
+  } = filters;
   const filtering = {
     isFinished: true
     // isTypeBuy
@@ -182,7 +189,9 @@ const createPrismaFiltersObject = (filters) => {
 
   // code
   if (!isEqual(code, "none")) {
-    filtering.companyCode = { contains: code };
+    filtering.companyCode = {
+      contains: code
+    };
   }
 
   // price
@@ -314,6 +323,29 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
   return `${price}|${beta}|${volAvg}|${mktCap}|${lastDiv}|${range}|${changes}|${companyName}|${exchange}|${exchangeShortName}|${industry}|${website}|${description}|${ceo}|${sector}|${country}|${fullTimeEmployees}|${phone}|${address}|${city}|${state}|${zip}|${dcfDiff}|${dcf}|${image}|${ipoDate}`;
 };
 
+const createRedisValueFromStockRatingJSON = (stockRatingJSON) => {
+  const {
+    date,
+    rating,
+    ratingScore,
+    ratingRecommendation,
+    ratingDetailsDCFScore,
+    ratingDetailsDCFRecommendation,
+    ratingDetailsROEScore,
+    ratingDetailsROERecommendation,
+    ratingDetailsROAScore,
+    ratingDetailsROARecommendation,
+    ratingDetailsDEScore,
+    ratingDetailsDERecommendation,
+    ratingDetailsPEScore,
+    ratingDetailsPERecommendation,
+    ratingDetailsPBScore,
+    ratingDetailsPBRecommendation
+  } = stockRatingJSON;
+
+  return `${date}|${rating}|${ratingScore}|${ratingRecommendation}|${ratingDetailsDCFScore}|${ratingDetailsDCFRecommendation}|${ratingDetailsROEScore}|${ratingDetailsROERecommendation}|${ratingDetailsROAScore}|${ratingDetailsROARecommendation}|${ratingDetailsDEScore}|${ratingDetailsDERecommendation}|${ratingDetailsPEScore}|${ratingDetailsPERecommendation}|${ratingDetailsPBScore}|${ratingDetailsPBRecommendation}`;
+}
+
 /**
  * @param cachedSharesList Shares list of symbols ['AAPL', 'GOOGL', 'FB', ...]
  * @returns Redis symbols string value used for cache
@@ -353,6 +385,7 @@ module.exports = {
   parseCachedShareProfile,
   createRedisValueFromStockQuoteJSON,
   createRedisValueFromStockProfileJSON,
+  createRedisValueFromStockRatingJSON,
   combineFMPStockQuoteAndProfile,
   createSymbolsStringFromCachedSharesList,
 

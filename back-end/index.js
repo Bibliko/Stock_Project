@@ -30,25 +30,37 @@ const {
   checkMarketClosed
 } = require("./utils/top-layer/MainBackendIndexHelperUtil");
 
-const { deletePrismaMarketHolidays } = require("./utils/MarketHolidaysUtil");
+const {
+  deletePrismaMarketHolidays
+} = require("./utils/MarketHolidaysUtil");
 
 const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
-const { startSocketIO } = require("./socketIO");
+const {
+  startSocketIO
+} = require("./socketIO");
 
 /*
 const {
   updateCachedShareQuotesUsingCache,
   updateCachedShareProfilesUsingCache
+  updateCachedShareRatingsUsingCache
 } = require("./utils/redis-utils/SharesInfoBank");
 */
 
-const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const {
+  PORT: port,
+  NODE_ENV,
+  FRONTEND_HOST,
+  SENDGRID_API_KEY
+} = process.env;
 const express = require("express");
 const app = express();
-const { pick } = require("lodash");
+const {
+  pick
+} = require("lodash");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -59,7 +71,9 @@ const server = http.createServer(app);
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require("passport");
-const { setupPassport } = require("./passport");
+const {
+  setupPassport
+} = require("./passport");
 const session = require("express-session");
 
 /* cors: for example, if front-end sends request to back-end,
@@ -147,6 +161,7 @@ setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 Update Cached Shares
 setInterval(() => updateCachedShareQuotesUsingCache(), 2 * oneSecond);
 setInterval(() => updateCachedShareProfilesUsingCache(), oneMinute);
+setInterval(() => updateCachedShareRatingsUsingCache(), oneSecond);
 */
 
 // All app routes are written below this comment:

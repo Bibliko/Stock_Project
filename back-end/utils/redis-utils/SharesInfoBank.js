@@ -1,4 +1,6 @@
-const { chunk } = require("lodash");
+const {
+  chunk
+} = require("lodash");
 
 const {
   getAsync,
@@ -13,7 +15,8 @@ const {
 
 const {
   getFullStockQuotesFromFMP,
-  getFullStockProfilesFromFMP
+  getFullStockProfilesFromFMP,
+  getFullStockRatingsFromFMP
 } = require("../FinancialModelingPrepUtil");
 
 const {
@@ -21,6 +24,7 @@ const {
   parseCachedShareProfile,
   createRedisValueFromStockQuoteJSON,
   createRedisValueFromStockProfileJSON,
+  createRedisValueFromStockRatingJSON,
   createSymbolsStringFromCachedSharesList,
   combineFMPStockQuoteAndProfile
 } = require("../low-dependency/ParserUtil");
@@ -141,7 +145,9 @@ const pushManyCodesToCachedShares = (companyCodes) => {
  */
 const updateSingleCachedShareQuote = (stockQuoteJSON) => {
   return new Promise((resolve, reject) => {
-    const { symbol } = stockQuoteJSON;
+    const {
+      symbol
+    } = stockQuoteJSON;
 
     const redisKey = `cachedShares|${symbol}|quote`;
     const valueString = createRedisValueFromStockQuoteJSON(stockQuoteJSON);
@@ -160,14 +166,41 @@ const updateSingleCachedShareQuote = (stockQuoteJSON) => {
  * @description
  * - Change cache data of a symbol
  * - Use redis key 'cachedShares|symbol|profile'
- * @param stockQuoteJSON stock PROFILE information obtained from FMP (json object)
+ * @param stockProfileJSON stock PROFILE information obtained from FMP (json object)
  */
 const updateSingleCachedShareProfile = (stockProfileJSON) => {
   return new Promise((resolve, reject) => {
-    const { symbol } = stockProfileJSON;
+    const {
+      symbol
+    } = stockProfileJSON;
 
     const redisKey = `cachedShares|${symbol}|profile`;
     const valueString = createRedisValueFromStockProfileJSON(stockProfileJSON);
+
+    setAsync(redisKey, valueString)
+      .then((quote) => {
+        resolve(`Updated ${redisKey} successfully`);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * @description
+ * - Change cache data of a symbol
+ * - Use redis key 'cachedShares|symbol|rating'
+ * @param stockRatingJSON stock RATING information obtained from FMP (json object)
+ */
+const updateSingleCachedShareRating = (stockRatingJSON) => {
+  return new Promise((resolve, reject) => {
+    const {
+      symbol
+    } = stockRatingJSON;
+
+    const redisKey = `cachedShares|${symbol}|rating`;
+    const valueString = createRedisValueFromStockRatingJSON(stockRatingJSON);
 
     setAsync(redisKey, valueString)
       .then((quote) => {
@@ -284,6 +317,52 @@ const updateCachedShareProfiles = (shareSymbols) => {
 };
 
 /**
+ * 
+ * @description
+ * Anh chưa biết viết description như thế nào cho phần này :((
+ */
+
+const updateCachedShareRatings = (shareSymbols) => {
+  return new Promise((resolve, reject) => {
+    // FMP Stock Ratings can only batch up to 50 symbols
+    const chunks50Symbols = chunk(shareSymbols, 50);
+    const tasksList = [];
+
+    const getStockRatingsFromFMPPromises = chunks50Symbols.map(
+      (chunkSymbols) => {
+        const symbolsString = createSymbolsStringFromCachedSharesList(
+          chunkSymbols
+        );
+        tasksList.push(() => getFullStockRatingsFromFMP(symbolsString));
+      }
+    );
+
+    SequentialPromisesWithResultsArray(getStockRatingsFromFMPPromises)
+      .then((stockRatingsJSONArray) => {
+        if (stockRatingsJSONArray) {
+          // stockQuotesJSONArray: [ [first 50 chunk], [second 50 chunk], ... ]
+          // We use two loops
+          const updateAllChunks = stockRatingsJSONArray.map(
+            (stockRatingsJSON) => {
+              const updateOneChunk = stockRatingsJSON.map((stockRating) => {
+                return updateSingleCachedShareRating(stockRating);
+              });
+              return Promise.all(updateOneChunk);
+            }
+          );
+          return Promise.all(updateAllChunks);
+        }
+      })
+      .then((finishedUpdatingAllCachedShareRatings) => {
+        resolve("Successfully updated all cached share ratings.");
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
  * @description
  * - Update cache of all stock symbols stored in 'cachedShares'
  * - Update each stock symbol using redis key 'cachedShares|symbol|quote'
@@ -314,12 +393,31 @@ const updateCachedShareProfilesUsingCache = () => {
       .then((cachedShares) => {
         return updateCachedShareProfiles(cachedShares);
       })
-      .then((finishedUpdatingCachedShareQuotes) => {
+      .then((finishedUpdatingCachedShareProfiles) => {
         resolve("Successfully updated cached share profiles automatically.");
       })
       .catch((err) => {
         reject(err);
       });
+  });
+};
+
+/**
+ * @description
+ * - Update cache of all stock symbols stored in 'cachedShares'
+ * - Update each stock symbol using redis key 'cachedShares|symbol|rating'
+ */
+
+const updateCachedShareRatingsUsingCache = () => {
+  return new Promise((resolve, reject) => {
+    getCachedShares()
+      .then((cachedShares) => {
+        return updateCachedShareRatings(cachedShares);
+      })
+      .then((finishedUpdatingCachedShareRatings) => {
+        resolve("Successfully updated cached share ratings automatically.");
+      })
+      .catch((err) => reject(err));
   });
 };
 
@@ -331,10 +429,13 @@ module.exports = {
 
   updateSingleCachedShareQuote,
   updateSingleCachedShareProfile,
+  updateSingleCachedShareRating,
 
   updateCachedShareQuotes,
   updateCachedShareProfiles,
+  updateCachedShareRatings,
 
   updateCachedShareQuotesUsingCache,
-  updateCachedShareProfilesUsingCache
+  updateCachedShareProfilesUsingCache,
+  updateCachedShareRatingsUsingCache
 };

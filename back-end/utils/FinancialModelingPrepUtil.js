@@ -226,9 +226,62 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
   });
 };
 
+/**
+ * shareSymbolsString: 'AAPL,GOOGL,...'
+ *
+ *  [{
+      "symbol" : "AAPL",
+      "date" : "2020-09-04",
+      "rating" : "S-",
+      "ratingScore" : 5,
+      "ratingRecommendation" : "Strong Buy",
+      "ratingDetailsDCFScore" : 5,
+      "ratingDetailsDCFRecommendation" : "Strong Buy",
+      "ratingDetailsROEScore" : 4,
+      "ratingDetailsROERecommendation" : "Buy",
+      "ratingDetailsROAScore" : 3,
+      "ratingDetailsROARecommendation" : "Neutral",
+      "ratingDetailsDEScore" : 5,
+      "ratingDetailsDERecommendation" : "Strong Buy",
+      "ratingDetailsPEScore" : 5,
+      "ratingDetailsPERecommendation" : "Strong Buy",
+      "ratingDetailsPBScore" : 5,
+      "ratingDetailsPBRecommendation" : "Strong Buy"
+    },
+    ...
+    ]
+ */
+
+const getFullStockRatingsFromFMP = (shareSymbolsString) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/profile/${shareSymbolsString}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stockRatings) => {
+        return stockRatings.json();
+      })
+      .then((stockRatingsJSON) => {
+        if (isEmpty(stockRatingsJSON)) {
+          reject(new Error(`Share symbols do not exist in FMP.`));
+        } else {
+          resolve(stockRatingsJSON);
+        }
+        if (isEmpty(stockRatingsJSON)) {
+          reject(new Error(`Share symbols do not exist in FMP.`));
+        } else if (stockRatingsJSON["Error Message"]) {
+          reject(stockRatingsJSON["Error Message"]);
+        } else {
+          resolve(stockRatingsJSON);
+        }
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 module.exports = {
   updateMarketHolidaysFromFMP,
 
   getFullStockQuotesFromFMP,
-  getFullStockProfilesFromFMP
+  getFullStockProfilesFromFMP,
+  getFullStockRatingsFromFMP
 };
