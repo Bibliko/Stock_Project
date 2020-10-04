@@ -232,16 +232,19 @@ export const changeUserEmail = (email, newEmail, mutateUser, socket) => {
   });
 };
 
+/**
+ *
+ * @param dataNeeded String or Object
+ * -  dataNeeded in form of:
+ *      dataNeeded: {
+ *      cash: true,
+ *      region: true,
+ *      ...
+ *    }
+ * - Special Note: If you want to get all scalar fields of user, use dataNeeded = "default"
+ * @param {string} email User email
+ */
 export const getUserData = (dataNeeded, email) => {
-  /**
-   *  dataNeeded in form of:
-   *      dataNeeded: {
-   *          cash: true,
-   *          region: true,
-   *          ...
-   *      }
-   */
-
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/getData`, {
       method: "get",

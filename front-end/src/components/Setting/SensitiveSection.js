@@ -1,7 +1,7 @@
 import React from "react";
 import validator from "email-validator";
 import clsx from "clsx";
-import { socket } from '../../App';
+import { socket } from "../../App";
 
 import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
 import SettingPasswordTextField from "../TextField/SettingTextFields/SettingPasswordTextField";
@@ -10,6 +10,7 @@ import {
   sendVerificationCode,
   checkVerificationCode,
   changeUserEmail,
+  getUserData,
 } from "../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -88,6 +89,7 @@ const styles = (theme) => ({
     maxWidth: "none",
     minWidth: "150px",
     margin: "10px",
+    padding: 0,
   },
   hide: {
     display: "none",
@@ -237,12 +239,19 @@ class SensitiveSection extends React.Component {
     });
   };
 
-  sendVerificationCode = () => {
-    sendVerificationCode(this.email, "email")
-      .then(() => {
+  sendVerificationCodeButton = () => {
+    getUserData("default", this.email)
+      .then((user) => {
+        return user ? null : sendVerificationCode(this.email, "email");
+      })
+      .then((emailSent) => {
         this.setState({
-          emailSuccess: "Email Verification Code has been sent",
-          emailError: "",
+          emailSuccess: emailSent
+            ? "Email Verification Code has been sent"
+            : "",
+          emailError: emailSent
+            ? ""
+            : "This email already exists. Can't change to this email.",
         });
       })
       .catch((err) => {
@@ -401,7 +410,7 @@ class SensitiveSection extends React.Component {
               )}
               <Button
                 className={classes.emailSendCodeButton}
-                onClick={this.sendVerificationCode}
+                onClick={this.sendVerificationCodeButton}
               >
                 Send Verification Code
               </Button>
