@@ -159,7 +159,7 @@ router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
 
   const tasksList = [];
 
-  companyCodes.map((companyCode) => {
+  companyCodes.forEach((companyCode) => {
     tasksList.push(() => getSingleCachedShareInfo(companyCode.toUpperCase()));
     return "dummy value";
   });
