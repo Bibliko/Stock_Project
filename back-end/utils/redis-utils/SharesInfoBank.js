@@ -1,6 +1,4 @@
-const {
-  chunk
-} = require("lodash");
+const { chunk } = require("lodash");
 
 const {
   getAsync,
@@ -146,9 +144,7 @@ const pushManyCodesToCachedShares = (companyCodes) => {
  */
 const updateSingleCachedShareQuote = (stockQuoteJSON) => {
   return new Promise((resolve, reject) => {
-    const {
-      symbol
-    } = stockQuoteJSON;
+    const { symbol } = stockQuoteJSON;
 
     const redisKey = `cachedShares|${symbol}|quote`;
     const valueString = createRedisValueFromStockQuoteJSON(stockQuoteJSON);
@@ -171,9 +167,7 @@ const updateSingleCachedShareQuote = (stockQuoteJSON) => {
  */
 const updateSingleCachedShareProfile = (stockProfileJSON) => {
   return new Promise((resolve, reject) => {
-    const {
-      symbol
-    } = stockProfileJSON;
+    const { symbol } = stockProfileJSON;
 
     const redisKey = `cachedShares|${symbol}|profile`;
     const valueString = createRedisValueFromStockProfileJSON(stockProfileJSON);
@@ -196,9 +190,7 @@ const updateSingleCachedShareProfile = (stockProfileJSON) => {
  */
 const updateSingleCachedShareRating = (stockRatingJSON) => {
   return new Promise((resolve, reject) => {
-    const {
-      symbol
-    } = stockRatingJSON;
+    const { symbol } = stockRatingJSON;
 
     const redisKey = `cachedShares|${symbol}|rating`;
     const valueString = createRedisValueFromStockRatingJSON(stockRatingJSON);
@@ -269,10 +261,10 @@ const updateCachedShareQuotes = (shareSymbols) => {
  * Maximum Parallel Queries: 0
  * - We will use Sequential Promises for updating profiles
  * - No parallel since profile query allows only up to 50 companies
- * -> If we do parellel queries, there could be more than 100 queries/sec since there are
+ * - If we do parellel queries, there could be more than 100 queries/sec since there are
  * at most 8000 companies in NYSE and NASDAQ combined!
  *
- * * @description
+ * @description
  * 1. Divide array of stock symbols into chunks of 50 symbols. Each chunk, get stock PROFILE information from FMP
  * 2. Update cache of each symbol using redis key 'cachedShares|symbol|profile'
  * @param shareSymbols Array of stock symbols. E.g: ["AAPL", "GOOGL"]
@@ -318,21 +310,23 @@ const updateCachedShareProfiles = (shareSymbols) => {
 };
 
 /**
- * 
- * @description
- * - Update a company rating.
+ * @description Update a company rating
  */
 const updateCachedShareRatings = (shareSymbols) => {
   return new Promise((resolve, reject) => {
     const tasksList = [];
 
     SequentialPromises(
-        tasksList.push(() => getFullStockRatingsFromFMP(createSymbolsStringFromCachedSharesList(shareSymbols)))
+      tasksList.push(() =>
+        getFullStockRatingsFromFMP(
+          createSymbolsStringFromCachedSharesList(shareSymbols)
+        )
       )
+    )
       .then((finishedUpdatingCachedShareRating) =>
         resolve("Successfully updated cached share ratings.")
       )
-      .catch(err => reject(err));
+      .catch((err) => reject(err));
   });
 };
 
@@ -341,7 +335,7 @@ const updateCachedShareRatings = (shareSymbols) => {
  * - Update cache of all stock symbols stored in 'cachedShares'
  * - Update each stock symbol using redis key 'cachedShares|symbol|quote'
  */
-const updateCachedShareQuotesUsingCache = () => {
+const updateCachedShareQuotesUsingCachedSharesList = () => {
   return new Promise((resolve, reject) => {
     getCachedShares()
       .then((cachedShares) => {
@@ -361,7 +355,7 @@ const updateCachedShareQuotesUsingCache = () => {
  * - Update cache of all stock symbols stored in 'cachedShares'
  * - Update each stock symbol using redis key 'cachedShares|symbol|profile'
  */
-const updateCachedShareProfilesUsingCache = () => {
+const updateCachedShareProfilesUsingCachedSharesList = () => {
   return new Promise((resolve, reject) => {
     getCachedShares()
       .then((cachedShares) => {
@@ -382,7 +376,7 @@ const updateCachedShareProfilesUsingCache = () => {
  * - Update each stock symbol using redis key 'cachedShares|symbol|rating'
  */
 
-const updateCachedShareRatingsUsingCache = () => {
+const updateCachedShareRatingsUsingCachedSharesList = () => {
   return new Promise((resolve, reject) => {
     getCachedShares()
       .then((cachedShares) => {
@@ -409,7 +403,7 @@ module.exports = {
   updateCachedShareProfiles,
   updateCachedShareRatings,
 
-  updateCachedShareQuotesUsingCache,
-  updateCachedShareProfilesUsingCache,
-  updateCachedShareRatingsUsingCache
+  updateCachedShareQuotesUsingCachedSharesList,
+  updateCachedShareProfilesUsingCachedSharesList,
+  updateCachedShareRatingsUsingCachedSharesList
 };
