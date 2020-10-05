@@ -1,5 +1,9 @@
-const { isEqual } = require("lodash");
-const { PrismaClient } = require("@prisma/client");
+const {
+  isEqual
+} = require("lodash");
+const {
+  PrismaClient
+} = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const {
@@ -9,7 +13,10 @@ const {
   delAsync
 } = require("../../redis/redis-client");
 
-const { newDate, getYearUTCString } = require("../low-dependency/DayTimeUtil");
+const {
+  newDate,
+  getYearUTCString
+} = require("../low-dependency/DayTimeUtil");
 const {
   findIfTimeNowIsHoliday,
   findIfTimeNowIsOutOfRange,
@@ -37,6 +44,7 @@ const {
  * - 'cachedShares': list
  * - 'cachedShares|${companyCode}|quote': value
  * - 'cachedShares|${companyCode}|profile': value
+ * - 'cachedShares|${companyCode}|rating': value
  *
  * - 'RANKING_LIST': list
  * - 'RANKING_LIST_${region}': list

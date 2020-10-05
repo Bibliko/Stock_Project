@@ -10,7 +10,8 @@ const {
 } = require("../../redis/redis-client");
 
 const {
-  SequentialPromisesWithResultsArray
+  SequentialPromisesWithResultsArray,
+  SequentialPromises
 } = require("../low-dependency/PromisesUtil");
 
 const {
@@ -319,46 +320,19 @@ const updateCachedShareProfiles = (shareSymbols) => {
 /**
  * 
  * @description
- * Anh chưa biết viết description như thế nào cho phần này :((
+ * - Update a company rating.
  */
-
 const updateCachedShareRatings = (shareSymbols) => {
   return new Promise((resolve, reject) => {
-    // FMP Stock Ratings can only batch up to 50 symbols
-    const chunks50Symbols = chunk(shareSymbols, 50);
     const tasksList = [];
 
-    const getStockRatingsFromFMPPromises = chunks50Symbols.map(
-      (chunkSymbols) => {
-        const symbolsString = createSymbolsStringFromCachedSharesList(
-          chunkSymbols
-        );
-        tasksList.push(() => getFullStockRatingsFromFMP(symbolsString));
-      }
-    );
-
-    SequentialPromisesWithResultsArray(getStockRatingsFromFMPPromises)
-      .then((stockRatingsJSONArray) => {
-        if (stockRatingsJSONArray) {
-          // stockQuotesJSONArray: [ [first 50 chunk], [second 50 chunk], ... ]
-          // We use two loops
-          const updateAllChunks = stockRatingsJSONArray.map(
-            (stockRatingsJSON) => {
-              const updateOneChunk = stockRatingsJSON.map((stockRating) => {
-                return updateSingleCachedShareRating(stockRating);
-              });
-              return Promise.all(updateOneChunk);
-            }
-          );
-          return Promise.all(updateAllChunks);
-        }
-      })
-      .then((finishedUpdatingAllCachedShareRatings) => {
-        resolve("Successfully updated all cached share ratings.");
-      })
-      .catch((err) => {
-        reject(err);
-      });
+    SequentialPromises(
+        tasksList.push(() => getFullStockRatingsFromFMP(createSymbolsStringFromCachedSharesList(shareSymbols)))
+      )
+      .then((finishedUpdatingCachedShareRating) =>
+        resolve("Successfully updated cached share ratings.")
+      )
+      .catch(err => reject(err));
   });
 };
 
