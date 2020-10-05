@@ -156,11 +156,15 @@ router.get(`/${getCachedShareInfo}`, (req, res) => {
 
 router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
   const { companyCodes } = req.query;
-  const getAllSharesInfoPromise = companyCodes.map((companyCode) => {
-    return getSingleCachedShareInfo(companyCode.toUpperCase());
+
+  const tasksList = [];
+
+  companyCodes.map((companyCode) => {
+    tasksList.push(() => getSingleCachedShareInfo(companyCode.toUpperCase()));
+    return "dummy value";
   });
 
-  Promise.all(getAllSharesInfoPromise)
+  SequentialPromisesWithResultsArray(tasksList)
     .then((sharesInfoJSON) => {
       res.send(sharesInfoJSON);
     })
