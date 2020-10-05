@@ -195,11 +195,10 @@ class WatchlistTableRow extends React.Component {
     const { watchlist, email } = this.props.userSession;
 
     let newWatchlist = [];
-    watchlist.map((companyCodeString) => {
+    watchlist.forEach((companyCodeString) => {
       if (!isEqual(companyCodeString, companyCode)) {
         newWatchlist.push(companyCodeString);
       }
-      return "dummy value";
     });
 
     const dataNeedChange = {

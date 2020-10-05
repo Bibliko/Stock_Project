@@ -33,11 +33,10 @@ router.put(`/${updateAccountSummaryChartWholeList}`, (req, res) => {
 
   const tasksList = [];
 
-  prismaTimestamps.map((timestamp) => {
+  prismaTimestamps.forEach((timestamp) => {
     const { UTCDateString, portfolioValue } = timestamp;
     const newValue = `${UTCDateString}|${portfolioValue}`;
     tasksList.push(() => listPushAsync(redisKey, newValue));
-    return "dummy value";
   });
 
   SequentialPromisesWithResultsArray(tasksList)
@@ -107,11 +106,10 @@ router.put(`/${updateSharesList}`, (req, res) => {
 
   const tasksList = [];
 
-  shares.map((share) => {
+  shares.forEach((share) => {
     const { id, companyCode, quantity, buyPriceAvg, userID } = share;
     const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
     tasksList.push(() => listPushAsync(redisKey, newValue));
-    return "dummy value";
   });
 
   SequentialPromisesWithResultsArray(tasksList)
@@ -161,7 +159,6 @@ router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
 
   companyCodes.forEach((companyCode) => {
     tasksList.push(() => getSingleCachedShareInfo(companyCode.toUpperCase()));
-    return "dummy value";
   });
 
   SequentialPromisesWithResultsArray(tasksList)

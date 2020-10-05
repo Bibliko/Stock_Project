@@ -180,18 +180,15 @@ class AccountSummaryChart extends React.Component {
       .then((cachedTimestamp) => {
         const { data } = cachedTimestamp;
         if (data) {
-          data.map((timestamp) => {
+          data.forEach((timestamp) => {
             const parsedChartItem = parseRedisAccountSummaryChartItem(
               timestamp
             );
 
             // eliminate cases that value of timestamp is null
             if (parsedChartItem[1]) {
-              return seriesData.push(
-                parseRedisAccountSummaryChartItem(timestamp)
-              );
+              seriesData.push(parseRedisAccountSummaryChartItem(timestamp));
             }
-            return "dummy value";
           });
         }
 

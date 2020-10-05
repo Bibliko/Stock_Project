@@ -296,9 +296,8 @@ class TransactionsHistoryTableContainer extends React.Component {
 
     const { transactions, transactionsLength } = redisTransactions;
 
-    transactions.map((transaction) => {
+    transactions.forEach((transaction) => {
       newTransactions.push(parseRedisTransactionsHistoryListItem(transaction));
-      return "dummy value";
     });
     this.setState(
       {

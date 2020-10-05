@@ -95,13 +95,12 @@ const reorganizeTransactionsHistoryM5RU = (
           listPushAsync(redisKey, valueString);
         });
 
-        M5RUList.map((M5RUItem) => {
+        M5RUList.forEach((M5RUItem) => {
           if (!isEqual(M5RUItem, valueString)) {
             tasksList.push(() => {
               listPushAsync(redisKey, M5RUItem);
             });
           }
-          return "dummy value";
         });
 
         return SequentialPromisesWithResultsArray(tasksList);
@@ -215,14 +214,13 @@ const createOrOverwriteTransactionsHistoryM5RUItemRedisKey = (
       .then((finishedDeletingOldTransactionsHistoryM5RUItem) => {
         const tasksList = [];
 
-        prismaTransactionsHistory.map((transaction) => {
+        prismaTransactionsHistory.forEach((transaction) => {
           const redisValue = createRedisValueFromFinishedTransaction(
             transaction
           );
           tasksList.push(() => {
             listPushAsync(redisKey, redisValue);
           });
-          return "dummy value";
         });
 
         return SequentialPromisesWithResultsArray(tasksList);
