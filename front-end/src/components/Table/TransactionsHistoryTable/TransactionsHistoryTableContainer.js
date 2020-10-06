@@ -188,11 +188,9 @@ const styles = (theme) => ({
     opacity: 1,
     color: "white",
     fontSize: "medium",
-    transition: "opacity 0.5s",
   },
   filterWordHidden: {
-    opacity: 0,
-    width: 0,
+    fontSize: 0,
   },
   title: {
     marginBottom: "30px",

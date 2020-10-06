@@ -23,7 +23,9 @@ const deletePrismaMarketHolidays = () => {
       }
     })
     .then(() => {
-      console.log("unnessary market holidays deleted MarketHolidaysUtil 29");
+      console.log(
+        "unnessary market holidays deleted MarketHolidaysUtil deletePrismaMarketHolidays"
+      );
     })
     .catch((err) => {
       console.log(err);
