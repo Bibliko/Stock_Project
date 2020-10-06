@@ -37,6 +37,7 @@ const theme = {
   palette: {
     primary: {
       main: "#2196f3",
+      light: "#9ED2EF"
     },
 
     backgroundBlue: {
