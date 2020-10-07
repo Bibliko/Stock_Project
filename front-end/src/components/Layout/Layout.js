@@ -98,6 +98,10 @@ const styles = (theme) => ({
     "& .MuiSnackbarContent-root": {
       backgroundColor: theme.palette.refreshSnackbar.main,
     },
+    top: theme.customMargin.topLayout,
+    [theme.breakpoints.down("xs")]: {
+      top: theme.customMargin.topLayoutSmall,
+    },
   },
   reloadButton: {
     color: theme.palette.refreshSnackbar.reloadButton,
@@ -231,7 +235,7 @@ class Layout extends React.Component {
           </div>
         </main>
         <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
           open={openRefreshCard}
           className={classes.refreshCard}
           onClose={this.handleCloseRefreshCard}

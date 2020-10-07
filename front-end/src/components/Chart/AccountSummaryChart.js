@@ -115,6 +115,7 @@ class AccountSummaryChart extends React.Component {
         },
       },
       yaxis: {
+        tickAmount: 3,
         labels: {
           show: true,
           style: {
