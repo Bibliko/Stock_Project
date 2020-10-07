@@ -20,10 +20,6 @@ const styles = (theme) => ({
     "& .MuiInputBase-root": {
       height: "40px",
       borderRadius: "20px",
-      boxShadow: `0.5px 0.5px 1px ${theme.palette.searchField.main}`,
-      "&:hover": {
-        boxShadow: `0.5px 0.5px 1px ${theme.palette.searchField.onHover}`,
-      },
     },
     "& .MuiInputLabel-outlined": {
       transform: "translate(14px, 13px) scale(1)",
@@ -57,12 +53,16 @@ const styles = (theme) => ({
     fontSize: "medium",
   },
   iconButton: {
+    padding: "8px",
+  },
+  clearIcon: {
     color: "rgba(255, 255, 255, 0.8)",
-    padding: 0,
-    paddingRight: "8px",
   },
   searchIcon: {
     color: theme.palette.searchField.main,
+  },
+  searchIconHover: {
+    color: theme.palette.searchField.onHover,
   },
   hide: {
     display: "none",
@@ -104,7 +104,7 @@ class SearchField extends React.Component {
         id="Search"
         ref={forwardedRef}
         value={searchCompany}
-        label="Search"
+        placeholder="Search..."
         inputRef={this.inputRef}
         autoComplete="off"
         variant="outlined"
@@ -125,13 +125,16 @@ class SearchField extends React.Component {
                 onClick={clearSearchCompany}
                 disableRipple
               >
-                <ClearRoundedIcon />
+                <ClearRoundedIcon className={classes.clearIcon} />
               </IconButton>
-              <SearchRoundedIcon
-                className={clsx(classes.searchIcon, {
-                  [classes.hide]: !isEmpty(searchCompany),
-                })}
-              />
+              <IconButton edge="end" className={classes.iconButton} disabled>
+                <SearchRoundedIcon
+                  edge="end"
+                  className={clsx(classes.searchIcon, {
+                    [classes.hide]: !isEmpty(searchCompany),
+                  })}
+                />
+              </IconButton>
             </InputAdornment>
           ),
         }}
