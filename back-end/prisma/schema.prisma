@@ -13,7 +13,7 @@ generator client {
 }
 
 model User {
-  id                        String                    @default(cuid()) @id
+  id                        String                    @id @default(cuid())
   email                     String?                   @unique
   password                  String?
   firstName                 String?
@@ -36,10 +36,11 @@ model User {
   shares                    Share[]
   accountSummaryChartInfo   AccountSummaryTimestamp[]
   rankingChartInfo          RankingTimestamp[]
+  companiesRatings          CompanyRating[]
 }
 
 model AccountSummaryTimestamp {
-  id             String @default(cuid()) @id
+  id             String @id @default(cuid())
   UTCDateString  String
   UTCDateKey     String
   year           Int
@@ -51,7 +52,7 @@ model AccountSummaryTimestamp {
 }
 
 model RankingTimestamp {
-  id              String @default(cuid()) @id
+  id              String @id @default(cuid())
   UTCDateString   String
   UTCDateKey      String
   year            Int
@@ -64,7 +65,7 @@ model RankingTimestamp {
 }
 
 model Share {
-  id          String   @default(cuid()) @id
+  id          String   @id @default(cuid())
   companyCode String?
   quantity    Int?
   buyPriceAvg Float?
@@ -75,7 +76,7 @@ model Share {
 }
 
 model UserTransaction {
-  id                 String    @default(cuid()) @id
+  id                 String    @id @default(cuid())
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @default(now()) @updatedAt
   companyCode        String?
@@ -93,7 +94,7 @@ model UserTransaction {
 }
 
 model MarketHolidays {
-  id                    String  @default(cuid()) @id
+  id                    String  @id @default(cuid())
   year                  Int?    @unique
   newYearsDay           String?
   martinLutherKingJrDay String?
@@ -107,8 +108,31 @@ model MarketHolidays {
 }
 
 model UserVerification {
-  id        String  @default(cuid()) @id
+  id        String  @id @default(cuid())
   email     String?
   password  String?
   expiredAt String? //handle specially -> don't need to use DateTime type
+}
+
+model CompanyRating {
+  id                             String @id @default(cuid())
+  symbol                         String
+  date                           String
+  rating                         String
+  ratingScore                    Int
+  ratingRecommendation           String
+  ratingDetailsDCFScore          Int
+  ratingDetailsDCFRecommendation String
+  ratingDetailsROEScore          Int
+  ratingDetailsROERecommendation String
+  ratingDetailsROAScore          Int
+  ratingDetailsROARecommendation String
+  ratingDetailsDEScore           Int
+  ratingDetailsDERecommendation  String
+  ratingDetailsPEScore           Int
+  ratingDetailsPERecommendation  String
+  ratingDetailsPBScore           Int
+  ratingDetailsPBRecommendation  String
+  user                           User   @relation(fields: [userID], references: [id])
+  userID                         String
 }
