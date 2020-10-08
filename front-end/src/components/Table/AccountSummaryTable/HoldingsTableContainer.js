@@ -36,7 +36,7 @@ const styles = (theme) => ({
   tableCell: {
     fontSize: "12px",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.main,
+    borderColor: theme.palette.tableHeader.darkBlue,
     borderStyle: "solid",
   },
   cellDiv: {
@@ -59,7 +59,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.main,
+    backgroundColor: theme.palette.tableHeader.darkBlue,
     color: "white",
   },
 }))(TableCell);

@@ -77,7 +77,7 @@ const styles = (theme) => ({
     marginBottom: "20px",
   },
   summary: {
-    color: theme.palette.bigTitle.red,
+    color: theme.palette.bigTitle.lightBlue,
   },
   holdings: {
     color: theme.palette.bigTitle.purple,

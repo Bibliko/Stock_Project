@@ -17,7 +17,7 @@ import { AssignmentRounded as AssignmentRoundedIcon } from "@material-ui/icons";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.main,
+    backgroundColor: theme.palette.tableHeader.darkBlue,
     color: "white",
   },
 }))(TableCell);
