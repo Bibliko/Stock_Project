@@ -38,7 +38,7 @@ const styles = (theme) => ({
     minWidth: "100px",
     fontSize: "12px",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.darkBlue,
+    borderColor: theme.palette.tableHeader.purple,
     borderStyle: "solid",
   },
   tableCellName: {
@@ -106,7 +106,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.darkBlue,
+    backgroundColor: theme.palette.tableHeader.purple,
     color: "white",
   },
 }))(TableCell);

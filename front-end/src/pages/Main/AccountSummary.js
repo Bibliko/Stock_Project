@@ -80,7 +80,7 @@ const styles = (theme) => ({
     color: theme.palette.bigTitle.lightBlue,
   },
   holdings: {
-    color: theme.palette.bigTitle.purple,
+    color: theme.palette.bigTitle.lighterBlue,
   },
   portfolioChart: {
     color: theme.palette.bigTitle.blue,

@@ -100,6 +100,8 @@ const theme = {
 
     tableHeader: {
       darkBlue: "rgba(35, 20, 150, 1)",
+      lightBlue: "rgba(0, 185, 209, 1)",
+      purple: "rgba(93, 64, 219, 1)",
     },
 
     tableRow: {
@@ -119,6 +121,7 @@ const theme = {
     bigTitle: {
       purple: "rgba(110, 80, 240, 1)",
       lightBlue: "rgba(54, 151, 254, 1)",
+      lighterBlue: "rgba(116, 224, 239, 1)",
       blue: "rgba(47, 128, 237, 1)",
       red: "rgba(220, 61, 74, 1)",
     },

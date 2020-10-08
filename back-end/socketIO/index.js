@@ -170,10 +170,11 @@ const startSocketIO = (server, globalBackendVariables) => {
 
       const { userID, userEmail } = socket;
 
+      clearInterval(intervalUpdateCacheSession);
+
       if (userID && userEmail && !io.sockets.adapter.rooms[userID]) {
         cleanUpTheRoom(userID, userEmail);
       }
-      clearInterval(intervalUpdateCacheSession);
 
       if (countSocketsInMainHall === 0) {
         clearIntervalsIfIntervalsNotEmpty([

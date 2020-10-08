@@ -44,7 +44,7 @@ const styles = (theme) => ({
     minWidth: "100px",
     fontSize: "12px",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.darkBlue,
+    borderColor: theme.palette.tableHeader.purple,
     borderStyle: "solid",
   },
   tableCellTransactionTime: {
