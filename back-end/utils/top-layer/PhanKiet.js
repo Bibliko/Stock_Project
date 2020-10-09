@@ -1,7 +1,7 @@
 /**
  * 
- * This file is here because I don't know where should I put these codes in.
- * Please tell me its suitable location so I can transfer these lines to an appropriate place.
+ * Please review this file one last time before I transfer all the codes to FinancialModelingPrepUtil.js
+ * I have fixed all the errors that you addressed, please take a look again.
  * 
  */
 
@@ -37,49 +37,37 @@ const getSingleShareRating = (shareSymbolString) =>
     });
 }
 
-const getStockScreener = (totalCompanies) =>
-{
-    return new Promise((resolve, reject) =>
-    {
-        fetch(
-            `https://financialmodelingprep.com/api/v3/stock-screener?limit=${totalCompanies}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
-        )
-        .then((stockRatingsArray) =>
-        {
-            return stockRatingsArray.json();
-        })
-        .then((stockRatingsArrayJSON) =>
-        {
-            resolve(stockRatingsArrayJSON);
-        })
-    });
-}
-
 const getAllSharesRatings = () =>
 {
     return new Promise((resolve, reject) =>
     {
-        try
-        {
-            const StockScreener = getStockScreener(600);
-            // eslint-disable-next-line prefer-const
-            let ratings = [];
-            
-            for (let i = 0; i < Object.values(StockScreener).length; ++ i)
-            {
-                ratings.push(getSingleShareRating(StockScreener[i].symbol));
-            }
 
-            resolve(ratings);
-        }
-        catch (err)
+        // This function below will not encounter any problem unless the API key expries, therefore, I don't catch error and I use async-await for better visualization.
+        const getStockScreener = async (totalCompanues) =>
         {
-            reject(err);
-        }
+            const stockRatingsArray = await fetch(`https://financialmodelingprep.com/api/v3/stock-screener?limit=${totalCompanies}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`);
+            const stockRatingsArrayJSON = await stockRatingsArray.json();
+
+            return stockRatingsArrayJSON;
+        };
+
+        const totalCompanies = 600; // The number of companies that we will fetch.
+        const StockScreener = getStockScreener(totalCompanies);
+
+
+        // eslint-disable-next-line prefer-const
+        let ratings = [];
+        
+        StockScreener.forEach((stockInfo) =>
+        {
+            ratings.push(getSingleShareRating(stockInfo.symbol));
+        });
+
+        resolve(ratings);
     });
 }
 
-const updateCompaniesRatingsList = (user) => {
+const updateCompaniesRatingsList = () => {
     prisma.user
     .findMany({
         where: {

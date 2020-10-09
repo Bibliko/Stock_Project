@@ -121,18 +121,4 @@ model CompanyRating {
   rating                         String
   ratingScore                    Int
   ratingRecommendation           String
-  ratingDetailsDCFScore          Int
-  ratingDetailsDCFRecommendation String
-  ratingDetailsROEScore          Int
-  ratingDetailsROERecommendation String
-  ratingDetailsROAScore          Int
-  ratingDetailsROARecommendation String
-  ratingDetailsDEScore           Int
-  ratingDetailsDERecommendation  String
-  ratingDetailsPEScore           Int
-  ratingDetailsPERecommendation  String
-  ratingDetailsPBScore           Int
-  ratingDetailsPBRecommendation  String
-  user                           User   @relation(fields: [userID], references: [id])
-  userID                         String
 }
