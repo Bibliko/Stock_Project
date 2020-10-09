@@ -38,7 +38,7 @@ const getSingleShareRating = (shareSymbolString) =>
 
 /**
  * @description This function fetch the rating data with certain number of companies.
- * @param totalCompanies The number of companies that we will fetch.
+ * @param totalCompanies The number of companies that we will fetch. In this version, we'll fetch 600 companies.
  */
 const getStockScreener = (totalCompanies) =>
 {
