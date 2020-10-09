@@ -349,6 +349,29 @@ const parseAccountSummaryTimestamp = (redisString) => {
   };
 };
 
+/**
+ * @param {object} historicalChartItem historical chart item obtained from FMP (OHLCV)
+ */
+const createRedisValueFromExchangeHistoricalChart = (historicalChartItem) => {
+  const { date, open, low, high, close, volume } = historicalChartItem;
+  return `${date}|${open}|${low}|${high}|${close}|${volume}`;
+};
+
+/**
+ * @param {string} redisString `date|open|low|high|close|volume`
+ */
+const parseCachedExchangeHistoricalChartItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+  return {
+    date: new Date(valuesArray[0]),
+    open: parseFloat(valuesArray[1]),
+    low: parseFloat(valuesArray[2]),
+    high: parseFloat(valuesArray[3]),
+    close: parseFloat(valuesArray[4]),
+    volume: parseInt(valuesArray[5], 10)
+  };
+};
+
 module.exports = {
   parseCachedMarketHoliday,
   createRedisValueFromMarketHoliday,
@@ -368,5 +391,8 @@ module.exports = {
   createRedisValueFromTransactionsHistoryFilters,
   parseRedisTransactionsHistoryFilters,
 
-  parseAccountSummaryTimestamp
+  parseAccountSummaryTimestamp,
+
+  createRedisValueFromExchangeHistoricalChart,
+  parseCachedExchangeHistoricalChartItem
 };

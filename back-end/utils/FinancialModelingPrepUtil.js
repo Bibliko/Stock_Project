@@ -221,9 +221,65 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
   });
 };
 
+/**
+ * Example response:
+ * [ {
+  "date" : "2020-10-08 16:00:00",
+  "open" : 3445.730000000000,
+  "low" : 3444.950000000000,
+  "high" : 3447.020000000000,
+  "close" : 3446.870000000000,
+  "volume" : 1841281537
+}, {
+  "date" : "2020-10-08 15:55:00",
+  "open" : 3444.100000000000,
+  "low" : 3443.170000000000,
+  "high" : 3445.730000000000,
+  "close" : 3445.730000000000,
+  "volume" : 1735127704
+} ... ]
+  @param {string} exchange NYSE or NASDAQ
+ */
+const getExchangeHistoricalChart5MinFromFMP = (exchange) => {
+  return new Promise((resolve, reject) => {
+    const index =
+      exchange.toUpperCase() === "NYSE"
+        ? "^NYA"
+        : exchange.toUpperCase() === "NASDAQ"
+        ? "^IXIC"
+        : "";
+
+    if (index === "") {
+      reject(new Error(`Exchange should be NYSE or NASDAQ.`));
+      return;
+    }
+
+    fetch(
+      `https://financialmodelingprep.com/api/v3/historical-chart/5min/${index}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((historicalChart) => {
+        return historicalChart.json();
+      })
+      .then((historicalChartJSON) => {
+        if (isEmpty(historicalChartJSON)) {
+          reject(new Error(`Share symbols do not exist in FMP.`));
+        } else if (historicalChartJSON["Error Message"]) {
+          reject(historicalChartJSON["Error Message"]);
+        } else {
+          resolve(historicalChartJSON);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 module.exports = {
   updateMarketHolidaysFromFMP,
 
   getFullStockQuotesFromFMP,
-  getFullStockProfilesFromFMP
+  getFullStockProfilesFromFMP,
+
+  getExchangeHistoricalChart5MinFromFMP
 };

@@ -9,6 +9,8 @@ import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
+import { getCachedExchangeHistoricalChart } from "../../utils/RedisUtil";
+
 import { withStyles } from "@material-ui/core/styles";
 import { Container, Grid, Paper, Typography } from "@material-ui/core";
 
@@ -129,6 +131,14 @@ class LandingPage extends React.Component {
 
   componentDidMount() {
     console.log(this.props.userSession);
+
+    getCachedExchangeHistoricalChart("NYSE")
+      .then((historicalChart) => {
+        console.log(historicalChart);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   shouldComponentUpdate(nextProps, nextState) {

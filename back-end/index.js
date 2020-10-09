@@ -36,14 +36,22 @@ const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
-const { startSocketIO } = require("./socketIO");
+/*
+  const {
+    updateCachedExchangeHistoricalChartWholeList
+    updateCachedExchangeHistoricalChartOneItem,
+    resetAllExchangesHistoricalChart
+  } = require("./utils/redis-utils/ExchangeHistoricalChart");
+*/
 
 /*
-const {
-  updateCachedShareQuotesUsingCache,
-  updateCachedShareProfilesUsingCache
-} = require("./utils/redis-utils/SharesInfoBank");
+  const {
+    updateCachedShareQuotesUsingCache,
+    updateCachedShareProfilesUsingCache
+  } = require("./utils/redis-utils/SharesInfoBank");
 */
+
+const { startSocketIO } = require("./socketIO");
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
 const express = require("express");
@@ -113,51 +121,77 @@ var globalBackendVariables = {
   isMarketClosed: false,
   hasUpdatedAllUsersToday: false,
   isPrismaMarketHolidaysInitialized: false,
+  hasReplacedAllExchangesHistoricalChart: false,
 
   updatedAllUsersFlag: false, // value true or false does not mean anything. This is just a flag
   updatedRankingListFlag: false // value true or false does not mean anything. This is just a flag
 };
 
-setInterval(deleteExpiredVerification, oneDay);
-
-// This function to help initialize prisma market holidays at first run
+// This function helps initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(globalBackendVariables);
 
-// Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
-setInterval(() => updateMarketHolidaysFromFMP(globalBackendVariables), oneDay);
-setInterval(deletePrismaMarketHolidays, oneDay);
+// This function helps initialize exchange NYSE historical chart 5min at first run
+// updateCachedExchangeHistoricalChartWholeList("NYSE");
+globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
-// Check Market Closed
-setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
-
-/* 
-Check if market closed to update users portfolio last closure.
-This interval will be moved to socket at the end of this file.
-*/
-setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
-
-/*
-Update Ranking List after 10 minutes
-This interval will be moved to socket at the end of this file.
-*/
 updateRankingList(globalBackendVariables);
-setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 
-/*
-Update Cached Shares
+const setupBackendIntervals = () => {
+  // Check Market Closed
+  setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
 
-setInterval(() => {
-  if(!globalBackendVariables.isMarketClosed) {
-    updateCachedShareQuotesUsingCache();
-  }
-}, 2 * oneSecond);
+  setInterval(deleteExpiredVerification, oneDay);
 
-setInterval(() => {
-  if(!globalBackendVariables.isMarketClosed) {
-    updateCachedShareProfilesUsingCache();
-  }
-}, oneMinute);
-*/
+  // Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
+  setInterval(
+    () => updateMarketHolidaysFromFMP(globalBackendVariables),
+    oneDay
+  );
+  setInterval(deletePrismaMarketHolidays, oneDay);
+
+  // setInterval(
+  //   () => resetAllExchangesHistoricalChart(globalBackendVariables),
+  //   oneSecond
+  // );
+  // setInterval(() => {
+  //   if(globalBackendVariables.isPrismaMarketHolidaysInitialized) {
+  //     updateCachedExchangeHistoricalChartOneItem("NYSE")
+  //     .catch(err => console.log(err));
+  //   }
+  // }, 5 * oneMinute);
+
+  /*
+    // Update Cached Shares
+
+    setInterval(() => {
+      if(
+        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
+        !globalBackendVariables.isMarketClosed
+      ) {
+        updateCachedShareQuotesUsingCache()
+        .catch(err => console.log(err));
+      }
+    }, 2 * oneSecond);
+
+    setInterval(() => {
+      if(
+        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
+        !globalBackendVariables.isMarketClosed
+      ) {
+        updateCachedShareProfilesUsingCache()
+        .catch(err => console.log(err));
+      }
+    }, oneMinute);
+  */
+
+  // Update all users portfolioLastClosure
+  setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
+
+  // All Users Ranking List
+  setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+};
+
+setupBackendIntervals();
 
 // All app routes are written below this comment:
 
