@@ -209,11 +209,6 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
       .then((stockProfilesJSON) => {
         if (isEmpty(stockProfilesJSON)) {
           reject(new Error(`Share symbols do not exist in FMP.`));
-        } else {
-          resolve(stockProfilesJSON);
-        }
-        if (isEmpty(stockProfilesJSON)) {
-          reject(new Error(`Share symbols do not exist in FMP.`));
         } else if (stockProfilesJSON["Error Message"]) {
           reject(stockProfilesJSON["Error Message"]);
         } else {
