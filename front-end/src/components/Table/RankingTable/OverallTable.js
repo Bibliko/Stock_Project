@@ -1,5 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router";
+import axios from 'axios'
+//import _ from 'lodash'
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -68,6 +70,19 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 class OverallTable extends React.Component {
+  state= {userRanking: []};
+
+  componentDidMount () {
+   axios('/api/userData/getOverallRanking', {
+      method: "get",
+      params: {
+        page: 1
+
+      },
+
+    }).then(result=>this.setState({userRanking: result.data})).catch(error=>console.log(error))
+  }
+
   chooseTableRowValue = (type) => {
     switch (type) {
       case "":
@@ -79,7 +94,45 @@ class OverallTable extends React.Component {
   };
 
   chooseTableRow = (type, classes) => {
-    return (
+    console.log(this.state.userRanking)
+
+    if(type==="1"){
+      const array1=this.state.userRanking[0]
+
+      if(array1){
+
+      return (
+        <StyledTableRow>
+          <TableCell
+            component="th"
+            scope="row"
+            align="center"
+            className={classes.tableCell}
+          >
+            {type}
+          </TableCell>
+          <TableCell
+            component="th"
+            scope="row"
+            align="center"
+            className={classes.tableCell}
+          >{array1.firstName}</TableCell>
+          <TableCell
+            component="th"
+            scope="row"
+            align="center"
+            className={classes.tableCell}
+          >{array1.totalPortfolio}</TableCell>
+          <TableCell
+            component="th"
+            scope="row"
+            align="center"
+            className={classes.tableCell}
+          >{array1.region}</TableCell>
+        </StyledTableRow>
+      );
+    } else {
+      return (
       <StyledTableRow>
         <TableCell
           component="th"
@@ -94,7 +147,7 @@ class OverallTable extends React.Component {
           scope="row"
           align="center"
           className={classes.tableCell}
-        ></TableCell>
+        >No user exist</TableCell>
         <TableCell
           component="th"
           scope="row"
@@ -108,10 +161,508 @@ class OverallTable extends React.Component {
           className={classes.tableCell}
         ></TableCell>
       </StyledTableRow>
-    );
+
+  )
+    }
+  }
+
+    if(type==="2"){
+      const array2=this.state.userRanking[1]
+
+      if(array2){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array2.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array2.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array2.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else{
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exist</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+
+
+    }
+
+    if(type==="3"){
+      const array3=this.state.userRanking[2]
+
+      if(array3){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array3.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array3.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array3.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else {
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exist</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+
+
+    }
+
+    if(type==="4"){
+      const array4=this.state.userRanking[3]
+
+      if(array4){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array4.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array4.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array4.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else{
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exist</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+
+
+    }
+
+    if(type==="5"){
+
+      const array5=this.state.userRanking[4]
+
+      if(array5){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array5.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array5.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array5.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else{
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exists</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+
+
+    }
+
+    if(type==="6"){
+      const array6=this.state.userRanking[5]
+
+      if(array6){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array6.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array6.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array6.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else{
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exists</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+
+
+    }
+
+    if(type==="7"){
+      const array7=this.state.userRanking[6]
+
+      if(array7){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array7.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array7.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array7.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else{
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exists</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+
+
+    }
+
+    if(type==="8"){
+      const array8=this.state.userRanking[7]
+
+      if(array8){
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array8.firstName}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array8.totalPortfolio}</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >{array8.region}</TableCell>
+          </StyledTableRow>
+        );
+      } else{
+        return (
+          <StyledTableRow>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {type}
+            </TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >No user exists</TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+            <TableCell
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            ></TableCell>
+          </StyledTableRow>
+        );
+      }
+      }
+
+
+
+
+
   };
 
   render() {
+     console.log(this.state.userRanking)
     const { classes } = this.props;
 
     return (
