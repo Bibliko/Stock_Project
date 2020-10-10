@@ -63,6 +63,12 @@ const styles = (theme) => ({
       marginTop: "20px",
     },
   },
+  caption: {
+    font: 'caption',
+    fontSize: "small",
+    color: "white",
+    margin: "10px",
+  },
   reloadButton: {
     marginTop: "10px",
     marginBottom: "20px",
@@ -108,7 +114,7 @@ class Companies extends React.Component {
     sortBy: "code",
     sortDirection: SortDirection.ASC,
     price: [0,320000],
-    marketCap: [0,1189.207115], // [$0, $2T]
+    marketCap: [250,1025], // [$1K, $2T]
     sector: "All",
     industry: "All",
     success: false,
@@ -118,6 +124,8 @@ class Companies extends React.Component {
   };
 
   handleSort = (sortDirection, sortBy) => {
+    if (sortBy === "index") return;
+
     let { stockData } = this.state;
     this.setState({
       stockData: stableSort(stockData, getComparator(sortDirection, sortBy)),
@@ -139,9 +147,9 @@ class Companies extends React.Component {
     });
   };
 
-  // MarketCap scale: y=x^4
+  // MarketCap scale: y = 10 ^ (0.012 * x)
   getMarketCap = (value) => {
-    return value**4;
+    return 10 ** (0.012 * value);
   };
 
   handleFilterChange = (key, value) => {
@@ -266,6 +274,10 @@ class Companies extends React.Component {
               handleSort={this.handleSort}
               handleOpenCompanyDetail={this.handleOpenDialog}
             />
+
+            <Typography className={classes.caption}>
+              {`Showing ${stockData.length} result` + ((stockData.length > 1) && "s")}
+            </Typography>
           </Grid>
         </Grid>
 

@@ -144,7 +144,11 @@ class VirtualizedTable extends React.Component {
             whiteSpace: "normal",
           }}
         >
-          {dataKey === "marketCap" ? simplifyNumber(cellData) : cellData}
+          {
+            dataKey === "marketCap" ? simplifyNumber(cellData)
+            : dataKey === "index" ? rowIndex + 1
+            : cellData
+          }
         </div>
       </CellMeasurer>
     );
@@ -167,19 +171,25 @@ class VirtualizedTable extends React.Component {
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
       >
-        <TableSortLabel
-          active={sortBy === dataKey}
-          direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
-        >
-          {label}
-          {sortBy === dataKey ? (
-            <span className={classes.visuallyHidden}>
-              {sortDirection.toLowerCase() === "desc"
-                ? "sorted descending"
-                : "sorted ascending"}
-            </span>
-          ) : null}
-        </TableSortLabel>
+        {
+          dataKey !== "index" ?
+
+          <TableSortLabel
+            active={sortBy === dataKey}
+            direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
+          >
+            {label}
+            {sortBy === dataKey ? (
+              <span className={classes.visuallyHidden}>
+                {sortDirection.toLowerCase() === "desc"
+                  ? "sorted descending"
+                  : "sorted ascending"}
+              </span>
+            ) : null}
+          </TableSortLabel>
+
+          : label
+        }
       </TableCell>
     );
   };
@@ -259,7 +269,6 @@ class VirtualizedTable extends React.Component {
                   cellRenderer={this.cellRenderer}
                   dataKey={dataKey}
                   flexGrow={1}
-                  minWidth={40}
                   {...other}
                 />
               );
@@ -277,8 +286,8 @@ VirtualizedTable.propTypes = {
     PropTypes.shape({
       dataKey: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      numeric: PropTypes.bool,
       width: PropTypes.number.isRequired,
+      minWidth: PropTypes.number,
     })
   ).isRequired,
   headerHeight: PropTypes.number,

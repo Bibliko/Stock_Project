@@ -77,6 +77,13 @@ class CompaniesListTable extends React.Component {
           resetCache={this.resetTableCache}
           columns={[
             {
+              width: 50,
+              minWidth: 50,
+              maxWidth: 50,
+              label: "No.",
+              dataKey: "index",
+            },
+            {
               width: 100,
               minWidth: 30,
               label: "Name",
@@ -84,21 +91,25 @@ class CompaniesListTable extends React.Component {
             },
             {
               width: 60,
+              minWidth: 40,
               label: "Code",
               dataKey: "code",
             },
             {
               width: 60,
+              minWidth: 40,
               label: "Price",
               dataKey: "price",
             },
             {
               width: 130,
+              minWidth: 40,
               label: "Market Cap",
               dataKey: "marketCap",
             },
             {
               width: 60,
+              minWidth: 40,
               label: "Rating",
               dataKey: "rating",
             },

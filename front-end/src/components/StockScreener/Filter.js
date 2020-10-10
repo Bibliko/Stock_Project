@@ -116,11 +116,11 @@ class Filter extends React.Component {
       ],
       marketCap: [
         {
-          value: 0,
-          label: "$0",
+          value: 250,
+          label: "$1K",
         },
         {
-          value: 1189.207115,
+          value: 1025,
           label: "$2T",
         },
       ],
@@ -158,8 +158,8 @@ class Filter extends React.Component {
           </Typography>
           <CustomSlider
             value={marketCap}
-            min={0}
-            max={1189.207115}
+            min={250}
+            max={1025}
             step={10}
             scale={getMarketCap}
             onChange={(event, value) => handleChange("marketCap", value)}
