@@ -358,12 +358,13 @@ const createRedisValueFromExchangeHistoricalChart = (historicalChartItem) => {
 };
 
 /**
+ * @note date stored in cache is in New York time.
  * @param {string} redisString `date|open|low|high|close|volume`
  */
 const parseCachedExchangeHistoricalChartItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return {
-    date: new Date(valuesArray[0]),
+    date: valuesArray[0],
     open: parseFloat(valuesArray[1]),
     low: parseFloat(valuesArray[2]),
     high: parseFloat(valuesArray[3]),

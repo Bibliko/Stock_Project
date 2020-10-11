@@ -3,7 +3,7 @@ import Chart from "react-apexcharts";
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 
-import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+import { oneMinute } from "../../utils/low-dependency/DayTimeUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
 import { getCachedAccountSummaryChartInfo } from "../../utils/RedisUtil";
 import { parseRedisAccountSummaryChartItem } from "../../utils/low-dependency/ParserUtil";
@@ -24,14 +24,8 @@ const styles = (theme) => ({
     marginTop: "20px",
   },
   chart: {
-    height: "auto",
-    width: "75%",
-    [theme.breakpoints.up("md")]: {
-      width: "60%",
-    },
-    [theme.breakpoints.down("xs")]: {
-      width: "100%",
-    },
+    width: "100%",
+    maxWidth: "500px",
   },
   note: {
     color: "white",
@@ -98,6 +92,10 @@ class AccountSummaryChart extends React.Component {
         },
         type: "area",
       },
+      stroke: {
+        width: 2,
+        curve: "straight",
+      },
       xaxis: {
         labels: {
           show: true,
@@ -121,6 +119,9 @@ class AccountSummaryChart extends React.Component {
           style: {
             colors: "white",
           },
+          formatter: (value) => {
+            return parseInt(value, 10);
+          },
         },
         title: {
           text: "Portfolio Value",
@@ -142,9 +143,6 @@ class AccountSummaryChart extends React.Component {
       },
       dataLabels: {
         enabled: false,
-      },
-      stroke: {
-        curve: "straight",
       },
       grid: {
         show: false,
@@ -221,7 +219,7 @@ class AccountSummaryChart extends React.Component {
 
     this.intervalUpdateChartSeries = setInterval(
       () => this.initializeOrUpdateChartSeries(),
-      30 * oneSecond
+      oneMinute
     );
   }
 
@@ -245,7 +243,12 @@ class AccountSummaryChart extends React.Component {
       <div className={classes.mainDiv}>
         {!isChartReady && <CircularProgress />}
         {isChartReady && !isEmpty(series[0].data) && (
-          <Chart options={options} series={series} className={classes.chart} />
+          <Chart
+            type="area"
+            options={options}
+            series={series}
+            className={classes.chart}
+          />
         )}
         {isChartReady && isEmpty(series[0].data) && (
           <Typography className={classes.note}>
