@@ -36,7 +36,6 @@ model User {
   shares                    Share[]
   accountSummaryChartInfo   AccountSummaryTimestamp[]
   rankingChartInfo          RankingTimestamp[]
-  companiesRatings          CompanyRating[]
 }
 
 model AccountSummaryTimestamp {
@@ -116,7 +115,7 @@ model UserVerification {
 
 model CompanyRating {
   id                             String @id @default(cuid())
-  symbol                         String
+  symbol                         String @unique
   rating                         String
   ratingScore                    Int
   ratingRecommendation           String

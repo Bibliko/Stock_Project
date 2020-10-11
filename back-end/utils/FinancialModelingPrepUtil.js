@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const { newDate, getYearUTCString } = require("./low-dependency/DayTimeUtil");
+const { SequentialPromisesWithResultsArray } = './low-dependency/PromisesUtil';
 
 const { updatePrismaMarketHolidays } = require("./MarketHolidaysUtil");
 
@@ -226,9 +227,113 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
   });
 };
 
+/**
+ * Sample Request
+ * [{
+    "symbol" : "AAPL",
+    "rating" : "S-",
+    "ratingScore" : 5,
+    "ratingRecommendation" : "Strong Buy",
+    ...
+  }]
+ */
+const getSingleShareRatingFromFMP = (shareSymbolString) =>
+{
+    return new Promise((resolve, reject) =>
+    {
+        fetch(`https://financialmodelingprep.com/api/v3/rating/${shareSymbolString}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`)
+        .then((stockRating) =>
+        {
+            return stockRating.json();
+        })
+        .then((stockRatingJSON) =>
+        {
+            if (isEmpty(stockRatingJSON))
+            {
+                reject(new Error(`Share symbols do not exist in FMP.`));
+            }
+            else if (stockRatingJSON["Error Message"])
+            {
+                reject(stockRatingJSON["Error Message"]);
+            }
+            else
+            {
+                resolve(stockRatingJSON[0]);
+            }
+        })
+        .catch(err => reject(err));
+    });
+}
+
+/**
+ * @description Fetch the rating data with certain number of companies.
+ * @param totalCompanies The number of companies that we will fetch. In this version, we'll fetch 600 companies.
+ * @returns Promise<Object[]>
+ */
+const getStockScreenerFromFMP = (totalCompanies) =>
+{
+    return new Promise((resolve, reject) =>
+    {
+        fetch(`https://financialmodelingprep.com/api/v3/stock-screener?limit=${totalCompanies}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`)
+        .then((stockRatingsArray) => 
+        {
+            return stockRatingsArray.json()
+        })
+        .then((stockRatingsArrayJSON) =>
+        {
+            if (isEmpty(stockRatingsArrayJSON))
+            {
+                reject(new Error("There is a problem with FMP API key."));
+            }
+            else if (stockRatingsArrayJSON["Error Message"])
+            {
+                reject(stockRatingsArrayJSON["Error Message"]);
+            }
+            else
+            {
+                resolve(stockRatingsArrayJSON);
+            }
+        })
+        .catch(err => reject(err));
+    });
+}
+
+
+
+/**
+ * @returns Promise<Object[]>
+ */
+
+const getFullStockRatingsFromFMP = () =>
+{
+    return new Promise((resolve, reject) =>
+    {
+        const totalCompanies = 600; // The number of companies that we will fetch.
+
+        const getRatingsArrayPromise = getStockScreenerFromFMP(totalCompanies)
+        .then((stockScreener) =>
+        {
+            // eslint-disable-next-line prefer-const
+            let tasksList = [];
+            
+            stockScreener.forEach((stockInfo) =>
+            {
+                tasksList.push(() => getSingleShareRatingFromFMP(stockInfo.symbol));
+            });
+
+            return SequentialPromisesWithResultsArray(tasksList);
+
+        })
+        .catch(err => reject(err));
+
+        return Promise.all(getRatingsArrayPromise);
+    });
+}
+
 module.exports = {
   updateMarketHolidaysFromFMP,
 
   getFullStockQuotesFromFMP,
-  getFullStockProfilesFromFMP
+  getFullStockProfilesFromFMP,
+  getFullStockRatingsFromFMP
 };
