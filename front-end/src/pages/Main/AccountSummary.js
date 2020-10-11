@@ -77,10 +77,10 @@ const styles = (theme) => ({
     marginBottom: "20px",
   },
   summary: {
-    color: theme.palette.bigTitle.red,
+    color: theme.palette.bigTitle.lightBlue,
   },
   holdings: {
-    color: theme.palette.bigTitle.purple,
+    color: theme.palette.bigTitle.lighterBlue,
   },
   portfolioChart: {
     color: theme.palette.bigTitle.blue,

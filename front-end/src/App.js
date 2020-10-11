@@ -116,13 +116,14 @@ class App extends React.Component {
       <ThemeProvider theme={createTheme()}>
         <LocalizationProvider dateAdapter={DateFnsUtils}>
           <Provider store={this.getReduxStore()}>
-            {this.state.path === "/login" && <Login />}
-            {this.state.path === "/signup" && <Signup />}
-            {this.state.path === "/forgotpassword" && <ForgotPassword />}
-            {this.state.path === "/verificationSucceed" && <Succeed />}
-            {this.state.path === "/verificationFail" && <Fail />}
-            {!this.specialLinks.includes(this.state.path) && (
-              <Switch>
+            <Switch>
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
+              <Route path="/forgotpassword" component={ForgotPassword} />
+              <Route path="/verificationSucceed" component={Succeed} />
+              <Route path="/verificationFail" component={Fail} />
+
+              {!this.specialLinks.includes(this.state.path) && (
                 <Layout toggleTheme={this.toggleTheme}>
                   <Route exact path="/" component={LandingPage} />
                   <Route path="/companies" component={Companies} />
@@ -135,7 +136,8 @@ class App extends React.Component {
                     component={TransactionsHistory}
                   />
                 </Layout>
-              </Switch>
+              )}
+            </Switch>
             )}
           </Provider>
         </LocalizationProvider>

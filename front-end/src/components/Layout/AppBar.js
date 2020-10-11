@@ -31,7 +31,7 @@ import {
 } from "@material-ui/core";
 
 import {
-  DashboardRounded as DashboardRoundedIcon,
+  PieChartRounded as PieChartRoundedIcon,
   AccountCircleRounded as AccountCircleRoundedIcon,
   BookRounded as BookRoundedIcon,
   CategoryRounded as CategoryRoundedIcon,
@@ -349,7 +349,7 @@ class PersistentAppBar extends React.Component {
                   redirectToPage("/accountSummary", this.props);
                 }}
               >
-                <DashboardRoundedIcon className={classes.normalIcon} />
+                <PieChartRoundedIcon className={classes.normalIcon} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Account">
