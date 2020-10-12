@@ -34,9 +34,6 @@ const styles = (theme) => ({
       fontSize: "14px",
     },
     color: "white",
-    "&:hover": {
-      color: theme.palette.succeed.tableSorted + " !important",
-    },
     "& .MuiTableSortLabel-root:hover": {
       color: theme.palette.succeed.tableSorted,
     },
@@ -50,6 +47,11 @@ const styles = (theme) => ({
       color: theme.palette.succeed.tableSortIcon,
     },
     alignItems: "center",
+  },
+  tableHeaderHover: {
+    "&:hover": {
+      color: theme.palette.succeed.tableSorted + " !important",
+    },
   },
   tableHeaderRow: {
     borderBottom: "1px solid #9ED2EF",
@@ -125,32 +127,38 @@ class VirtualizedTable extends React.Component {
     );
   };
 
+  innerCellRenderer = ({cellData, dataKey, ...other}) => {
+    const { classes } = this.props;
+    return (
+      <div
+        className={clsx(classes.tableCell, {
+          [classes.tableNormalCell]: dataKey !== "name",
+          [classes.tableNameCell]: dataKey === "name",
+        })}
+        style={{
+          whiteSpace: "normal",
+        }}
+        {...other}
+      >
+        { dataKey === "marketCap" ? simplifyNumber(cellData) : cellData }
+      </div>
+    );
+  };
+
   cellRenderer = ({ cellData, dataKey, parent, rowIndex }) => {
     const { classes, cache } = this.props;
     return (
-      <CellMeasurer
-        cache={cache}
-        columnIndex={0}
-        key={dataKey}
-        parent={parent}
-        rowIndex={rowIndex}
-      >
-        <div
-          className={clsx(classes.tableCell, {
-            [classes.tableNormalCell]: dataKey !== "name",
-            [classes.tableNameCell]: dataKey === "name",
-          })}
-          style={{
-            whiteSpace: "normal",
-          }}
+      dataKey === "name" ?
+        <CellMeasurer
+          cache={cache}
+          columnIndex={1}
+          key={dataKey}
+          parent={parent}
+          rowIndex={rowIndex}
         >
-          {
-            dataKey === "marketCap" ? simplifyNumber(cellData)
-            : dataKey === "index" ? rowIndex + 1
-            : cellData
-          }
-        </div>
-      </CellMeasurer>
+          {this.innerCellRenderer({cellData, dataKey})}
+        </CellMeasurer>
+      : this.innerCellRenderer({cellData, dataKey, key: dataKey, parent, rowIndex})
     );
   };
 
@@ -163,10 +171,11 @@ class VirtualizedTable extends React.Component {
         className={clsx(
           {
             [classes.sortLabel]: sortBy === dataKey,
+            [classes.tableHeaderHover]: dataKey !== "index",
           },
           classes.tableCell,
           classes.flexContainer,
-          classes.tableHeader
+          classes.tableHeader,
         )}
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
@@ -288,6 +297,7 @@ VirtualizedTable.propTypes = {
       label: PropTypes.string.isRequired,
       width: PropTypes.number.isRequired,
       minWidth: PropTypes.number,
+      maxWidth: PropTypes.number,
     })
   ).isRequired,
   headerHeight: PropTypes.number,

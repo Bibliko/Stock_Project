@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 
 import CompanyDialog from "../../components/CompanyDetail/CompanyDialog";
-import CompaniesListTable from "../../components/Table/CompaniesListTable/CompaniesListTable"
+import CompaniesListTable from "../../components/Table/CompaniesListTable/CompaniesListTable";
 import Filter from "../../components/StockScreener/Filter";
 import ProgressButton from "../../components/Button/ProgressButton";
 
@@ -67,7 +67,7 @@ const styles = (theme) => ({
     font: 'caption',
     fontSize: "small",
     color: "white",
-    margin: "10px",
+    margin: "20px",
   },
   reloadButton: {
     marginTop: "10px",
@@ -104,7 +104,10 @@ function stableSort(array, comparator) {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map((el) => el[0]);
+  return stabilizedThis.map((el, index) => {
+    el[0].index = index + 1;
+    return el[0];
+  });
 }
 
 class Companies extends React.Component {
@@ -113,8 +116,8 @@ class Companies extends React.Component {
     stockData: [],
     sortBy: "code",
     sortDirection: SortDirection.ASC,
-    price: [0,320000],
-    marketCap: [250,1025], // [$1K, $2T]
+    price: [0, 320000],
+    marketCap: [250, 1025], // [$1K, $2T]
     sector: "All",
     industry: "All",
     success: false,
@@ -276,7 +279,7 @@ class Companies extends React.Component {
             />
 
             <Typography className={classes.caption}>
-              {`Showing ${stockData.length} result` + ((stockData.length > 1) && "s")}
+              {`Showing ${stockData.length} result` + (stockData.length > 1 ? "s" : "")}
             </Typography>
           </Grid>
         </Grid>
