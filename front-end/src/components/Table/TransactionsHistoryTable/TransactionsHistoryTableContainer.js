@@ -51,24 +51,26 @@ const styles = (theme) => ({
     minWidth: "200px",
   },
   cellDiv: {
+    fontSize: "medium",
     display: "flex",
     alignItems: "center",
     "&.MuiTableSortLabel-root": {
+      color: "white",
       "&.MuiTableSortLabel-active": {
-        color: theme.palette.succeed.tableSorted,
+        fontStyle: "italic",
         "&.MuiTableSortLabel-root": {
           "&.MuiTableSortLabel-active": {
             "& .MuiTableSortLabel-icon": {
-              color: theme.palette.succeed.tableSortIcon,
+              color: "white",
             },
           },
         },
       },
       "&:hover": {
-        color: theme.palette.succeed.tableSortIcon,
+        fontStyle: "italic",
       },
       "&:focus": {
-        color: theme.palette.succeed.tableSortIcon,
+        fontStyle: "italic",
       },
     },
   },
@@ -216,7 +218,6 @@ class TransactionsHistoryTableContainer extends React.Component {
       code: "none", // none OR random string with NO String ";"
       quantity: "none_to_none", // (int/none)_to_(int/none)
       price: "none_to_none", // (int/none)_to_(int/none)
-      brokerage: "none_to_none", // (int/none)_to_(int/none)
       spendOrGain: "none_to_none", // (int/none)_to_(int/none)
       transactionTime: "none_to_none", // (DateTime/none)_to_(DateTime/none)
     },
@@ -231,8 +232,7 @@ class TransactionsHistoryTableContainer extends React.Component {
       "Code",
       "Quantity",
       "Price",
-      "Brokerage",
-      "Spend/Gain",
+      "Gain/Loss",
       "Transaction Time",
     ],
     prismaNames: [
@@ -240,7 +240,6 @@ class TransactionsHistoryTableContainer extends React.Component {
       "companyCode",
       "quantity",
       "priceAtTransaction",
-      "brokerage",
       "spendOrGain",
       "finishedTime",
     ],

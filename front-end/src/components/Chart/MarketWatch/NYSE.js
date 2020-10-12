@@ -189,7 +189,13 @@ class NYSEMarketWatch extends React.Component {
     }
   };
 
-  initializeOrUpdateChartSeries = () => {
+  initializeOrUpdateChartSeriesForShortPeriod = () => {
+    const { chartTimeLimit } = this.state;
+    if (chartTimeLimit !== "1D" && chartTimeLimit !== "1W") {
+      clearInterval(this.intervalUpdateChartSeries);
+      return;
+    }
+
     let seriesData = [];
 
     getCachedExchangeHistoricalChart("NYSE")
@@ -234,17 +240,18 @@ class NYSEMarketWatch extends React.Component {
         chartTimeLimit: newValue,
       },
       () => {
-        this.initializeOrUpdateChartSeries();
+        this.initializeOrUpdateChartSeriesForShortPeriod();
       }
     );
   };
 
   componentDidMount() {
-    this.initializeOrUpdateChartSeries();
-    this.intervalUpdateChartSeries = setInterval(
-      () => this.initializeOrUpdateChartSeries(),
-      5 * oneMinute
-    );
+    this.initializeOrUpdateChartSeriesForShortPeriod();
+
+    this.intervalUpdateChartSeries = setInterval(() => {
+      this.initializeOrUpdateChartSeriesForShortPeriod();
+    }, 5 * oneMinute);
+
     this.intervalCheckBreakpoints = setInterval(
       () => this.checkBreakpointsAndAdjustChart(),
       oneSecond

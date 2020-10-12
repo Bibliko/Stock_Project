@@ -104,14 +104,13 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
     companyCode,
     quantity,
     priceAtTransaction,
-    brokerage,
     spendOrGain,
     finishedTime,
   } = transactionInfo;
 
   switch (type) {
     case "Type":
-      return isTypeBuy ? "Buy_Spend" : "Sell_Gain";
+      return isTypeBuy ? "Buy" : "Sell";
 
     case "Code":
       return `${companyCode}`;
@@ -122,10 +121,7 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
     case "Price":
       return `$${numberWithCommas(priceAtTransaction.toFixed(2))}`;
 
-    case "Brokerage":
-      return `$${numberWithCommas(brokerage.toFixed(2))}`;
-
-    case "Spend/Gain":
+    case "Gain/Loss":
       return isTypeBuy
         ? `- $${numberWithCommas(Math.abs(spendOrGain).toFixed(2))}`
         : `$${numberWithCommas(spendOrGain.toFixed(2))}`;

@@ -189,7 +189,6 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
- *    brokerage: (int/none)_to_(int/none)
  *    spendOrGain: (int/none)_to_(int/none)
  *    transactionTime: (DateTime/none)_to_(DateTime/none)
  * }
@@ -203,7 +202,6 @@ const createPrismaFiltersObject = (filters) => {
     // priceAtTransaction
     // finishedTime
     // quantity
-    // brokerage
     // spendOrGain
   };
 
@@ -219,6 +217,7 @@ const createPrismaFiltersObject = (filters) => {
 
   // price
   const priceValues = price.split("_to_");
+  filtering.priceAtTransaction = {};
   if (!isEqual(priceValues[0], "none")) {
     filtering.priceAtTransaction.gte = parseInt(priceValues[0], 10);
   }
@@ -230,16 +229,20 @@ const createPrismaFiltersObject = (filters) => {
   const timeValues = transactionTime.split("_to_");
   filtering.finishedTime = {};
   if (!isEqual(timeValues[0], "none")) {
-    filtering.finishedTime.gte = new Date(timeValues[0]);
+    const date = new Date(timeValues[0]);
+    date.setHours(0, 0, 0);
+    filtering.finishedTime.gte = date;
   }
   if (!isEqual(timeValues[1], "none")) {
-    filtering.finishedTime.lte = new Date(timeValues[1]);
+    const date = new Date(timeValues[1]);
+    date.setHours(23, 59, 59);
+    filtering.finishedTime.lte = date;
   }
 
-  // quantity, brokerage, spendOrGain
-  const forLoopItems = ["quantity", "brokerage", "spendOrGain"];
-  for (let i = 0; i < 3; i++) {
-    const item = forLoopItems[i];
+  // quantity, spendOrGain
+  const forLoopItems = ["quantity", "spendOrGain"];
+  forLoopItems.forEach((value, index) => {
+    const item = forLoopItems[index];
     const values = filters[item].split("_to_");
 
     filtering[item] = {};
@@ -250,7 +253,7 @@ const createPrismaFiltersObject = (filters) => {
     if (!isEqual(values[1], "none")) {
       filtering[item].lte = parseInt(values[1], 10);
     }
-  }
+  });
 
   return filtering;
 };
@@ -262,27 +265,18 @@ const createPrismaFiltersObject = (filters) => {
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
- *    brokerage: (int/none)_to_(int/none)
  *    spendOrGain: (int/none)_to_(int/none)
  *    transactionTime: (DateTime/none)_to_(DateTime/none)
  * }
  * @returns Transactions History filters redis string
  */
 const createRedisValueFromTransactionsHistoryFilters = (filters) => {
-  const {
-    type,
-    code,
-    quantity,
-    price,
-    brokerage,
-    spendOrGain,
-    transactionTime
-  } = filters;
-  return `${type};${code};${quantity};${price};${brokerage};${spendOrGain};${transactionTime}`;
+  const { type, code, quantity, price, spendOrGain, transactionTime } = filters;
+  return `${type};${code};${quantity};${price};${spendOrGain};${transactionTime}`;
 };
 
 /**
- * @param redisValue `type;code;quantity;price;brokerage;spendOrGain;transactionTime`
+ * @param redisValue `type;code;quantity;price;spendOrGain;transactionTime`
  * @returns Transactions History filter object
  */
 const parseRedisTransactionsHistoryFilters = (redisValue) => {
@@ -292,9 +286,8 @@ const parseRedisTransactionsHistoryFilters = (redisValue) => {
     code: values[1],
     quantity: values[2].split("_to_"),
     price: values[3].split("_to_"),
-    brokerage: values[4].split("_to_"),
-    spendOrGain: values[5].split("_to_"),
-    transactionTime: values[6].split("_to_")
+    spendOrGain: values[4].split("_to_"),
+    transactionTime: values[5].split("_to_")
   };
 };
 

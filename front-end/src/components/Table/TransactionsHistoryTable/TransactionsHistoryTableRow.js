@@ -84,13 +84,7 @@ class TransactionsHistoryTableRow extends React.Component {
           transactionInfo
         )}
         {chooseTableCell(
-          "Brokerage",
-          this.isTableRowTheLast,
-          classes,
-          transactionInfo
-        )}
-        {chooseTableCell(
-          "Spend/Gain",
+          "Gain/Loss",
           this.isTableRowTheLast,
           classes,
           transactionInfo
