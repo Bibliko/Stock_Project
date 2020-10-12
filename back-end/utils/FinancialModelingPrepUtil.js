@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const { newDate, getYearUTCString } = require("./low-dependency/DayTimeUtil");
-const { SequentialPromisesWithResultsArray } = './low-dependency/PromisesUtil';
+const { SequentialPromisesWithResultsArray } = require("./low-dependency/PromisesUtil");
 
 const { updatePrismaMarketHolidays } = require("./MarketHolidaysUtil");
 
@@ -250,7 +250,8 @@ const getSingleShareRatingFromFMP = (shareSymbolString) =>
         {
             if (isEmpty(stockRatingJSON))
             {
-                reject(new Error(`Share symbols do not exist in FMP.`));
+                // The share symbol of MSF.BR is currently unsupported.
+                if (shareSymbolString !== "MSF.BR") reject(new Error("Share symbol does not exist."));
             }
             else if (stockRatingJSON["Error Message"])
             {
@@ -268,7 +269,7 @@ const getSingleShareRatingFromFMP = (shareSymbolString) =>
 /**
  * @description Fetch the rating data with certain number of companies.
  * @param totalCompanies The number of companies that we will fetch. In this version, we'll fetch 600 companies.
- * @returns Promise<Object[]>
+ * @return {Promise<object[]>} array of objects (those found in endpoint stock-screener FMP)
  */
 const getStockScreenerFromFMP = (totalCompanies) =>
 {
@@ -283,15 +284,15 @@ const getStockScreenerFromFMP = (totalCompanies) =>
         {
             if (isEmpty(stockRatingsArrayJSON))
             {
-                reject(new Error("There is a problem with FMP API key."));
+              reject(new Error("There is a problem with FMP API key."));
             }
             else if (stockRatingsArrayJSON["Error Message"])
             {
-                reject(stockRatingsArrayJSON["Error Message"]);
+              reject(stockRatingsArrayJSON["Error Message"]);
             }
             else
             {
-                resolve(stockRatingsArrayJSON);
+              resolve(stockRatingsArrayJSON);
             }
         })
         .catch(err => reject(err));
@@ -301,37 +302,44 @@ const getStockScreenerFromFMP = (totalCompanies) =>
 
 
 /**
- * @returns Promise<Object[]>
+ * @return {Promise<object[]>} array of stocks ratings (obtained from FMP)
  */
 
 const getFullStockRatingsFromFMP = () =>
 {
     return new Promise((resolve, reject) =>
     {
-        const totalCompanies = 600; // The number of companies that we will fetch.
+      // The number of companies that we will fetch.
+      const totalCompanies = 600 + 1; // Since MSF.BR's rating is currently unsupported, we need another company in order to have enough data.
 
-        const getRatingsArrayPromise = getStockScreenerFromFMP(totalCompanies)
-        .then((stockScreener) =>
-        {
-            // eslint-disable-next-line prefer-const
-            let tasksList = [];
-            
-            stockScreener.forEach((stockInfo) =>
-            {
-                tasksList.push(() => getSingleShareRatingFromFMP(stockInfo.symbol));
-            });
+      getStockScreenerFromFMP(totalCompanies)
+      .then((stockScreener) =>
+      {
+          // eslint-disable-next-line prefer-const
+          let tasksList = [];
+          
+          stockScreener.forEach((stockInfo) =>
+          {
+              tasksList.push(() => getSingleShareRatingFromFMP(stockInfo.symbol));
+          });
 
-            return SequentialPromisesWithResultsArray(tasksList);
+          return SequentialPromisesWithResultsArray(tasksList);
 
-        })
-        .catch(err => reject(err));
-
-        return Promise.all(getRatingsArrayPromise);
+      })
+      .then((stockScreenerArray) => 
+      {
+        console.log(stockScreenerArray.length());
+        resolve(stockScreenerArray);
+      })
+      .catch(err => reject(err));
     });
 }
 
 module.exports = {
   updateMarketHolidaysFromFMP,
+
+  getSingleShareRatingFromFMP,
+  getStockScreenerFromFMP,
 
   getFullStockQuotesFromFMP,
   getFullStockProfilesFromFMP,

@@ -1,10 +1,9 @@
-const { isEmpty } = require("lodash");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const { SequentialPromisesWithResultsArray } = './low-dependency/PromisesUtil';
+const { SequentialPromisesWithResultsArray } = require("./low-dependency/PromisesUtil");
 
-const { getFullStockRatingsFromFMP } = './FinancialModelingPrepUtil.js'
+const { getFullStockRatingsFromFMP } = require("./FinancialModelingPrepUtil.js");
 
 /**
  * @description create Prisma models if they have not existed or update them.
@@ -12,18 +11,19 @@ const { getFullStockRatingsFromFMP } = './FinancialModelingPrepUtil.js'
 const updateCompaniesRatingsList = () => {
     return new Promise((resolve, reject) =>
     {
-        const updateCompaniesRatingPromise = getFullStockRatingsFromFMP((allSharesRatings) =>
+	console.log("Updating companies' ratings);
+
+        getFullStockRatingsFromFMP((allSharesRatings) =>
         {
             // eslint-disable-next-line prefer-const
             let tasksList = [];
 
-            
             // @returns: Object<Promise>
             allSharesRatings.forEach((shareRating) =>
             {
                 tasksList.push(() => 
                 {
-                    prisma.companiesRatings.findMany({
+                    prisma.companiesRatings.findOne({
                         where:
                         {
                             symbol: shareRating.symbol
@@ -31,9 +31,9 @@ const updateCompaniesRatingsList = () => {
                     })
                     .then((shareRatingPrisma) =>
                     {
-                        if (isEmpty(shareRatingPrisma))
+                        if (shareRatingPrisma)
                         {
-                            return prisma.companiesRatings.create({
+                            return prisma.companyRating.create({
                                 data:
                                 {
                                     symbol: shareRating.symbol,
@@ -45,7 +45,7 @@ const updateCompaniesRatingsList = () => {
                         }
                         else
                         {
-                            return prisma.companies.update({
+                            return prisma.companyRating.update({
                                 where:
                                 {
                                     symbol: shareRatingPrisma[0].symbol
@@ -65,13 +65,14 @@ const updateCompaniesRatingsList = () => {
 
             return SequentialPromisesWithResultsArray(tasksList);
         })
-        .then((finishedUpdatingCompaniesRatingsList) =>
+        .then((stockRatingsArray) =>
         {
-            resolve("Successfully updating companies' ratings list");
+            // console.log("Successfully update companies' ratings");
+            // console.log(stockRatingsArray);
+            // resolve(stockRatingsArray);
+            resolve("Successfully update companies' ratings");
         })
         .catch((err) => reject(err));
-
-        return Promise.all(updateCompaniesRatingPromise);
 
     });
 };

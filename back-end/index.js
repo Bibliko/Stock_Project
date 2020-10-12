@@ -36,6 +36,10 @@ const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
+const {
+  updateCompaniesRatingsList
+} = require("./utils/PrismaCompanyRatingUtil");
+
 const { startSocketIO } = require("./socketIO");
 
 /*
@@ -142,6 +146,13 @@ This interval will be moved to socket at the end of this file.
 */
 updateRankingList(globalBackendVariables);
 setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+
+/*
+Update ratings of companies in Database every day.
+*/
+setInterval(() => updateCompaniesRatingsList(), oneSecond * 30);
+  
+
 
 /*
 Update Cached Shares
