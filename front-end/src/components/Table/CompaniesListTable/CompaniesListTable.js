@@ -85,7 +85,7 @@ class CompaniesListTable extends React.Component {
             },
             {
               width: 100,
-              minWidth: 30,
+              minWidth: 60,
               label: "Name",
               dataKey: "name",
             },
@@ -102,14 +102,14 @@ class CompaniesListTable extends React.Component {
               dataKey: "price",
             },
             {
-              width: 130,
-              minWidth: 40,
+              width: 120,
+              minWidth: 60,
               label: "Market Cap",
               dataKey: "marketCap",
             },
             {
-              width: 60,
-              minWidth: 40,
+              width: 80,
+              minWidth: 60,
               label: "Rating",
               dataKey: "rating",
             },

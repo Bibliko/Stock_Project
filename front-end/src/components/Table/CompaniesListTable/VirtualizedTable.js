@@ -37,6 +37,9 @@ const styles = (theme) => ({
     "& .MuiTableSortLabel-root:hover": {
       color: theme.palette.succeed.tableSorted,
     },
+    "& .MuiTableSortLabel-root:focus": {
+      color: theme.palette.succeed.tableSorted,
+    },
     "& .MuiTableSortLabel-active": {
       color: theme.palette.succeed.tableSorted,
       "& .MuiTableSortLabel-icon": {
@@ -127,7 +130,7 @@ class VirtualizedTable extends React.Component {
     );
   };
 
-  innerCellRenderer = ({cellData, dataKey, ...other}) => {
+  innerCellRenderer = ({ cellData, dataKey, ...other }) => {
     const { classes } = this.props;
     return (
       <div
@@ -140,25 +143,30 @@ class VirtualizedTable extends React.Component {
         }}
         {...other}
       >
-        { dataKey === "marketCap" ? simplifyNumber(cellData) : cellData }
+        {dataKey === "marketCap" ? simplifyNumber(cellData) : cellData}
       </div>
     );
   };
 
   cellRenderer = ({ cellData, dataKey, parent, rowIndex }) => {
-    const { classes, cache } = this.props;
-    return (
-      dataKey === "name" ?
-        <CellMeasurer
-          cache={cache}
-          columnIndex={1}
-          key={dataKey}
-          parent={parent}
-          rowIndex={rowIndex}
-        >
-          {this.innerCellRenderer({cellData, dataKey})}
-        </CellMeasurer>
-      : this.innerCellRenderer({cellData, dataKey, key: dataKey, parent, rowIndex})
+    const { cache } = this.props;
+    return dataKey === "name" ? (
+      <CellMeasurer
+        cache={cache}
+        columnIndex={1}
+        key={dataKey}
+        parent={parent}
+        rowIndex={rowIndex}
+      >
+        {this.innerCellRenderer({ cellData, dataKey })}
+      </CellMeasurer>
+    ) : (
+      this.innerCellRenderer({
+        cellData,
+        dataKey,
+        key: dataKey,
+        parent,
+      })
     );
   };
 
@@ -175,14 +183,12 @@ class VirtualizedTable extends React.Component {
           },
           classes.tableCell,
           classes.flexContainer,
-          classes.tableHeader,
+          classes.tableHeader
         )}
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
       >
-        {
-          dataKey !== "index" ?
-
+        {dataKey !== "index" ? (
           <TableSortLabel
             active={sortBy === dataKey}
             direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
@@ -196,9 +202,9 @@ class VirtualizedTable extends React.Component {
               </span>
             ) : null}
           </TableSortLabel>
-
-          : label
-        }
+        ) : (
+          label
+        )}
       </TableCell>
     );
   };
