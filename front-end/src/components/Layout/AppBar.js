@@ -31,7 +31,6 @@ import {
 } from "@material-ui/core";
 
 import {
-  PieChartRounded as PieChartRoundedIcon,
   AccountCircleRounded as AccountCircleRoundedIcon,
   BookRounded as BookRoundedIcon,
   CategoryRounded as CategoryRoundedIcon,
@@ -342,16 +341,6 @@ class PersistentAppBar extends React.Component {
                 <BookRoundedIcon className={classes.normalIcon} />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Portfolio">
-              <IconButton
-                className={classes.secondaryMenuButton}
-                onClick={() => {
-                  redirectToPage("/accountSummary", this.props);
-                }}
-              >
-                <PieChartRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
             <Tooltip title="Account">
               <IconButton
                 className={classes.accountButton}
@@ -401,6 +390,14 @@ class PersistentAppBar extends React.Component {
                           }}
                         >
                           Account Settings
+                        </MenuItem>
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={() => {
+                            redirectToPage("/accountSummary", this.props);
+                          }}
+                        >
+                          Account Summary
                         </MenuItem>
                         <MenuItem
                           className={classes.accountMenuItem}

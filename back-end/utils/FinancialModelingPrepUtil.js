@@ -10,22 +10,11 @@ const { updatePrismaMarketHolidays } = require("./MarketHolidaysUtil");
 const { FINANCIAL_MODELING_PREP_API_KEY } = process.env;
 
 /**
- *  Initially, time for interval to update market holidays is one second.
- *  After we initialize prisma market holidays, we change this time to one day.
- *  We also change boolean isPrismaMarketHolidaysInitialized to true
- *
- *  marketHours[index] =
- *  [
- *      {
- *          stockExchangeName: 'New York Stock Exchange',
- *          stockMarketHours: { openingHour: '09:30 a.m. ET', closingHour: '04:00 p.m. ET' },
- *          stockMarketHolidays: [ [Object], [Object], [Object], [Object] ],
- *          isTheStockMarketOpen: false,
- *          isTheEuronextMarketOpen: false,
- *          isTheForexMarketOpen: false,
- *          isTheCryptoMarketOpen: true
- *      }
- *  ]
+ *  @description
+ *  - Initially, time for interval to update market holidays is one second.
+ *  - After we initialize prisma market holidays, we change this time to one day.
+ *  - We also change boolean isPrismaMarketHolidaysInitialized to true
+ *  @param {object} globalBackendVariables global object declared in back-end/index
  */
 const updateMarketHolidaysFromFMP = (globalBackendVariables) => {
   var timeNow = newDate();
@@ -56,8 +45,7 @@ const updateMarketHolidaysFromFMP = (globalBackendVariables) => {
         }
       })
       .then((marketHours) => {
-        // example of marketHours is in note above!
-
+        // example of marketHours is in FMP!
         if (marketHours) {
           return marketHours.json();
         }
@@ -106,37 +94,9 @@ const updateMarketHolidaysFromFMP = (globalBackendVariables) => {
   });
 };
 
-/** 
- * Batch requests up to 800 companies in one request
- * 
- * Example response of full stock:
- * [ {
-  "symbol" : "AAPL",
-  "name" : "Apple Inc.",
-  "price" : 425.04000000,
-  "changesPercentage" : 10.47000000,
-  "change" : 40.28000000,
-  "dayLow" : 403.36000000,
-  "dayHigh" : 425.66000000,
-  "yearHigh" : 425.66000000,
-  "yearLow" : 192.58000000,
-  "marketCap" : 1842263621632.00000000,
-  "priceAvg50" : 372.20715000,
-  "priceAvg200" : 314.67236000,
-  "volume" : 93573867,
-  "avgVolume" : 35427873,
-  "exchange" : "NASDAQ",
-  "open" : 411.53500000,
-  "previousClose" : 384.76000000,
-  "eps" : 13.18500000,
-  "pe" : 32.23663300,
-  "earningsAnnouncement" : "2020-07-30T20:00:00.000+0000",
-  "sharesOutstanding" : 4334329996,
-  "timestamp" : 1596329461
-},
- ...
-]
-  shareSymbolsString: 'AAPL,GOOGL,...'
+/**
+ * @note Batch requests up to 800 companies in one request
+ * @param {string} shareSymbolsString e.g: 'AAPL,GOOGL'
  */
 const getFullStockQuotesFromFMP = (shareSymbolsString) => {
   return new Promise((resolve, reject) => {
@@ -162,41 +122,8 @@ const getFullStockQuotesFromFMP = (shareSymbolsString) => {
 };
 
 /**
- * Batch requests up to 50 companies in one request
- * 
- * [ {
-  "symbol" : "AAPL",
-  "price" : 120.96,
-  "beta" : 1.28511,
-  "volAvg" : 165778904,
-  "mktCap" : 2068718420000,
-  "lastDiv" : 0.75,
-  "range" : "52.7675-137.98",
-  "changes" : 0.08,
-  "companyName" : "Apple Inc",
-  "exchange" : "Nasdaq Global Select",
-  "exchangeShortName" : "NASDAQ",
-  "industry" : "Consumer Electronics",
-  "website" : "https://www.apple.com/",
-  "description" : "Apple, Inc. engages in the design, manufacture, and sale of smartphones, personal computers, tablets, wearables and accessories, and other variety of related services. The company is headquartered in Cupertino, California and currently employs 137,000 full-time employees. The company is considered one of the Big Four technology companies, alongside Amazon, Google, and Microsoft. The firm's hardware products include the iPhone smartphone, the iPad tablet computer, the Mac personal computer, the iPod portable media player, the Apple Watch smartwatch, the Apple TV digital media player, the AirPods wireless earbuds and the HomePod smart speaker. Apple's software includes the macOS, iOS, iPadOS, watchOS, and tvOS operating systems, the iTunes media player, the Safari web browser, the Shazam acoustic fingerprint utility, and the iLife and iWork creativity and productivity suites, as well as professional applications like Final Cut Pro, Logic Pro, and Xcode. Its online services include the iTunes Store, the iOS App Store, Mac App Store, Apple Music, Apple TV+, iMessage, and iCloud. Other services include Apple Store, Genius Bar, AppleCare, Apple Pay, Apple Pay Cash, and Apple Card.",
-  "ceo" : "Mr. Timothy Cook",
-  "sector" : "Technology",
-  "country" : "US",gh90 
-  "fullTimeEmployees" : "137000",
-  "phone" : "14089961010",
-  "address" : "1 Apple Park Way",
-  "city" : "Cupertino",
-  "state" : "CALIFORNIA",
-  "zip" : "95014",
-  "dcfDiff" : 89.92,
-  "dcf" : 297.11,
-  "image" : "https://financialmodelingprep.com/image-stock/AAPL.jpg",
-  "ipoDate" : "1980-12-12"
-
-  -> redisValue: price|beta|volAvg|mktCap|lastDiv|range|changes|companyName|exchange|exchangeShortName|industry|website|description|ceo|sector|country|fullTimeEmployees|phone|address|city|state|zip|dcfDiff|dcf|image|ipoDate
-} ]
-
-  shareSymbolsString: 'AAPL,GOOGL,...'
+ * @note Batch requests up to 50 companies in one request
+ * @param {string} shareSymbolsString e.g: 'AAPL,GOOGL'
  */
 const getFullStockProfilesFromFMP = (shareSymbolsString) => {
   return new Promise((resolve, reject) => {
@@ -222,25 +149,10 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
 };
 
 /**
- * Example response:
- * [ {
-  "date" : "2020-10-08 16:00:00",
-  "open" : 3445.730000000000,
-  "low" : 3444.950000000000,
-  "high" : 3447.020000000000,
-  "close" : 3446.870000000000,
-  "volume" : 1841281537
-}, {
-  "date" : "2020-10-08 15:55:00",
-  "open" : 3444.100000000000,
-  "low" : 3443.170000000000,
-  "high" : 3445.730000000000,
-  "close" : 3445.730000000000,
-  "volume" : 1735127704
-} ... ]
-  @param {string} exchange NYSE or NASDAQ
+ *  @param {string} exchange NYSE or NASDAQ
+ *  @param {string} typeChart 5min or full
  */
-const getExchangeHistoricalChart5MinFromFMP = (exchange) => {
+const getExchangeHistoricalChartFromFMP = (exchange, typeChart) => {
   return new Promise((resolve, reject) => {
     const index =
       exchange.toUpperCase() === "NYSE"
@@ -249,13 +161,24 @@ const getExchangeHistoricalChart5MinFromFMP = (exchange) => {
         ? "^IXIC"
         : "";
 
-    if (index === "") {
-      reject(new Error(`Exchange should be NYSE or NASDAQ.`));
+    const fmpTypeChart =
+      typeChart === "5min"
+        ? "historical-chart/5min"
+        : typeChart === "full"
+        ? "historical-price-full"
+        : "";
+
+    if (index === "" || fmpTypeChart === "") {
+      reject(
+        new Error(
+          `Exchange should be NYSE or NASDAQ. FMP Chart Type should be 5min or full.`
+        )
+      );
       return;
     }
 
     fetch(
-      `https://financialmodelingprep.com/api/v3/historical-chart/5min/${index}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      `https://financialmodelingprep.com/api/v3/${fmpTypeChart}/${index}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
       .then((historicalChart) => {
         return historicalChart.json();
@@ -266,7 +189,11 @@ const getExchangeHistoricalChart5MinFromFMP = (exchange) => {
         } else if (historicalChartJSON["Error Message"]) {
           reject(historicalChartJSON["Error Message"]);
         } else {
-          resolve(historicalChartJSON);
+          const result =
+            typeChart === "5min"
+              ? historicalChartJSON
+              : historicalChartJSON.historical;
+          resolve(result);
         }
       })
       .catch((err) => {
@@ -281,5 +208,5 @@ module.exports = {
   getFullStockQuotesFromFMP,
   getFullStockProfilesFromFMP,
 
-  getExchangeHistoricalChart5MinFromFMP
+  getExchangeHistoricalChartFromFMP
 };

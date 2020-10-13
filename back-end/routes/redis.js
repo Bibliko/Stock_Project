@@ -177,9 +177,9 @@ router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
 });
 
 router.get(`/${getExchangeHistoricalChart}`, (req, res) => {
-  const { exchange } = req.query;
+  const { exchange, typeChart } = req.query;
 
-  getCachedExchangeHistoricalChart(exchange)
+  getCachedExchangeHistoricalChart(exchange, typeChart)
     .then((historicalChartData) => {
       res.send(historicalChartData);
     })

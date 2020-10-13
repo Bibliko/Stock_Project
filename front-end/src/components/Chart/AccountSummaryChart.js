@@ -88,7 +88,7 @@ class AccountSummaryChart extends React.Component {
               },
             },
           },
-          autoSelected: "selection",
+          autoSelected: "reset",
         },
         type: "area",
       },
@@ -105,7 +105,7 @@ class AccountSummaryChart extends React.Component {
           datetimeUTC: false,
         },
         type: "datetime",
-        tickAmount: 6,
+        tickAmount: 2,
         tooltip: {
           formatter: function (val, opts) {
             return new Date(val).toLocaleTimeString();
@@ -139,6 +139,10 @@ class AccountSummaryChart extends React.Component {
           formatter: function (val, opts) {
             return `$${numberWithCommas(val)}`;
           },
+        },
+        fixed: {
+          enabled: true,
+          offsetY: -50,
         },
       },
       dataLabels: {

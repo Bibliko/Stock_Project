@@ -10,7 +10,7 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+import { oneSecond, oneMinute } from "../../utils/low-dependency/DayTimeUtil";
 
 import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
@@ -241,6 +241,7 @@ class Layout extends React.Component {
           </div>
         </main>
         <Snackbar
+          autoHideDuration={5 * oneMinute}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
           open={openRefreshCard}
           className={classes.refreshCard}

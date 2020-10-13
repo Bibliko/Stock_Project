@@ -38,7 +38,7 @@ const {
 
 /*
   const {
-    updateCachedExchangeHistoricalChartWholeList
+    updateCachedExchangeHistoricalChartWholeList,
     updateCachedExchangeHistoricalChartOneItem,
     resetAllExchangesHistoricalChart
   } = require("./utils/redis-utils/ExchangeHistoricalChart");
@@ -131,7 +131,8 @@ var globalBackendVariables = {
 updateMarketHolidaysFromFMP(globalBackendVariables);
 
 // This function helps initialize exchange NYSE historical chart 5min at first run
-// updateCachedExchangeHistoricalChartWholeList("NYSE");
+// updateCachedExchangeHistoricalChartWholeList("NYSE", "5min");
+// updateCachedExchangeHistoricalChartWholeList("NYSE", "full");
 globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
 updateRankingList(globalBackendVariables);
@@ -154,11 +155,25 @@ const setupBackendIntervals = () => {
   //   oneSecond
   // );
   // setInterval(() => {
-  //   if(globalBackendVariables.isPrismaMarketHolidaysInitialized) {
-  //     updateCachedExchangeHistoricalChartOneItem("NYSE")
-  //     .catch(err => console.log(err));
+  //   if (
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "5min").catch((err) =>
+  //       console.log(err)
+  //     );
   //   }
   // }, 5 * oneMinute);
+  // setInterval(() => {
+  //   if (
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "full").catch((err) =>
+  //       console.log(err)
+  //     );
+  //   }
+  // }, oneDay);
 
   /*
     // Update Cached Shares

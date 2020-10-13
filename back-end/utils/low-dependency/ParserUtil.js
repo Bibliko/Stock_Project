@@ -345,7 +345,9 @@ const parseAccountSummaryTimestamp = (redisString) => {
 /**
  * @param {object} historicalChartItem historical chart item obtained from FMP (OHLCV)
  */
-const createRedisValueFromExchangeHistoricalChart = (historicalChartItem) => {
+const createRedisValueFromExchangeHistoricalChart5min = (
+  historicalChartItem
+) => {
   const { date, open, low, high, close, volume } = historicalChartItem;
   return `${date}|${open}|${low}|${high}|${close}|${volume}`;
 };
@@ -354,7 +356,7 @@ const createRedisValueFromExchangeHistoricalChart = (historicalChartItem) => {
  * @note date stored in cache is in New York time.
  * @param {string} redisString `date|open|low|high|close|volume`
  */
-const parseCachedExchangeHistoricalChartItem = (redisString) => {
+const parseCachedExchangeHistoricalChart5minItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return {
     date: valuesArray[0],
@@ -363,6 +365,49 @@ const parseCachedExchangeHistoricalChartItem = (redisString) => {
     high: parseFloat(valuesArray[3]),
     close: parseFloat(valuesArray[4]),
     volume: parseInt(valuesArray[5], 10)
+  };
+};
+
+/**
+ * @param {object} historicalChartItem historical chart full item obtained from FMP
+ */
+const createRedisValueFromExchangeHistoricalChartFull = (
+  historicalChartItem
+) => {
+  const {
+    date,
+    open,
+    low,
+    high,
+    close,
+    adjClose,
+    volume,
+    unadjustedVolume,
+    change,
+    changePercent,
+    vwap,
+    label,
+    changeOverTime
+  } = historicalChartItem;
+  return `${date}|${open}|${low}|${high}|${close}|${adjClose}|${volume}|${unadjustedVolume}|${change}|${changePercent}|${vwap}|${label}|${changeOverTime}`;
+};
+
+const parseCachedExchangeHistoricalChartFullItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+  return {
+    date: valuesArray[0],
+    open: parseFloat(valuesArray[1]),
+    low: parseFloat(valuesArray[2]),
+    high: parseFloat(valuesArray[3]),
+    close: parseFloat(valuesArray[4]),
+    adjClose: parseFloat(valuesArray[5]),
+    volume: parseInt(valuesArray[6], 10),
+    unadjustedVolume: parseInt(valuesArray[7], 10),
+    change: parseFloat(valuesArray[8]),
+    changePercent: parseFloat(valuesArray[9]),
+    vwap: parseFloat(valuesArray[10]),
+    label: valuesArray[11],
+    changeOverTime: parseFloat(valuesArray[12])
   };
 };
 
@@ -387,6 +432,9 @@ module.exports = {
 
   parseAccountSummaryTimestamp,
 
-  createRedisValueFromExchangeHistoricalChart,
-  parseCachedExchangeHistoricalChartItem
+  createRedisValueFromExchangeHistoricalChart5min,
+  parseCachedExchangeHistoricalChart5minItem,
+
+  createRedisValueFromExchangeHistoricalChartFull,
+  parseCachedExchangeHistoricalChartFullItem
 };

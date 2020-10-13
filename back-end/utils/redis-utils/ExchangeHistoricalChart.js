@@ -1,4 +1,4 @@
-const { isEqual } = require("lodash");
+const { isEqual, isEmpty } = require("lodash");
 
 const {
   listRangeAsync,
@@ -8,34 +8,57 @@ const {
 } = require("../../redis/redis-client");
 
 const {
-  createRedisValueFromExchangeHistoricalChart,
-  parseCachedExchangeHistoricalChartItem
+  createRedisValueFromExchangeHistoricalChart5min,
+  parseCachedExchangeHistoricalChart5minItem,
+  parseCachedExchangeHistoricalChartFullItem,
+  createRedisValueFromExchangeHistoricalChartFull
 } = require("../low-dependency/ParserUtil");
 
-const { cachedExchangeHistoricalChart } = require("./RedisUtil");
+const {
+  cachedExchangeHistoricalChartFull,
+  cachedExchangeHistoricalChart5min
+} = require("./RedisUtil");
 
 const {
   SequentialPromisesWithResultsArray
 } = require("../low-dependency/PromisesUtil");
 
 const {
-  getExchangeHistoricalChart5MinFromFMP
+  getExchangeHistoricalChartFromFMP
 } = require("../FinancialModelingPrepUtil");
 
 /**
- * @description Use redis key 'cachedExchangeHistoricalChart|${exchange}'
+ * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}'
  * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
  * @return {Promise<object[]>} historicalChartObjectsArray. Each object will look like Historical Stock Index Prices endpoint on FMP
  */
-const getCachedExchangeHistoricalChart = (exchange) => {
+const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `${cachedExchangeHistoricalChart}|${exchange}`;
+    const cacheSection =
+      typeChart === "5min"
+        ? cachedExchangeHistoricalChart5min
+        : typeChart === "full"
+        ? cachedExchangeHistoricalChartFull
+        : "";
+    if (isEmpty(cacheSection)) {
+      reject(new Error("FMP Chart Type should be 5min or full."));
+    }
+
+    const redisKey = `${cacheSection}|${exchange}`;
 
     listRangeAsync(redisKey, 0, -1)
       .then((historicalChartArray) => {
         const historicalChartObjectsArray = historicalChartArray.map(
           (historicalChartItem) => {
-            return parseCachedExchangeHistoricalChartItem(historicalChartItem);
+            if (typeChart === "5min") {
+              return parseCachedExchangeHistoricalChart5minItem(
+                historicalChartItem
+              );
+            }
+            return parseCachedExchangeHistoricalChartFullItem(
+              historicalChartItem
+            );
           }
         );
 
@@ -48,27 +71,45 @@ const getCachedExchangeHistoricalChart = (exchange) => {
 };
 
 /**
- * @description Use redis key 'cachedExchangeHistoricalChart|${exchange}'
+ * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}'
  * @description
  * - Remove current list
  * - Push each historical chart item to list so that LATEST date to the left (order from FMP too)
  * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
  * @param {object[]} historicalChartArray Array of ohclv chart from FMP
  */
 const pushCachedExchangeHistoricalChartWholeList = (
   exchange,
+  typeChart,
   historicalChartArray
 ) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `${cachedExchangeHistoricalChart}|${exchange}`;
+    const cacheSection =
+      typeChart === "5min"
+        ? cachedExchangeHistoricalChart5min
+        : typeChart === "full"
+        ? cachedExchangeHistoricalChartFull
+        : "";
+    if (isEmpty(cacheSection)) {
+      reject(new Error("FMP Chart Type should be 5min or full."));
+    }
+
+    const redisKey = `${cacheSection}|${exchange}`;
+
     delAsync(redisKey)
       .then((finishedErasingRecentList) => {
         const tasksList = [];
 
         historicalChartArray.forEach((historicalChartItem) => {
-          const redisValue = createRedisValueFromExchangeHistoricalChart(
-            historicalChartItem
-          );
+          const redisValue =
+            typeChart === "5min"
+              ? createRedisValueFromExchangeHistoricalChart5min(
+                  historicalChartItem
+                )
+              : createRedisValueFromExchangeHistoricalChartFull(
+                  historicalChartItem
+                );
           tasksList.push(() => listPushAsync(redisKey, redisValue));
         });
 
@@ -76,7 +117,7 @@ const pushCachedExchangeHistoricalChartWholeList = (
       })
       .then((finishedPushing) => {
         resolve(
-          `Successfully finished pushing all historical chart items of exchange ${exchange} to cache`
+          `Successfully finished pushing historical chart ${typeChart} items of exchange ${exchange} to cache`
         );
       })
       .catch((err) => {
@@ -86,20 +127,38 @@ const pushCachedExchangeHistoricalChartWholeList = (
 };
 
 /**
- * @description Use redis key 'cachedExchangeHistoricalChart|${exchange}'
+ * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}'
  * @description Compare latest item of new historical chart to latest one in cache
  * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
  * @param {object[]} newHistoricalChartArray Item of ohclv chart from FMP
  */
 const pushCachedExchangeHistoricalChartLatestItem = (
   exchange,
+  typeChart,
   newHistoricalChartArray
 ) => {
   return new Promise((resolve, reject) => {
-    const redisKey = `${cachedExchangeHistoricalChart}|${exchange}`;
-    const redisValue = createRedisValueFromExchangeHistoricalChart(
-      newHistoricalChartArray[0]
-    );
+    const cacheSection =
+      typeChart === "5min"
+        ? cachedExchangeHistoricalChart5min
+        : typeChart === "full"
+        ? cachedExchangeHistoricalChartFull
+        : "";
+    if (isEmpty(cacheSection)) {
+      reject(new Error("FMP Chart Type should be 5min or full."));
+    }
+
+    const redisKey = `${cacheSection}|${exchange}`;
+
+    const redisValue =
+      typeChart === "5min"
+        ? createRedisValueFromExchangeHistoricalChart5min(
+            newHistoricalChartArray[0]
+          )
+        : createRedisValueFromExchangeHistoricalChartFull(
+            newHistoricalChartArray[0]
+          );
 
     listRangeAsync(redisKey, 0, 0)
       .then((historicalChartLatestItemInCache) => {
@@ -111,7 +170,7 @@ const pushCachedExchangeHistoricalChartLatestItem = (
       })
       .then((finishedPushing) => {
         resolve(
-          `Successfully finished pushing latest historical chart items of exchange ${exchange} to cache`
+          `Successfully finished pushing latest historical chart ${typeChart} items of exchange ${exchange} to cache`
         );
       })
       .catch((err) => {
@@ -121,16 +180,18 @@ const pushCachedExchangeHistoricalChartLatestItem = (
 };
 
 /**
- * @description Use redis key 'cachedExchangeHistoricalChart|${exchange}'
+ * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}'
  * @description Update exchange historical chart whole list using FMP
  * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
  */
-const updateCachedExchangeHistoricalChartWholeList = (exchange) => {
+const updateCachedExchangeHistoricalChartWholeList = (exchange, typeChart) => {
   return new Promise((resolve, reject) => {
-    getExchangeHistoricalChart5MinFromFMP(exchange)
+    getExchangeHistoricalChartFromFMP(exchange, typeChart)
       .then((historicalChartJSON) => {
         return pushCachedExchangeHistoricalChartWholeList(
           exchange,
+          typeChart,
           historicalChartJSON
         );
       })
@@ -144,16 +205,18 @@ const updateCachedExchangeHistoricalChartWholeList = (exchange) => {
 };
 
 /**
- * @description Use redis key 'cachedExchangeHistoricalChart|${exchange}'
+ * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}'
  * @description Update exchange historical chart one item using FMP
  * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
  */
-const updateCachedExchangeHistoricalChartOneItem = (exchange) => {
+const updateCachedExchangeHistoricalChartOneItem = (exchange, typeChart) => {
   return new Promise((resolve, reject) => {
-    getExchangeHistoricalChart5MinFromFMP(exchange)
+    getExchangeHistoricalChartFromFMP(exchange, typeChart)
       .then((historicalChartJSON) => {
         return pushCachedExchangeHistoricalChartLatestItem(
           exchange,
+          typeChart,
           historicalChartJSON
         );
       })
@@ -182,7 +245,8 @@ const resetAllExchangesHistoricalChart = (globalBackendVariables) => {
     !globalBackendVariables.hasReplacedAllExchangesHistoricalChart
   ) {
     globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
-    updateCachedExchangeHistoricalChartWholeList("NYSE");
+    updateCachedExchangeHistoricalChartWholeList("NYSE", "5min");
+    updateCachedExchangeHistoricalChartWholeList("NYSE", "full");
   }
 
   // if market is closed but flag hasReplacedAllExchangesHistoricalChart not switch to false yet -> change it to false
@@ -195,6 +259,13 @@ const resetAllExchangesHistoricalChart = (globalBackendVariables) => {
 };
 
 module.exports = {
+  /* 
+    - Historical Chart 5 min
+    -> From FMP, 5 min historical chart only stores the latest 7 days
+
+    - Historical Chart full 
+    -> From FMP, we get stock info (endpoint: historical-price-full) each day from when the company was established.
+  */
   getCachedExchangeHistoricalChart,
   pushCachedExchangeHistoricalChartWholeList,
   pushCachedExchangeHistoricalChartLatestItem,

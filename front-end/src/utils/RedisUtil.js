@@ -141,14 +141,16 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
 
 /**
  * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
  * @return {Promise<object[]>} historicalChart: array of historical chart timestamp storing OHLCV
  */
-export const getCachedExchangeHistoricalChart = (exchange) => {
+export const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/redis/${getExchangeHistoricalChart}`, {
       method: "get",
       params: {
         exchange,
+        typeChart,
       },
       withCredentials: true,
     })
