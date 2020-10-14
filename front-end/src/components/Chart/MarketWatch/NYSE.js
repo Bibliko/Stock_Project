@@ -1,5 +1,11 @@
 import React from "react";
-import Chart from "react-apexcharts";
+
+import Highcharts from "highcharts";
+import Boost from "highcharts/modules/boost";
+import HighchartsReact from "highcharts-react-official";
+
+import { DateTime } from "luxon";
+
 import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 
@@ -9,10 +15,6 @@ import {
 } from "../../../utils/low-dependency/DayTimeUtil";
 import { withMediaQuery } from "../../../theme/ThemeUtil";
 import { getCachedExchangeHistoricalChart } from "../../../utils/RedisUtil";
-import {
-  numberWithCommas,
-  isNum,
-} from "../../../utils/low-dependency/NumberUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import { Typography, CircularProgress } from "@material-ui/core";
@@ -57,100 +59,149 @@ const styles = (theme) => ({
   },
 });
 
+Boost(Highcharts);
+
 class NYSEMarketWatch extends React.Component {
   state = {
-    options: {
+    highChartOptions: {
       chart: {
-        id: "NYSEMarketWatch",
-        sparkline: {
-          enabled: false,
+        zoomType: "x",
+        backgroundColor: "rgba(255, 255, 255, 0)",
+        style: {
+          color: "white",
         },
-        zoom: {
+      },
+
+      title: {
+        text: "NYSE Exchange",
+        style: {
+          color: "white",
+        },
+      },
+
+      subtitle: {
+        text: "Note: DRAG to zoom (on web only)",
+        style: {
+          color: "white",
+        },
+      },
+
+      legend: {
+        align: "center",
+        verticalAlign: "bottom",
+        layout: "horizontal",
+        borderColor: "white",
+        itemHiddenStyle: {
+          color: "white",
+        },
+        itemHoverStyle: {
+          color: "#2196f3",
+        },
+        itemStyle: {
+          color: "#2196f3",
+          cursor: "pointer",
+          fontSize: "12px",
+          fontWeight: "bold",
+          textOverflow: "ellipsis",
+        },
+      },
+
+      xAxis: {
+        labels: {
           enabled: true,
-        },
-        toolbar: {
-          show: false,
-          autoSelected: "reset",
-        },
-        type: "area",
-      },
-      stroke: {
-        width: 2,
-        curve: "straight",
-      },
-      xaxis: {
-        labels: {
-          show: true,
           style: {
-            colors: "white",
-          },
-          formatter: (value) => {
-            return this.xAxisFormatter(value, "labels");
+            color: "white",
           },
         },
-        type: "category",
-        tickAmount: 2,
+        type: "datetime",
       },
-      yaxis: {
-        tickAmount: 3,
+
+      yAxis: {
         labels: {
-          show: true,
+          enabled: true,
           style: {
-            colors: "white",
-          },
-          formatter: (value) => {
-            return parseInt(value, 10);
+            color: "white",
           },
         },
+        allowDecimals: false,
         title: {
           text: "Close Price",
           style: {
-            fontSize: "14px",
             color: "white",
           },
         },
       },
-      tooltip: {
-        x: {
-          formatter: (value) => {
-            return this.xAxisFormatter(value, "tooltip");
+
+      series: [
+        {
+          type: "area",
+          name: "Close Price",
+          data: [],
+        },
+      ],
+
+      time: {
+        useUTC: false,
+      },
+
+      plotOptions: {
+        series: {
+          boostThreshold: 2000,
+          turboThreshold: 5000,
+        },
+
+        area: {
+          fillColor: {
+            linearGradient: {
+              x1: 0,
+              y1: 0,
+              x2: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, "rgba(33, 150, 243, 0.1)"],
+              [1, "rgba(33, 150, 243, 0.5)"],
+            ],
           },
-        },
-        y: {
-          formatter: (value) => {
-            return `$${numberWithCommas(value.toFixed(3))}`;
+          marker: {
+            radius: 2,
           },
-        },
-        fixed: {
-          enabled: true,
-          offsetY: -50,
+          lineWidth: 1,
+          states: {
+            hover: {
+              lineWidth: 1,
+            },
+          },
+          threshold: null,
         },
       },
-      dataLabels: {
-        enabled: false,
-      },
-      grid: {
-        show: false,
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          type: "vertical",
-          shadeIntensity: 0.7,
-          opacityFrom: 0.8,
-          opacityTo: 0.4,
-          stops: [0, 100],
-        },
+
+      responsive: {
+        rules: [
+          {
+            condition: {
+              maxWidth: 400,
+            },
+            chartOptions: {
+              yAxis: {
+                labels: {
+                  enabled: false,
+                },
+                title: {
+                  text: null,
+                },
+              },
+              subtitle: {
+                text: null,
+              },
+              credits: {
+                enabled: false,
+              },
+            },
+          },
+        ],
       },
     },
-
-    series: [
-      {
-        name: "Close Price",
-        type: "area",
-        data: [],
-      },
-    ],
 
     historicalChart5min: [],
     historicalChartFull: [],
@@ -160,96 +211,14 @@ class NYSEMarketWatch extends React.Component {
   };
 
   intervalUpdateChartSeries;
-  intervalCheckBreakpoints;
-
-  prevIsScreenSmall = this.props.mediaQuery;
-
-  /**
-   * @param {string} value string "date|chartTimeLimit" or numberic string (e.g: '79') showing index in seriesData (if xAxisType is tooltip)
-   * @param {string} xAxisType tooltip or labels
-   */
-  xAxisFormatter = (value, xAxisType) => {
-    const { data } = this.state.series[0];
-    let valuesArray;
-
-    if (!value) {
-      return value;
-    } else {
-      if (!isNum(value)) {
-        valuesArray = value.split("|");
-      } else {
-        if (!data[parseInt(value, 10) - 1]) return;
-        valuesArray = data[parseInt(value, 10) - 1].x.split("|");
-      }
-    }
-
-    const date = valuesArray[0];
-    const chartTimeLimit = valuesArray[1];
-
-    if (
-      chartTimeLimit === "1M" ||
-      chartTimeLimit === "6M" ||
-      chartTimeLimit === "Full"
-    ) {
-      return new Date(date).toLocaleDateString();
-    }
-
-    if (xAxisType === "tooltip") {
-      return new Date(date).toLocaleString();
-    }
-
-    if (chartTimeLimit === "1D") {
-      return new Date(date).toLocaleTimeString();
-    }
-
-    if (chartTimeLimit === "1W") {
-      const firstDataDate = new Date(
-        data[0].x.split("|")[0]
-      ).toLocaleDateString();
-
-      const lastDataDate = new Date(
-        data[data.length - 1].x.split("|")[0]
-      ).toLocaleDateString();
-
-      if (firstDataDate === lastDataDate) {
-        return new Date(date).toLocaleTimeString();
-      } else {
-        return new Date(date).toLocaleDateString();
-      }
-    }
-  };
-
-  checkBreakpointsAndAdjustChart = () => {
-    const { mediaQuery: isScreenSmall } = this.props;
-    if (isScreenSmall !== this.prevIsScreenSmall) {
-      this.prevIsScreenSmall = isScreenSmall;
-
-      this.setState({
-        options: {
-          ...this.state.options,
-          yaxis: {
-            ...this.state.options.yaxis,
-            show: !isScreenSmall,
-            title: {
-              ...this.state.options.yaxis.title,
-              text: isScreenSmall ? undefined : "Close Price",
-            },
-          },
-          xaxis: {
-            ...this.state.options.xaxis,
-            labels: {
-              ...this.state.options.xaxis.labels,
-              show: !isScreenSmall,
-            },
-          },
-        },
-      });
-    }
-  };
 
   chooseMinDate = (historicalChart) => {
     const { chartTimeLimit } = this.state;
-    let minDate = new Date(historicalChart[0].date);
+
+    // standard here means fitting all browsers (Safari, Chrome, Firefox): '2020/10/20'
+    const datePieces = historicalChart[0].date.split("-");
+    const standardFormDate = datePieces.join("/");
+    let minDate = new Date(standardFormDate);
 
     if (chartTimeLimit === "Full") {
       minDate.setFullYear(0);
@@ -308,12 +277,15 @@ class NYSEMarketWatch extends React.Component {
         setTimeout(() => {
           this.setState(
             {
-              series: [
-                {
-                  ...this.state.series[0],
-                  data: seriesData,
-                },
-              ],
+              highChartOptions: {
+                ...this.state.highChartOptions,
+                series: [
+                  {
+                    ...this.state.highChartOptions.series[0],
+                    data: seriesData,
+                  },
+                ],
+              },
             },
             () => {
               setTimeout(() => {
@@ -342,13 +314,29 @@ class NYSEMarketWatch extends React.Component {
         ? historicalChart5min
         : historicalChartFull;
 
-    const minDate = this.chooseMinDate(historicalChart);
+    const minTimestamp = DateTime.fromJSDate(
+      this.chooseMinDate(historicalChart),
+      {
+        zone: "America/New_York",
+      }
+    ).toMillis();
 
     for (let i = historicalChart.length - 1; i >= 0; i--) {
       const { date, close } = historicalChart[i];
 
-      if (new Date(date) >= minDate) {
-        const chartItem = { x: `${date}|${chartTimeLimit}`, y: close };
+      // - length === 10 when '2020-10-20' without time following after
+      // - 16:00:00 is the time when NYSE closes market
+      const localTimestamp =
+        date.length === 10
+          ? DateTime.fromISO(date, { zone: "America/New_York" })
+              .set({ hour: 16, minute: 0, second: 0 })
+              .toMillis()
+          : DateTime.fromFormat(date, "yyyy-MM-dd hh:mm:ss", {
+              zone: "America/New_York",
+            }).toMillis();
+
+      if (localTimestamp >= minTimestamp) {
+        const chartItem = [localTimestamp, close];
         seriesData.push(chartItem);
       }
     }
@@ -369,7 +357,7 @@ class NYSEMarketWatch extends React.Component {
     }
   };
 
-  initializeAndCreateIntervalForChartSeries5min = () => {
+  initializeAndCreateIntervalForChartSeries = () => {
     clearInterval(this.intervalUpdateChartSeries);
 
     this.initializeHistoricalChartUsingDataFromCache()
@@ -396,17 +384,11 @@ class NYSEMarketWatch extends React.Component {
   };
 
   componentDidMount() {
-    this.initializeAndCreateIntervalForChartSeries5min();
-
-    this.intervalCheckBreakpoints = setInterval(
-      () => this.checkBreakpointsAndAdjustChart(),
-      oneSecond
-    );
+    this.initializeAndCreateIntervalForChartSeries();
   }
 
   componentWillUnmount() {
     clearInterval(this.intervalUpdateChartSeries);
-    clearInterval(this.intervalCheckBreakpoints);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -417,11 +399,10 @@ class NYSEMarketWatch extends React.Component {
     const { classes } = this.props;
 
     const {
-      options,
-      series,
       isChartReady,
       chartTimeLimit,
       chartTimeLimitChoices,
+      highChartOptions,
     } = this.state;
 
     return (
@@ -429,15 +410,22 @@ class NYSEMarketWatch extends React.Component {
         {!isChartReady && (
           <CircularProgress className={classes.circularProgress} />
         )}
-        {isChartReady && isEmpty(series[0].data) && (
+        {isChartReady && isEmpty(highChartOptions.series[0].data) && (
           <Typography className={classes.note}>No Data</Typography>
         )}
-        <Chart
-          type="area"
-          series={series}
-          options={options}
-          className={classes.chart}
-        />
+        {isChartReady && !isEmpty(highChartOptions.series[0].data) && (
+          <HighchartsReact
+            containerProps={{
+              style: {
+                width: "100%",
+                maxWidth: "600px",
+              },
+            }}
+            highcharts={Highcharts}
+            options={highChartOptions}
+          />
+        )}
+
         <ToggleButtonGroup
           value={chartTimeLimit}
           exclusive

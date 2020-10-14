@@ -67,15 +67,6 @@ const styles = (theme) => ({
     fontWeight: "bold",
     marginBottom: "5px",
   },
-  gridSubtitle: {
-    color: "white",
-    fontStyle: "italic",
-    fontSize: "small",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "smaller",
-    },
-    marginBottom: "20px",
-  },
   summary: {
     color: theme.palette.bigTitle.lightBlue,
   },
@@ -242,9 +233,6 @@ class AccountSummary extends React.Component {
               className={clsx(classes.gridTitle, classes.portfolioChart)}
             >
               Portfolio Chart
-            </Typography>
-            <Typography className={classes.gridSubtitle}>
-              Chart tools are best supported on Chrome!
             </Typography>
             <Typography className={classes.titleChart}>
               ${numberWithCommas(totalPortfolio.toFixed(2))}
