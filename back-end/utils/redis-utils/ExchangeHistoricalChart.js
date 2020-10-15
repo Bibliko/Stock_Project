@@ -28,7 +28,7 @@ const {
 } = require("../FinancialModelingPrepUtil");
 
 /**
- * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}'
+ * @description Use redis key 'cachedExchangeHistoricalChart5min|${exchange}' or 'cachedExchangeHistoricalChartFull|${exchange}'
  * @param {string} exchange NYSE or NASDAQ
  * @param {string} typeChart 5min or full
  * @return {Promise<object[]>} historicalChartObjectsArray. Each object will look like Historical Stock Index Prices endpoint on FMP
@@ -184,24 +184,45 @@ const pushCachedExchangeHistoricalChartLatestItem = (
  * @description Update exchange historical chart whole list using FMP
  * @param {string} exchange NYSE or NASDAQ
  * @param {string} typeChart 5min or full
+ * @param {boolean} forceReplace Do you want to force replacing the current cache?
+ * @param {object} globalBackendVariables
  */
-const updateCachedExchangeHistoricalChartWholeList = (exchange, typeChart) => {
-  return new Promise((resolve, reject) => {
-    getExchangeHistoricalChartFromFMP(exchange, typeChart)
-      .then((historicalChartJSON) => {
+const updateCachedExchangeHistoricalChartWholeList = (
+  exchange,
+  typeChart,
+  forceReplace,
+  globalBackendVariables
+) => {
+  getCachedExchangeHistoricalChart(exchange, typeChart)
+    .then((cachedHistoricalChart) => {
+      if (isEmpty(cachedHistoricalChart) || forceReplace) {
+        return getExchangeHistoricalChartFromFMP(exchange, typeChart);
+      }
+    })
+    .then((historicalChartJSON) => {
+      if (historicalChartJSON) {
         return pushCachedExchangeHistoricalChartWholeList(
           exchange,
           typeChart,
           historicalChartJSON
         );
-      })
-      .then((finishedPushing) => {
-        resolve(finishedPushing);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+      }
+    })
+    .then((finishedPushing) => {
+      if (finishedPushing) {
+        globalBackendVariables.updatedExchangeHistoricalChartFullFlag = !globalBackendVariables.updatedExchangeHistoricalChartFullFlag;
+        console.log(
+          `Finished updating exchange historical chart whole list ${typeChart} ${exchange}.`
+        );
+      } else {
+        console.log(
+          `No updating needed for exchange historical chart whole list ${typeChart} ${exchange}.`
+        );
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /**
@@ -209,24 +230,43 @@ const updateCachedExchangeHistoricalChartWholeList = (exchange, typeChart) => {
  * @description Update exchange historical chart one item using FMP
  * @param {string} exchange NYSE or NASDAQ
  * @param {string} typeChart 5min or full
+ * @param {object} globalBackendVariable
  */
-const updateCachedExchangeHistoricalChartOneItem = (exchange, typeChart) => {
-  return new Promise((resolve, reject) => {
-    getExchangeHistoricalChartFromFMP(exchange, typeChart)
-      .then((historicalChartJSON) => {
-        return pushCachedExchangeHistoricalChartLatestItem(
-          exchange,
-          typeChart,
-          historicalChartJSON
+const updateCachedExchangeHistoricalChartOneItem = (
+  exchange,
+  typeChart,
+  globalBackendVariables
+) => {
+  getExchangeHistoricalChartFromFMP(exchange, typeChart)
+    .then((historicalChartJSON) => {
+      return pushCachedExchangeHistoricalChartLatestItem(
+        exchange,
+        typeChart,
+        historicalChartJSON
+      );
+    })
+    .then((finishedPushing) => {
+      if (finishedPushing) {
+        const {
+          updatedExchangeHistoricalChart5minFlag
+        } = globalBackendVariables[exchange];
+
+        globalBackendVariables[
+          exchange
+        ].updatedExchangeHistoricalChart5minFlag = !updatedExchangeHistoricalChart5minFlag;
+
+        console.log(
+          `Finished updating exchange historical chart one item ${typeChart} ${exchange}.`
         );
-      })
-      .then((finishedPushing) => {
-        resolve(finishedPushing);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+      } else {
+        console.log(
+          `No updating needed for exchange historical chart one item ${typeChart} ${exchange}.`
+        );
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /**
@@ -245,8 +285,18 @@ const resetAllExchangesHistoricalChart = (globalBackendVariables) => {
     !globalBackendVariables.hasReplacedAllExchangesHistoricalChart
   ) {
     globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
-    updateCachedExchangeHistoricalChartWholeList("NYSE", "5min");
-    updateCachedExchangeHistoricalChartWholeList("NYSE", "full");
+    updateCachedExchangeHistoricalChartWholeList(
+      "NYSE",
+      "5min",
+      true,
+      globalBackendVariables
+    );
+    updateCachedExchangeHistoricalChartWholeList(
+      "NYSE",
+      "full",
+      true,
+      globalBackendVariables
+    );
   }
 
   // if market is closed but flag hasReplacedAllExchangesHistoricalChart not switch to false yet -> change it to false

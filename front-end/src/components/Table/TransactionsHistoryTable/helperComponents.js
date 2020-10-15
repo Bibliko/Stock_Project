@@ -67,7 +67,7 @@ export const chooseTableCell = (
   classes,
   transactionInfo
 ) => {
-  const { isTypeBuy } = transactionInfo;
+  const { isTypeBuy, spendOrGain } = transactionInfo;
 
   return (
     <TableCell
@@ -86,8 +86,13 @@ export const chooseTableCell = (
       >
         <Typography
           className={clsx(classes.watchlistRowItem, {
-            [classes.buyIcon]: type === "Type" && isTypeBuy,
-            [classes.sellIcon]: type === "Type" && !isTypeBuy,
+            [classes.greenIcon]:
+              (type === "Type" && isTypeBuy) ||
+              (type === "Gain/Loss" && spendOrGain > 0),
+
+            [classes.redIcon]:
+              (type === "Type" && !isTypeBuy) ||
+              (type === "Gain/Loss" && spendOrGain < 0),
           })}
           noWrap
         >

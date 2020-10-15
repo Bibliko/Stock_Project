@@ -36,19 +36,17 @@ const {
   updateMarketHolidaysFromFMP
 } = require("./utils/FinancialModelingPrepUtil");
 
-/*
-  const {
-    updateCachedExchangeHistoricalChartWholeList,
-    updateCachedExchangeHistoricalChartOneItem,
-    resetAllExchangesHistoricalChart
-  } = require("./utils/redis-utils/ExchangeHistoricalChart");
-*/
+const {
+  updateCachedExchangeHistoricalChartWholeList
+  // updateCachedExchangeHistoricalChartOneItem,
+  // resetAllExchangesHistoricalChart
+} = require("./utils/redis-utils/ExchangeHistoricalChart");
 
 /*
-  const {
-    updateCachedShareQuotesUsingCache,
-    updateCachedShareProfilesUsingCache
-  } = require("./utils/redis-utils/SharesInfoBank");
+const {
+  updateCachedShareQuotesUsingCache,
+  updateCachedShareProfilesUsingCache
+} = require("./utils/redis-utils/SharesInfoBank");
 */
 
 const { startSocketIO } = require("./socketIO");
@@ -124,15 +122,45 @@ var globalBackendVariables = {
   hasReplacedAllExchangesHistoricalChart: false,
 
   updatedAllUsersFlag: false, // value true or false does not mean anything. This is just a flag
-  updatedRankingListFlag: false // value true or false does not mean anything. This is just a flag
+  updatedRankingListFlag: false, // value true or false does not mean anything. This is just a flag
+  NYSE: {
+    updatedExchangeHistoricalChart5minFlag: false,
+    updatedExchangeHistoricalChartFullFlag: false
+  },
+  NASDAQ: {
+    updatedExchangeHistoricalChart5minFlag: false,
+    updatedExchangeHistoricalChartFullFlag: false
+  }
 };
 
 // This function helps initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(globalBackendVariables);
 
 // This function helps initialize exchange NYSE historical chart 5min at first run
-// updateCachedExchangeHistoricalChartWholeList("NYSE", "5min");
-// updateCachedExchangeHistoricalChartWholeList("NYSE", "full");
+updateCachedExchangeHistoricalChartWholeList(
+  "NYSE",
+  "5min",
+  false,
+  globalBackendVariables
+);
+updateCachedExchangeHistoricalChartWholeList(
+  "NYSE",
+  "full",
+  false,
+  globalBackendVariables
+);
+updateCachedExchangeHistoricalChartWholeList(
+  "NASDAQ",
+  "5min",
+  false,
+  globalBackendVariables
+);
+updateCachedExchangeHistoricalChartWholeList(
+  "NASDAQ",
+  "full",
+  false,
+  globalBackendVariables
+);
 globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
 updateRankingList(globalBackendVariables);
@@ -154,14 +182,18 @@ const setupBackendIntervals = () => {
   //   () => resetAllExchangesHistoricalChart(globalBackendVariables),
   //   oneSecond
   // );
+
   // setInterval(() => {
   //   if (
   //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
   //     !globalBackendVariables.isMarketClosed
   //   ) {
-  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "5min").catch((err) =>
-  //       console.log(err)
+  //     updateCachedExchangeHistoricalChartOneItem(
+  //       "NYSE",
+  //       "5min",
+  //       globalBackendVariables
   //     );
+  //     // updateCachedExchangeHistoricalChartOneItem("NASDAQ", "5min", globalBackendVariables)
   //   }
   // }, 5 * oneMinute);
   // setInterval(() => {
@@ -169,9 +201,8 @@ const setupBackendIntervals = () => {
   //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
   //     !globalBackendVariables.isMarketClosed
   //   ) {
-  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "full").catch((err) =>
-  //       console.log(err)
-  //     );
+  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "full", globalBackendVariables)
+  //     updateCachedExchangeHistoricalChartOneItem("NASDAQ", "full", globalBackendVariables)
   //   }
   // }, oneDay);
 
@@ -233,7 +264,12 @@ app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
-  const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];
+  const flags = [
+    "updatedAllUsersFlag",
+    "updatedRankingListFlag",
+    "NYSE",
+    "NASDAQ"
+  ];
   const flagsResult = pick(globalBackendVariables, flags);
   res.send(flagsResult);
 });

@@ -1,20 +1,28 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import Highcharts from "highcharts";
-import Boost from "highcharts/modules/boost";
 import HighchartsReact from "highcharts-react-official";
+
+import Boost from "highcharts/modules/boost";
+import BrokenAxis from "highcharts/modules/broken-axis";
 
 import { DateTime } from "luxon";
 
-import { isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { socket } from "../../App";
+
+import { oneMinute, oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+import { withMediaQuery } from "../../theme/ThemeUtil";
+import { getCachedExchangeHistoricalChart } from "../../utils/RedisUtil";
+import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
 import {
-  oneMinute,
-  oneSecond,
-} from "../../../utils/low-dependency/DayTimeUtil";
-import { withMediaQuery } from "../../../theme/ThemeUtil";
-import { getCachedExchangeHistoricalChart } from "../../../utils/RedisUtil";
+  offSocketListeners,
+  checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag,
+  updatedExchangeHistoricalChartFlag,
+} from "../../utils/SocketUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import { Typography, CircularProgress } from "@material-ui/core";
@@ -24,7 +32,7 @@ const styles = (theme) => ({
   mainDiv: {
     height: "100%",
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
     flexDirection: "column",
   },
@@ -53,15 +61,12 @@ const styles = (theme) => ({
       },
     },
   },
-  circularProgress: {
-    position: "absolute",
-    alignSelf: "center",
-  },
 });
 
 Boost(Highcharts);
+BrokenAxis(Highcharts);
 
-class NYSEMarketWatch extends React.Component {
+class MarketWatch extends React.Component {
   state = {
     highChartOptions: {
       chart: {
@@ -73,7 +78,7 @@ class NYSEMarketWatch extends React.Component {
       },
 
       title: {
-        text: "NYSE Exchange",
+        text: "NYSE Composite",
         style: {
           color: "white",
         },
@@ -113,6 +118,7 @@ class NYSEMarketWatch extends React.Component {
             color: "white",
           },
         },
+        breaks: {},
         type: "datetime",
       },
 
@@ -207,10 +213,10 @@ class NYSEMarketWatch extends React.Component {
     historicalChartFull: [],
     chartTimeLimitChoices: ["1D", "1W", "1M", "6M", "Full"],
     chartTimeLimit: "1D",
+    updatedExchangeHistoricalChart5minFlag: false,
+    updatedExchangeHistoricalChartFullFlag: false,
     isChartReady: false,
   };
-
-  intervalUpdateChartSeries;
 
   chooseMinDate = (historicalChart) => {
     const { chartTimeLimit } = this.state;
@@ -245,10 +251,12 @@ class NYSEMarketWatch extends React.Component {
   };
 
   initializeHistoricalChartUsingDataFromCache = () => {
+    const { exchange } = this.props;
+
     return new Promise((resolve, reject) => {
       Promise.all([
-        getCachedExchangeHistoricalChart("NYSE", "5min"),
-        getCachedExchangeHistoricalChart("NYSE", "full"),
+        getCachedExchangeHistoricalChart(exchange, "5min"),
+        getCachedExchangeHistoricalChart(exchange, "full"),
       ])
         .then(([historicalChart5min, historicalChartFull]) => {
           this.setState(
@@ -268,7 +276,8 @@ class NYSEMarketWatch extends React.Component {
     });
   };
 
-  setStateChartAfterGettingInfoFromCache = (seriesData) => {
+  setStateChartAfterGettingInfoFromCache = (seriesData, xAxisBreaks) => {
+    const { exchange } = this.props;
     this.setState(
       {
         isChartReady: false,
@@ -279,6 +288,14 @@ class NYSEMarketWatch extends React.Component {
             {
               highChartOptions: {
                 ...this.state.highChartOptions,
+                title: {
+                  ...this.state.highChartOptions.title,
+                  text: `${exchange} Composite`,
+                },
+                xAxis: {
+                  ...this.state.highChartOptions.xAxis,
+                  breaks: xAxisBreaks,
+                },
                 series: [
                   {
                     ...this.state.highChartOptions.series[0],
@@ -309,6 +326,9 @@ class NYSEMarketWatch extends React.Component {
 
     let seriesData = [];
 
+    // highcharts xAxis.breaks
+    let xAxisBreaks = [];
+
     const historicalChart =
       chartTimeLimit === "1D" || chartTimeLimit === "1W"
         ? historicalChart5min
@@ -325,7 +345,7 @@ class NYSEMarketWatch extends React.Component {
       const { date, close } = historicalChart[i];
 
       // - length === 10 when '2020-10-20' without time following after
-      // - 16:00:00 is the time when NYSE closes market
+      // - 16:00:00 is the time when NYSE and NASDAQ closes market
       const localTimestamp =
         date.length === 10
           ? DateTime.fromISO(date, { zone: "America/New_York" })
@@ -336,12 +356,23 @@ class NYSEMarketWatch extends React.Component {
             }).toMillis();
 
       if (localTimestamp >= minTimestamp) {
+        if (seriesData.length > 0 && chartTimeLimit === "1W") {
+          const latestItemInSeriesData = seriesData[seriesData.length - 1][0];
+
+          if (localTimestamp > latestItemInSeriesData + 5 * oneMinute) {
+            xAxisBreaks.push({
+              from: latestItemInSeriesData,
+              to: localTimestamp,
+              breakSize: 5 * oneMinute,
+            });
+          }
+        }
         const chartItem = [localTimestamp, close];
         seriesData.push(chartItem);
       }
     }
 
-    this.setStateChartAfterGettingInfoFromCache(seriesData);
+    this.setStateChartAfterGettingInfoFromCache(seriesData, xAxisBreaks);
   };
 
   onChangeChartTimeLimit = (event, newValue) => {
@@ -357,20 +388,6 @@ class NYSEMarketWatch extends React.Component {
     }
   };
 
-  initializeAndCreateIntervalForChartSeries = () => {
-    clearInterval(this.intervalUpdateChartSeries);
-
-    this.initializeHistoricalChartUsingDataFromCache()
-      .then((done) => {
-        this.intervalUpdateChartSeries = setInterval(() => {
-          this.initializeHistoricalChartUsingDataFromCache();
-        }, 5 * oneMinute);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   helperToggleButtonComponent = (choice, classes) => {
     return (
       <ToggleButton
@@ -383,16 +400,59 @@ class NYSEMarketWatch extends React.Component {
     );
   };
 
+  setupMarketWatchChart = () => {
+    const { exchange } = this.props;
+
+    Promise.all([
+      this.initializeHistoricalChartUsingDataFromCache(),
+      getGlobalBackendVariablesFlags(),
+    ])
+      .then(([done, flags]) => {
+        const {
+          updatedExchangeHistoricalChart5minFlag,
+          updatedExchangeHistoricalChartFullFlag,
+        } = flags[exchange];
+        this.setState(
+          {
+            updatedExchangeHistoricalChart5minFlag,
+            updatedExchangeHistoricalChartFullFlag,
+          },
+          () => {
+            checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag(
+              socket,
+              this
+            );
+          }
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   componentDidMount() {
-    this.initializeAndCreateIntervalForChartSeries();
+    this.setupMarketWatchChart();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!isEqual(this.props.exchange, prevProps.exchange)) {
+      this.setupMarketWatchChart();
+    }
   }
 
   componentWillUnmount() {
-    clearInterval(this.intervalUpdateChartSeries);
+    offSocketListeners(socket, updatedExchangeHistoricalChartFlag);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextState, this.state);
+    const compareKeys = ["exchange"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+
+    return (
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
+    );
   }
 
   render() {
@@ -407,9 +467,7 @@ class NYSEMarketWatch extends React.Component {
 
     return (
       <div className={classes.mainDiv}>
-        {!isChartReady && (
-          <CircularProgress className={classes.circularProgress} />
-        )}
+        {!isChartReady && <CircularProgress />}
         {isChartReady && isEmpty(highChartOptions.series[0].data) && (
           <Typography className={classes.note}>No Data</Typography>
         )}
@@ -440,6 +498,11 @@ class NYSEMarketWatch extends React.Component {
   }
 }
 
+MarketWatch.propTypes = {
+  classes: PropTypes.object.isRequired,
+  exchange: PropTypes.string.isRequired,
+};
+
 export default withStyles(styles)(
-  withTheme(withRouter(withMediaQuery("(max-width:600px)")(NYSEMarketWatch)))
+  withTheme(withRouter(withMediaQuery("(max-width:600px)")(MarketWatch)))
 );

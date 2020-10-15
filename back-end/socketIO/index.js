@@ -11,7 +11,6 @@ const {
 
 const {
   oneSecond,
-  clearIntervalsIfIntervalsNotEmpty,
   getYearUTCString,
   newDate
 } = require("../utils/low-dependency/DayTimeUtil");
@@ -31,6 +30,7 @@ const updateUserSessionInitialMessage =
 const checkMarketClosedString = "checkMarketClosed";
 const updatedAllUsersFlag = "updatedAllUsersFlag";
 const updatedRankingListFlag = "updatedRankingListFlag";
+const updatedExchangeHistoricalChartFlag = "updatedExchangeHistoricalChartFlag";
 const finishedSettingUpUserCacheSession = "finishedSettingUpUserCacheSession";
 
 const setupIntervalUpdateCacheSession = (intervalID, userEmail) => {
@@ -56,9 +56,7 @@ const startSocketIO = (server, globalBackendVariables) => {
 
   let countSocketsInMainHall = 0;
 
-  let intervalSendMarketClosed = null;
-  let intervalSendUpdatedAllUsersFlag = null;
-  let intervalSendUpdatedRankingListFlag = null;
+  let intervalIOSendInfo = null;
 
   io.on(connection, (socket) => {
     console.log(`New client connected ${socket.id}\n`);
@@ -177,44 +175,35 @@ const startSocketIO = (server, globalBackendVariables) => {
       }
 
       if (countSocketsInMainHall === 0) {
-        clearIntervalsIfIntervalsNotEmpty([
-          intervalSendMarketClosed,
-          intervalSendUpdatedAllUsersFlag,
-          intervalSendUpdatedRankingListFlag
-        ]);
+        clearInterval(intervalIOSendInfo);
       }
     });
 
     /*
-      Set up 3 general intervals all sockets will use:
+      Set up general intervals all sockets will use:
       - Send boolean "Is market closed?"
       - Send boolean flag "Has just updated all users (portfolioLastClosure, accountSummaryChartTimestamp)?"
       - Send boolean flag "Has just updated ranking of all users?"
+      - Send boolean flag "Has just updated exchange historical chart 5min and full?"
     */
 
     if (countSocketsInMainHall === 1) {
-      clearIntervalsIfIntervalsNotEmpty([
-        intervalSendMarketClosed,
-        intervalSendUpdatedAllUsersFlag,
-        intervalSendUpdatedRankingListFlag
-      ]);
+      clearInterval(intervalIOSendInfo);
 
-      intervalSendMarketClosed = setInterval(() => {
+      intervalIOSendInfo = setInterval(() => {
         io.emit(checkMarketClosedString, globalBackendVariables.isMarketClosed);
-      }, oneSecond);
-
-      intervalSendUpdatedAllUsersFlag = setInterval(() => {
         io.emit(
           updatedAllUsersFlag,
           globalBackendVariables.updatedAllUsersFlag
         );
-      }, oneSecond);
-
-      intervalSendUpdatedRankingListFlag = setInterval(() => {
         io.emit(
           updatedRankingListFlag,
           globalBackendVariables.updatedRankingListFlag
         );
+        io.emit(updatedExchangeHistoricalChartFlag, {
+          NYSE: globalBackendVariables.NYSE,
+          NASDAQ: globalBackendVariables.NASDAQ
+        });
       }, oneSecond);
     }
   });

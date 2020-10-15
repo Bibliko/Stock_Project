@@ -29,10 +29,10 @@ const styles = (theme) => ({
   cellDivSpecialForType: {
     justifyContent: "flex-start",
   },
-  buyIcon: {
+  greenIcon: {
     color: "#27AE60",
   },
-  sellIcon: {
+  redIcon: {
     color: "#EB5757",
   },
 

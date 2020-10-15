@@ -32,7 +32,6 @@ import {
 
 import {
   AccountCircleRounded as AccountCircleRoundedIcon,
-  BookRounded as BookRoundedIcon,
   CategoryRounded as CategoryRoundedIcon,
 } from "@material-ui/icons";
 
@@ -338,7 +337,11 @@ class PersistentAppBar extends React.Component {
             </Popper>
             <Tooltip title="Education">
               <IconButton className={classes.secondaryMenuButton}>
-                <BookRoundedIcon className={classes.normalIcon} />
+                <img
+                  alt="Education"
+                  src="/educationIcon.png"
+                  className={classes.normalIcon}
+                />
               </IconButton>
             </Tooltip>
             <Tooltip title="Account">
@@ -386,18 +389,18 @@ class PersistentAppBar extends React.Component {
                         <MenuItem
                           className={classes.accountMenuItem}
                           onClick={() => {
-                            redirectToPage("/setting", this.props);
-                          }}
-                        >
-                          Account Settings
-                        </MenuItem>
-                        <MenuItem
-                          className={classes.accountMenuItem}
-                          onClick={() => {
                             redirectToPage("/accountSummary", this.props);
                           }}
                         >
                           Account Summary
+                        </MenuItem>
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={() => {
+                            redirectToPage("/setting", this.props);
+                          }}
+                        >
+                          Account Settings
                         </MenuItem>
                         <MenuItem
                           className={classes.accountMenuItem}
