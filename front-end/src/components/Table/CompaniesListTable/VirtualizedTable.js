@@ -34,10 +34,10 @@ const styles = (theme) => ({
       fontSize: "14px",
     },
     color: "white",
-    "&:hover": {
-      color: theme.palette.succeed.tableSorted + " !important",
-    },
     "& .MuiTableSortLabel-root:hover": {
+      color: theme.palette.succeed.tableSorted,
+    },
+    "& .MuiTableSortLabel-root:focus": {
       color: theme.palette.succeed.tableSorted,
     },
     "& .MuiTableSortLabel-active": {
@@ -50,6 +50,11 @@ const styles = (theme) => ({
       color: theme.palette.succeed.tableSortIcon,
     },
     alignItems: "center",
+  },
+  tableHeaderHover: {
+    "&:hover": {
+      color: theme.palette.succeed.tableSorted + " !important",
+    },
   },
   tableHeaderRow: {
     borderBottom: "1px solid #9ED2EF",
@@ -125,28 +130,43 @@ class VirtualizedTable extends React.Component {
     );
   };
 
-  cellRenderer = ({ cellData, dataKey, parent, rowIndex }) => {
-    const { classes, cache } = this.props;
+  innerCellRenderer = ({ cellData, dataKey, ...other }) => {
+    const { classes } = this.props;
     return (
+      <div
+        className={clsx(classes.tableCell, {
+          [classes.tableNormalCell]: dataKey !== "name",
+          [classes.tableNameCell]: dataKey === "name",
+        })}
+        style={{
+          whiteSpace: "normal",
+        }}
+        {...other}
+      >
+        {dataKey === "marketCap" ? simplifyNumber(cellData) : cellData}
+      </div>
+    );
+  };
+
+  cellRenderer = ({ cellData, dataKey, parent, rowIndex }) => {
+    const { cache } = this.props;
+    return dataKey === "name" ? (
       <CellMeasurer
         cache={cache}
-        columnIndex={0}
+        columnIndex={1}
         key={dataKey}
         parent={parent}
         rowIndex={rowIndex}
       >
-        <div
-          className={clsx(classes.tableCell, {
-            [classes.tableNormalCell]: dataKey !== "name",
-            [classes.tableNameCell]: dataKey === "name",
-          })}
-          style={{
-            whiteSpace: "normal",
-          }}
-        >
-          {dataKey === "marketCap" ? simplifyNumber(cellData) : cellData}
-        </div>
+        {this.innerCellRenderer({ cellData, dataKey })}
       </CellMeasurer>
+    ) : (
+      this.innerCellRenderer({
+        cellData,
+        dataKey,
+        key: dataKey,
+        parent,
+      })
     );
   };
 
@@ -159,6 +179,7 @@ class VirtualizedTable extends React.Component {
         className={clsx(
           {
             [classes.sortLabel]: sortBy === dataKey,
+            [classes.tableHeaderHover]: dataKey !== "index",
           },
           classes.tableCell,
           classes.flexContainer,
@@ -167,19 +188,23 @@ class VirtualizedTable extends React.Component {
         style={{ height: headerHeight }}
         sortDirection={sortBy === dataKey ? sortDirection.toLowerCase() : false}
       >
-        <TableSortLabel
-          active={sortBy === dataKey}
-          direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
-        >
-          {label}
-          {sortBy === dataKey ? (
-            <span className={classes.visuallyHidden}>
-              {sortDirection.toLowerCase() === "desc"
-                ? "sorted descending"
-                : "sorted ascending"}
-            </span>
-          ) : null}
-        </TableSortLabel>
+        {dataKey !== "index" ? (
+          <TableSortLabel
+            active={sortBy === dataKey}
+            direction={sortBy === dataKey ? sortDirection.toLowerCase() : "asc"}
+          >
+            {label}
+            {sortBy === dataKey ? (
+              <span className={classes.visuallyHidden}>
+                {sortDirection.toLowerCase() === "desc"
+                  ? "sorted descending"
+                  : "sorted ascending"}
+              </span>
+            ) : null}
+          </TableSortLabel>
+        ) : (
+          label
+        )}
       </TableCell>
     );
   };
@@ -259,7 +284,6 @@ class VirtualizedTable extends React.Component {
                   cellRenderer={this.cellRenderer}
                   dataKey={dataKey}
                   flexGrow={1}
-                  minWidth={40}
                   {...other}
                 />
               );
@@ -277,8 +301,9 @@ VirtualizedTable.propTypes = {
     PropTypes.shape({
       dataKey: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      numeric: PropTypes.bool,
       width: PropTypes.number.isRequired,
+      minWidth: PropTypes.number,
+      maxWidth: PropTypes.number,
     })
   ).isRequired,
   headerHeight: PropTypes.number,
