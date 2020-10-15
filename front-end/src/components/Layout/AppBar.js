@@ -31,9 +31,7 @@ import {
 } from "@material-ui/core";
 
 import {
-  DashboardRounded as DashboardRoundedIcon,
   AccountCircleRounded as AccountCircleRoundedIcon,
-  BookRounded as BookRoundedIcon,
   CategoryRounded as CategoryRoundedIcon,
 } from "@material-ui/icons";
 
@@ -339,17 +337,11 @@ class PersistentAppBar extends React.Component {
             </Popper>
             <Tooltip title="Education">
               <IconButton className={classes.secondaryMenuButton}>
-                <BookRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Portfolio">
-              <IconButton
-                className={classes.secondaryMenuButton}
-                onClick={() => {
-                  redirectToPage("/accountSummary", this.props);
-                }}
-              >
-                <DashboardRoundedIcon className={classes.normalIcon} />
+                <img
+                  alt="Education"
+                  src="/educationIcon.png"
+                  className={classes.normalIcon}
+                />
               </IconButton>
             </Tooltip>
             <Tooltip title="Account">
@@ -394,6 +386,14 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={() => {
+                            redirectToPage("/accountSummary", this.props);
+                          }}
+                        >
+                          Account Summary
+                        </MenuItem>
                         <MenuItem
                           className={classes.accountMenuItem}
                           onClick={() => {

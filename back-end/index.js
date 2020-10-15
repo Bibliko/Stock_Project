@@ -37,10 +37,10 @@ const {
 } = require("./utils/FinancialModelingPrepUtil");
 
 const {
-  updateCompaniesRatingsList
-} = require("./utils/PrismaCompanyRatingUtil");
-
-const { startSocketIO } = require("./socketIO");
+  updateCachedExchangeHistoricalChartWholeList
+  // updateCachedExchangeHistoricalChartOneItem,
+  // resetAllExchangesHistoricalChart
+} = require("./utils/redis-utils/ExchangeHistoricalChart");
 
 /*
 const {
@@ -48,6 +48,8 @@ const {
   updateCachedShareProfilesUsingCache
 } = require("./utils/redis-utils/SharesInfoBank");
 */
+
+const { startSocketIO } = require("./socketIO");
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
 const express = require("express");
@@ -117,58 +119,125 @@ var globalBackendVariables = {
   isMarketClosed: false,
   hasUpdatedAllUsersToday: false,
   isPrismaMarketHolidaysInitialized: false,
+  hasReplacedAllExchangesHistoricalChart: false,
 
   updatedAllUsersFlag: false, // value true or false does not mean anything. This is just a flag
-  updatedRankingListFlag: false // value true or false does not mean anything. This is just a flag
+  updatedRankingListFlag: false, // value true or false does not mean anything. This is just a flag
+  NYSE: {
+    updatedExchangeHistoricalChart5minFlag: false,
+    updatedExchangeHistoricalChartFullFlag: false
+  },
+  NASDAQ: {
+    updatedExchangeHistoricalChart5minFlag: false,
+    updatedExchangeHistoricalChartFullFlag: false
+  }
 };
 
-setInterval(deleteExpiredVerification, oneDay);
-
-// This function to help initialize prisma market holidays at first run
+// This function helps initialize prisma market holidays at first run
 updateMarketHolidaysFromFMP(globalBackendVariables);
 
-// Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
-setInterval(() => updateMarketHolidaysFromFMP(globalBackendVariables), oneDay);
-setInterval(deletePrismaMarketHolidays, oneDay);
+// This function helps initialize exchange NYSE historical chart 5min at first run
+updateCachedExchangeHistoricalChartWholeList(
+  "NYSE",
+  "5min",
+  false,
+  globalBackendVariables
+);
+updateCachedExchangeHistoricalChartWholeList(
+  "NYSE",
+  "full",
+  false,
+  globalBackendVariables
+);
+updateCachedExchangeHistoricalChartWholeList(
+  "NASDAQ",
+  "5min",
+  false,
+  globalBackendVariables
+);
+updateCachedExchangeHistoricalChartWholeList(
+  "NASDAQ",
+  "full",
+  false,
+  globalBackendVariables
+);
+globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
-// Check Market Closed
-setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
-
-/* 
-Check if market closed to update users portfolio last closure.
-This interval will be moved to socket at the end of this file.
-*/
-setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
-
-/*
-Update Ranking List after 10 minutes
-This interval will be moved to socket at the end of this file.
-*/
 updateRankingList(globalBackendVariables);
-setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 
-/*
-Update ratings of companies in Database every day.
-*/
-setInterval(() => updateCompaniesRatingsList(), oneDay);
-  
+const setupBackendIntervals = () => {
+  // Check Market Closed
+  setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
 
+  setInterval(deleteExpiredVerification, oneDay);
 
-/*
-Update Cached Shares
+  // Update Market Holidays and Delete Market Holidays in Database that belong to last year (no longer needed)
+  setInterval(
+    () => updateMarketHolidaysFromFMP(globalBackendVariables),
+    oneDay
+  );
+  setInterval(deletePrismaMarketHolidays, oneDay);
 
-setInterval(() => {
-  if(!globalBackendVariables.isMarketClosed) {
-    updateCachedShareQuotesUsingCache();
-  }
-}, 2 * oneSecond);
+  // setInterval(
+  //   () => resetAllExchangesHistoricalChart(globalBackendVariables),
+  //   oneSecond
+  // );
 
-setInterval(() => {
-  if(!globalBackendVariables.isMarketClosed) {
-    updateCachedShareProfilesUsingCache();
-  }
-}, oneMinute);
-*/
+  // setInterval(() => {
+  //   if (
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //     updateCachedExchangeHistoricalChartOneItem(
+  //       "NYSE",
+  //       "5min",
+  //       globalBackendVariables
+  //     );
+  //     // updateCachedExchangeHistoricalChartOneItem("NASDAQ", "5min", globalBackendVariables)
+  //   }
+  // }, 5 * oneMinute);
+  // setInterval(() => {
+  //   if (
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "full", globalBackendVariables)
+  //     updateCachedExchangeHistoricalChartOneItem("NASDAQ", "full", globalBackendVariables)
+  //   }
+  // }, oneDay);
+
+  /*
+    // Update Cached Shares
+
+    setInterval(() => {
+      if(
+        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
+        !globalBackendVariables.isMarketClosed
+      ) {
+        updateCachedShareQuotesUsingCache()
+        .catch(err => console.log(err));
+      }
+    }, 2 * oneSecond);
+
+    setInterval(() => {
+      if(
+        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
+        !globalBackendVariables.isMarketClosed
+      ) {
+        updateCachedShareProfilesUsingCache()
+        .catch(err => console.log(err));
+      }
+    }, oneMinute);
+  */
+
+  // Update all users portfolioLastClosure
+  setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
+
+  // All Users Ranking List
+  setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+};
+
+setupBackendIntervals();
 
 // All app routes are written below this comment:
 
@@ -195,7 +264,12 @@ app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
-  const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];
+  const flags = [
+    "updatedAllUsersFlag",
+    "updatedRankingListFlag",
+    "NYSE",
+    "NASDAQ"
+  ];
   const flagsResult = pick(globalBackendVariables, flags);
   res.send(flagsResult);
 });
