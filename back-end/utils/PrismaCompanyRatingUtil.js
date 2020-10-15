@@ -11,9 +11,10 @@ const { getFullStockRatingsFromFMP } = require("./FinancialModelingPrepUtil.js")
 const updateCompaniesRatingsList = () => {
     return new Promise((resolve, reject) =>
     {
-	console.log("Updating companies' ratings);
+	    console.log("Updating companies ratings");
 
-        getFullStockRatingsFromFMP((allSharesRatings) =>
+        getFullStockRatingsFromFMP()
+        .then((allSharesRatings) =>
         {
             // eslint-disable-next-line prefer-const
             let tasksList = [];
@@ -31,7 +32,7 @@ const updateCompaniesRatingsList = () => {
                     })
                     .then((shareRatingPrisma) =>
                     {
-                        if (shareRatingPrisma)
+                        if (!shareRatingPrisma)
                         {
                             return prisma.companyRating.create({
                                 data:
@@ -67,10 +68,7 @@ const updateCompaniesRatingsList = () => {
         })
         .then((stockRatingsArray) =>
         {
-            // console.log("Successfully update companies' ratings");
-            // console.log(stockRatingsArray);
-            // resolve(stockRatingsArray);
-            resolve("Successfully update companies' ratings");
+            resolve("Successfully update companies ratings");
         })
         .catch((err) => reject(err));
 

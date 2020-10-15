@@ -310,7 +310,8 @@ const getFullStockRatingsFromFMP = () =>
     return new Promise((resolve, reject) =>
     {
       // The number of companies that we will fetch.
-      const totalCompanies = 600 + 1; // Since MSF.BR's rating is currently unsupported, we need another company in order to have enough data.
+      // Since MSF.BR's rating is currently unsupported, we need another company in order to have enough data.
+      const totalCompanies = 600 + 1; 
 
       getStockScreenerFromFMP(totalCompanies)
       .then((stockScreener) =>
@@ -328,7 +329,6 @@ const getFullStockRatingsFromFMP = () =>
       })
       .then((stockScreenerArray) => 
       {
-        console.log(stockScreenerArray.length());
         resolve(stockScreenerArray);
       })
       .catch(err => reject(err));

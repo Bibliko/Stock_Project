@@ -150,7 +150,7 @@ setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 /*
 Update ratings of companies in Database every day.
 */
-setInterval(() => updateCompaniesRatingsList(), oneSecond * 30);
+setInterval(() => updateCompaniesRatingsList(), oneDay);
   
 
 
