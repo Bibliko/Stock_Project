@@ -319,6 +319,7 @@ module.exports = {
 
   getFullStockQuotesFromFMP,
   getFullStockProfilesFromFMP,
+  getFullStockRatingsFromFMP,
 
   getExchangeHistoricalChartFromFMP
 };
