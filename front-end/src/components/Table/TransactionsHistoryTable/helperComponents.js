@@ -17,7 +17,7 @@ import { AssignmentRounded as AssignmentRoundedIcon } from "@material-ui/icons";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.main,
+    backgroundColor: theme.palette.tableHeader.purple,
     color: "white",
   },
 }))(TableCell);
@@ -67,7 +67,7 @@ export const chooseTableCell = (
   classes,
   transactionInfo
 ) => {
-  const { isTypeBuy } = transactionInfo;
+  const { isTypeBuy, spendOrGain } = transactionInfo;
 
   return (
     <TableCell
@@ -86,8 +86,13 @@ export const chooseTableCell = (
       >
         <Typography
           className={clsx(classes.watchlistRowItem, {
-            [classes.buyIcon]: type === "Type" && isTypeBuy,
-            [classes.sellIcon]: type === "Type" && !isTypeBuy,
+            [classes.greenIcon]:
+              (type === "Type" && isTypeBuy) ||
+              (type === "Gain/Loss" && spendOrGain > 0),
+
+            [classes.redIcon]:
+              (type === "Type" && !isTypeBuy) ||
+              (type === "Gain/Loss" && spendOrGain < 0),
           })}
           noWrap
         >
@@ -104,14 +109,13 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
     companyCode,
     quantity,
     priceAtTransaction,
-    brokerage,
     spendOrGain,
     finishedTime,
   } = transactionInfo;
 
   switch (type) {
     case "Type":
-      return isTypeBuy ? "Buy_Spend" : "Sell_Gain";
+      return isTypeBuy ? "Buy" : "Sell";
 
     case "Code":
       return `${companyCode}`;
@@ -122,10 +126,7 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
     case "Price":
       return `$${numberWithCommas(priceAtTransaction.toFixed(2))}`;
 
-    case "Brokerage":
-      return `$${numberWithCommas(brokerage.toFixed(2))}`;
-
-    case "Spend/Gain":
+    case "Gain/Loss":
       return isTypeBuy
         ? `- $${numberWithCommas(Math.abs(spendOrGain).toFixed(2))}`
         : `$${numberWithCommas(spendOrGain.toFixed(2))}`;

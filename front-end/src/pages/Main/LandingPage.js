@@ -6,6 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
+import MarketWatchPaper from "../../components/Paper/LandingPage/MarketWatch";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -171,15 +172,13 @@ class LandingPage extends React.Component {
             direction="row"
             className={classes.fullHeightWidth}
           >
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
+            <Grid item xs={12} sm={12} className={classes.itemGrid}>
               <Typography
                 className={clsx(classes.gridTitle, classes.marketWatch)}
               >
-                MARKET WATCH TESTING
+                MARKET WATCH
               </Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
+              <MarketWatchPaper />
             </Grid>
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
               <Typography

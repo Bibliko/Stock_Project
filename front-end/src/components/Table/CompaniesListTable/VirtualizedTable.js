@@ -58,7 +58,7 @@ const styles = (theme) => ({
   },
   tableHeaderRow: {
     borderBottom: "1px solid #9ED2EF",
-    backgroundColor: theme.palette.tableHeader.main,
+    backgroundColor: theme.palette.tableHeader.purple,
   },
   tableRow: {
     cursor: "pointer",

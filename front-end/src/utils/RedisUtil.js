@@ -15,6 +15,8 @@ const getSharesList = "getSharesList";
 const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
+const getExchangeHistoricalChart = "getExchangeHistoricalChart";
+
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/redis/${getAccountSummaryChartWholeList}`, {
@@ -137,6 +139,31 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
   });
 };
 
+/**
+ * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
+ * @return {Promise<object[]>} historicalChart: array of historical chart timestamp storing OHLCV
+ */
+export const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/${getExchangeHistoricalChart}`, {
+      method: "get",
+      params: {
+        exchange,
+        typeChart,
+      },
+      withCredentials: true,
+    })
+      .then((historicalChartData) => {
+        const { data: historicalChart } = historicalChartData;
+        resolve(historicalChart);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export default {
   getCachedAccountSummaryChartInfo,
 
@@ -147,4 +174,6 @@ export default {
   getManyFullStocksInfo,
 
   getManyStockInfosUsingPrismaShares,
+
+  getCachedExchangeHistoricalChart,
 };

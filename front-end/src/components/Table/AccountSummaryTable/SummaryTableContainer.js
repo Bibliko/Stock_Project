@@ -31,12 +31,14 @@ const styles = (theme) => ({
       "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
   },
   tableCell: {
+    color: "white",
     border: "hidden",
-    borderRightWidth: "1px",
-    borderRightColor: "#DC3D4A",
+    borderRightWidth: "0px",
+    // borderRightColor: "white",
     borderRightStyle: "solid",
   },
   tableCellCenter: {
+    color: "white",
     border: "hidden",
     display: "flex",
     alignItems: "center",
@@ -58,17 +60,17 @@ const styles = (theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: "#EB5757",
+      backgroundColor: theme.palette.tableRow.darkBlue,
     },
     "&:nth-of-type(even)": {
-      backgroundColor: "#FE8383",
+      backgroundColor: theme.palette.tableRow.lightBlue,
     },
   },
 }))(TableRow);
 
 class SummaryTableContainer extends React.Component {
   checkIfDailyChangeUpOrDown = (type) => {
-    if (type === "Daily Change") 
+    if (type === "Daily Change")
       return this.props.userDailyChange >= 0 ? "Up" : "Down";
   };
 
