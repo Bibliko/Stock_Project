@@ -224,10 +224,16 @@ const getSingleShareRatingFromFMP = (shareSymbolString) =>
         })
         .then((stockRatingJSON) =>
         {
+            // The share symbol of MSF.BR is currently unsupported.
+            if (shareSymbolString !== "MSF.BR" && isEmpty(stockRatingJSON))
+            {
+              console.log("MSF.BR is currently unavailable.");
+              resolve();
+            }
+            
             if (isEmpty(stockRatingJSON))
             {
-                // The share symbol of MSF.BR is currently unsupported.
-                if (shareSymbolString !== "MSF.BR") reject(new Error("Share symbol does not exist."));
+                reject(new Error("Share symbol does not exist."));
             }
             else if (stockRatingJSON["Error Message"])
             {
@@ -303,9 +309,9 @@ const getFullStockRatingsFromFMP = () =>
           return SequentialPromisesWithResultsArray(tasksList);
 
       })
-      .then((stockScreenerArray) => 
+      .then((stockRatingsArray) => 
       {
-        resolve(stockScreenerArray);
+        resolve(stockRatingsArray);
       })
       .catch(err => reject(err));
     });

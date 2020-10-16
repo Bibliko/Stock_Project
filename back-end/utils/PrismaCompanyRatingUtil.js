@@ -11,7 +11,7 @@ const { getFullStockRatingsFromFMP } = require("./FinancialModelingPrepUtil.js")
 const updateCompaniesRatingsList = () => {
     return new Promise((resolve, reject) =>
     {
-	    console.log("Updating companies ratings");
+	    console.log("Updating companies' ratings");
 
         getFullStockRatingsFromFMP()
         .then((allSharesRatings) =>
@@ -49,7 +49,7 @@ const updateCompaniesRatingsList = () => {
                             return prisma.companyRating.update({
                                 where:
                                 {
-                                    symbol: shareRatingPrisma[0].symbol
+                                    symbol: shareRatingPrisma.symbol
                                 },
                                 data:
                                 {
@@ -59,16 +59,15 @@ const updateCompaniesRatingsList = () => {
                                 }
                             });
                         }
-                    })
-                    .catch(err => reject(err));
+                    });
                 });
             });
 
             return SequentialPromisesWithResultsArray(tasksList);
         })
-        .then((stockRatingsArray) =>
+        .then((finishedUpdatingAllCompanyRatings) =>
         {
-            resolve("Successfully update companies ratings");
+            resolve("Successfully update companies' ratings");
         })
         .catch((err) => reject(err));
 
