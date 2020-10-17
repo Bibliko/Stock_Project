@@ -6,8 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
-import RankingPaper from "../../components/Paper/LandingPage/RankingPaper"
-
+import RankingPaper from "../../components/Paper/LandingPage/RankingPaper";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -208,7 +207,7 @@ class LandingPage extends React.Component {
                 RANKINGS
               </Typography>
               <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}                
+                className={clsx(classes.fullHeightWidth, classes.paperColor)}
               />
               <RankingPaper />
             </Grid>
