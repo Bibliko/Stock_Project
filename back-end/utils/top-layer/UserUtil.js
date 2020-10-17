@@ -121,6 +121,10 @@ const createRankingTimestampIfNecessary = (user) => {
  * @param globalBackendVariables Is in back-end/index.js
  */
 const updateRankingList = (globalBackendVariables) => {
+  if (!globalBackendVariables.isPrismaMarketHolidaysInitialized) {
+    return;
+  }
+
   keysAsync("RANKING_LIST*")
     .then((keysList) => {
       if (!isEmpty(keysList)) {
@@ -189,15 +193,17 @@ const updateRankingList = (globalBackendVariables) => {
     });
 };
 
-//
 /**
- * @description_1 Update portfolioLastClosure and ranking for all users in server
+ * @description_1 Update for all users in server
+ * - portfolioLastClosure
+ * - accountSummaryTimestamp
+ * - rankingTimestamp
  * @description_2 Update data in database only.
  * @description_3
  * - Clean cache for account summary chart timestamps of each user
- * - On front-end, Layout.js will check updated...Flag and update front-end account summary timestamps of user
+ * - On front-end, Layout.js will check updatedAllUsersFlag and update front-end account summary timestamps of user
  * @description_3 Switch globalBackendVariables updatedAllUsers flag whenever finished.
- * @param globalBackendVariables Is in back-end/index.js
+ * @param {object} globalBackendVariables Is in back-end/index.js
  */
 const updateAllUsers = (globalBackendVariables) => {
   prisma.user
@@ -218,7 +224,7 @@ const updateAllUsers = (globalBackendVariables) => {
     })
     .then((usersArray) => {
       console.log(
-        `Updating ${usersArray.length} user(s): portfolioLastClosure and accountSummaryTimestamp`
+        `Updating ${usersArray.length} user(s): portfolioLastClosure, accountSummaryTimestamp, rankingTimestamp`
       );
 
       const updateAllUsersPromise = usersArray.map((user, index) => {
@@ -249,7 +255,7 @@ const updateAllUsers = (globalBackendVariables) => {
     .then(() => {
       globalBackendVariables.updatedAllUsersFlag = !globalBackendVariables.updatedAllUsersFlag;
       console.log(
-        "Successfully updated all users portfolioLastClosure and accountSummaryChartTimestamp\n"
+        "Successfully updated all users portfolioLastClosure, accountSummaryTimestamp, rankingTimestamp\n"
       );
     })
     .catch((err) => {

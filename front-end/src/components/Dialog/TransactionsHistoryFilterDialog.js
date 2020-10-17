@@ -145,14 +145,13 @@ class TransactionsHistoryFilterDialog extends React.Component {
     errorReports: 0,
   };
 
-  keys = ["Quantity", "Price", "Brokerage", "Spend / Gain"];
+  keys = ["Quantity", "Price", "Gain/Loss"];
 
   defaultFilters = {
     type: "none", // buy, sell, OR none
     code: "none", // none OR random string with NO String ";"
     quantity: "none_to_none", // (int/none)_to_(int/none)
     price: "none_to_none", // (int/none)_to_(int/none)
-    brokerage: "none_to_none", // (int/none)_to_(int/none)
     spendOrGain: "none_to_none", // (int/none)_to_(int/none)
     transactionTime: "none_to_none", // (DateTime/none)_to_(DateTime/none)
   };

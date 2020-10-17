@@ -62,8 +62,7 @@ class NumberFromToFilter extends React.Component {
   keys = {
     Quantity: "quantity",
     Price: "price",
-    Brokerage: "brokerage",
-    "Spend / Gain": "spendOrGain",
+    "Gain/Loss": "spendOrGain",
   };
 
   timeoutUpdateFrom;

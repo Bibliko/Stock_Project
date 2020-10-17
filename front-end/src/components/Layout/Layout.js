@@ -10,7 +10,7 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+import { oneSecond, oneMinute } from "../../utils/low-dependency/DayTimeUtil";
 
 import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
@@ -25,6 +25,7 @@ import {
   checkIsDifferentFromSocketUpdatedRankingListFlag,
   checkHasFinishedSettingUpUserCacheSession,
   checkFinishedUpdatingUserSession,
+  finishedSettingUpUserCacheSession,
 } from "../../utils/SocketUtil";
 
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
@@ -151,20 +152,26 @@ class Layout extends React.Component {
 
   clearIntervalsAndListeners = () => {
     clearInterval(this.checkStockQuotesInterval);
+
+    offSocketListeners(socket, finishedSettingUpUserCacheSession);
     offSocketListeners(socket, checkMarketClosed);
     offSocketListeners(socket, updatedAllUsersFlag);
     offSocketListeners(socket, updatedRankingListFlag);
   };
 
   afterSettingUpUserCacheSession = () => {
-    this.setState(
-      {
-        finishedSettingUp: true,
-      },
-      () => {
-        this.setupIntervals();
-      }
-    );
+    const { finishedSettingUp } = this.state;
+    if (!finishedSettingUp) {
+      this.setState(
+        {
+          finishedSettingUp: true,
+        },
+        () => {
+          this.setupSocketListeners();
+          this.setupIntervals();
+        }
+      );
+    }
   };
 
   componentDidMount() {
@@ -186,7 +193,6 @@ class Layout extends React.Component {
           },
           () => {
             socket.emit(joinUserRoom, this.props.userSession);
-            this.setupSocketListeners();
             checkHasFinishedSettingUpUserCacheSession(socket, this);
           }
         );
@@ -235,6 +241,7 @@ class Layout extends React.Component {
           </div>
         </main>
         <Snackbar
+          autoHideDuration={5 * oneMinute}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
           open={openRefreshCard}
           className={classes.refreshCard}
