@@ -206,10 +206,10 @@ class LandingPage extends React.Component {
               <Typography className={clsx(classes.gridTitle, classes.rankings)}>
                 RANKINGS
               </Typography>
+              <RankingPaper />
               <Paper
                 className={clsx(classes.fullHeightWidth, classes.paperColor)}
               />
-              <RankingPaper />
             </Grid>
             <SpaceDivMainPages />
           </Grid>

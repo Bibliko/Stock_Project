@@ -8,11 +8,14 @@ import SwipeableViews from "react-swipeable-views";
 
 const styles = (theme) => ({
   root: {
-    width: theme.customWidth.redirectingPaper,
-    height: theme.customHeight.redirectingPaper,
-    backgroundColor: theme.palette.paperBackground.main,
+    // width: theme.customWidth.redirectingPaper,
+    // height: theme.customHeight.redirectingPaper,
+    backgroundColor: theme.palette.paperBackground.onPage,
     alignItems: "center",
     justifyContent: "center",
+    height: "100%",
+    width: "100%",
+    minHeight: "200px",
   },
   appBar: {
     flexGrow: 1,
