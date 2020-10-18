@@ -18,11 +18,7 @@ import {
   joinUserRoom,
   checkMarketClosed,
   socketCheckMarketClosed,
-  updatedAllUsersFlag,
-  updatedRankingListFlag,
   offSocketListeners,
-  checkIsDifferentFromSocketUpdatedAllUsersFlag,
-  checkIsDifferentFromSocketUpdatedRankingListFlag,
   checkHasFinishedSettingUpUserCacheSession,
   checkFinishedUpdatingUserSession,
   finishedSettingUpUserCacheSession,
@@ -36,11 +32,9 @@ import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { CssBaseline, Snackbar, Button, IconButton } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 
 import { Skeleton } from "@material-ui/lab";
-
-import { Close as CloseIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
@@ -95,44 +89,15 @@ const styles = (theme) => ({
     height: "100vh",
     backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
-  refreshCard: {
-    "& .MuiSnackbarContent-root": {
-      backgroundColor: theme.palette.refreshSnackbar.main,
-    },
-    top: theme.customMargin.topLayout,
-    [theme.breakpoints.down("xs")]: {
-      top: theme.customMargin.topLayoutSmall,
-    },
-  },
-  reloadButton: {
-    color: theme.palette.refreshSnackbar.reloadButton,
-    fontWeight: "bold",
-  },
 });
 
 class Layout extends React.Component {
   state = {
     hideReminder: false,
     finishedSettingUp: false,
-
-    updatedAllUsersFlagFromLayout: false,
-    updatedRankingListFlagFromLayout: false,
-    openRefreshCard: false,
   };
 
   checkStockQuotesInterval;
-
-  handleCloseRefreshCard = (event, reason) => {
-    if (reason !== "clickaway") {
-      this.setState({
-        openRefreshCard: false,
-      });
-    }
-  };
-
-  reloadLayout = () => {
-    window.location.reload();
-  };
 
   setupIntervals = () => {
     // if (this.props.userSession.hasFinishedSettingUp) {
@@ -145,8 +110,7 @@ class Layout extends React.Component {
 
   setupSocketListeners = () => {
     socketCheckMarketClosed(socket, this);
-    checkIsDifferentFromSocketUpdatedAllUsersFlag(socket, this);
-    checkIsDifferentFromSocketUpdatedRankingListFlag(socket, this);
+
     checkFinishedUpdatingUserSession(socket, this);
   };
 
@@ -155,8 +119,6 @@ class Layout extends React.Component {
 
     offSocketListeners(socket, finishedSettingUpUserCacheSession);
     offSocketListeners(socket, checkMarketClosed);
-    offSocketListeners(socket, updatedAllUsersFlag);
-    offSocketListeners(socket, updatedRankingListFlag);
   };
 
   afterSettingUpUserCacheSession = () => {
@@ -175,8 +137,6 @@ class Layout extends React.Component {
   };
 
   componentDidMount() {
-    console.log(this.props.userSession);
-
     if (shouldRedirectToLogin(this.props)) {
       redirectToPage("/login", this.props);
       return;
@@ -214,7 +174,7 @@ class Layout extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { finishedSettingUp, openRefreshCard } = this.state;
+    const { finishedSettingUp } = this.state;
 
     if (shouldRedirectToLogin(this.props)) {
       return null;
@@ -240,33 +200,6 @@ class Layout extends React.Component {
             <div className={classes.bottomSpace} />
           </div>
         </main>
-        <Snackbar
-          autoHideDuration={5 * oneMinute}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          open={openRefreshCard}
-          className={classes.refreshCard}
-          onClose={this.handleCloseRefreshCard}
-          message="New Data / Refresh Page"
-          action={
-            <React.Fragment>
-              <Button
-                className={classes.reloadButton}
-                size="small"
-                onClick={this.reloadLayout}
-              >
-                RELOAD
-              </Button>
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={this.handleCloseRefreshCard}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </React.Fragment>
-          }
-        />
       </div>
     );
   }

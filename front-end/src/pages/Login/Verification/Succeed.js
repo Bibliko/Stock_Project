@@ -86,7 +86,6 @@ class Succeed extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.userSession);
     if (shouldRedirectToLandingPage(this.props)) {
       redirectToPage("/", this.props);
     }

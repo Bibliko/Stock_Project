@@ -128,10 +128,6 @@ class LandingPage extends React.Component {
     });
   };
 
-  componentDidMount() {
-    console.log(this.props.userSession);
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     return (
       !isEqual(nextProps.userSession, this.props.userSession) ||
