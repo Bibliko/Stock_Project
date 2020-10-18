@@ -10,7 +10,7 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneSecond, oneMinute } from "../../utils/low-dependency/DayTimeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
