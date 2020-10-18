@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router";
 
+
 import { withStyles } from "@material-ui/core/styles";
 import {
   TableRow,
@@ -60,6 +61,7 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 class MyStatsTable extends React.Component {
+
   chooseTableRowValue = (type) => {
     switch (type) {
       case "Overall ranking":
