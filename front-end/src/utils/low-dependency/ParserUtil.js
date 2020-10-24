@@ -1,4 +1,6 @@
-// redisString: "timestamp1|value1"
+/**
+ *  @return {string[]} [timestamp, value]
+ */
 export const parseRedisAccountSummaryChartItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return valuesArray;

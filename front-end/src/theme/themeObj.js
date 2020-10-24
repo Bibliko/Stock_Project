@@ -1,3 +1,18 @@
+/* 
+  palette:
+  - Basic
+  - App Bar
+  - Paper
+  - Table
+  - Menu
+  - Text
+  - Filter
+  - Snack Bar
+  - Speed Dial
+  - Search Field
+  - Switch dark / light mode
+*/
+
 const theme = {
   customWidth: {
     maxSearchFieldWithLogo: "360px",
@@ -35,45 +50,10 @@ const theme = {
     searchMenu: 1200,
   },
   palette: {
+    // Basic
     primary: {
       main: "#2196f3",
       light: "#9ED2EF"
-    },
-
-    backgroundBlue: {
-      main: "#619FD7",
-    },
-
-    appBarButtonBackground: {
-      gradient: "linear-gradient(#66CCFF 20%, #6666FF 50%)",
-    },
-
-    paperBackground: {
-      main: "#1E1E1E",
-      onPage: "rgba(46, 44, 48, 1)",
-      deepBlueTable: "rgba(26,22,75,1)",
-      gradient: "linear-gradient(180deg, #1E1E1E 30%, #180B66 100%)",
-    },
-
-    tableBackground: {
-      gradient: "linear-gradient(180deg, #1b163d 0%, #180f56 100%)",
-    },
-
-    menuBackground: {
-      main: "#303030",
-    },
-
-    appBarBlue: {
-      main: "rgba(35, 20, 150, 1)",
-    },
-
-    filterButton: {
-      main: "rgba(74, 50, 209, 1)",
-      onHover: "rgba(90, 70, 220, 1)",
-    },
-
-    subText: {
-      main: "rgba(5, 5, 5, 1)",
     },
 
     succeed: {
@@ -88,10 +68,25 @@ const theme = {
       backgroundColorHover: "rgba(220, 61, 74, 0.3)",
     },
 
-    bigTitle: {
-      purple: "rgba(110, 80, 240, 1)",
-      blue: "rgba(47, 128, 237, 1)",
-      red: "rgba(220, 61, 74, 1)",
+    disabled: {
+      whiteColor: "rgba(255, 255, 255, 0.3)",
+    },
+
+    // App Bar
+    appBarButtonBackground: {
+      gradient: "linear-gradient(#66CCFF 20%, #6666FF 50%)",
+    },
+
+    appBarBlue: {
+      main: "rgba(35, 20, 150, 1)",
+    },
+
+    // Paper
+    paperBackground: {
+      main: "#1E1E1E",
+      onPage: "rgba(46, 44, 48, 1)",
+      deepBlueTable: "rgba(26,22,75,1)",
+      gradient: "linear-gradient(180deg, #1E1E1E 30%, #180B66 100%)",
     },
 
     gradientPaper: {
@@ -99,20 +94,58 @@ const theme = {
         "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
     },
 
-    disabled: {
-      whiteColor: "rgba(255, 255, 255, 0.3)",
+    // Table
+    tableBackground: {
+      gradient: "linear-gradient(180deg, #1b163d 0%, #180f56 100%)",
     },
 
+    tableHeader: {
+      darkBlue: "rgba(35, 20, 150, 1)",
+      lightBlue: "rgba(0, 185, 209, 1)",
+      purple: "rgba(93, 64, 219, 1)",
+    },
+
+    tableRow: {
+      lightBlue: "rgba(54, 151, 254, 1)",
+      darkBlue: "rgba(19, 100, 186, 1)",
+    },
+
+    // Menu
+    menuBackground: {
+      main: "#303030",
+    },
+
+    // Text
+    subText: {
+      main: "rgba(5, 5, 5, 1)",
+    },
+    bigTitle: {
+      purple: "rgba(110, 80, 240, 1)",
+      lightBlue: "rgba(54, 151, 254, 1)",
+      lighterBlue: "rgba(116, 224, 239, 1)",
+      blue: "rgba(47, 128, 237, 1)",
+      red: "rgba(220, 61, 74, 1)",
+    },
+
+    // Filter
+    filterButton: {
+      main: "rgba(74, 50, 209, 1)",
+      onHover: "rgba(90, 70, 220, 1)",
+    },
+
+    // Snack Bar
     refreshSnackbar: {
       main: "rgba(80, 60, 210, 1)",
       reloadButton: "rgba(40, 180, 260, 1)",
     },
 
+    // Speed Dial (<=> Back Drop)
     layoutSpeedDial: {
       main: "rgba(74, 50, 209, 1)",
       onHover: "rgba(90, 70, 220, 1)",
     },
 
+    // Search Field
     searchField: {
       main: "rgba(160, 150, 250, 0.7)",
       onHover: "rgba(160, 150, 250, 1)",
@@ -125,10 +158,7 @@ const theme = {
       searchIcon: "rgba(160, 150, 250, 1)",
     },
 
-    tableHeader: {
-      main: "rgba(35, 20, 150, 1)",
-    },
-
+    // Switch dark / light mode
     type: "light",
   },
 
@@ -224,9 +254,6 @@ const theme = {
           backgroundColor: "rgba(255,255,255,0.1)",
           color: "rgba(255,255,255,0.5)",
         },
-        // "&$today": {
-        //   border: "unset",
-        // },
       },
       today: {
         border: "unset",
@@ -288,7 +315,6 @@ const theme = {
         backgroundColor: "#000066",
       },
     },
-    // Mui Pickers
 
     // Mui Popover
     MuiPopover: {
@@ -297,7 +323,6 @@ const theme = {
         color: "white",
       },
     },
-    // Mui Popover
   },
 };
 

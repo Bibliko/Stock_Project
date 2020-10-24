@@ -35,11 +35,10 @@ const pushWholeListToCachedSharesList = (email, shares) => {
 
     const tasksList = [];
 
-    shares.map((share) => {
+    shares.forEach((share) => {
       const { id, companyCode, quantity, buyPriceAvg, userID } = share;
       const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
       tasksList.push(() => listPushAsync(redisKey, newValue));
-      return "dummy value";
     });
 
     SequentialPromisesWithResultsArray(tasksList)
@@ -62,11 +61,10 @@ const pushWholeListToCachedAccountSummaryTimestamps = (email, timestamps) => {
 
     const tasksList = [];
 
-    timestamps.map((timestamp) => {
+    timestamps.forEach((timestamp) => {
       const { UTCDateString, portfolioValue } = timestamp;
       const newValue = `${UTCDateString}|${portfolioValue}`;
       tasksList.push(() => listPushAsync(redisKey, newValue));
-      return "dummy value";
     });
 
     SequentialPromisesWithResultsArray(tasksList)

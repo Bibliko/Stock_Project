@@ -1,8 +1,10 @@
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 
 export const checkMarketClosed = "checkMarketClosed";
 export const updatedAllUsersFlag = "updatedAllUsersFlag";
 export const updatedRankingListFlag = "updatedRankingListFlag";
+export const updatedExchangeHistoricalChartFlag =
+  "updatedExchangeHistoricalChartFlag";
 export const finishedSettingUpUserCacheSession =
   "finishedSettingUpUserCacheSession";
 
@@ -97,6 +99,48 @@ export const checkIsDifferentFromSocketUpdatedRankingListFlag = (
 
 /**
  * @description
+ * - Listen to socket from back-end and check against MarketWatchChart.js updatedExchangeHistoricalChartFlag5min and updatedExchangeHistoricalChartFlagFull
+ * - setState updatedExchangeHistoricalChartFlag5min and updatedExchangeHistoricalChartFlagFull
+ * @param socket Initialized in App.js
+ * @param thisComponent reference of component (this) - in this case MarketWatchChart.js
+ */
+export const checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag = (
+  socket,
+  thisComponent
+) => {
+  socket.on(updatedExchangeHistoricalChartFlag, (twoFlagsFromBackend) => {
+    const compareFlags = [
+      "updatedExchangeHistoricalChart5minFlag",
+      "updatedExchangeHistoricalChartFullFlag",
+    ];
+    const compareThisComponent = pick(thisComponent.state, compareFlags);
+
+    const { exchange } = thisComponent.props;
+
+    const {
+      updatedExchangeHistoricalChart5minFlag,
+      updatedExchangeHistoricalChartFullFlag,
+    } = twoFlagsFromBackend[exchange];
+
+    if (!isEqual(twoFlagsFromBackend[exchange], compareThisComponent)) {
+      console.log("Updating");
+      thisComponent.setState(
+        {
+          updatedExchangeHistoricalChart5minFlag,
+          updatedExchangeHistoricalChartFullFlag,
+        },
+        () => {
+          thisComponent
+            .initializeHistoricalChartUsingDataFromCache()
+            .catch((err) => console.log(err));
+        }
+      );
+    }
+  });
+};
+
+/**
+ * @description
  * - Listen to socket from back-end and check against Layout.js updatedRankingFlag
  * - use this.afterSettingUpUserCacheSession()
  * @param socket Initialized in App.js
@@ -145,6 +189,7 @@ export default {
   checkMarketClosed,
   updatedAllUsersFlag,
   updatedRankingListFlag,
+  updatedExchangeHistoricalChartFlag,
   finishedSettingUpUserCacheSession,
   finishedUpdatingUserSession,
   updateUserSessionInitialMessage,
@@ -154,8 +199,11 @@ export default {
   updateUserSession,
 
   socketCheckMarketClosed,
+
   checkIsDifferentFromSocketUpdatedAllUsersFlag,
   checkIsDifferentFromSocketUpdatedRankingListFlag,
+  checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag,
+
   checkHasFinishedSettingUpUserCacheSession,
   checkFinishedUpdatingUserSession,
 

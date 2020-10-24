@@ -4,9 +4,22 @@ import { parseRedisSharesListItem } from "./low-dependency/ParserUtil";
 
 const BACKEND_HOST = getBackendHost();
 
+// const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
+// const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
+const getAccountSummaryChartWholeList = "getAccountSummaryChartWholeList";
+// const getAccountSummaryChartLatestItem = "getAccountSummaryChartLatestItem";
+
+// const updateSharesList = "updateSharesList";
+const getSharesList = "getSharesList";
+
+const getCachedShareInfo = "getCachedShareInfo";
+const getManyCachedSharesInfo = "getManyCachedSharesInfo";
+
+const getExchangeHistoricalChart = "getExchangeHistoricalChart";
+
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getAccountSummaryChartWholeList`, {
+    axios(`${BACKEND_HOST}/redis/${getAccountSummaryChartWholeList}`, {
       method: "get",
       params: {
         email,
@@ -24,7 +37,7 @@ export const getCachedAccountSummaryChartInfo = (email) => {
 
 export const getCachedSharesList = (email) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getSharesList`, {
+    axios(`${BACKEND_HOST}/redis/${getSharesList}`, {
       method: "get",
       params: {
         email,
@@ -58,38 +71,13 @@ export const getParsedCachedSharesList = (email) => {
   });
 };
 
-/** 
- * Example response of full stock:
- * [ {
-  "symbol" : "AAPL",
-  "name" : "Apple Inc.",
-  "price" : 425.04000000,
-  "changesPercentage" : 10.47000000,
-  "change" : 40.28000000,
-  "dayLow" : 403.36000000,
-  "dayHigh" : 425.66000000,
-  "yearHigh" : 425.66000000,
-  "yearLow" : 192.58000000,
-  "marketCap" : 1842263621632.00000000,
-  "priceAvg50" : 372.20715000,
-  "priceAvg200" : 314.67236000,
-  "volume" : 93573867,
-  "avgVolume" : 35427873,
-  "exchange" : "NASDAQ",
-  "open" : 411.53500000,
-  "previousClose" : 384.76000000,
-  "eps" : 13.18500000,
-  "pe" : 32.23663300,
-  "earningsAnnouncement" : "2020-07-30T20:00:00.000+0000",
-  "sharesOutstanding" : 4334329996,
-  "timestamp" : 1596329461
-},
- ...
-]
+/**
+ * @param {string} companyCode company code. e.g: AAPl -> Must be in capital
+ * @description Get full stock quote + profile (using FMP data)
  */
 export const getFullStockInfo = (companyCode) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/getCachedShareInfo`, {
+    axios(`${BACKEND_HOST}/redis/${getCachedShareInfo}`, {
       method: "get",
       params: {
         companyCode,
@@ -106,17 +94,69 @@ export const getFullStockInfo = (companyCode) => {
   });
 };
 
-export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
-  // prismaShares means: shares with companyCode attribute
-  // prismaShares won't be empty since you need to eliminate that case before using this function
-
+/**
+ * @param {string[]} companyCodes company codes. e.g: AAPL, GOOGL, ... -> Must be in capital
+ * @description Get full stock quote + profile (using FMP data) of all company codes in parameter
+ */
+export const getManyFullStocksInfo = (companyCodes) => {
   return new Promise((resolve, reject) => {
-    const getCachedSharesInfoPromiseArray = prismaShares.map((share, index) => {
-      return getFullStockInfo(share.companyCode);
+    axios(`${BACKEND_HOST}/redis/${getManyCachedSharesInfo}`, {
+      method: "get",
+      params: {
+        companyCodes,
+      },
+      withCredentials: true,
+    })
+      .then((sharesInfo) => {
+        const { data: fullStocksInfo } = sharesInfo;
+        resolve(fullStocksInfo);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * @param {object[]} prismaShares objects of Prisma Share
+ * - prismaShares means: shares with companyCode attribute
+ * - prismaShares won't be empty since you need to eliminate that case before using this function
+ * @description Wrapper over function getManyFullStocksInfo
+ * @return {Promise<object[]>}
+ */
+export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
+  return new Promise((resolve, reject) => {
+    const companyCodes = prismaShares.map((share) => {
+      return share.companyCode;
     });
-    Promise.all(getCachedSharesInfoPromiseArray)
+    getManyFullStocksInfo(companyCodes)
       .then((cachedSharesArray) => {
         resolve(cachedSharesArray);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+/**
+ * @param {string} exchange NYSE or NASDAQ
+ * @param {string} typeChart 5min or full
+ * @return {Promise<object[]>} historicalChart: array of historical chart timestamp storing OHLCV
+ */
+export const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/${getExchangeHistoricalChart}`, {
+      method: "get",
+      params: {
+        exchange,
+        typeChart,
+      },
+      withCredentials: true,
+    })
+      .then((historicalChartData) => {
+        const { data: historicalChart } = historicalChartData;
+        resolve(historicalChart);
       })
       .catch((err) => {
         reject(err);
@@ -131,5 +171,9 @@ export default {
   getParsedCachedSharesList, // AccountSummary, UserUtil
 
   getFullStockInfo,
+  getManyFullStocksInfo,
+
   getManyStockInfosUsingPrismaShares,
+
+  getCachedExchangeHistoricalChart,
 };

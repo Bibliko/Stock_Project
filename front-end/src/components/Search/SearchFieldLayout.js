@@ -13,7 +13,7 @@ import SearchPopper from "./SearchPopper";
 import SearchField from "./SearchField";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
+import { IconButton, Tooltip } from "@material-ui/core";
 
 import { SearchRounded as SearchRoundedIcon } from "@material-ui/icons";
 
@@ -295,16 +295,18 @@ class SearchFieldLayout extends React.Component {
 
     return (
       <div className={classes.searchFieldMotherContainer}>
-        <img
-          src="/bibliko.png"
-          alt="Bibliko"
-          className={clsx(classes.logo, {
-            [classes.hideFade]: isExtendingSearchMenu,
-          })}
-          onClick={() => {
-            redirectToPage("/", this.props);
-          }}
-        />
+        <Tooltip title="Home">
+          <img
+            src="/bibliko.png"
+            alt="Bibliko"
+            className={clsx(classes.logo, {
+              [classes.hideFade]: isExtendingSearchMenu,
+            })}
+            onClick={() => {
+              redirectToPage("/", this.props);
+            }}
+          />
+        </Tooltip>
         <IconButton
           className={clsx(classes.iconButton, {
             [classes.hideFadeIcon]: isExtendingSearchMenu,

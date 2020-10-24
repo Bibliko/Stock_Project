@@ -44,31 +44,33 @@ const styles = (theme) => ({
     minWidth: "100px",
     fontSize: "12px",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.main,
+    borderColor: theme.palette.tableHeader.purple,
     borderStyle: "solid",
   },
   tableCellTransactionTime: {
     minWidth: "200px",
   },
   cellDiv: {
+    fontSize: "medium",
     display: "flex",
     alignItems: "center",
     "&.MuiTableSortLabel-root": {
+      color: "white",
       "&.MuiTableSortLabel-active": {
-        color: theme.palette.succeed.tableSorted,
+        fontStyle: "italic",
         "&.MuiTableSortLabel-root": {
           "&.MuiTableSortLabel-active": {
             "& .MuiTableSortLabel-icon": {
-              color: theme.palette.succeed.tableSortIcon,
+              color: "white",
             },
           },
         },
       },
       "&:hover": {
-        color: theme.palette.succeed.tableSortIcon,
+        fontStyle: "italic",
       },
       "&:focus": {
-        color: theme.palette.succeed.tableSortIcon,
+        fontStyle: "italic",
       },
     },
   },
@@ -188,11 +190,9 @@ const styles = (theme) => ({
     opacity: 1,
     color: "white",
     fontSize: "medium",
-    transition: "opacity 0.5s",
   },
   filterWordHidden: {
-    opacity: 0,
-    width: 0,
+    fontSize: 0,
   },
   title: {
     marginBottom: "30px",
@@ -218,7 +218,6 @@ class TransactionsHistoryTableContainer extends React.Component {
       code: "none", // none OR random string with NO String ";"
       quantity: "none_to_none", // (int/none)_to_(int/none)
       price: "none_to_none", // (int/none)_to_(int/none)
-      brokerage: "none_to_none", // (int/none)_to_(int/none)
       spendOrGain: "none_to_none", // (int/none)_to_(int/none)
       transactionTime: "none_to_none", // (DateTime/none)_to_(DateTime/none)
     },
@@ -233,8 +232,7 @@ class TransactionsHistoryTableContainer extends React.Component {
       "Code",
       "Quantity",
       "Price",
-      "Brokerage",
-      "Spend/Gain",
+      "Gain/Loss",
       "Transaction Time",
     ],
     prismaNames: [
@@ -242,7 +240,6 @@ class TransactionsHistoryTableContainer extends React.Component {
       "companyCode",
       "quantity",
       "priceAtTransaction",
-      "brokerage",
       "spendOrGain",
       "finishedTime",
     ],
@@ -296,9 +293,8 @@ class TransactionsHistoryTableContainer extends React.Component {
 
     const { transactions, transactionsLength } = redisTransactions;
 
-    transactions.map((transaction) => {
+    transactions.forEach((transaction) => {
       newTransactions.push(parseRedisTransactionsHistoryListItem(transaction));
-      return "dummy value";
     });
     this.setState(
       {

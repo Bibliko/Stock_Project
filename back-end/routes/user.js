@@ -110,7 +110,12 @@ router.put("/changeEmail", (req, res) => {
 router.get("/getData", (req, res) => {
   const { email, dataNeeded } = req.query;
 
-  var dataJSON = JSON.parse(dataNeeded);
+  var dataJSON;
+  if (dataNeeded === "default") {
+    dataJSON = "default";
+  } else {
+    dataJSON = JSON.parse(dataNeeded);
+  }
 
   getUserData(email, dataJSON)
     .then((data) => {
@@ -122,6 +127,9 @@ router.get("/getData", (req, res) => {
     });
 });
 
+/**
+ * @description Get top 8 users (overall ranking) on the given page in request.
+ */
 router.get("/getOverallRanking", (req, res) => {
   const { page } = req.query;
 
@@ -145,6 +153,9 @@ router.get("/getOverallRanking", (req, res) => {
     });
 });
 
+/**
+ * @description Get top 8 users (regional ranking) on the given page and region in request.
+ */
 router.get("/getRegionalRanking", (req, res) => {
   const { region, page } = req.query;
 

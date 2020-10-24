@@ -3,11 +3,11 @@ const prisma = new PrismaClient();
 
 /**
  * @param email User email
- * @param dataNeeded Object { cash: true, totalPortfolio: true, ... }
+ * @param dataNeeded Object { cash: true, totalPortfolio: true, ... } or key: "default"
  */
 const getUserData = (email, dataNeeded) => {
   return new Promise((resolve, reject) => {
-    var dataJSON = { ...dataNeeded };
+    var dataJSON = dataNeeded === "default" ? {} : { ...dataNeeded };
 
     if (dataJSON.shares) {
       dataJSON = {
@@ -27,7 +27,7 @@ const getUserData = (email, dataNeeded) => {
         where: {
           email
         },
-        select: dataJSON
+        select: dataNeeded !== "default" ? dataJSON : null
       })
       .then((data) => {
         resolve(data);

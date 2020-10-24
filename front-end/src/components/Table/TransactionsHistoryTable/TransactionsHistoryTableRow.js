@@ -29,10 +29,10 @@ const styles = (theme) => ({
   cellDivSpecialForType: {
     justifyContent: "flex-start",
   },
-  buyIcon: {
+  greenIcon: {
     color: "#27AE60",
   },
-  sellIcon: {
+  redIcon: {
     color: "#EB5757",
   },
 
@@ -84,13 +84,7 @@ class TransactionsHistoryTableRow extends React.Component {
           transactionInfo
         )}
         {chooseTableCell(
-          "Brokerage",
-          this.isTableRowTheLast,
-          classes,
-          transactionInfo
-        )}
-        {chooseTableCell(
-          "Spend/Gain",
+          "Gain/Loss",
           this.isTableRowTheLast,
           classes,
           transactionInfo

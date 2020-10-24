@@ -6,19 +6,13 @@ import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
 
-import {
-  SortDirection,
-} from "react-virtualized";
+import { SortDirection } from "react-virtualized";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Container,
-  Grid,
-  Typography,
-} from "@material-ui/core";
+import { Container, Grid, Typography } from "@material-ui/core";
 
 import CompanyDialog from "../../components/CompanyDetail/CompanyDialog";
-import CompaniesListTable from "../../components/Table/CompaniesListTable/CompaniesListTable"
+import CompaniesListTable from "../../components/Table/CompaniesListTable/CompaniesListTable";
 import Filter from "../../components/StockScreener/Filter";
 import ProgressButton from "../../components/Button/ProgressButton";
 
@@ -63,6 +57,12 @@ const styles = (theme) => ({
       marginTop: "20px",
     },
   },
+  caption: {
+    font: "caption",
+    fontSize: "small",
+    color: "white",
+    margin: "20px",
+  },
   reloadButton: {
     marginTop: "10px",
     marginBottom: "20px",
@@ -72,7 +72,7 @@ const styles = (theme) => ({
 function descendingComparator(a, b, orderBy) {
   let items = [a[orderBy], b[orderBy]];
 
-  if (typeof(items[0]) === "string") {
+  if (typeof items[0] === "string") {
     items = items.map((value) => value.toLowerCase());
   }
 
@@ -98,7 +98,10 @@ function stableSort(array, comparator) {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map((el) => el[0]);
+  return stabilizedThis.map((el, index) => {
+    el[0].index = index + 1;
+    return el[0];
+  });
 }
 
 class Companies extends React.Component {
@@ -107,8 +110,8 @@ class Companies extends React.Component {
     stockData: [],
     sortBy: "code",
     sortDirection: SortDirection.ASC,
-    price: [0,320000],
-    marketCap: [0,1189.207115], // [$0, $2T]
+    price: [0, 320000],
+    marketCap: [250, 1025], // [$1K, $2T]
     sector: "All",
     industry: "All",
     success: false,
@@ -118,11 +121,13 @@ class Companies extends React.Component {
   };
 
   handleSort = (sortDirection, sortBy) => {
+    if (sortBy === "index") return;
+
     let { stockData } = this.state;
     this.setState({
       stockData: stableSort(stockData, getComparator(sortDirection, sortBy)),
       sortBy: sortBy,
-      sortDirection: sortDirection
+      sortDirection: sortDirection,
     });
   };
 
@@ -139,9 +144,9 @@ class Companies extends React.Component {
     });
   };
 
-  // MarketCap scale: y=x^4
+  // MarketCap scale: y = 10 ^ (0.012 * x)
   getMarketCap = (value) => {
-    return value**4;
+    return 10 ** (0.012 * value);
   };
 
   handleFilterChange = (key, value) => {
@@ -174,16 +179,13 @@ class Companies extends React.Component {
       debounce: true,
     });
     this.updateStockScreener(this.setSuccess, this.setError);
-    setTimeout(() => {this.setState({debounce:false})}, 5000);
+    setTimeout(() => {
+      this.setState({ debounce: false });
+    }, 5000);
   };
 
-  updateStockScreener = (callback = ()=>{}, errorCallback = ()=>{}) => {
-    const {
-      price,
-      marketCap,
-      sector,
-      industry,
-    } = this.state;
+  updateStockScreener = (callback = () => {}, errorCallback = () => {}) => {
+    const { price, marketCap, sector, industry } = this.state;
 
     getStockScreener({
       priceFilter: price,
@@ -191,17 +193,20 @@ class Companies extends React.Component {
       sectorFilter: sector,
       industryFilter: industry,
     })
-    .then((stockData) => {
-      const { sortDirection, sortBy } = this.state;
+      .then((stockData) => {
+        const { sortDirection, sortBy } = this.state;
 
-      this.setState({
-        stockData: stableSort(stockData, getComparator(sortDirection, sortBy)),
+        this.setState({
+          stockData: stableSort(
+            stockData,
+            getComparator(sortDirection, sortBy)
+          ),
+        });
+        callback();
+      })
+      .catch(() => {
+        errorCallback();
       });
-      callback();
-    })
-    .catch(() => {
-      errorCallback();
-    });
   };
 
   componentDidMount() {
@@ -255,7 +260,7 @@ class Companies extends React.Component {
           </Grid>
           <Grid item xs={12} sm={8}>
             <Typography className={clsx(classes.gridTitle)} component="div">
-              Companies List
+              Companies
             </Typography>
 
             <CompaniesListTable
@@ -266,6 +271,11 @@ class Companies extends React.Component {
               handleSort={this.handleSort}
               handleOpenCompanyDetail={this.handleOpenDialog}
             />
+
+            <Typography className={classes.caption}>
+              {`Showing ${stockData.length} result` +
+                (stockData.length > 1 ? "s" : "")}
+            </Typography>
           </Grid>
         </Grid>
 

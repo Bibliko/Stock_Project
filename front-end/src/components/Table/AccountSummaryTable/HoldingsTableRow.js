@@ -24,7 +24,6 @@ import {
   AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
 } from "@material-ui/icons";
 
-
 const styles = (theme) => ({
   tableCell: {
     color: "white",
@@ -228,11 +227,10 @@ class HoldingsTableRow extends React.Component {
     const { code } = this.props.rowData;
     const { email, watchlist } = this.props.userSession;
     let newWatchlist = [];
-    watchlist.map((companyCodeString) => {
+    watchlist.forEach((companyCodeString) => {
       if (!isEqual(companyCodeString, code)) {
         newWatchlist.push(companyCodeString);
       }
-      return "dummy value";
     });
 
     const dataNeedChange = {

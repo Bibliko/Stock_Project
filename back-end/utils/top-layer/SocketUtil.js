@@ -112,6 +112,13 @@ const updateUserCacheSession = (email) => {
 
     getLastItemOfCachedAccountSummaryTimestamps(email)
       .then((timestampString) => {
+        if (!timestampString) {
+          return prisma.user.findOne({
+            where: { email },
+            select: { totalPortfolio: true }
+          });
+        }
+
         const { UTCDateString } = parseAccountSummaryTimestamp(timestampString);
         const milisecNow = new Date(timeNow).getTime();
         const milisecInCache = new Date(UTCDateString).getTime();

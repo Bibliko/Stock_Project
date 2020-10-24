@@ -27,12 +27,11 @@ import {
   Popper,
   MenuItem,
   MenuList,
+  Tooltip,
 } from "@material-ui/core";
 
 import {
-  DashboardRounded as DashboardRoundedIcon,
   AccountCircleRounded as AccountCircleRoundedIcon,
-  BookRounded as BookRoundedIcon,
   CategoryRounded as CategoryRoundedIcon,
 } from "@material-ui/icons";
 
@@ -249,17 +248,18 @@ class PersistentAppBar extends React.Component {
             <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
-            <IconButton
-              title="Game"
-              disabled={openGameMenu}
-              className={classes.secondaryMenuButton}
-              ref={this.gameAnchorRef}
-              aria-controls={openGameMenu ? "menu-list-grow" : undefined}
-              aria-haspopup="true"
-              onClick={this.toggleGameMenu}
-            >
-              <CategoryRoundedIcon className={classes.normalIcon} />
-            </IconButton>
+            <Tooltip title="Game">
+              <IconButton
+                disabled={openGameMenu}
+                className={classes.secondaryMenuButton}
+                ref={this.gameAnchorRef}
+                aria-controls={openGameMenu ? "menu-list-grow" : undefined}
+                aria-haspopup="true"
+                onClick={this.toggleGameMenu}
+              >
+                <CategoryRoundedIcon className={classes.normalIcon} />
+              </IconButton>
+            </Tooltip>
             <Popper
               open={openGameMenu}
               anchorEl={this.gameAnchorRef.current}
@@ -335,39 +335,35 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
-            <IconButton
-              title="Education"
-              className={classes.secondaryMenuButton}
-            >
-              <BookRoundedIcon className={classes.normalIcon} />
-            </IconButton>
-            <IconButton
-              title="Portfolio"
-              className={classes.secondaryMenuButton}
-              onClick={() => {
-                redirectToPage("/accountSummary", this.props);
-              }}
-            >
-              <DashboardRoundedIcon className={classes.normalIcon} />
-            </IconButton>
-            <IconButton
-              className={classes.accountButton}
-              disabled={openAccountMenu}
-              ref={this.accountAnchorRef}
-              aria-label="Account Menu"
-              aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
-              aria-haspopup="true"
-              onClick={this.toggleAccountMenu}
-            >
-              {isEmpty(userSession.avatarUrl) ? (
-                <AccountCircleRoundedIcon className={classes.avatarIcon} />
-              ) : (
-                <Avatar
-                  className={classes.avatarIcon}
-                  src={userSession.avatarUrl}
+            <Tooltip title="Education">
+              <IconButton className={classes.secondaryMenuButton}>
+                <img
+                  alt="Education"
+                  src="/educationIcon.png"
+                  className={classes.normalIcon}
                 />
-              )}
-            </IconButton>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Account">
+              <IconButton
+                className={classes.accountButton}
+                disabled={openAccountMenu}
+                ref={this.accountAnchorRef}
+                aria-label="Account Menu"
+                aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
+                aria-haspopup="true"
+                onClick={this.toggleAccountMenu}
+              >
+                {isEmpty(userSession.avatarUrl) ? (
+                  <AccountCircleRoundedIcon className={classes.avatarIcon} />
+                ) : (
+                  <Avatar
+                    className={classes.avatarIcon}
+                    src={userSession.avatarUrl}
+                  />
+                )}
+              </IconButton>
+            </Tooltip>
             <Popper
               open={openAccountMenu}
               anchorEl={this.accountAnchorRef.current}
@@ -390,6 +386,14 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
+                        <MenuItem
+                          className={classes.accountMenuItem}
+                          onClick={() => {
+                            redirectToPage("/accountSummary", this.props);
+                          }}
+                        >
+                          Account Summary
+                        </MenuItem>
                         <MenuItem
                           className={classes.accountMenuItem}
                           onClick={() => {
