@@ -13,7 +13,13 @@ import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import { TableRow, TableCell, IconButton, Typography } from "@material-ui/core";
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Tooltip,
+} from "@material-ui/core";
 
 import {
   AddBoxRounded as AddBoxRoundedIcon,
@@ -90,11 +96,23 @@ const styles = (theme) => ({
   },
 });
 
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.menuBackground.main,
+    color: "white",
+    maxWidth: 220,
+  },
+  arrow: {
+    color: theme.palette.menuBackground.main,
+  },
+}))(Tooltip);
+
 class HoldingsTableRow extends React.Component {
   state = {
     lastPrice: "Updating",
     profitOrLoss: "Updating",
     isInWatchlist: false,
+    openInfo: false,
   };
 
   checkStockPriceInterval;
@@ -164,9 +182,25 @@ class HoldingsTableRow extends React.Component {
             {this.chooseTableCellValue(type)}
           </Typography>
           {type === "Code" && (
-            <IconButton className={classes.codeInfoButton}>
-              <InfoRoundedIcon />
-            </IconButton>
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  <Typography color="inherit">Logo</Typography>
+                  <Typography color="inherit">Name</Typography>
+                </React.Fragment>
+              }
+              arrow
+              open={this.state.openInfo}
+            >
+              <IconButton
+                className={classes.codeInfoButton}
+                onClick={this.switchInfoTooltip}
+                onMouseEnter={this.openInfoTooltip}
+                onMouseLeave={this.closeInfoTooltip}
+              >
+                <InfoRoundedIcon onBlur={this.closeInfoTooltip} />
+              </IconButton>
+            </HtmlTooltip>
           )}
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
@@ -177,6 +211,24 @@ class HoldingsTableRow extends React.Component {
         </div>
       </TableCell>
     );
+  };
+
+  switchInfoTooltip = () => {
+    this.setState({
+      openInfo: !this.state.openInfo,
+    });
+  };
+
+  openInfoTooltip = () => {
+    this.setState({
+      openInfo: true,
+    });
+  };
+
+  closeInfoTooltip = () => {
+    this.setState({
+      openInfo: false,
+    });
   };
 
   addToWatchlist = () => {

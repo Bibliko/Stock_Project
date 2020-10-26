@@ -51,7 +51,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -79,7 +79,7 @@ const styles = (theme) => ({
     fontWeight: "bold",
   },
   link: {
-    color: "black",
+    color: theme.palette.loginLink.main,
     fontWeight: "bold",
     fontSize: "small",
   },
@@ -93,10 +93,6 @@ const styles = (theme) => ({
     width: "120px",
     margin: theme.spacing(1),
   },
-  rememberMe: {
-    color: "black",
-    fontSize: "small",
-  },
   alternativeLoginButton: {
     maxHeight: "fit-content",
     maxWidth: "fit-content",
@@ -108,8 +104,8 @@ const styles = (theme) => ({
   },
   orLogInWith: {
     marginTop: 0,
-    fontWeight: "500",
-    color: theme.palette.subText.main,
+    fontWeight: "normal",
+    color: theme.palette.loginLink.main,
     fontSize: "15px",
   },
   error: {
@@ -119,7 +115,9 @@ const styles = (theme) => ({
     minHeight: "20px",
   },
   errorText: {
-    fontSize: "small",
+    fontSize: "medium",
+    fontWeight: "bold",
+    color: theme.palette.fail.main,
   },
   input: {
     color: "black",
@@ -270,7 +268,6 @@ class Login extends React.Component {
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
                     <Typography
-                      color="error"
                       align="center"
                       className={classes.errorText}
                     >

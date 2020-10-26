@@ -41,7 +41,7 @@ const styles = (theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: theme.palette.appBarBlue.main,
+    background: theme.palette.appBarBlue.main,
     height: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
       height: theme.customHeight.appBarHeightSmall,
@@ -64,7 +64,7 @@ const styles = (theme) => ({
       color: "white",
     },
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      backgroundColor: theme.palette.menuItemHover.main,
     },
   },
   secondaryMenuButton: {
@@ -82,7 +82,7 @@ const styles = (theme) => ({
       color: "white",
     },
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      backgroundColor: theme.palette.menuItemHover.main,
     },
   },
   normalIcon: {
@@ -125,6 +125,7 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
+    paddingRight: "10px",
   },
   menuPaper: {
     backgroundColor: theme.palette.menuBackground.main,
@@ -133,12 +134,23 @@ const styles = (theme) => ({
   },
   endMenuItem: {
     marginBottom: "5px",
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
   },
   accountMenuItem: {
     fontSize: "medium",
     [theme.breakpoints.down("xs")]: {
       fontSize: "0.875rem",
       minHeight: "40px",
+    },
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
+  },
+  menuItemHover: {
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
     },
   },
 });
@@ -289,6 +301,7 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/transactionsHistory", this.props);
                           }}
+                          className={classes.menuItemHover}
                         >
                           Trading History
                         </MenuItem>
@@ -306,6 +319,7 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/watchlist", this.props);
                           }}
+                          className={classes.menuItemHover}
                         >
                           Watchlist
                         </MenuItem>
@@ -314,18 +328,22 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/companies", this.props);
                           }}
+                          className={classes.menuItemHover}
                         >
                           Companies
                         </MenuItem>
 
                         <MenuItem disabled>Explore</MenuItem>
-                        <MenuItem dense>Charts</MenuItem>
+                        <MenuItem dense className={classes.menuItemHover}>
+                          Charts
+                        </MenuItem>
                         <MenuItem
                           dense
                           onClick={() => {
                             redirectToPage("/ranking", this.props);
                           }}
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          className={classes.menuItemHover}
                         >
                           Ranking
                         </MenuItem>
