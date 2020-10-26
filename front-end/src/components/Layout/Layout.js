@@ -71,7 +71,7 @@ const styles = (theme) => ({
     position: "fixed",
   },
   secondLayerBackground: {
-    background: "rgba(25, 19, 89, 1)",
+    background: theme.palette.paperBackground.secondLayer,
     backgroundSize: "cover",
     height: "100vh",
     width: "100%",
