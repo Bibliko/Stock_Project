@@ -146,6 +146,9 @@ const styles = (theme) => ({
   form: {
     flexDirection: "column",
   },
+  dividerLine: {
+    backgroundColor: theme.palette.loginLink.main,
+  },
 });
 
 class Login extends React.Component {
@@ -267,10 +270,7 @@ class Login extends React.Component {
                 </form>
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
-                    <Typography
-                      align="center"
-                      className={classes.errorText}
-                    >
+                    <Typography align="center" className={classes.errorText}>
                       Error: {error}
                     </Typography>
                   </Grid>
@@ -291,7 +291,11 @@ class Login extends React.Component {
                 >
                   Create an account
                 </Button>
-                <Divider orientation="vertical" flexItem />
+                <Divider
+                  orientation="vertical"
+                  flexItem
+                  className={classes.dividerLine}
+                />
                 <Button
                   color="primary"
                   onClick={() => {
@@ -312,7 +316,7 @@ class Login extends React.Component {
               >
                 <Grid item xs className={classes.center}>
                   <Typography className={classes.orLogInWith}>
-                    or login with
+                    OR login with
                   </Typography>
                 </Grid>
                 <Grid item xs className={classes.center}>
