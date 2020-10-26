@@ -48,7 +48,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -82,6 +82,7 @@ const styles = (theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    color: theme.palette.loginLink.main,
   },
   image: {
     borderRadius: "50%",
@@ -94,19 +95,19 @@ const styles = (theme) => ({
     marginBottom: "10px",
   },
   announcementText: {
-    fontSize: "small",
+    fontSize: "medium",
+    fontWeight: "bold",
+    color: theme.palette.fail.main,
   },
   successText: {
-    fontSize: "small",
+    fontSize: "medium",
+    fontWeight: "bold",
     color: theme.palette.succeed.main,
   },
-  successTextLarge: {
-    fontSize: "large",
-    fontWeight: "bold",
-  },
   orLogInWith: {
-    fontWeight: "lighter",
-    color: theme.palette.subText.main,
+    fontWeight: "normal",
+    color: theme.palette.loginLink.main,
+    fontSize: "15px",
   },
   alternativeLoginButton: {
     maxHeight: "fit-content",
@@ -119,7 +120,8 @@ const styles = (theme) => ({
   },
   backToLoginText: {
     fontSize: "15px",
-    fontWeight: "600",
+    fontWeight: "bold",
+    color: theme.palette.loginLink.main,
   },
   buttonStyles: {
     marginTop: "4px",
@@ -425,7 +427,6 @@ class ForgotPassword extends React.Component {
               {!isEmpty(error) && (
                 <Grid item xs className={classes.center}>
                   <Typography
-                    color="error"
                     align="center"
                     className={classes.announcementText}
                   >
@@ -435,12 +436,7 @@ class ForgotPassword extends React.Component {
               )}
               {!isEmpty(success) && isEmpty(error) && (
                 <Grid item xs className={classes.center}>
-                  <Typography
-                    align="center"
-                    className={clsx(classes.successText, {
-                      [classes.successTextLarge]: this.shouldShowSuccessOnly(),
-                    })}
-                  >
+                  <Typography align="center" className={classes.successText}>
                     Success: {success}
                   </Typography>
                 </Grid>

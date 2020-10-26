@@ -48,9 +48,7 @@ const styles = (theme) => ({
 });
 
 class WatchlistPage extends React.Component {
-  componentDidMount() {
-    console.log(this.props.userSession);
-  }
+
 
   shouldComponentUpdate(nextProps, nextState) {
     const compareKeys = ["email", "watchlist"];

@@ -1,10 +1,9 @@
 import { isEqual, pick } from "lodash";
 
 export const checkMarketClosed = "checkMarketClosed";
-export const updatedAllUsersFlag = "updatedAllUsersFlag";
-export const updatedRankingListFlag = "updatedRankingListFlag";
-export const updatedExchangeHistoricalChartFlag =
-  "updatedExchangeHistoricalChartFlag";
+export const updatedUserDataFlags = "updatedUserDataFlags";
+export const updatedExchangeHistoricalChartFlags =
+  "updatedExchangeHistoricalChartFlags";
 export const finishedSettingUpUserCacheSession =
   "finishedSettingUpUserCacheSession";
 
@@ -37,61 +36,33 @@ export const socketCheckMarketClosed = (socket, thisComponent) => {
 
 /**
  * @description
- * - Listen to socket from back-end and check against Layout.js updatedAllUsersFlag
- * - setState updatedAllUsersFlagFromLayout
+ * - Listen to socket from back-end and check against AccountSummary.js updatedAllUsersFlag and updatedRankingListFlag
+ * - setState updatedAllUsersFlag and updatedRankingListFlag
  * @param socket Initialized in App.js
- * @param thisComponent reference of component (this) - in this case Layout.js
+ * @param thisComponent reference of component (this) - in this case AccountSummary.js
  */
-export const checkIsDifferentFromSocketUpdatedAllUsersFlag = (
-  socket,
-  thisComponent
-) => {
-  socket.on(updatedAllUsersFlag, (flagFromBackend) => {
+export const checkSocketUpdatedUserDataFlags = (socket, thisComponent) => {
+  socket.on(updatedUserDataFlags, (flagsFromBackend) => {
     const {
-      updatedAllUsersFlagFromLayout,
-      openRefreshCard,
+      updatedAllUsersFlag: allUsersComponent,
+      updatedRankingListFlag: rankingComponent,
     } = thisComponent.state;
+
+    const {
+      updatedAllUsersFlag: allUsersBackend,
+      updatedRankingListFlag: rankingBackend,
+    } = flagsFromBackend;
+
     const { hasFinishedSettingUp } = thisComponent.props.userSession;
 
     if (
-      !isEqual(flagFromBackend, updatedAllUsersFlagFromLayout) &&
-      !openRefreshCard &&
+      (!isEqual(allUsersComponent, allUsersBackend) ||
+        !isEqual(rankingComponent, rankingBackend)) &&
       hasFinishedSettingUp
     ) {
       thisComponent.setState({
-        updatedAllUsersFlagFromLayout: flagFromBackend,
-        openRefreshCard: true,
-      });
-    }
-  });
-};
-
-/**
- * @description
- * - Listen to socket from back-end and check against Layout.js updatedRankingFlag
- * - setState updatedRankingListFlagFromLayout
- * @param socket Initialized in App.js
- * @param thisComponent reference of component (this)  - in this case Layout.js
- */
-export const checkIsDifferentFromSocketUpdatedRankingListFlag = (
-  socket,
-  thisComponent
-) => {
-  socket.on(updatedRankingListFlag, (flagFromBackend) => {
-    const {
-      updatedRankingListFlagFromLayout,
-      openRefreshCard,
-    } = thisComponent.state;
-    const { hasFinishedSettingUp } = thisComponent.props.userSession;
-
-    if (
-      !isEqual(flagFromBackend, updatedRankingListFlagFromLayout) &&
-      !openRefreshCard &&
-      hasFinishedSettingUp
-    ) {
-      thisComponent.setState({
-        updatedRankingListFlagFromLayout: flagFromBackend,
-        openRefreshCard: true,
+        updatedAllUsersFlag: allUsersBackend,
+        updatedRankingListFlag: rankingBackend,
       });
     }
   });
@@ -104,11 +75,11 @@ export const checkIsDifferentFromSocketUpdatedRankingListFlag = (
  * @param socket Initialized in App.js
  * @param thisComponent reference of component (this) - in this case MarketWatchChart.js
  */
-export const checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag = (
+export const checkSocketUpdatedExchangeHistoricalChartFlags = (
   socket,
   thisComponent
 ) => {
-  socket.on(updatedExchangeHistoricalChartFlag, (twoFlagsFromBackend) => {
+  socket.on(updatedExchangeHistoricalChartFlags, (twoFlagsFromBackend) => {
     const compareFlags = [
       "updatedExchangeHistoricalChart5minFlag",
       "updatedExchangeHistoricalChartFullFlag",
@@ -187,9 +158,8 @@ export const offSocketListeners = (socket, option) => {
 
 export default {
   checkMarketClosed,
-  updatedAllUsersFlag,
-  updatedRankingListFlag,
-  updatedExchangeHistoricalChartFlag,
+  updatedUserDataFlags,
+  updatedExchangeHistoricalChartFlags,
   finishedSettingUpUserCacheSession,
   finishedUpdatingUserSession,
   updateUserSessionInitialMessage,
@@ -200,9 +170,8 @@ export default {
 
   socketCheckMarketClosed,
 
-  checkIsDifferentFromSocketUpdatedAllUsersFlag,
-  checkIsDifferentFromSocketUpdatedRankingListFlag,
-  checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag,
+  checkSocketUpdatedUserDataFlags,
+  checkSocketUpdatedExchangeHistoricalChartFlags,
 
   checkHasFinishedSettingUpUserCacheSession,
   checkFinishedUpdatingUserSession,

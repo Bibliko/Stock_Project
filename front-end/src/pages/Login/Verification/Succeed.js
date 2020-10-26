@@ -40,7 +40,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -55,6 +55,7 @@ const styles = (theme) => ({
   },
   title: {
     fontSize: "large",
+    fontWeight: "bold",
     color: theme.palette.succeed.main,
   },
   avatar: {
@@ -86,7 +87,6 @@ class Succeed extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.userSession);
     if (shouldRedirectToLandingPage(this.props)) {
       redirectToPage("/", this.props);
     }

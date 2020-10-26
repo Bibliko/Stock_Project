@@ -109,6 +109,9 @@ const styles = (theme) => ({
     },
     textAlign: "center",
   },
+  largeMarginBottom: {
+    marginBottom: "40px",
+  },
 });
 
 class LandingPage extends React.Component {
@@ -127,10 +130,6 @@ class LandingPage extends React.Component {
       hoverPaperAccountSetting: false,
     });
   };
-
-  componentDidMount() {
-    console.log(this.props.userSession);
-  }
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
@@ -172,7 +171,12 @@ class LandingPage extends React.Component {
             direction="row"
             className={classes.fullHeightWidth}
           >
-            <Grid item xs={12} sm={12} className={classes.itemGrid}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              className={clsx(classes.itemGrid, classes.largeMarginBottom)}
+            >
               <Typography
                 className={clsx(classes.gridTitle, classes.marketWatch)}
               >

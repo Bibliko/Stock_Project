@@ -34,7 +34,7 @@ const styles = (theme) => ({
     minWidth: "120px",
   },
   tableCell: {
-    fontSize: "12px",
+    fontSize: "medium",
     borderWidth: "1px",
     borderColor: theme.palette.tableHeader.lightBlue,
     borderStyle: "solid",
@@ -128,7 +128,6 @@ class HoldingsTableContainer extends React.Component {
               {this.chooseTableCell("Buy Price (Avg)", classes)}
               {this.chooseTableCell("Last Price", classes)}
               {this.chooseTableCell("Profit/Loss", classes)}
-              {this.chooseTableCell("Actions", classes)}
               {this.chooseTableCell("Watchlist", classes)}
             </TableRow>
           </TableHead>

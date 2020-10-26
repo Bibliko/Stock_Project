@@ -13,15 +13,20 @@ import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import { TableRow, TableCell, IconButton, Typography } from "@material-ui/core";
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Tooltip,
+} from "@material-ui/core";
 
 import {
   AddBoxRounded as AddBoxRoundedIcon,
   ArrowDropUpRounded as ArrowDropUpRoundedIcon,
   ArrowDropDownRounded as ArrowDropDownRoundedIcon,
-  AttachMoneyRounded as AttachMoneyRoundedIcon,
   DeleteForeverRounded as DeleteForeverRoundedIcon,
-  AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
+  InfoRounded as InfoRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -40,49 +45,21 @@ const styles = (theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  buyButton: {
-    color: "#27AE60",
-    "&:hover": {
-      color: "rgba(39, 174, 96, 0.8)",
-    },
-    margin: "2px",
-    borderRadius: "50%",
-    fontSize: "smaller",
-    fontWeight: "bold",
-    padding: "4px",
-  },
-  sellButton: {
-    color: "#EB5757",
-    "&:hover": {
-      color: "rgba(235, 87, 87, 0.8)",
-    },
-    margin: "2px",
-    borderRadius: "50%",
-    fontSize: "smaller",
-    fontWeight: "bold",
-    padding: "4px",
-  },
   addWatchlistButton: {
     color: "#619FD7",
     "&:hover": {
       color: "rgba(97, 159, 215, 0.8)",
     },
-    padding: "5px",
   },
   removeWatchlistButton: {
-    padding: "5px",
-  },
-  watchlistIcon: {
-    height: "22px",
-    width: "22px",
-  },
-  removeWatchlistIcon: {
-    height: "22px",
-    width: "22px",
     color: "white",
     "&:hover": {
       color: "#e23d3d",
     },
+  },
+  watchlistIcon: {
+    height: "22px",
+    width: "22px",
   },
   arrowUp: {
     color: "#219653",
@@ -114,13 +91,28 @@ const styles = (theme) => ({
   lastRow: {
     borderBottomWidth: "1px",
   },
+  codeInfoButton: {
+    color: "white",
+  },
 });
+
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.menuBackground.main,
+    color: "white",
+    maxWidth: 220,
+  },
+  arrow: {
+    color: theme.palette.menuBackground.main,
+  },
+}))(Tooltip);
 
 class HoldingsTableRow extends React.Component {
   state = {
     lastPrice: "Updating",
     profitOrLoss: "Updating",
     isInWatchlist: false,
+    openInfo: false,
   };
 
   checkStockPriceInterval;
@@ -189,6 +181,27 @@ class HoldingsTableRow extends React.Component {
           <Typography className={classes.holdingsTableItem}>
             {this.chooseTableCellValue(type)}
           </Typography>
+          {type === "Code" && (
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  <Typography color="inherit">Logo</Typography>
+                  <Typography color="inherit">Name</Typography>
+                </React.Fragment>
+              }
+              arrow
+              open={this.state.openInfo}
+            >
+              <IconButton
+                className={classes.codeInfoButton}
+                onClick={this.switchInfoTooltip}
+                onMouseEnter={this.openInfoTooltip}
+                onMouseLeave={this.closeInfoTooltip}
+              >
+                <InfoRoundedIcon onBlur={this.closeInfoTooltip} />
+              </IconButton>
+            </HtmlTooltip>
+          )}
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -198,6 +211,24 @@ class HoldingsTableRow extends React.Component {
         </div>
       </TableCell>
     );
+  };
+
+  switchInfoTooltip = () => {
+    this.setState({
+      openInfo: !this.state.openInfo,
+    });
+  };
+
+  openInfoTooltip = () => {
+    this.setState({
+      openInfo: true,
+    });
+  };
+
+  closeInfoTooltip = () => {
+    this.setState({
+      openInfo: false,
+    });
   };
 
   addToWatchlist = () => {
@@ -343,22 +374,6 @@ class HoldingsTableRow extends React.Component {
         <TableCell
           align="center"
           className={clsx(classes.tableCell, {
-            [classes.lastRow]: this.isTableRowTheLast(),
-          })}
-        >
-          <div className={classes.cellDiv}>
-            <IconButton className={classes.buyButton}>
-              <AddCircleOutlineRoundedIcon />
-            </IconButton>
-            <IconButton className={classes.sellButton}>
-              <AttachMoneyRoundedIcon />
-            </IconButton>
-          </div>
-        </TableCell>
-
-        <TableCell
-          align="center"
-          className={clsx(classes.tableCell, {
             [classes.lastRightCell]: this.isTableRowTheLast(),
             [classes.lastRow]: this.isTableRowTheLast(),
           })}
@@ -377,9 +392,7 @@ class HoldingsTableRow extends React.Component {
                 className={classes.removeWatchlistButton}
                 onClick={this.removeFromWatchlist}
               >
-                <DeleteForeverRoundedIcon
-                  className={classes.removeWatchlistIcon}
-                />
+                <DeleteForeverRoundedIcon className={classes.watchlistIcon} />
               </IconButton>
             )}
           </div>

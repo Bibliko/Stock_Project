@@ -17,9 +17,15 @@ const styles = (theme) => ({
     margin: "8px",
     fontWeight: "normal",
     color: "white",
+    backgroundColor: theme.palette.searchFieldBackground.main,
+    "&:hover": {
+      backgroundColor: theme.palette.searchFieldBackground.onHover,
+    },
+    borderRadius: "20px",
+    zIndex: theme.customZIndex.searchFieldTextField,
     "& .MuiInputBase-root": {
       height: "40px",
-      borderRadius: "20px",
+      borderRadius: theme.customMargin.appBarPadding,
     },
     "& .MuiInputLabel-outlined": {
       transform: "translate(14px, 13px) scale(1)",
@@ -31,22 +37,17 @@ const styles = (theme) => ({
       borderBottom: "2px solid #000000",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      borderWidth: "2px",
-      borderColor: theme.palette.searchField.main,
+      borderWidth: 0,
     },
     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: theme.palette.searchField.onHover,
+      borderWidth: 0,
     },
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: theme.palette.searchField.onHover,
+      borderWidth: 0,
     },
-    "& .MuiFormLabel-root": {
-      fontSize: "small",
-      color: theme.palette.searchField.main,
-      "&.Mui-focused": {
-        color: theme.palette.searchField.onHover,
-      },
-    },
+  },
+  backgroundWhenTextFieldOpen: {
+    backgroundColor: theme.palette.searchFieldBackground.onHover,
   },
   input: {
     color: "white",
@@ -59,10 +60,7 @@ const styles = (theme) => ({
     color: "rgba(255, 255, 255, 0.8)",
   },
   searchIcon: {
-    color: theme.palette.searchField.main,
-  },
-  searchIconHover: {
-    color: theme.palette.searchField.onHover,
+    color: "rgba(255, 255, 255, 0.6)",
   },
   hide: {
     display: "none",
@@ -94,9 +92,9 @@ class SearchField extends React.Component {
       forwardedRef,
       searchCompany,
       changeSearchCompany,
-      extendSearchMenu,
-      shrinkSearchMenu,
+      turnOnSearchMenu,
       clearSearchCompany,
+      focused,
     } = this.props;
 
     return (
@@ -109,12 +107,15 @@ class SearchField extends React.Component {
         autoComplete="off"
         variant="outlined"
         margin="normal"
-        className={classes.textField}
+        className={clsx(classes.textField, {
+          [classes.backgroundWhenTextFieldOpen]: focused,
+        })}
         onChange={changeSearchCompany}
-        onClick={extendSearchMenu}
-        onBlur={shrinkSearchMenu}
+        onClick={turnOnSearchMenu}
         InputProps={{
-          className: classes.input,
+          classes: {
+            input: classes.input,
+          },
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
