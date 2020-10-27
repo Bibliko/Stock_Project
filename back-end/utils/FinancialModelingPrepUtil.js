@@ -218,22 +218,14 @@ const getSingleShareRatingFromFMP = (shareSymbolString) =>
     return new Promise((resolve, reject) =>
     {
         fetch(`https://financialmodelingprep.com/api/v3/rating/${shareSymbolString}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`)
-        .then((stockRating) =>
-        {
-            return stockRating.json();
-        })
+        .then((stockRating) => stockRating.json())
         .then((stockRatingJSON) =>
         {
-            // The share symbol of MSF.BR is currently unsupported.
-            if (shareSymbolString !== "MSF.BR" && isEmpty(stockRatingJSON))
-            {
-              console.log("MSF.BR is currently unavailable.");
-              resolve();
-            }
-            
             if (isEmpty(stockRatingJSON))
             {
-                reject(new Error("Share symbol does not exist."));
+                // Some shareSymbolStrings are not well formated on the server, causing things to collapsed
+                console.log(shareSymbolString + " does not exist.");
+                resolve(null);
             }
             else if (stockRatingJSON["Error Message"])
             {
@@ -291,29 +283,32 @@ const getFullStockRatingsFromFMP = () =>
 {
     return new Promise((resolve, reject) =>
     {
-      // The number of companies that we will fetch.
-      // Since MSF.BR's rating is currently unsupported, we need another company in order to have enough data.
-      const totalCompanies = 600 + 1; 
 
+      // The number of companies that we will fetch.
+      const totalCompanies = 20;
+      
       getStockScreenerFromFMP(totalCompanies)
       .then((stockScreener) =>
       {
           // eslint-disable-next-line prefer-const
           let tasksList = [];
-          
-          stockScreener.forEach((stockInfo) =>
+          stockScreener.forEach((stockInfo, index) =>
           {
-              tasksList.push(() => getSingleShareRatingFromFMP(stockInfo.symbol));
+              if (stockInfo.symbol)
+              {
+                  tasksList.push(() => getSingleShareRatingFromFMP(stockInfo.symbol));
+              }
           });
 
-          return SequentialPromisesWithResultsArray(tasksList);
-
+          SequentialPromisesWithResultsArray(tasksList)
+          .then((stockRatingsArray) =>
+          {
+              resolve(stockRatingsArray);
+          })
+          .catch(err =>  reject(err));
+          
       })
-      .then((stockRatingsArray) => 
-      {
-        resolve(stockRatingsArray);
-      })
-      .catch(err => reject(err));
+      .catch(err =>  reject(err));
     });
 }
 

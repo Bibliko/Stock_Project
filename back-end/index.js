@@ -49,6 +49,8 @@ const {
 } = require("./utils/redis-utils/SharesInfoBank");
 */
 
+const { updateCompaniesRatingsList } = require("./utils/PrismaCompanyRatingUtil");
+
 const { startSocketIO } = require("./socketIO");
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
@@ -235,6 +237,9 @@ const setupBackendIntervals = () => {
 
   // All Users Ranking List
   setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+
+
+  setInterval(() => updateCompaniesRatingsList(), oneMinute/2 );
 };
 
 setupBackendIntervals();
