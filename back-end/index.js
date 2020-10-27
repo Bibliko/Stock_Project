@@ -239,7 +239,7 @@ const setupBackendIntervals = () => {
   setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 
 
-  setInterval(() => updateCompaniesRatingsList(), oneMinute/2 );
+  setInterval(() => updateCompaniesRatingsList(), oneDay );
 };
 
 setupBackendIntervals();
