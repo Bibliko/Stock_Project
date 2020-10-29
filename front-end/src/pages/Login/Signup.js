@@ -72,9 +72,9 @@ const styles = (theme) => ({
     padding: theme.spacing(1),
     height: "40px",
     width: "120px",
-    background: "black",
+    background: theme.palette.submitButton.main,
     "&:hover": {
-      backgroundColor: "black",
+      backgroundColor: theme.palette.submitButton.main,
       opacity: 0.8,
     },
     borderRadius: "40px",
@@ -93,6 +93,7 @@ const styles = (theme) => ({
     marginTop: 5,
     display: "flex",
     justifyContent: "center",
+    minHeight: "30px",
   },
   announcementText: {
     fontSize: "medium",

@@ -48,7 +48,7 @@ const styles = (theme) => ({
     },
   },
   dialogAppBar: {
-    backgroundColor: theme.palette.appBarBlue.main,
+    background: theme.palette.appBarBlue.main,
   },
   tab: {
     "&.MuiTab-textColorPrimary": {
