@@ -165,6 +165,13 @@ const theme = {
       searchIcon: "rgba(255, 255, 255, 0.7)",
     },
 
+    // Donut Chart
+    donutChart: {
+      cash: "#3c71d0",
+      shares: "#D4AF37",
+      text: "white",
+    },
+
     // Switch dark / light mode
     type: "light",
   },
