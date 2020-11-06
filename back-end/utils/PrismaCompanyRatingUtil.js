@@ -64,13 +64,11 @@ const updateCompaniesRatingsList = () => {
                 });
             });
 
-            SequentialPromisesWithResultsArray(tasksList)
-            .then((finishedUpdatingAllCompanyRatings) =>
-            {
-                console.log("Successfully update companies' ratings");
-                resolve("Successfully update companies' ratings");
-            })
-            .catch((err) => reject(err));
+            return SequentialPromisesWithResultsArray(tasksList);
+        })
+        .then((finishedUpdatingAllCompanyRatings) =>
+        {
+            resolve("Successfully update companies' ratings");
         })
         .catch(err => reject(err));
 

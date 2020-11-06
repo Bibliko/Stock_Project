@@ -167,6 +167,8 @@ globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
 updateRankingList(globalBackendVariables);
 
+updateCompaniesRatingsList();
+
 const setupBackendIntervals = () => {
   // Check Market Closed
   setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
@@ -267,6 +269,7 @@ app.use("/marketHolidaysData", require("./routes/marketHolidays"));
 app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
+app.use("/companyRating", require("./routes/companyRating"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = [

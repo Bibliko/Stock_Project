@@ -218,7 +218,9 @@ const getSingleShareRatingFromFMP = (shareSymbolString) =>
     return new Promise((resolve, reject) =>
     {
         fetch(`https://financialmodelingprep.com/api/v3/rating/${shareSymbolString}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`)
-        .then((stockRating) => stockRating.json())
+        .then((stockRating) => {
+          return stockRating.json();
+        })
         .then((stockRatingJSON) =>
         {
             if (isEmpty(stockRatingJSON))
@@ -247,11 +249,9 @@ const getSingleShareRatingFromFMP = (shareSymbolString) =>
  */
 const getStockScreenerFromFMP = (totalCompanies) =>
 {
-    return new Promise((resolve, reject) =>
-    {
+    return new Promise((resolve, reject) => {
         fetch(`https://financialmodelingprep.com/api/v3/stock-screener?limit=${totalCompanies}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`)
-        .then((stockRatingsArray) => 
-        {
+        .then((stockRatingsArray) => {
             return stockRatingsArray.json()
         })
         .then((stockRatingsArrayJSON) =>
@@ -273,9 +273,10 @@ const getStockScreenerFromFMP = (totalCompanies) =>
     });
 }
 
-
-
 /**
+ * 
+ * @description Using Screener of FMP and keyword "limit" to get the name of companies, in this case is 20.
+ * After that, loop over every company and use the rating api for each company.
  * @return {Promise<object[]>} array of stocks ratings (obtained from FMP)
  */
 
@@ -300,14 +301,10 @@ const getFullStockRatingsFromFMP = () =>
               }
           });
 
-          SequentialPromisesWithResultsArray(tasksList)
-          .then((stockRatingsArray) =>
-          {
-              resolve(stockRatingsArray);
-          })
-          .catch(err =>  reject(err));
+          return SequentialPromisesWithResultsArray(tasksList);
           
       })
+      .then((stockRatingsArray) => resolve(stockRatingsArray))
       .catch(err =>  reject(err));
     });
 }
