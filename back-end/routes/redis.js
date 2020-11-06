@@ -152,8 +152,12 @@ router.get(`/${getCachedShareInfo}`, (req, res) => {
       res.send(shareInfoJSON);
     })
     .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
+      if (err.message === "Share symbols do not exist in FMP.") {
+        res.status(404).send(err.message);
+      } else {
+        console.log(err);
+        res.sendStatus(500);
+      }
     });
 });
 
@@ -171,8 +175,12 @@ router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
       res.send(sharesInfoJSON);
     })
     .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
+      if (err.message.indexOf("Share symbols do not exist in FMP") > -1) {
+        res.status(404).send(err);
+      } else {
+        console.log(err);
+        res.sendStatus(500);
+      }
     });
 });
 

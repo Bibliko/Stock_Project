@@ -133,8 +133,8 @@ const theme = {
     bigTitle: {
       purple: "rgba(110, 80, 240, 1)",
       lightBlue: "rgba(54, 151, 254, 1)",
+      lightBlueHover: "rgba(47, 128, 237, 1)",
       lighterBlue: "rgba(116, 224, 239, 1)",
-      blue: "rgba(47, 128, 237, 1)",
       red: "rgba(220, 61, 74, 1)",
     },
     loginLink: {
