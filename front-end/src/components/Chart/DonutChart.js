@@ -28,11 +28,11 @@ const styles = (theme) => ({
     transform: "translateY(0.25em)",
   },
   totalPortfolio: {
-    fontSize: "30px",
+    fontSize: "26px",
     fontWeight: "bold",
     lineHeight: "1",
     textAnchor: "middle",
-    transform: "translateY(-15px)",
+    transform: "translateY(-10px)",
   },
   label: {
     fontSize: "16px",
@@ -50,6 +50,13 @@ const CASH_COLOR = themeObj.palette.donutChart.cash;
 const SHARES_COLOR = themeObj.palette.donutChart.shares;
 const TEXT_COLOR = themeObj.palette.donutChart.text;
 
+const CustomTooltip = withStyles((theme) => ({
+  tooltip: {
+    fontSize: "13px",
+    backgroundColor: theme.palette.primary.main,
+  },
+}))(Tooltip);
+
 class DonutChart extends React.Component {
   getStrokeDashArray(progress) {
     const { scale } = this.props;
@@ -65,14 +72,14 @@ class DonutChart extends React.Component {
       totalPortfolio,
     } = this.props;
 
-    const circleRadius = 15.91549430918954 * scale; // magic number to get a circle with a circumference of 100
+    const circleRadius = (100 / (2 * Math.PI)) * scale; // Make a circle with a circumference of 100 for convenience
     return (
       <svg
         viewBox="0 0 180 180"
         preserveAspectRatio="xMinYMin meet"
         className={classes.radialChart}
       >
-        <Tooltip title="Shares" aria-label="Shares" placement="top" leaveDelay={200}>
+        <CustomTooltip title={`Shares: ${100 - progress}%`} aria-label="Shares" placement="top" leaveDelay={200}>
           <circle
             className={classes.radialChartProgress}
             stroke={SHARES_COLOR}
@@ -85,8 +92,8 @@ class DonutChart extends React.Component {
             cy="90"
             r={circleRadius}
           />
-        </Tooltip>
-        <Tooltip title="Cash" aria-label="Cash" placement="top" leaveDelay={200}>
+        </CustomTooltip>
+        <CustomTooltip title={`Cash: ${progress}%`} aria-label="Cash" placement="top" leaveDelay={200}>
           <circle
             className={clsx(classes.radialChartProgress, {
               [classes.noProgress]: progress === 0
@@ -101,7 +108,7 @@ class DonutChart extends React.Component {
             cy="90"
             r={circleRadius}
           />
-        </Tooltip>
+        </CustomTooltip>
         <rect
           x={"58"}
           y={"128"}

@@ -49,7 +49,6 @@ const styles = (theme) => ({
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginTop: "10%",
   },
   tableContainer: {
     display: "flex",
@@ -165,7 +164,7 @@ class AccountSummary extends React.Component {
     return (
       <Grid container item direction="row" spacing={2} xs={12} className={classes.container}>
 
-        <Grid item xs={6} sm={12} md={6} className={classes.gridItem}>
+        <Grid item xs={12} sm={12} md={6} className={classes.gridItem}>
           <Avatar
             src={avatarUrl}
             className={classes.avatar}
@@ -180,7 +179,7 @@ class AccountSummary extends React.Component {
           </div>
         </Grid>
 
-        <Grid item xs={6} sm={12} md={6} className={classes.gridItem}
+        <Grid item xs={12} sm={12} md={6} className={classes.gridItem}
           style={{
             justifyContent: "center",
             color: dailyChange >= 0 ? "#219653" : "#ef0808",
@@ -193,9 +192,10 @@ class AccountSummary extends React.Component {
 
         <Grid item xs={12} sm={12} md={6} className={classes.chartContainer}>
           <DonutChart
-            progress={cash / totalPortfolio * 100.0}  // Percentage of cash
+            progress={Math.round(((cash / totalPortfolio * 100) + Number.EPSILON) * 100) / 100}  // Percentage of cash rounded to 2 decimal places
             scale={5}
-            totalPortfolio={totalPortfolio}
+            strokeWidth={9}
+            totalPortfolio={Math.round((totalPortfolio + Number.EPSILON) * 10) / 10}
           />
         </Grid>
 
@@ -203,7 +203,7 @@ class AccountSummary extends React.Component {
           <Typography className={classes.tableTitle}>
             {"Top Holdings"}
           </Typography>
-          {isEmpty(holdingsRows) && (
+            {isEmpty(holdingsRows) && (
               <Paper className={classes.paperAccountSummary} elevation={2}>
                 <StorefrontRoundedIcon className={classes.storeIcon} />
                 <Typography className={classes.holdingsText}>
