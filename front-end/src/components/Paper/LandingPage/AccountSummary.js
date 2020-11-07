@@ -12,12 +12,7 @@ import {
 
 import { getParsedCachedSharesList } from "../../../utils/RedisUtil";
 
-import {
-  Grid,
-  Typography,
-  Avatar,
-  Paper,
-} from "@material-ui/core";
+import { Grid, Typography, Avatar, Paper } from "@material-ui/core";
 import { StorefrontRounded as StorefrontRoundedIcon } from "@material-ui/icons";
 
 import DonutChart from "../../Chart/DonutChart";
@@ -47,13 +42,13 @@ const styles = (theme) => ({
   chartContainer: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     alignItems: "center",
   },
   tableContainer: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     alignItems: "flex-start",
   },
   name: {
@@ -106,7 +101,7 @@ class AccountSummary extends React.Component {
           share.buyPriceAvg
         )
       );
-    })
+    });
 
     if (!isEqual(this.state.holdingsRows, holdingsRows)) {
       this.setState({
@@ -120,9 +115,11 @@ class AccountSummary extends React.Component {
       .then((shares) => {
         this.setState(
           {
-            userShares: shares.sort((firstShare, secondShare) => {
-              return secondShare.quantity - firstShare.quantity;  // temporarily sorted by quantity
-            }).slice(0, 5),
+            userShares: shares
+              .sort((firstShare, secondShare) => {
+                return secondShare.quantity - firstShare.quantity; // temporarily sorted by quantity
+              })
+              .slice(0, 5),
           },
           () => {
             this.updateHoldingsTable();
@@ -162,13 +159,16 @@ class AccountSummary extends React.Component {
     const dailyChange = totalPortfolio - totalPortfolioLastClosure;
 
     return (
-      <Grid container item direction="row" spacing={2} xs={12} className={classes.container}>
-
+      <Grid
+        container
+        item
+        direction="row"
+        spacing={2}
+        xs={12}
+        className={classes.container}
+      >
         <Grid item xs={12} sm={12} md={6} className={classes.gridItem}>
-          <Avatar
-            src={avatarUrl}
-            className={classes.avatar}
-          />
+          <Avatar src={avatarUrl} className={classes.avatar} />
           <div>
             <Typography className={classes.name}>
               {firstName + " " + lastName}
@@ -179,7 +179,12 @@ class AccountSummary extends React.Component {
           </div>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={6} className={classes.gridItem}
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={6}
+          className={classes.gridItem}
           style={{
             justifyContent: "center",
             color: dailyChange >= 0 ? "#219653" : "#ef0808",
@@ -192,10 +197,10 @@ class AccountSummary extends React.Component {
 
         <Grid item xs={12} sm={12} md={6} className={classes.chartContainer}>
           <DonutChart
-            progress={Math.round(((cash / totalPortfolio * 100) + Number.EPSILON) * 100) / 100}  // Percentage of cash rounded to 2 decimal places
+            progress={parseFloat(((cash / totalPortfolio) * 100).toFixed(2))} // Percentage of cash rounded to 2 decimal places
             scale={5}
             strokeWidth={9}
-            totalPortfolio={Math.round((totalPortfolio + Number.EPSILON) * 10) / 10}
+            totalPortfolio={parseFloat(totalPortfolio.toFixed(2))}
           />
         </Grid>
 
@@ -203,19 +208,18 @@ class AccountSummary extends React.Component {
           <Typography className={classes.tableTitle}>
             {"Top Holdings"}
           </Typography>
-            {isEmpty(holdingsRows) && (
-              <Paper className={classes.paperAccountSummary} elevation={2}>
-                <StorefrontRoundedIcon className={classes.storeIcon} />
-                <Typography className={classes.holdingsText}>
-                  Start by buying some stocks!
-                </Typography>
-              </Paper>
-            )}
+          {isEmpty(holdingsRows) && (
+            <Paper className={classes.paperAccountSummary} elevation={2}>
+              <StorefrontRoundedIcon className={classes.storeIcon} />
+              <Typography className={classes.holdingsText}>
+                Start by buying some stocks!
+              </Typography>
+            </Paper>
+          )}
           {!isEmpty(holdingsRows) && (
             <HoldingsTableContainer minimal={true} rows={holdingsRows} />
           )}
         </Grid>
-
       </Grid>
     );
   }
