@@ -10,6 +10,8 @@ import {
   checkSocketUpdatedUserDataFlags,
 } from "../../../utils/SocketUtil";
 
+import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
+
 import { getParsedCachedSharesList } from "../../../utils/RedisUtil";
 
 import { Grid, Typography, Avatar, Paper } from "@material-ui/core";
@@ -197,10 +199,10 @@ class AccountSummary extends React.Component {
 
         <Grid item xs={12} sm={12} md={6} className={classes.chartContainer}>
           <DonutChart
-            progress={parseFloat(((cash / totalPortfolio) * 100).toFixed(2))} // Percentage of cash rounded to 2 decimal places
+            progress={roundNumber((cash / totalPortfolio) * 100, 2)} // Percentage of cash rounded to 2 decimal places
             scale={5}
             strokeWidth={9}
-            totalPortfolio={parseFloat(totalPortfolio.toFixed(2))}
+            totalPortfolio={roundNumber(totalPortfolio, 1)}
           />
         </Grid>
 

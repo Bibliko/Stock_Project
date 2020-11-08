@@ -28,7 +28,7 @@ const styles = (theme) => ({
     transform: "translateY(0.25em)",
   },
   totalPortfolio: {
-    fontSize: "26px",
+    fontSize: "24px",
     fontWeight: "bold",
     lineHeight: "1",
     textAnchor: "middle",
