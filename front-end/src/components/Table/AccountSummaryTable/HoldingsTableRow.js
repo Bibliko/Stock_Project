@@ -169,7 +169,7 @@ class HoldingsTableRow extends React.Component {
           [classes.arrowDown]: this.checkIfProfitOrLoss(type) === "Loss",
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
-          [classes.stickyCell]: type === "Code",
+          [classes.stickyCell]: type === "Code" && !this.props.minimal,
         })}
       >
         <div
@@ -360,43 +360,44 @@ class HoldingsTableRow extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, minimal } = this.props;
     const { isInWatchlist } = this.state;
 
     return (
       <TableRow>
         {this.chooseTableCell("Code", classes)}
-        {this.chooseTableCell("Holding", classes)}
-        {this.chooseTableCell("Buy Price (Avg)", classes)}
-        {this.chooseTableCell("Last Price", classes)}
+        {!minimal && this.chooseTableCell("Holding", classes)}
+        {!minimal && this.chooseTableCell("Buy Price (Avg)", classes)}
+        {!minimal && this.chooseTableCell("Last Price", classes)}
         {this.chooseTableCell("Profit/Loss", classes)}
-
-        <TableCell
-          align="center"
-          className={clsx(classes.tableCell, {
-            [classes.lastRightCell]: this.isTableRowTheLast(),
-            [classes.lastRow]: this.isTableRowTheLast(),
-          })}
-        >
-          <div className={classes.cellDiv}>
-            {!isInWatchlist && (
-              <IconButton
-                className={classes.addWatchlistButton}
-                onClick={this.addToWatchlist}
-              >
-                <AddBoxRoundedIcon className={classes.watchlistIcon} />
-              </IconButton>
-            )}
-            {isInWatchlist && (
-              <IconButton
-                className={classes.removeWatchlistButton}
-                onClick={this.removeFromWatchlist}
-              >
-                <DeleteForeverRoundedIcon className={classes.watchlistIcon} />
-              </IconButton>
-            )}
-          </div>
-        </TableCell>
+        {!minimal && 
+          <TableCell
+            align="center"
+            className={clsx(classes.tableCell, {
+              [classes.lastRightCell]: this.isTableRowTheLast(),
+              [classes.lastRow]: this.isTableRowTheLast(),
+            })}
+          >
+            <div className={classes.cellDiv}>
+              {!isInWatchlist && (
+                <IconButton
+                  className={classes.addWatchlistButton}
+                  onClick={this.addToWatchlist}
+                >
+                  <AddBoxRoundedIcon className={classes.watchlistIcon} />
+                </IconButton>
+              )}
+              {isInWatchlist && (
+                <IconButton
+                  className={classes.removeWatchlistButton}
+                  onClick={this.removeFromWatchlist}
+                >
+                  <DeleteForeverRoundedIcon className={classes.watchlistIcon} />
+                </IconButton>
+              )}
+            </div>
+          </TableCell>
+        }
       </TableRow>
     );
   }
