@@ -3,7 +3,10 @@ import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 import clsx from "clsx";
 
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -81,7 +84,7 @@ class SummaryTableContainer extends React.Component {
 
       case "Shares":
         return `$${numberWithCommas(
-          (this.props.totalPortfolio - this.props.cash).toFixed(2)
+          roundNumber(this.props.totalPortfolio - this.props.cash, 2)
         )}`;
 
       case "Total Portfolio Value":
