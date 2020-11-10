@@ -49,7 +49,11 @@ const {
 } = require("./utils/redis-utils/SharesInfoBank");
 */
 
-const { updateCompaniesRatingsList } = require("./utils/PrismaCompanyRatingUtil");
+/*
+const {
+  updateCompaniesRatingsList
+} = require("./utils/PrismaCompanyRatingUtil");
+*/
 
 const { startSocketIO } = require("./socketIO");
 
@@ -167,7 +171,7 @@ globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
 updateRankingList(globalBackendVariables);
 
-updateCompaniesRatingsList();
+// updateCompaniesRatingsList();
 
 const setupBackendIntervals = () => {
   // Check Market Closed
@@ -240,8 +244,7 @@ const setupBackendIntervals = () => {
   // All Users Ranking List
   setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 
-
-  setInterval(() => updateCompaniesRatingsList(), oneDay );
+  // setInterval(() => updateCompaniesRatingsList(), oneDay);
 };
 
 setupBackendIntervals();
