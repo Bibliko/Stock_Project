@@ -1,7 +1,10 @@
 import React from "react";
 import clsx from "clsx";
 
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 import { convertToLocalTimeString } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -124,12 +127,12 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
       return `${numberWithCommas(quantity)}`;
 
     case "Price":
-      return `$${numberWithCommas(priceAtTransaction.toFixed(2))}`;
+      return `$${numberWithCommas(roundNumber(priceAtTransaction, 2))}`;
 
     case "Gain/Loss":
       return isTypeBuy
-        ? `- $${numberWithCommas(Math.abs(spendOrGain).toFixed(2))}`
-        : `$${numberWithCommas(spendOrGain.toFixed(2))}`;
+        ? `- $${numberWithCommas(roundNumber(Math.abs(spendOrGain), 2))}`
+        : `$${numberWithCommas(roundNumber(spendOrGain, 2))}`;
 
     case "Transaction Time":
       return convertToLocalTimeString(finishedTime);

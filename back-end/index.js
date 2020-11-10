@@ -42,12 +42,10 @@ const {
   // resetAllExchangesHistoricalChart
 } = require("./utils/redis-utils/ExchangeHistoricalChart");
 
-/*
-const {
-  updateCachedShareQuotesUsingCache,
-  updateCachedShareProfilesUsingCache
-} = require("./utils/redis-utils/SharesInfoBank");
-*/
+// const {
+//   updateCachedShareQuotesUsingCache,
+//   updateCachedShareProfilesUsingCache
+// } = require("./utils/redis-utils/SharesInfoBank");
 
 const { startSocketIO } = require("./socketIO");
 
@@ -206,31 +204,29 @@ const setupBackendIntervals = () => {
   //   }
   // }, oneDay);
 
-  /*
-    // Update Cached Shares
+  // // Update Cached Shares
 
-    setInterval(() => {
-      if(
-        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
-        !globalBackendVariables.isMarketClosed
-      ) {
-        updateCachedShareQuotesUsingCache()
-        .catch(err => console.log(err));
-      }
-    }, 2 * oneSecond);
+  // setInterval(() => {
+  //   if(
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //     updateCachedShareQuotesUsingCache()
+  //     .catch(err => console.log(err));
+  //   }
+  // }, 2 * oneSecond);
 
-    setInterval(() => {
-      if(
-        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
-        !globalBackendVariables.isMarketClosed
-      ) {
-        updateCachedShareProfilesUsingCache()
-        .catch(err => console.log(err));
-      }
-    }, oneMinute);
-  */
+  // setInterval(() => {
+  //   if(
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //     updateCachedShareProfilesUsingCache()
+  //     .catch(err => console.log(err));
+  //   }
+  // }, oneMinute);
 
-  // Update all users portfolioLastClosure
+  // Change flag and update all users data in database
   setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
 
   // All Users Ranking List

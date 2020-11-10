@@ -264,7 +264,8 @@ const updateAllUsers = (globalBackendVariables) => {
 };
 
 /**
- * @description Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @description_1 Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @description_2 Update all users data in database
  * @param globalBackendVariables object passed in from back-end/index
  */
 const checkAndUpdateAllUsers = (globalBackendVariables) => {

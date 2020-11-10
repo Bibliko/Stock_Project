@@ -20,8 +20,8 @@ import { getCachedExchangeHistoricalChart } from "../../utils/RedisUtil";
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
 import {
   offSocketListeners,
-  checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag,
-  updatedExchangeHistoricalChartFlag,
+  checkSocketUpdatedExchangeHistoricalChartFlags,
+  updatedExchangeHistoricalChartFlags,
 } from "../../utils/SocketUtil";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
@@ -418,7 +418,7 @@ class MarketWatch extends React.Component {
             updatedExchangeHistoricalChartFullFlag,
           },
           () => {
-            checkIsDifferentFromSocketUpdatedExchangeHistoricalChartFlag(
+            checkSocketUpdatedExchangeHistoricalChartFlags(
               socket,
               this
             );
@@ -441,7 +441,7 @@ class MarketWatch extends React.Component {
   }
 
   componentWillUnmount() {
-    offSocketListeners(socket, updatedExchangeHistoricalChartFlag);
+    offSocketListeners(socket, updatedExchangeHistoricalChartFlags);
   }
 
   shouldComponentUpdate(nextProps, nextState) {

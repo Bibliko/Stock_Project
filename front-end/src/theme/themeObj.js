@@ -15,7 +15,7 @@
 
 const theme = {
   customWidth: {
-    maxSearchFieldWithLogo: "360px",
+    maxSearchFieldWithLogo: "370px",
     maxSearchFieldWidth: "240px",
 
     mainPageWidth: "90%",
@@ -33,6 +33,8 @@ const theme = {
     settingTextFieldSmall: "35px",
   },
   customMargin: {
+    appBarPadding: "20px",
+
     topLayout: "80px",
     topLayoutSmall: "70px",
 
@@ -48,6 +50,7 @@ const theme = {
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     searchFieldContainer: 1000,
     searchMenu: 1200,
+    searchFieldTextField: 1300,
   },
   palette: {
     // Basic
@@ -57,12 +60,12 @@ const theme = {
 
     succeed: {
       main: "rgba(32, 154, 85, 1)",
-      tableSorted: "rgba(90, 210, 130, 1)",
-      tableSortIcon: "rgba(90, 210, 130, 0.8)",
+      tableSorted: "rgba(255, 56, 73, 1)",
+      tableSortIcon: "rgba(255, 56, 73, 0.8)",
     },
 
     fail: {
-      main: "#DC3D4A",
+      main: "#ff3848",
       backgroundColor: "rgba(220, 61, 74, 0.2)",
       backgroundColorHover: "rgba(220, 61, 74, 0.3)",
     },
@@ -72,12 +75,8 @@ const theme = {
     },
 
     // App Bar
-    appBarButtonBackground: {
-      gradient: "linear-gradient(#66CCFF 20%, #6666FF 50%)",
-    },
-
     appBarBlue: {
-      main: "rgba(35, 20, 150, 1)",
+      main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
     },
 
     // Paper
@@ -85,12 +84,18 @@ const theme = {
       main: "#1E1E1E",
       onPage: "rgba(46, 44, 48, 1)",
       deepBlueTable: "rgba(26,22,75,1)",
-      gradient: "linear-gradient(180deg, #1E1E1E 30%, #180B66 100%)",
+      gradient: "linear-gradient(180deg, #1E1E1E 10%, #141466 80%)",
+      secondLayer: "#141466"
+    },
+
+    loginBackground: {
+      main: "#0d0d0d",
     },
 
     gradientPaper: {
-      main:
-        "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
+      // main:
+      //   "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
+      main: "linear-gradient(-45deg, #6677CC 10%, #2929CC 70%)",
     },
 
     // Table
@@ -111,19 +116,22 @@ const theme = {
 
     // Menu
     menuBackground: {
-      main: "#303030",
+      main: "#141466",
+    },
+    menuItemHover: {
+      main: "rgba(255, 255, 255, 0.2)",
     },
 
     // Text
-    subText: {
-      main: "rgba(5, 5, 5, 1)",
-    },
     bigTitle: {
       purple: "rgba(110, 80, 240, 1)",
       lightBlue: "rgba(54, 151, 254, 1)",
       lighterBlue: "rgba(116, 224, 239, 1)",
       blue: "rgba(47, 128, 237, 1)",
       red: "rgba(220, 61, 74, 1)",
+    },
+    loginLink: {
+      main: "#e0e0e0",
     },
 
     // Filter
@@ -146,15 +154,22 @@ const theme = {
 
     // Search Field
     searchField: {
-      main: "rgba(160, 150, 250, 0.7)",
-      onHover: "rgba(160, 150, 250, 1)",
+      main: "rgba(41, 41, 204, 0.7)",
+      onHover: "rgba(41, 41, 204, 1)",
     },
 
-    searchFieldButtonSmallScreen: {
-      main: "rgba(160, 150, 250, 0.3)",
-      onHover: "rgba(160, 150, 250, 0.4)",
-      rippleSpan: "rgba(160, 150, 250, 0.6)",
-      searchIcon: "rgba(160, 150, 250, 1)",
+    searchFieldBackground: {
+      main: "rgba(102, 119, 204, 0.5)",
+      onHover: "rgba(102, 119, 204, 0.7)",
+      rippleSpan: "rgba(102, 119, 204, 0.6)",
+      searchIcon: "rgba(255, 255, 255, 0.7)",
+    },
+
+    // Donut Chart
+    donutChart: {
+      cash: "#3c71d0",
+      shares: "#D4AF37",
+      text: "white",
     },
 
     // Switch dark / light mode

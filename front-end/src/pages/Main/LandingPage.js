@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import MarketWatchPaper from "../../components/Paper/LandingPage/MarketWatch";
+import AccountSummaryPaper from "../../components/Paper/LandingPage/AccountSummary";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -41,7 +42,6 @@ const styles = (theme) => ({
     height: "100%",
     width: "100%",
     minHeight: "200px",
-    padding: "24px",
   },
   paperColor: {
     backgroundColor: theme.palette.paperBackground.onPage,
@@ -109,6 +109,9 @@ const styles = (theme) => ({
     },
     textAlign: "center",
   },
+  largeMarginBottom: {
+    marginBottom: "40px",
+  },
 });
 
 class LandingPage extends React.Component {
@@ -127,10 +130,6 @@ class LandingPage extends React.Component {
       hoverPaperAccountSetting: false,
     });
   };
-
-  componentDidMount() {
-    console.log(this.props.userSession);
-  }
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
@@ -172,7 +171,12 @@ class LandingPage extends React.Component {
             direction="row"
             className={classes.fullHeightWidth}
           >
-            <Grid item xs={12} sm={12} className={classes.itemGrid}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              className={clsx(classes.itemGrid, classes.largeMarginBottom)}
+            >
               <Typography
                 className={clsx(classes.gridTitle, classes.marketWatch)}
               >
@@ -180,25 +184,8 @@ class LandingPage extends React.Component {
               </Typography>
               <MarketWatchPaper />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography
-                className={clsx(classes.gridTitle, classes.stocksOnTheMove)}
-              >
-                STOCKS ON THE MOVE
-              </Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography
-                className={clsx(classes.gridTitle, classes.accountSummary)}
-              >
-                ACCOUNT SUMMARY
-              </Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
+            <Grid container item xs={12} sm={6} className={classes.itemGrid}>
+              <AccountSummaryPaper />
             </Grid>
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
               <Typography className={clsx(classes.gridTitle, classes.rankings)}>
