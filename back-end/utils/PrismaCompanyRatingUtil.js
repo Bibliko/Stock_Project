@@ -5,10 +5,8 @@ const { SequentialPromisesWithResultsArray } = require("./low-dependency/Promise
 
 const { getFullStockRatingsFromFMP } = require("./FinancialModelingPrepUtil.js");
 
-/**
- * @description create Prisma models if they have not existed or update them.
- */
-const updateCompaniesRatingsList = () => {
+const executeUpdateCompaniesRatingsList = () =>
+{
     return new Promise((resolve, reject) =>
     {
         console.log("Updating companies' ratings");
@@ -68,10 +66,33 @@ const updateCompaniesRatingsList = () => {
         })
         .then((finishedUpdatingAllCompanyRatings) =>
         {
-            resolve("Successfully update companies' ratings");
+            console.log("Successfully update companies' ratings");
+            resolve(null);
         })
         .catch(err => reject(err));
+    });
+}
 
+/**
+ * @description create Prisma models if they have not existed or update them.
+ */
+const updateCompaniesRatingsList = () => {
+
+    return new Promise((resolve, reject) =>
+    {
+        const forceUpdate = false;
+
+        if (forceUpdate === false && process.env.NODE_ENV === "development")
+        {
+            return prisma.companyRating.count()
+            .then((countModels) =>
+            {
+                if (countModels > 0) console.log("[DEVELOPER MODE] Unnecessary ratings update has been prevented.");
+                else executeUpdateCompaniesRatingsList();
+            })
+            .catch(err => reject(err));
+        }
+        else executeUpdateCompaniesRatingsList();
     });
 };
 
