@@ -76,7 +76,8 @@ class CompanyDetail extends React.Component {
           err.response.data === "Share symbols do not exist in FMP."
         ) {
           this.setState({
-            errorMessage: `Company code ${companyCode} does not exist.`,
+            errorMessage: `Company code ${companyCode.toUpperCase()} does not exist.`,
+            finishedSettingUp: true,
           });
         } else {
           console.log(err);
@@ -103,7 +104,9 @@ class CompanyDetail extends React.Component {
 
     return (
       <Container className={classes.root} disableGutters>
-        {!finishedSettingUp && <CircularProgress />}
+        {!finishedSettingUp && (
+          <CircularProgress style={{ alignSelf: "center" }} />
+        )}
         {finishedSettingUp && (
           <Grid
             container
