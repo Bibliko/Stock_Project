@@ -9,11 +9,9 @@ const {
   getFullStockRatingsFromFMP
 } = require("./FinancialModelingPrepUtil.js");
 
-const executeUpdateCompaniesRatingsList = () =>
-{
-    return new Promise((resolve, reject) =>
-    {
-        console.log("Updating companies' ratings");
+const executeUpdateCompaniesRatingsList = () => {
+  return new Promise((resolve, reject) => {
+    console.log("Updating companies' ratings");
 
     getFullStockRatingsFromFMP()
       .then((allSharesRatings) => {
@@ -56,36 +54,37 @@ const executeUpdateCompaniesRatingsList = () =>
           });
         });
 
-            return SequentialPromisesWithResultsArray(tasksList);
-        })
-        .then((finishedUpdatingAllCompanyRatings) =>
-        {
-            console.log("Successfully update companies' ratings");
-            resolve(null);
-        })
-        .catch(err => reject(err));
-    });
-}
+        return SequentialPromisesWithResultsArray(tasksList);
+      })
+      .then((finishedUpdatingAllCompanyRatings) => {
+        console.log("Successfully update companies' ratings");
+        resolve(null);
+      })
+      .catch((err) => reject(err));
+  });
+};
 
 /**
  * @description create Prisma models if they have not existed or update them.
  */
 const updateCompaniesRatingsList = (forceUpdate = false) => {
-
-    return new Promise((resolve, reject) =>
-    {
-        if (forceUpdate === false && process.env.NODE_ENV === "development")
-        {
-            return prisma.companyRating.count()
-            .then((countModels) =>
-            {
-                if (countModels > 0) console.log("[DEVELOPER MODE] Unnecessary ratings update has been prevented.");
-                else executeUpdateCompaniesRatingsList();
-            })
-            .catch(err => reject(err));
-        }
-        else executeUpdateCompaniesRatingsList();
-    });
+  return new Promise((resolve, reject) => {
+    if (!forceUpdate && process.env.NODE_ENV === "development") {
+      prisma.companyRating
+        .count()
+        .then((countModels) => {
+          if (countModels === 0) {
+            return executeUpdateCompaniesRatingsList();
+          }
+          console.log(
+            "[DEVELOPER MODE] Unnecessary ratings update has been prevented."
+          );
+        })
+        .catch((err) => reject(err));
+    } else {
+      executeUpdateCompaniesRatingsList().catch((err) => reject(err));
+    }
+  });
 };
 
 module.exports = {

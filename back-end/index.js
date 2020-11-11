@@ -245,7 +245,7 @@ const setupBackendIntervals = () => {
   // Update the companies' ratings
   // parameter: forceUpdate <Boolean>
   // If forceUpdate is true and system is in developer mode, does not need to call API.
-  setInterval(() => updateCompaniesRatingsList(false), oneDay);
+  setInterval(() => updateCompaniesRatingsList(), oneDay);
 };
 
 setupBackendIntervals();
