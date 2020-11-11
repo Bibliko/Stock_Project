@@ -47,6 +47,10 @@ const {
 //   updateCachedShareProfilesUsingCache
 // } = require("./utils/redis-utils/SharesInfoBank");
 
+const {
+  updateCompaniesRatingsList
+} = require("./utils/PrismaCompanyRatingUtil");
+
 const { startSocketIO } = require("./socketIO");
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
@@ -163,6 +167,8 @@ globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
 
 updateRankingList(globalBackendVariables);
 
+updateCompaniesRatingsList();
+
 const setupBackendIntervals = () => {
   // Check Market Closed
   setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
@@ -231,6 +237,11 @@ const setupBackendIntervals = () => {
 
   // All Users Ranking List
   setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+
+  // Update the companies' ratings
+  // parameter: forceUpdate <Boolean>
+  // If forceUpdate is true and system is in developer mode, does not need to call API.
+  setInterval(() => updateCompaniesRatingsList(), oneDay);
 };
 
 setupBackendIntervals();
@@ -258,6 +269,7 @@ app.use("/marketHolidaysData", require("./routes/marketHolidays"));
 app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
+app.use("/companyRating", require("./routes/companyRating"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = [

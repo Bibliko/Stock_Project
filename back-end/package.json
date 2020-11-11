@@ -8,7 +8,7 @@
     "prisma-save": "npx prisma migrate save --experimental",
     "prisma-up": "npx prisma migrate up --experimental",
     "prisma-studio": "npx prisma studio",
-    "prisma-generate": "npx prisma generate && npx babel-node ./bin/PrismaFlowTypedGenerator",
+    "prisma-generate": "npx prisma generate",
     "update-db": "npm run prisma-generate && npm run prisma-save && npm run prisma-up",
     "docker-stop-containers": "npx run-script-os",
     "docker-stop-containers:windows": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./bin/DockerStopContainers/DockerStopContainers.ps1",
