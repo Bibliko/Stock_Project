@@ -242,7 +242,10 @@ const setupBackendIntervals = () => {
   // All Users Ranking List
   setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
 
-  setInterval(() => updateCompaniesRatingsList(), oneDay);
+  // Update the companies' ratings
+  // parameter: forceUpdate <Boolean>
+  // If forceUpdate is true and system is in developer mode, does not need to call API.
+  setInterval(() => updateCompaniesRatingsList(false), oneDay);
 };
 
 setupBackendIntervals();

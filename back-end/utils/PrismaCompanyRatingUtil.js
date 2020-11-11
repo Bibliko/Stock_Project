@@ -70,12 +70,10 @@ const executeUpdateCompaniesRatingsList = () =>
 /**
  * @description create Prisma models if they have not existed or update them.
  */
-const updateCompaniesRatingsList = () => {
+const updateCompaniesRatingsList = (forceUpdate = false) => {
 
     return new Promise((resolve, reject) =>
     {
-        const forceUpdate = false;
-
         if (forceUpdate === false && process.env.NODE_ENV === "development")
         {
             return prisma.companyRating.count()
