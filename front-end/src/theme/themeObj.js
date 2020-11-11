@@ -43,6 +43,8 @@ const theme = {
     smallTopFloatingToolButton: "100px",
 
     dialogItemsTransactionsHistoryFilters: "20px",
+
+    companyDetailPageSectionMarginBottom: "50px",
   },
   customZIndex: {
     reminder: 10,

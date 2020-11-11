@@ -132,8 +132,14 @@ export const marketCountdownUpdate = (thisComponent) => {
 };
 
 export const isLeapYear = (year) => {
-  return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 };
+
+/**
+ * @description Simplify miliseconds to minutes or hours or days or A long time ago
+ * @param {Number} miliseconds
+ */
+export const simplifyMiliseconds = (miliseconds) => {};
 
 export default {
   oneSecond,
@@ -150,4 +156,5 @@ export default {
   newDate,
   marketCountdownUpdate,
   isLeapYear,
+  simplifyMiliseconds,
 };

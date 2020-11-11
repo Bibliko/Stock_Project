@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
@@ -8,14 +7,16 @@ import { connect } from "react-redux";
 import { getFullStockInfo } from "../../utils/RedisUtil";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
+import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
+import CompanyAbout from "../../components/CompanyDetail/CompanyAbout";
+import CompanyNewsContainer from "../../components/CompanyDetail/CompanyNews/CompanyNewsContainer";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
   Container,
   Typography,
   Grid,
-  Divider,
-  Button,
+  CircularProgress,
 } from "@material-ui/core";
 
 const styles = (theme) => ({
@@ -33,49 +34,10 @@ const styles = (theme) => ({
     flexDirection: "column",
     maxWidth: "none",
   },
-  title: {
-    fontSize: "xx-large",
-    fontWeight: "bold",
-    color: "white",
-  },
   title2: {
     fontSize: "x-large",
     fontWeight: "bold",
     color: "white",
-  },
-  title3: {
-    fontSize: "small",
-    fontWeight: "bold",
-    color: "white",
-  },
-  fontSmallDetail: {
-    fontSize: "small",
-    color: "white",
-  },
-  bodyText: {
-    color: "white",
-    marginBottom: "20px",
-  },
-  divider: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    marginTop: "5px",
-    marginBottom: "10px",
-  },
-  spaceBottom: {
-    marginBottom: "30px",
-  },
-  descriptionButton: {
-    padding: 0,
-    paddingLeft: "5px",
-    fontSize: "smaller",
-    color: theme.palette.bigTitle.lightBlue,
-    "&:hover": {
-      color: theme.palette.bigTitle.lightBlueHover,
-    },
-  },
-  companyDetailGrid: {
-    alignSelf: "center",
-    width: "100%",
   },
   fullWidth: {
     width: "100%",
@@ -90,8 +52,7 @@ class CompanyDetail extends React.Component {
 
     errorMessage: "",
 
-    showFullDescription: false,
-    companyDetail: "",
+    finishedSettingUp: false,
   };
 
   componentDidMount() {
@@ -102,7 +63,7 @@ class CompanyDetail extends React.Component {
           {
             companyCode: companyCode.toUpperCase(),
             companyData,
-            companyDetail: companyData.description.substring(0, 350),
+            finishedSettingUp: true,
           },
           () => {
             console.log(this.state.companyData);
@@ -123,20 +84,6 @@ class CompanyDetail extends React.Component {
       });
   }
 
-  extendDescription = () => {
-    this.setState({
-      showFullDescription: true,
-      companyDetail: this.state.companyData.description,
-    });
-  };
-
-  shrinkDescription = () => {
-    this.setState({
-      showFullDescription: false,
-      companyDetail: this.state.companyData.description.substring(0, 350),
-    });
-  };
-
   shouldComponentUpdate(nextProps, nextState) {
     return (
       !isEqual(nextProps.userSession, this.props.userSession) ||
@@ -150,78 +97,39 @@ class CompanyDetail extends React.Component {
       companyCode,
       companyData,
       errorMessage,
-      showFullDescription,
-      companyDetail,
+
+      finishedSettingUp,
     } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
-        <Grid
-          container
-          spacing={2}
-          direction="column"
-          className={classes.fullWidth}
-        >
-          {errorMessage !== "" && (
-            <Typography className={classes.title2}>{errorMessage}</Typography>
-          )}
-          {errorMessage === "" && (
-            <React.Fragment>
-              <Typography className={classes.title}>
-                {`${companyData.companyName} (${companyCode.toUpperCase()})`}
-              </Typography>
-              <Typography className={classes.title2}>
-                {`$${companyData.price}`}
-              </Typography>
+        {!finishedSettingUp && <CircularProgress />}
+        {finishedSettingUp && (
+          <Grid
+            container
+            spacing={2}
+            direction="column"
+            className={classes.fullWidth}
+          >
+            {errorMessage !== "" && (
+              <Typography className={classes.title2}>{errorMessage}</Typography>
+            )}
+            {errorMessage === "" && (
+              <React.Fragment>
+                <NamePriceGraph
+                  companyName={companyData.companyName}
+                  companyCode={companyCode}
+                  recentPrice={companyData.price}
+                />
 
-              <Typography className={clsx(classes.title2, classes.spaceBottom)}>
-                #Graph#
-              </Typography>
+                <CompanyAbout companyData={companyData} />
 
-              <Grid
-                container
-                spacing={2}
-                direction="column"
-                className={classes.companyDetailGrid}
-                item
-                xs={12}
-              >
-                <Typography className={classes.title2}>About</Typography>
-                <Divider className={classes.divider} />
-                <Typography className={classes.bodyText}>
-                  {companyDetail}
-                  {showFullDescription && (
-                    <Button
-                      className={classes.descriptionButton}
-                      disableRipple
-                      onClick={this.shrinkDescription}
-                    >
-                      See Less
-                    </Button>
-                  )}
-                  {!showFullDescription && (
-                    <Button
-                      className={classes.descriptionButton}
-                      disableRipple
-                      onClick={this.extendDescription}
-                    >
-                      See More
-                    </Button>
-                  )}
-                </Typography>
-                <Grid item xs={12} container direction="row" spacing={2}>
-                  <Grid item xs={4}>
-                    <Typography className={classes.title3}>CEO</Typography>
-                    <Typography className={classes.fontSmallDetail}>
-                      {companyData.ceo}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </React.Fragment>
-          )}
-          <SpaceDivMainPages />
-        </Grid>
+                <CompanyNewsContainer companyData={companyData} />
+              </React.Fragment>
+            )}
+            <SpaceDivMainPages />
+          </Grid>
+        )}
       </Container>
     );
   }
