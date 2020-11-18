@@ -10,14 +10,10 @@ import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
 import CompanyAbout from "../../components/CompanyDetail/CompanyAbout";
 import CompanyNewsContainer from "../../components/CompanyDetail/CompanyNews/CompanyNewsContainer";
+import SegmentedBar from "../../components/ProgressBar/SegmentedBar";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Container,
-  Typography,
-  Grid,
-  CircularProgress,
-} from "@material-ui/core";
+import { Container, Typography, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -42,6 +38,10 @@ const styles = (theme) => ({
   fullWidth: {
     width: "100%",
     margin: 0,
+  },
+  segmentedBar: {
+    position: "absolute",
+    left: "calc((100% - 100px) / 2)",
   },
 });
 
@@ -106,7 +106,7 @@ class CompanyDetail extends React.Component {
     return (
       <Container className={classes.root} disableGutters>
         {!finishedSettingUp && (
-          <CircularProgress style={{ alignSelf: "center" }} />
+          <SegmentedBar className={classes.segmentedBar} />
         )}
         {finishedSettingUp && (
           <Grid
