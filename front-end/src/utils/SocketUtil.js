@@ -1,9 +1,7 @@
-import { isEqual, pick } from "lodash";
+import { isEqual } from "lodash";
 
 export const checkMarketClosed = "checkMarketClosed";
 export const updatedUserDataFlags = "updatedUserDataFlags";
-export const updatedExchangeHistoricalChartFlags =
-  "updatedExchangeHistoricalChartFlags";
 export const finishedSettingUpUserCacheSession =
   "finishedSettingUpUserCacheSession";
 
@@ -70,48 +68,6 @@ export const checkSocketUpdatedUserDataFlags = (socket, thisComponent) => {
 
 /**
  * @description
- * - Listen to socket from back-end and check against MarketWatchChart.js updatedExchangeHistoricalChartFlag5min and updatedExchangeHistoricalChartFlagFull
- * - setState updatedExchangeHistoricalChartFlag5min and updatedExchangeHistoricalChartFlagFull
- * @param socket Initialized in App.js
- * @param thisComponent reference of component (this) - in this case MarketWatchChart.js
- */
-export const checkSocketUpdatedExchangeHistoricalChartFlags = (
-  socket,
-  thisComponent
-) => {
-  socket.on(updatedExchangeHistoricalChartFlags, (twoFlagsFromBackend) => {
-    const compareFlags = [
-      "updatedExchangeHistoricalChart5minFlag",
-      "updatedExchangeHistoricalChartFullFlag",
-    ];
-    const compareThisComponent = pick(thisComponent.state, compareFlags);
-
-    const { exchange } = thisComponent.props;
-
-    const {
-      updatedExchangeHistoricalChart5minFlag,
-      updatedExchangeHistoricalChartFullFlag,
-    } = twoFlagsFromBackend[exchange];
-
-    if (!isEqual(twoFlagsFromBackend[exchange], compareThisComponent)) {
-      console.log("Updating");
-      thisComponent.setState(
-        {
-          updatedExchangeHistoricalChart5minFlag,
-          updatedExchangeHistoricalChartFullFlag,
-        },
-        () => {
-          thisComponent
-            .initializeHistoricalChartUsingDataFromCache()
-            .catch((err) => console.log(err));
-        }
-      );
-    }
-  });
-};
-
-/**
- * @description
  * - Listen to socket from back-end and check against Layout.js updatedRankingFlag
  * - use this.afterSettingUpUserCacheSession()
  * @param socket Initialized in App.js
@@ -159,7 +115,6 @@ export const offSocketListeners = (socket, option) => {
 export default {
   checkMarketClosed,
   updatedUserDataFlags,
-  updatedExchangeHistoricalChartFlags,
   finishedSettingUpUserCacheSession,
   finishedUpdatingUserSession,
   updateUserSessionInitialMessage,
@@ -171,7 +126,6 @@ export default {
   socketCheckMarketClosed,
 
   checkSocketUpdatedUserDataFlags,
-  checkSocketUpdatedExchangeHistoricalChartFlags,
 
   checkHasFinishedSettingUpUserCacheSession,
   checkFinishedUpdatingUserSession,

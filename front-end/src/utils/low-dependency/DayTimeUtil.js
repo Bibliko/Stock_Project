@@ -137,9 +137,24 @@ export const isLeapYear = (year) => {
 
 /**
  * @description Simplify miliseconds to minutes or hours or days or A long time ago
+ * @returns {String} time string: 5m, 1d, ...
  * @param {Number} miliseconds
  */
-export const simplifyMiliseconds = (miliseconds) => {};
+export const simplifyMiliseconds = (miliseconds) => {
+  if (miliseconds < 60 * oneMinute) {
+    return `${Math.round(miliseconds / oneMinute)}m`;
+  }
+
+  if (miliseconds < 24 * oneHour) {
+    return `${Math.round(miliseconds / oneHour)}h`;
+  }
+
+  if (miliseconds < 30 * oneDay) {
+    return `${Math.round(miliseconds / oneDay)}d`;
+  }
+
+  return "A long time ago";
+};
 
 export default {
   oneSecond,

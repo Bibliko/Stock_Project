@@ -121,6 +121,28 @@ export const getStockScreener = ({
   });
 };
 
+/**
+ *
+ * @param {String} companyCode company code needed
+ * @param {Number} limit how many news do you need?
+ */
+export const getStockNews = (companyCode, limit) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/stock_news?tickers=${companyCode}&limit=${limit}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((news) => {
+        return news.json();
+      })
+      .then((newsJSON) => {
+        resolve(newsJSON);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const shortenCompanyNameToFourWords = (companyName) => {
   let resultName = "";
   let numberOfSpaces = 0;
@@ -141,5 +163,7 @@ export default {
   searchNASDAQTickers,
   searchCompanyTickers,
   getStockScreener,
+  getStockNews,
+
   shortenCompanyNameToFourWords,
 };

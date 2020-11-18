@@ -35,7 +35,7 @@ const styles = (theme) => ({
   divider: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     marginTop: "5px",
-    marginBottom: "10px",
+    marginBottom: "20px",
   },
   bodyText: {
     color: "white",
@@ -45,6 +45,7 @@ const styles = (theme) => ({
     padding: 0,
     paddingLeft: "5px",
     fontSize: "smaller",
+    fontWeight: "bold",
     color: theme.palette.bigTitle.lightBlue,
     "&:hover": {
       color: theme.palette.bigTitle.lightBlueHover,
@@ -56,7 +57,7 @@ const styles = (theme) => ({
     color: "white",
   },
   websiteLink: {
-    fontSize: "small",
+    fontSize: "14px",
     color: "white",
     marginTop: "5px",
     marginBottom: "10px",
@@ -73,7 +74,11 @@ const styles = (theme) => ({
     justifyContent: "center",
   },
   showDetailButton: {
+    fontWeight: "bold",
     color: theme.palette.primary.main,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.hover,
+    },
   },
 });
 
@@ -171,7 +176,14 @@ class CompanyAbout extends React.Component {
             </Button>
           )}
         </Typography>
-        <Grid item xs={12} container direction="row" spacing={2}>
+        <Grid
+          item
+          xs={12}
+          container
+          direction="row"
+          spacing={2}
+          style={{ alignSelf: "center" }}
+        >
           {this.gridElement(
             "IPO Date",
             new Date(companyData.ipoDate).toDateString(),

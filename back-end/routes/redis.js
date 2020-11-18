@@ -12,8 +12,8 @@ const {
   sharesList
 } = require("../utils/redis-utils/RedisUtil");
 const {
-  getCachedExchangeHistoricalChart
-} = require("../utils/redis-utils/ExchangeHistoricalChart");
+  getCachedHistoricalChart
+} = require("../utils/redis-utils/HistoricalChart");
 
 const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
 const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
@@ -26,7 +26,7 @@ const getSharesList = "getSharesList";
 const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
-const getExchangeHistoricalChart = "getExchangeHistoricalChart";
+const getHistoricalChart = "getHistoricalChart";
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
@@ -184,10 +184,10 @@ router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
     });
 });
 
-router.get(`/${getExchangeHistoricalChart}`, (req, res) => {
-  const { exchange, typeChart } = req.query;
+router.get(`/${getHistoricalChart}`, (req, res) => {
+  const { exchangeOrCompany, typeChart, getFromCacheDirectly } = req.query;
 
-  getCachedExchangeHistoricalChart(exchange, typeChart)
+  getCachedHistoricalChart(exchangeOrCompany, typeChart, getFromCacheDirectly)
     .then((historicalChartData) => {
       res.send(historicalChartData);
     })

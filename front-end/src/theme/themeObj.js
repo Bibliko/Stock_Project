@@ -11,6 +11,7 @@
   - Snack Bar
   - Speed Dial
   - Search Field
+  - Company Detailed Page
   - Switch dark / light mode
 */
 
@@ -58,7 +59,8 @@ const theme = {
   palette: {
     // Basic
     primary: {
-      main: "#2196f3",
+      main: "rgba(33, 150, 243, 1)",
+      hover: "rgba(33, 150, 243, 0.2)",
     },
 
     succeed: {
@@ -142,6 +144,10 @@ const theme = {
     loginLink: {
       main: "#e0e0e0",
     },
+    normalBlackFont: {
+      primary: "white",
+      secondary: "rgb(169, 179, 187)",
+    },
 
     // Filter
     filterButton: {
@@ -172,6 +178,11 @@ const theme = {
       onHover: "rgba(102, 119, 204, 0.7)",
       rippleSpan: "rgba(102, 119, 204, 0.6)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
+    },
+
+    // Company Detailed Page
+    newsCardHover: {
+      main: "rgba(255, 255, 255, 0.2)",
     },
 
     // Switch dark / light mode

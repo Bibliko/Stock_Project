@@ -1,8 +1,9 @@
 import React from "react";
-import clsx from "clsx";
 import PropTypes from "prop-types";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
+
+import ExchangeOrCompanyPriceChart from "../Chart/ExchangeOrCompanyPriceChart";
 
 import { withStyles } from "@material-ui/core/styles";
 import { Typography, Grid } from "@material-ui/core";
@@ -46,15 +47,28 @@ class NamePriceGraph extends React.Component {
     const { classes, companyName, companyCode, recentPrice } = this.props;
 
     return (
-      <Grid className={classes.companyGrid}>
-        <Typography className={classes.title}>
-          {`${companyName} (${companyCode.toUpperCase()})`}
-        </Typography>
-        <Typography className={classes.title2}>{`$${recentPrice}`}</Typography>
-
-        <Typography className={clsx(classes.title2, classes.spaceBottom)}>
-          #Graph#
-        </Typography>
+      <Grid
+        item
+        xs={12}
+        container
+        direction="row"
+        className={classes.companyGrid}
+      >
+        <Grid item xs={12}>
+          <Typography className={classes.title}>
+            {`${companyName} (${companyCode.toUpperCase()})`}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography className={classes.title2}>
+            {`$${recentPrice.toFixed(2)}`}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <ExchangeOrCompanyPriceChart
+            exchangeOrCompany={companyCode.toUpperCase()}
+          />
+        </Grid>
       </Grid>
     );
   }

@@ -15,7 +15,7 @@ const getSharesList = "getSharesList";
 const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
-const getExchangeHistoricalChart = "getExchangeHistoricalChart";
+const getHistoricalChart = "getHistoricalChart";
 
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
@@ -140,17 +140,23 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
 };
 
 /**
- * @param {string} exchange NYSE or NASDAQ
+ * @param {string} exchangeOrCompany NYSE or NASDAQ or company code
  * @param {string} typeChart 5min or full
+ * @param {boolean} getFromCacheDirectly default: TRUE if NODE_ENV is in development & FALSE if in production
  * @return {Promise<object[]>} historicalChart: array of historical chart timestamp storing OHLCV
  */
-export const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
+export const getCachedHistoricalChart = (
+  exchangeOrCompany,
+  typeChart,
+  getFromCacheDirectly = process.env.NODE_ENV === "development" ? true : false
+) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/${getExchangeHistoricalChart}`, {
+    axios(`${BACKEND_HOST}/redis/${getHistoricalChart}`, {
       method: "get",
       params: {
-        exchange,
+        exchangeOrCompany,
         typeChart,
+        getFromCacheDirectly,
       },
       withCredentials: true,
     })
@@ -175,5 +181,5 @@ export default {
 
   getManyStockInfosUsingPrismaShares,
 
-  getCachedExchangeHistoricalChart,
+  getCachedHistoricalChart,
 };

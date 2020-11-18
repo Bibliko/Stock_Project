@@ -72,6 +72,7 @@ class CompanyDetail extends React.Component {
       })
       .catch((err) => {
         if (
+          err.response &&
           err.response.data &&
           err.response.data === "Share symbols do not exist in FMP."
         ) {
@@ -111,7 +112,7 @@ class CompanyDetail extends React.Component {
           <Grid
             container
             spacing={2}
-            direction="column"
+            direction="row"
             className={classes.fullWidth}
           >
             {errorMessage !== "" && (
