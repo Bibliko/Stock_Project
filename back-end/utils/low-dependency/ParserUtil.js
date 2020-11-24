@@ -345,9 +345,7 @@ const parseAccountSummaryTimestamp = (redisString) => {
 /**
  * @param {object} historicalChartItem historical chart item obtained from FMP (OHLCV)
  */
-const createRedisValueFromExchangeHistoricalChart5min = (
-  historicalChartItem
-) => {
+const createRedisValueFromHistoricalChart5min = (historicalChartItem) => {
   const { date, open, low, high, close, volume } = historicalChartItem;
   return `${date}|${open}|${low}|${high}|${close}|${volume}`;
 };
@@ -356,7 +354,7 @@ const createRedisValueFromExchangeHistoricalChart5min = (
  * @note date stored in cache is in New York time.
  * @param {string} redisString `date|open|low|high|close|volume`
  */
-const parseCachedExchangeHistoricalChart5minItem = (redisString) => {
+const parseCachedHistoricalChart5minItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return {
     date: valuesArray[0],
@@ -371,9 +369,7 @@ const parseCachedExchangeHistoricalChart5minItem = (redisString) => {
 /**
  * @param {object} historicalChartItem historical chart full item obtained from FMP
  */
-const createRedisValueFromExchangeHistoricalChartFull = (
-  historicalChartItem
-) => {
+const createRedisValueFromHistoricalChartFull = (historicalChartItem) => {
   const {
     date,
     open,
@@ -392,7 +388,7 @@ const createRedisValueFromExchangeHistoricalChartFull = (
   return `${date}|${open}|${low}|${high}|${close}|${adjClose}|${volume}|${unadjustedVolume}|${change}|${changePercent}|${vwap}|${label}|${changeOverTime}`;
 };
 
-const parseCachedExchangeHistoricalChartFullItem = (redisString) => {
+const parseCachedHistoricalChartFullItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return {
     date: valuesArray[0],
@@ -432,9 +428,9 @@ module.exports = {
 
   parseAccountSummaryTimestamp,
 
-  createRedisValueFromExchangeHistoricalChart5min,
-  parseCachedExchangeHistoricalChart5minItem,
+  createRedisValueFromHistoricalChart5min,
+  parseCachedHistoricalChart5minItem,
 
-  createRedisValueFromExchangeHistoricalChartFull,
-  parseCachedExchangeHistoricalChartFullItem
+  createRedisValueFromHistoricalChartFull,
+  parseCachedHistoricalChartFullItem
 };

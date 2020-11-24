@@ -8,8 +8,6 @@ const BACKEND_HOST = getBackendHost();
  * @returns global flags in back-end
  * - updatedAllUsersFlag
  * - updatedRankingListFlag
- * - NYSE,
- * - NASDAQ
  */
 export const getGlobalBackendVariablesFlags = () => {
   return new Promise((resolve, reject) => {

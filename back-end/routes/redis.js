@@ -12,8 +12,8 @@ const {
   sharesList
 } = require("../utils/redis-utils/RedisUtil");
 const {
-  getCachedExchangeHistoricalChart
-} = require("../utils/redis-utils/ExchangeHistoricalChart");
+  getCachedHistoricalChart
+} = require("../utils/redis-utils/HistoricalChart");
 
 const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
 const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
@@ -26,7 +26,7 @@ const getSharesList = "getSharesList";
 const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
-const getExchangeHistoricalChart = "getExchangeHistoricalChart";
+const getHistoricalChart = "getHistoricalChart";
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
@@ -152,8 +152,12 @@ router.get(`/${getCachedShareInfo}`, (req, res) => {
       res.send(shareInfoJSON);
     })
     .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
+      if (err.message === "Share symbols do not exist in FMP.") {
+        res.status(404).send(err.message);
+      } else {
+        console.log(err);
+        res.sendStatus(500);
+      }
     });
 });
 
@@ -171,15 +175,19 @@ router.get(`/${getManyCachedSharesInfo}`, (req, res) => {
       res.send(sharesInfoJSON);
     })
     .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
+      if (err.message.indexOf("Share symbols do not exist in FMP") > -1) {
+        res.status(404).send(err);
+      } else {
+        console.log(err);
+        res.sendStatus(500);
+      }
     });
 });
 
-router.get(`/${getExchangeHistoricalChart}`, (req, res) => {
-  const { exchange, typeChart } = req.query;
+router.get(`/${getHistoricalChart}`, (req, res) => {
+  const { exchangeOrCompany, typeChart, getFromCacheDirectly } = req.query;
 
-  getCachedExchangeHistoricalChart(exchange, typeChart)
+  getCachedHistoricalChart(exchangeOrCompany, typeChart, getFromCacheDirectly)
     .then((historicalChartData) => {
       res.send(historicalChartData);
     })

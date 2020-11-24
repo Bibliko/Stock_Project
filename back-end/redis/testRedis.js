@@ -1,4 +1,5 @@
 const redisClient = require("./redis-client");
+// const { promisify } = require("util");
 
 // app.get('/store/:key', async (req, res) => {
 //     const { key } = req.params;
@@ -78,21 +79,47 @@ const redisClient = require("./redis-client");
 //     });
 // };
 
-const testList2 = () => {
-  const redisKey = `test`;
+// const testList2 = () => {
+//   const redisKey = `test`;
+
+//   redisClient
+//     .listRangeAsync(redisKey, 0, -1)
+//     .then((testValue) => {
+//       console.log(testValue);
+//       return redisClient.listPushAsync(redisKey, "hello");
+//     })
+//     .then((finishedUpdating) => {
+//       console.log(finishedUpdating);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+const testRedisTransaction = () => {
+  const multi = redisClient.multi();
 
   redisClient
-    .listRangeAsync(redisKey, 0, -1)
-    .then((testValue) => {
-      console.log(testValue);
-      return redisClient.listPushAsync(redisKey, "hello");
+    .watchAsync("test")
+    .then((watched) => {
+      console.log(watched);
+      return redisClient.getAsync("test");
     })
-    .then((finishedUpdating) => {
-      console.log(finishedUpdating);
+    .then((value) => {
+      console.log(value);
+      return value;
+    })
+    .then((value) => {
+      multi.setAsync("test", "hello");
+      return multi.execAsync();
+    })
+    .then((results) => {
+      console.log(results);
+      console.log("Ending Process...");
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-testList2();
+testRedisTransaction();

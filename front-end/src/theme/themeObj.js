@@ -3,6 +3,7 @@
   - Basic
   - App Bar
   - Paper
+  - Login
   - Table
   - Menu
   - Text
@@ -10,6 +11,7 @@
   - Snack Bar
   - Speed Dial
   - Search Field
+  - Company Detailed Page
   - Switch dark / light mode
 */
 
@@ -42,6 +44,8 @@ const theme = {
     smallTopFloatingToolButton: "100px",
 
     dialogItemsTransactionsHistoryFilters: "20px",
+
+    companyDetailPageSectionMarginBottom: "10px",
   },
   customZIndex: {
     reminder: 10,
@@ -55,7 +59,12 @@ const theme = {
   palette: {
     // Basic
     primary: {
-      main: "#2196f3",
+      main: "rgba(33, 150, 243, 1)",
+      hover: "rgba(33, 150, 243, 0.2)",
+    },
+
+    secondary: {
+      main: "rgba(235, 107, 52, 1)",
     },
 
     succeed: {
@@ -65,9 +74,9 @@ const theme = {
     },
 
     fail: {
-      main: "#ff3848",
-      backgroundColor: "rgba(220, 61, 74, 0.2)",
-      backgroundColorHover: "rgba(220, 61, 74, 0.3)",
+      main: "#ff0000",
+      backgroundColor: "rgba(255, 0, 0, 0.1)",
+      backgroundColorHover: "rgba(255, 0, 0, 0.2)",
     },
 
     disabled: {
@@ -85,9 +94,10 @@ const theme = {
       onPage: "rgba(46, 44, 48, 1)",
       deepBlueTable: "rgba(26,22,75,1)",
       gradient: "linear-gradient(180deg, #1E1E1E 10%, #141466 80%)",
-      secondLayer: "#141466"
+      secondLayer: "#141466",
     },
 
+    // Login
     loginBackground: {
       main: "#0d0d0d",
     },
@@ -95,7 +105,12 @@ const theme = {
     gradientPaper: {
       // main:
       //   "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
-      main: "linear-gradient(-45deg, #6677CC 10%, #2929CC 70%)",
+      // main: "linear-gradient(-45deg, #6677CC 10%, #2929CC 70%)",
+      main: "rgba(90, 105, 201, 1)",
+    },
+
+    submitButton: {
+      main: "#222f80",
     },
 
     // Table
@@ -126,12 +141,16 @@ const theme = {
     bigTitle: {
       purple: "rgba(110, 80, 240, 1)",
       lightBlue: "rgba(54, 151, 254, 1)",
+      lightBlueHover: "rgba(47, 128, 237, 1)",
       lighterBlue: "rgba(116, 224, 239, 1)",
-      blue: "rgba(47, 128, 237, 1)",
       red: "rgba(220, 61, 74, 1)",
     },
     loginLink: {
       main: "#e0e0e0",
+    },
+    normalFontColor: {
+      primary: "white",
+      secondary: "rgb(169, 179, 187)",
     },
 
     // Filter
@@ -163,6 +182,11 @@ const theme = {
       onHover: "rgba(102, 119, 204, 0.7)",
       rippleSpan: "rgba(102, 119, 204, 0.6)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
+    },
+
+    // Company Detailed Page
+    newsCardHover: {
+      main: "rgba(255, 255, 255, 0.2)",
     },
 
     // Donut Chart

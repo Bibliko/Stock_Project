@@ -9,7 +9,7 @@ import { userAction } from "../../../redux/storeActions/actions";
 
 import {
   numberWithCommas,
-  shortenNumber,
+  simplifyNumber,
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
 import { getFullStockInfo } from "../../../utils/RedisUtil";
@@ -168,7 +168,7 @@ class WatchlistTableRow extends React.Component {
         return `$${numberWithCommas(roundNumber(this.state.price, 2))}`;
 
       case "Volume":
-        return `${shortenNumber(roundNumber(this.state.volume, 2))}`;
+        return `${simplifyNumber(this.state.volume, 2)}`;
 
       case "Change %":
         if (this.state.changesPercentage < 0) {
@@ -181,7 +181,7 @@ class WatchlistTableRow extends React.Component {
         )}%`;
 
       case "Market Cap":
-        return `${shortenNumber(this.state.marketCap)}`;
+        return `${simplifyNumber(this.state.marketCap)}`;
 
       default:
         return;
