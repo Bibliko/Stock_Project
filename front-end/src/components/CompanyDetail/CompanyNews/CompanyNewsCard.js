@@ -28,7 +28,7 @@ const styles = (theme) => ({
   },
   timeFont: {
     fontSize: "medium",
-    color: theme.palette.normalBlackFont.secondary,
+    color: theme.palette.normalFontColor.secondary,
   },
   title: {
     fontSize: "large",

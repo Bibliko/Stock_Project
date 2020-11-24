@@ -18,6 +18,7 @@ const styles = (theme) => ({
   rectangle: {
     width: "10px",
     height: "10px",
+    transition: "background-color 0.1s linear",
   },
 });
 

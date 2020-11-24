@@ -32,8 +32,8 @@
   "dependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.10.5",
-    "@prisma/cli": "^2.10.2",
-    "@prisma/client": "^2.10.2",
+    "@prisma/cli": "^2.11.0",
+    "@prisma/client": "^2.11.0",
     "@sendgrid/mail": "^7.2.1",
     "algoliasearch": "^4.3.0",
     "bluebird": "^3.7.2",

@@ -52,6 +52,10 @@ const updateMarketHolidaysFromFMP = (globalBackendVariables) => {
       })
       .then((marketHoursJSON) => {
         if (marketHoursJSON && marketHoursJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil updateMarketHolidaysFromFMP"
+          );
           reject(marketHoursJSON["Error Message"]);
           return;
         }
@@ -110,6 +114,10 @@ const getFullStockQuotesFromFMP = (shareSymbolsString) => {
         if (isEmpty(stockQuotesJSON)) {
           reject(new Error(`Share symbols do not exist in FMP.`));
         } else if (stockQuotesJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil getFullStockQuotesFromFMP"
+          );
           reject(stockQuotesJSON["Error Message"]);
         } else {
           resolve(stockQuotesJSON);
@@ -137,6 +145,10 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
         if (isEmpty(stockProfilesJSON)) {
           reject(new Error(`Share symbols do not exist in FMP.`));
         } else if (stockProfilesJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil getFullStockProfilesFromFMP"
+          );
           reject(stockProfilesJSON["Error Message"]);
         } else {
           resolve(stockProfilesJSON);
@@ -187,6 +199,10 @@ const getHistoricalChartFromFMP = (exchangeOrCompany, typeChart) => {
             )
           );
         } else if (historicalChartJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil getHistoricalChartFromFMP"
+          );
           reject(historicalChartJSON["Error Message"]);
         } else {
           const result =

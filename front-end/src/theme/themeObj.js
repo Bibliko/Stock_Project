@@ -45,7 +45,7 @@ const theme = {
 
     dialogItemsTransactionsHistoryFilters: "20px",
 
-    companyDetailPageSectionMarginBottom: "50px",
+    companyDetailPageSectionMarginBottom: "10px",
   },
   customZIndex: {
     reminder: 10,
@@ -61,6 +61,10 @@ const theme = {
     primary: {
       main: "rgba(33, 150, 243, 1)",
       hover: "rgba(33, 150, 243, 0.2)",
+    },
+
+    secondary: {
+      main: "rgba(235, 107, 52, 1)",
     },
 
     succeed: {
@@ -144,7 +148,7 @@ const theme = {
     loginLink: {
       main: "#e0e0e0",
     },
-    normalBlackFont: {
+    normalFontColor: {
       primary: "white",
       secondary: "rgb(169, 179, 187)",
     },

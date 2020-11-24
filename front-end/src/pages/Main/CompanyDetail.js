@@ -1,19 +1,24 @@
 import React from "react";
+import clsx from "clsx";
 import { isEqual } from "lodash";
 import { withRouter } from "react-router";
+import { socket } from "../../App";
 
 import { connect } from "react-redux";
+import { userAction } from "../../redux/storeActions/actions";
 
 import { getFullStockInfo } from "../../utils/RedisUtil";
+import { changeUserData } from "../../utils/UserUtil";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
 import CompanyAbout from "../../components/CompanyDetail/CompanyAbout";
 import CompanyNewsContainer from "../../components/CompanyDetail/CompanyNews/CompanyNewsContainer";
+import CompanyActions from "../../components/CompanyDetail/CompanyActions";
 import SegmentedBar from "../../components/ProgressBar/SegmentedBar";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Container, Typography, Grid } from "@material-ui/core";
+import { Container, Typography, Grid, Button } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -36,12 +41,32 @@ const styles = (theme) => ({
     color: "white",
   },
   fullWidth: {
+    display: "flex",
+    justifyContent: "center",
     width: "100%",
     margin: 0,
   },
   segmentedBar: {
     position: "absolute",
     left: "calc((100% - 100px) / 2)",
+  },
+  actionsContainer: {
+    height: "fit-content",
+    position: "sticky",
+    top: `calc(${theme.customHeight.appBarHeight} + ${theme.customMargin.topLayout})`,
+  },
+  tranactionsCard: {
+    width: "100%",
+  },
+  watchlistButton: {
+    color: theme.palette.primary.main,
+    border: `1px solid ${theme.palette.primary.main}`,
+    fontWeight: "bold",
+    textTransform: "none",
+  },
+  watchlistButtonRemove: {
+    color: theme.palette.secondary.main,
+    border: `1px solid ${theme.palette.secondary.main}`,
   },
 });
 
@@ -53,6 +78,47 @@ class CompanyDetail extends React.Component {
     errorMessage: "",
 
     finishedSettingUp: false,
+  };
+
+  addToWatchlist = () => {
+    const { companyCode } = this.state;
+    const { email, watchlist } = this.props.userSession;
+    let newWatchlist = watchlist;
+
+    newWatchlist.push(companyCode);
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket).catch(
+      (err) => {
+        console.log(err);
+      }
+    );
+  };
+
+  removeFromWatchlist = () => {
+    const { companyCode } = this.state;
+    const { email, watchlist } = this.props.userSession;
+    let newWatchlist = [];
+
+    watchlist.forEach((companyCodeString) => {
+      if (!isEqual(companyCodeString, companyCode)) {
+        newWatchlist.push(companyCodeString);
+      }
+    });
+
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket).catch(
+      (err) => {
+        console.log(err);
+      }
+    );
   };
 
   componentDidMount() {
@@ -94,7 +160,7 @@ class CompanyDetail extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, userSession } = this.props;
     const {
       companyCode,
       companyData,
@@ -120,15 +186,62 @@ class CompanyDetail extends React.Component {
             )}
             {errorMessage === "" && (
               <React.Fragment>
-                <NamePriceGraph
-                  companyName={companyData.companyName}
-                  companyCode={companyCode}
-                  recentPrice={companyData.price}
-                />
+                <Grid
+                  item
+                  xs={12}
+                  md={9}
+                  container
+                  spacing={2}
+                  direction="row"
+                  className={classes.fullWidth}
+                >
+                  <NamePriceGraph
+                    companyName={companyData.companyName}
+                    companyCode={companyCode}
+                    recentPrice={companyData.price}
+                  />
 
-                <CompanyAbout companyData={companyData} />
+                  <CompanyAbout companyData={companyData} />
 
-                <CompanyNewsContainer companyData={companyData} />
+                  <CompanyNewsContainer companyData={companyData} />
+                </Grid>
+
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  container
+                  spacing={4}
+                  direction="row"
+                  className={clsx(classes.actionsContainer, classes.fullWidth)}
+                >
+                  <Grid item xs={12}>
+                    <CompanyActions
+                      companyCode={companyCode}
+                      className={classes.transactionsCard}
+                    />
+                  </Grid>
+                  <Grid item xs={12} className={classes.fullWidth}>
+                    <Button
+                      variant="outlined"
+                      className={clsx(classes.watchlistButton, {
+                        [classes.watchlistButtonRemove]: userSession.watchlist.includes(
+                          companyCode
+                        ),
+                      })}
+                      onClick={
+                        userSession.watchlist.includes(companyCode)
+                          ? this.removeFromWatchlist
+                          : this.addToWatchlist
+                      }
+                    >
+                      {userSession.watchlist.includes(companyCode) &&
+                        "Remove from watchlist"}
+                      {!userSession.watchlist.includes(companyCode) &&
+                        "Add to watchlist"}
+                    </Button>
+                  </Grid>
+                </Grid>
               </React.Fragment>
             )}
             <SpaceDivMainPages />
@@ -143,6 +256,11 @@ const mapStateToProps = (state) => ({
   userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(CompanyDetail))
-);
+const mapDispatchToProps = (dispatch) => ({
+  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(withRouter(CompanyDetail)));
