@@ -21,6 +21,12 @@ export const simplifyNumber = (number) => {
   return +number.toFixed(2);
 };
 
+export const roundNumber = (number, decimalPlaces = 0) => {
+  if (typeof number !== "number") return number;
+  decimalPlaces = 10 ** decimalPlaces;
+  return Math.round((number + Number.EPSILON) * decimalPlaces) / decimalPlaces;
+}
+
 /**
  * @param {string} string Test if string contains only numbers
  */
@@ -31,5 +37,6 @@ export const isNum = (string) => {
 export default {
   numberWithCommas,
   simplifyNumber,
+  roundNumber,
   isNum,
 };

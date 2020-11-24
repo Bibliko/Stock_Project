@@ -189,6 +189,13 @@ const theme = {
       main: "rgba(255, 255, 255, 0.2)",
     },
 
+    // Donut Chart
+    donutChart: {
+      cash: "#3c71d0",
+      shares: "#D4AF37",
+      text: "white",
+    },
+
     // Switch dark / light mode
     type: "light",
   },

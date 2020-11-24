@@ -52,7 +52,6 @@ const styles = (theme) => ({
 
 const CustomTooltip = withStyles((theme) => ({
   tooltip: {
-    boxShadow: theme.shadows[1],
     fontSize: "12px",
     backgroundColor: theme.palette.primary.main,
   },

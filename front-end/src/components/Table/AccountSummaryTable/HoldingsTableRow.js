@@ -9,7 +9,10 @@ import { userAction } from "../../../redux/storeActions/actions";
 
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -137,16 +140,14 @@ class HoldingsTableRow extends React.Component {
         return `${numberWithCommas(rowData.holding)}`;
 
       case "Buy Price (Avg)":
-        return `$${numberWithCommas(rowData.buyPriceAvg.toFixed(2))}`;
+        return `$${numberWithCommas(roundNumber(rowData.buyPriceAvg, 2))}`;
 
       case "Last Price":
         return `$${numberWithCommas(this.state.lastPrice)}`;
 
       case "Profit/Loss":
-        if (parseFloat(this.state.profitOrLoss, 10) < 0) {
-          return `-$${numberWithCommas(
-            Math.abs(parseFloat(this.state.profitOrLoss, 10))
-          )}`;
+        if ((this.state.profitOrLoss, 10 < 0)) {
+          return `-$${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
         }
         return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
@@ -169,7 +170,7 @@ class HoldingsTableRow extends React.Component {
           [classes.arrowDown]: this.checkIfProfitOrLoss(type) === "Loss",
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
-          [classes.stickyCell]: type === "Code",
+          [classes.stickyCell]: type === "Code" && !this.props.minimal,
         })}
       >
         <div
@@ -308,8 +309,9 @@ class HoldingsTableRow extends React.Component {
 
     if (lastPrice && !isEqual(this.state.lastPrice, lastPrice)) {
       this.setState({
-        lastPrice: lastPrice.toFixed(2),
-        profitOrLoss: ((lastPrice - buyPriceAvg) * holding - brokerage).toFixed(
+        lastPrice: roundNumber(lastPrice, 2),
+        profitOrLoss: roundNumber(
+          (lastPrice - buyPriceAvg) * holding - brokerage,
           2
         ),
       });
@@ -360,43 +362,44 @@ class HoldingsTableRow extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, minimal } = this.props;
     const { isInWatchlist } = this.state;
 
     return (
       <TableRow>
         {this.chooseTableCell("Code", classes)}
-        {this.chooseTableCell("Holding", classes)}
-        {this.chooseTableCell("Buy Price (Avg)", classes)}
-        {this.chooseTableCell("Last Price", classes)}
+        {!minimal && this.chooseTableCell("Holding", classes)}
+        {!minimal && this.chooseTableCell("Buy Price (Avg)", classes)}
+        {!minimal && this.chooseTableCell("Last Price", classes)}
         {this.chooseTableCell("Profit/Loss", classes)}
-
-        <TableCell
-          align="center"
-          className={clsx(classes.tableCell, {
-            [classes.lastRightCell]: this.isTableRowTheLast(),
-            [classes.lastRow]: this.isTableRowTheLast(),
-          })}
-        >
-          <div className={classes.cellDiv}>
-            {!isInWatchlist && (
-              <IconButton
-                className={classes.addWatchlistButton}
-                onClick={this.addToWatchlist}
-              >
-                <AddBoxRoundedIcon className={classes.watchlistIcon} />
-              </IconButton>
-            )}
-            {isInWatchlist && (
-              <IconButton
-                className={classes.removeWatchlistButton}
-                onClick={this.removeFromWatchlist}
-              >
-                <DeleteForeverRoundedIcon className={classes.watchlistIcon} />
-              </IconButton>
-            )}
-          </div>
-        </TableCell>
+        {!minimal && (
+          <TableCell
+            align="center"
+            className={clsx(classes.tableCell, {
+              [classes.lastRightCell]: this.isTableRowTheLast(),
+              [classes.lastRow]: this.isTableRowTheLast(),
+            })}
+          >
+            <div className={classes.cellDiv}>
+              {!isInWatchlist && (
+                <IconButton
+                  className={classes.addWatchlistButton}
+                  onClick={this.addToWatchlist}
+                >
+                  <AddBoxRoundedIcon className={classes.watchlistIcon} />
+                </IconButton>
+              )}
+              {isInWatchlist && (
+                <IconButton
+                  className={classes.removeWatchlistButton}
+                  onClick={this.removeFromWatchlist}
+                >
+                  <DeleteForeverRoundedIcon className={classes.watchlistIcon} />
+                </IconButton>
+              )}
+            </div>
+          </TableCell>
+        )}
       </TableRow>
     );
   }
