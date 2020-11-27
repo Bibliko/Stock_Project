@@ -82,8 +82,7 @@ class CompanyDetail extends React.Component {
 
   addToWatchlist = () => {
     const { companyCode } = this.state;
-    const { email, watchlist } = this.props.userSession;
-    let newWatchlist = watchlist;
+    let { email, watchlist: newWatchlist } = this.props.userSession;
 
     newWatchlist.push(companyCode);
     const dataNeedChange = {
@@ -100,14 +99,11 @@ class CompanyDetail extends React.Component {
 
   removeFromWatchlist = () => {
     const { companyCode } = this.state;
-    const { email, watchlist } = this.props.userSession;
-    let newWatchlist = [];
+    let { email, watchlist: newWatchlist } = this.props.userSession;
 
-    watchlist.forEach((companyCodeString) => {
-      if (!isEqual(companyCodeString, companyCode)) {
-        newWatchlist.push(companyCodeString);
-      }
-    });
+    newWatchlist = newWatchlist.filter(
+      (companyCodeString) => companyCodeString !== companyCode
+    );
 
     const dataNeedChange = {
       watchlist: {
