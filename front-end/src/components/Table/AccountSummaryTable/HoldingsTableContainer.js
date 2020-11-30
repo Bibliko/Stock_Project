@@ -36,7 +36,7 @@ const styles = (theme) => ({
   tableCell: {
     fontSize: "medium",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.lightBlue,
+    borderColor: theme.palette.primary.main,
     borderStyle: "solid",
   },
   cellDiv: {
@@ -59,7 +59,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.lightBlue,
+    backgroundColor: theme.palette.primary.main,
     color: "white",
   },
 }))(TableCell);
@@ -145,7 +145,7 @@ class HoldingsTableContainer extends React.Component {
           </TableBody>
         </Table>
         <Snackbar
-          anchorOrigin={{vertical: "bottom", horizontal:"left"}}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           open={openSnackbar}
           autoHideDuration={6 * oneSecond}
           onClose={this.handleCloseSnackbar}

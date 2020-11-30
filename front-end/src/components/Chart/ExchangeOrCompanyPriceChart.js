@@ -46,14 +46,14 @@ const styles = (theme) => ({
   },
   toggleButton: {
     "&.MuiToggleButton-root": {
-      color: "rgba(255, 255, 255, 0.6)",
-      border: "1px solid rgba(255, 255, 255, 0.3)",
+      color: theme.palette.primary.main,
+      border: `1px solid ${theme.palette.primary.main}`,
       "&.Mui-selected": {
-        color: "rgba(255, 255, 255, 0.8)",
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
+        color: theme.palette.secondary.main,
+        backgroundColor: theme.palette.secondary.hover,
       },
       "&:hover": {
-        backgroundColor: "rgba(255, 255, 255, 0.4)",
+        backgroundColor: theme.palette.primary.hover,
       },
     },
   },
@@ -98,13 +98,13 @@ class ExchangeOrCompanyPriceChart extends React.Component {
         layout: "horizontal",
         borderColor: "white",
         itemHiddenStyle: {
-          color: "white",
+          color: "rgba(169, 179, 187, 1)",
         },
         itemHoverStyle: {
-          color: "#2196f3",
+          color: "rgba(169, 179, 187, 1)",
         },
         itemStyle: {
-          color: "#2196f3",
+          color: "rgba(120, 127, 246, 1)",
           cursor: "pointer",
           fontSize: "12px",
           fontWeight: "bold",
@@ -153,6 +153,7 @@ class ExchangeOrCompanyPriceChart extends React.Component {
         {
           type: "area",
           name: "Close Price",
+          color: "#787ff6",
           data: [],
         },
       ],
@@ -167,6 +168,7 @@ class ExchangeOrCompanyPriceChart extends React.Component {
           turboThreshold: 5000,
           marker: {
             enabled: false,
+            fillColor: "rgb(120, 127, 246)",
           },
         },
 
@@ -179,17 +181,19 @@ class ExchangeOrCompanyPriceChart extends React.Component {
               y2: 1,
             },
             stops: [
-              [0, "rgba(33, 150, 243, 0.1)"],
-              [1, "rgba(33, 150, 243, 0.5)"],
+              [0, "rgba(120, 127, 246, 0.1)"],
+              [1, "rgba(120, 127, 246, 0.5)"],
             ],
           },
           marker: {
             radius: 2,
           },
           lineWidth: 2,
+          lineColor: "rgb(120, 127, 246)",
           states: {
             hover: {
               lineWidth: 2.5,
+              lineColor: "rgb(120, 127, 246)",
             },
           },
           threshold: null,
