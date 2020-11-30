@@ -39,25 +39,29 @@ model User {
 }
 
 model AccountSummaryTimestamp {
-  id             String @id @default(cuid())
+  id             String   @id @default(cuid())
   UTCDateString  String
   UTCDateKey     String
   year           Int
   portfolioValue Float
-  user           User   @relation(fields: [userID], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+  user           User     @relation(fields: [userID], references: [id])
   userID         String
 
   @@unique([UTCDateKey, userID])
 }
 
 model RankingTimestamp {
-  id              String @id @default(cuid())
+  id              String   @id @default(cuid())
   UTCDateString   String
   UTCDateKey      String
   year            Int
   ranking         Int
   regionalRanking Int
-  user            User   @relation(fields: [userID], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  user            User     @relation(fields: [userID], references: [id])
   userID          String
 
   @@unique([UTCDateKey, userID])
@@ -107,16 +111,18 @@ model MarketHolidays {
 }
 
 model UserVerification {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   email     String?
   password  String?
   expiredAt String? //handle specially -> don't need to use DateTime type
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model CompanyRating {
-  id                             String @id @default(cuid())
-  symbol                         String @unique
-  rating                         String
-  ratingScore                    Int
-  ratingRecommendation           String
+  id                   String @id @default(cuid())
+  symbol               String @unique
+  rating               String
+  ratingScore          Int
+  ratingRecommendation String
 }
