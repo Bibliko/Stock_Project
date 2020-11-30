@@ -19,6 +19,9 @@ const {
 } = require("../low-dependency/DayTimeUtil");
 
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
+const {
+  SequentialPromisesWithResultsArray
+} = require("../low-dependency/PromisesUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -214,20 +217,19 @@ const updateAllUsers = (globalBackendVariables) => {
       select: {
         id: true,
         email: true,
-        totalPortfolio: true
-      },
-      orderBy: [
-        {
-          totalPortfolio: "desc"
-        }
-      ]
+        totalPortfolio: true,
+        ranking: true,
+        regionalRanking: true
+      }
     })
     .then((usersArray) => {
       console.log(
         `Updating ${usersArray.length} user(s): portfolioLastClosure, accountSummaryTimestamp, rankingTimestamp`
       );
 
-      const updateAllUsersPromise = usersArray.map((user, index) => {
+      const tasksList = [];
+
+      usersArray.forEach((user, index) => {
         const updatePortfolioLastClosure = prisma.user.update({
           where: {
             id: user.id
@@ -241,16 +243,19 @@ const updateAllUsers = (globalBackendVariables) => {
           user
         );
 
-        const accountRankingPromise = createRankingTimestampIfNecessary(user);
+        const rankingPromise = createRankingTimestampIfNecessary(user);
 
-        return Promise.all([
-          updatePortfolioLastClosure,
-          accountSummaryPromise,
-          accountRankingPromise,
-          resetUserCachedAccountSummaryTimestamps(user.email)
-        ]);
+        tasksList.push(() => {
+          return Promise.all([
+            updatePortfolioLastClosure,
+            accountSummaryPromise,
+            rankingPromise,
+            resetUserCachedAccountSummaryTimestamps(user.email)
+          ]);
+        });
       });
-      return Promise.all(updateAllUsersPromise);
+
+      return SequentialPromisesWithResultsArray(tasksList);
     })
     .then(() => {
       globalBackendVariables.updatedAllUsersFlag = !globalBackendVariables.updatedAllUsersFlag;
