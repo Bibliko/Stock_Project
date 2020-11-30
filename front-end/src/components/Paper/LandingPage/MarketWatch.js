@@ -26,9 +26,9 @@ const styles = (theme) => ({
     },
   },
   marketButtonChosen: {
-    color: "rgba(33, 150, 243, 1)",
+    color: theme.palette.primary.main,
     "&:hover": {
-      backgroundColor: "rgba(33, 150, 243, 0.3)",
+      backgroundColor: theme.palette.primary.hover,
     },
   },
 });

@@ -9,7 +9,7 @@ const styles = (theme) => ({
   radialChart: {
     display: "inline-block",
     position: "relative",
-    width: "100%",
+    width: "80%",
     transition: "all 0.3s ease-in",
   },
   noProgress: {
@@ -28,14 +28,14 @@ const styles = (theme) => ({
     transform: "translateY(0.25em)",
   },
   totalPortfolio: {
-    fontSize: "24px",
+    fontSize: "20px",
     fontWeight: "bold",
     lineHeight: "1",
     textAnchor: "middle",
     transform: "translateY(-10px)",
   },
   label: {
-    fontSize: "16px",
+    fontSize: "14px",
     fontWeight: "normal",
     textAnchor: "middle",
   },
@@ -46,13 +46,13 @@ const styles = (theme) => ({
     transform: "translateX(7px) translateY(43px)",
   },
 });
-const CASH_COLOR = themeObj.palette.donutChart.cash;
-const SHARES_COLOR = themeObj.palette.donutChart.shares;
-const TEXT_COLOR = themeObj.palette.donutChart.text;
+const CASH_COLOR = themeObj.palette.primary.main;
+const SHARES_COLOR = themeObj.palette.secondary.main;
+const TEXT_COLOR = themeObj.palette.normalFontColor.primary;
 
 const CustomTooltip = withStyles((theme) => ({
   tooltip: {
-    fontSize: "13px",
+    fontSize: "14px",
     backgroundColor: theme.palette.primary.main,
   },
 }))(Tooltip);
@@ -79,7 +79,12 @@ class DonutChart extends React.Component {
         preserveAspectRatio="xMinYMin meet"
         className={classes.radialChart}
       >
-        <CustomTooltip title={`Shares: ${100 - progress}%`} aria-label="Shares" placement="top" leaveDelay={200}>
+        <CustomTooltip
+          title={`Shares: ${100 - progress}%`}
+          aria-label="Shares"
+          placement="top"
+          leaveDelay={200}
+        >
           <circle
             className={classes.radialChartProgress}
             stroke={SHARES_COLOR}
@@ -93,10 +98,15 @@ class DonutChart extends React.Component {
             r={circleRadius}
           />
         </CustomTooltip>
-        <CustomTooltip title={`Cash: ${progress}%`} aria-label="Cash" placement="top" leaveDelay={200}>
+        <CustomTooltip
+          title={`Cash: ${progress}%`}
+          aria-label="Cash"
+          placement="top"
+          leaveDelay={200}
+        >
           <circle
             className={clsx(classes.radialChartProgress, {
-              [classes.noProgress]: progress === 0
+              [classes.noProgress]: progress === 0,
             })}
             stroke={CASH_COLOR}
             strokeWidth={strokeWidth}
@@ -111,7 +121,7 @@ class DonutChart extends React.Component {
         </CustomTooltip>
         <rect
           x={"58"}
-          y={"128"}
+          y={"116"}
           rx={"1"}
           ry={"1"}
           width={"5.5"}
@@ -122,7 +132,7 @@ class DonutChart extends React.Component {
         />
         <rect
           x={"58"}
-          y={"104"}
+          y={"92"}
           rx={"1"}
           ry={"1"}
           width={"5.5"}
@@ -134,7 +144,7 @@ class DonutChart extends React.Component {
         <g className={classes.text}>
           <text
             x={"50%"}
-            y={"50%"}
+            y={"43%"}
             fill={TEXT_COLOR}
             className={classes.totalPortfolio}
           >
@@ -142,7 +152,7 @@ class DonutChart extends React.Component {
           </text>
           <text
             x={"50%"}
-            y={"50%"}
+            y={"43%"}
             fill={TEXT_COLOR}
             className={clsx(classes.label, classes.cashLabel)}
           >
@@ -150,7 +160,7 @@ class DonutChart extends React.Component {
           </text>
           <text
             x={"50%"}
-            y={"50%"}
+            y={"43%"}
             fill={TEXT_COLOR}
             className={clsx(classes.label, classes.sharesLabel)}
           >

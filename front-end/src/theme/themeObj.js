@@ -59,18 +59,21 @@ const theme = {
   palette: {
     // Basic
     primary: {
-      main: "rgba(33, 150, 243, 1)",
-      hover: "rgba(33, 150, 243, 0.2)",
+      // main: "rgba(33, 150, 243, 1)",
+      main: "rgba(135, 143, 255, 1)",
+      hover: "rgb(135, 143, 255, 0.3)",
     },
 
     secondary: {
-      main: "rgba(235, 107, 52, 1)",
+      // main: "rgba(235, 107, 52, 1)",
+      main: "rgba(102, 189, 219, 1)",
+      hover: "rgba(102, 189, 219, 0.3)",
     },
 
     succeed: {
-      main: "rgba(32, 154, 85, 1)",
-      tableSorted: "rgba(255, 56, 73, 1)",
-      tableSortIcon: "rgba(255, 56, 73, 0.8)",
+      main: "rgba(30, 198, 36, 1)",
+      tableSorted: "rgba(30, 198, 36, 1)",
+      tableSortIcon: "rgba(30, 198, 36, 0.8)",
     },
 
     fail: {
@@ -85,15 +88,17 @@ const theme = {
 
     // App Bar
     appBarBlue: {
-      main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
+      // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
+      main: "rgba(31, 47, 152, 0.95)",
     },
 
     // Paper
     paperBackground: {
-      main: "#1E1E1E",
+      main: "rgba(47, 51, 54, 1)",
       onPage: "rgba(46, 44, 48, 1)",
       deepBlueTable: "rgba(26,22,75,1)",
-      gradient: "linear-gradient(180deg, #1E1E1E 10%, #141466 80%)",
+      // gradient: "linear-gradient(180deg, #1E1E1E 10%, #141466 80%)",
+      gradient: "rgba(22, 26, 27, 1)",
       secondLayer: "#141466",
     },
 
@@ -143,7 +148,7 @@ const theme = {
       lightBlue: "rgba(54, 151, 254, 1)",
       lightBlueHover: "rgba(47, 128, 237, 1)",
       lighterBlue: "rgba(116, 224, 239, 1)",
-      red: "rgba(220, 61, 74, 1)",
+      main: "rgba(111, 130, 255, 1)",
     },
     loginLink: {
       main: "#e0e0e0",

@@ -25,10 +25,11 @@ const styles = (theme) => ({
 class SegmentedBar extends React.Component {
   state = {
     colorWhiteArray: [
-      "rgba(255, 255, 255, 0.2)",
-      "rgba(255, 255, 255, 0.4)",
-      "rgba(255, 255, 255, 0.6)",
-      "rgba(255, 255, 255, 0.8)",
+      // themeObj palette secondary main
+      "rgba(102, 189, 219, 0.2)",
+      "rgba(102, 189, 219, 0.4)",
+      "rgba(102, 189, 219, 0.6)",
+      "rgba(102, 189, 219, 0.8)",
     ],
   };
 

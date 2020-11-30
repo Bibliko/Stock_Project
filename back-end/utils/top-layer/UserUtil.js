@@ -88,7 +88,7 @@ const createRankingTimestampIfNecessary = (user) => {
       })
       .then((timestamp) => {
         if (!timestamp) {
-          prisma.rankingTimestamp.create({
+          return prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
               UTCDateKey: getFullDateUTCString(newDate()),
@@ -361,6 +361,7 @@ module.exports = {
   deleteExpiredVerification,
 
   createAccountSummaryChartTimestampIfNecessary,
+  createRankingTimestampIfNecessary,
 
   updateAllUsers,
   checkAndUpdateAllUsers,
