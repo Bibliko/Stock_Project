@@ -7,7 +7,6 @@
   - Table
   - Menu
   - Text
-  - Filter
   - Snack Bar
   - Speed Dial
   - Search Field
@@ -16,6 +15,12 @@
 */
 
 const theme = {
+  customShadow: {
+    popup:
+      "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)",
+    tableContainer:
+      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+  },
   customWidth: {
     maxSearchFieldWithLogo: "370px",
     maxSearchFieldWidth: "240px",
@@ -59,47 +64,46 @@ const theme = {
   palette: {
     // Basic
     primary: {
-      // main: "rgba(33, 150, 243, 1)",
       main: "rgba(135, 143, 255, 1)",
-      hover: "rgb(135, 143, 255, 0.3)",
+      hover: "rgba(135, 143, 255, 0.3)",
+      sub: "rgba(104, 80, 230, 1)",
+      subHover: "rgba(126, 101, 255, 1)",
     },
 
     secondary: {
-      // main: "rgba(235, 107, 52, 1)",
-      main: "rgba(102, 189, 219, 1)",
-      hover: "rgba(102, 189, 219, 0.3)",
+      main: "rgba(128, 222, 255, 1)",
+      hover: "rgba(128, 222, 255, 0.3)",
+      sub: "rgba(120, 127, 246, 1)",
     },
 
     succeed: {
       main: "rgba(30, 198, 36, 1)",
-      tableSorted: "rgba(30, 198, 36, 1)",
-      tableSortIcon: "rgba(30, 198, 36, 0.8)",
+      sub: "rgba(47, 134, 165, 1)",
+      subHover: "rgba(53, 150, 185, 1)",
     },
 
     fail: {
-      main: "#ff0000",
-      backgroundColor: "rgba(255, 0, 0, 0.1)",
-      backgroundColorHover: "rgba(255, 0, 0, 0.2)",
+      main: "rgba(200, 50, 50, 1)",
+      mainHover: "rgba(230, 60, 60, 1)",
+      sub: "rgba(255, 105, 105, 1)",
     },
 
     disabled: {
-      whiteColor: "rgba(255, 255, 255, 0.3)",
+      main: "rgba(255, 255, 255, 0.3)",
     },
 
     // App Bar
-    appBarBlue: {
-      // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
-      main: "rgba(31, 47, 152, 0.95)",
+    appBarBackground: {
+      main: "rgba(43, 12, 154, 0.95)",
     },
 
     // Paper
     paperBackground: {
-      main: "rgba(47, 51, 54, 1)",
-      onPage: "rgba(46, 44, 48, 1)",
-      deepBlueTable: "rgba(26,22,75,1)",
-      // gradient: "linear-gradient(180deg, #1E1E1E 10%, #141466 80%)",
-      gradient: "rgba(22, 26, 27, 1)",
-      secondLayer: "#141466",
+      main: "rgba(22, 26, 27, 1)",
+      sub: "rgba(54, 36, 157, 1)", // The same color as theme.palette.appBarBackground.main with full opacity
+      onPage: "rgba(47, 51, 54, 1)",
+      onPageLight: "rgba(59, 64, 68, 1)",
+      // secondLayer: "#141466",
     },
 
     // Login
@@ -108,9 +112,6 @@ const theme = {
     },
 
     gradientPaper: {
-      // main:
-      //   "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
-      // main: "linear-gradient(-45deg, #6677CC 10%, #2929CC 70%)",
       main: "rgba(90, 105, 201, 1)",
     },
 
@@ -119,10 +120,6 @@ const theme = {
     },
 
     // Table
-    tableBackground: {
-      gradient: "linear-gradient(180deg, #1b163d 0%, #180f56 100%)",
-    },
-
     tableHeader: {
       darkBlue: "rgba(35, 20, 150, 1)",
       lightBlue: "rgba(0, 185, 209, 1)",
@@ -135,20 +132,14 @@ const theme = {
     },
 
     // Menu
-    menuBackground: {
-      main: "#141466",
-    },
     menuItemHover: {
       main: "rgba(255, 255, 255, 0.2)",
     },
 
     // Text
     bigTitle: {
-      purple: "rgba(110, 80, 240, 1)",
       lightBlue: "rgba(54, 151, 254, 1)",
       lightBlueHover: "rgba(47, 128, 237, 1)",
-      lighterBlue: "rgba(116, 224, 239, 1)",
-      main: "rgba(111, 130, 255, 1)",
     },
     loginLink: {
       main: "#e0e0e0",
@@ -156,12 +147,6 @@ const theme = {
     normalFontColor: {
       primary: "white",
       secondary: "rgb(169, 179, 187)",
-    },
-
-    // Filter
-    filterButton: {
-      main: "rgba(74, 50, 209, 1)",
-      onHover: "rgba(90, 70, 220, 1)",
     },
 
     // Snack Bar
@@ -177,15 +162,11 @@ const theme = {
     },
 
     // Search Field
-    searchField: {
-      main: "rgba(41, 41, 204, 0.7)",
-      onHover: "rgba(41, 41, 204, 1)",
-    },
-
     searchFieldBackground: {
-      main: "rgba(102, 119, 204, 0.5)",
-      onHover: "rgba(102, 119, 204, 0.7)",
-      rippleSpan: "rgba(102, 119, 204, 0.6)",
+      main: "rgba(97, 103, 208, 0.8)",
+      onHover: "rgba(97, 103, 208, 1)",
+      rippleSpan: "rgba(97, 103, 208, 0.9)",
+      whenOpen: "rgba(30, 30, 30, 1)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
     },
 
@@ -362,7 +343,7 @@ const theme = {
     // Mui Popover
     MuiPopover: {
       paper: {
-        backgroundColor: "rgba(46, 44, 48, 1)",
+        backgroundColor: "rgba(59, 64, 68, 1)", // theme.palette.paperBackground.onPageLight
         color: "white",
       },
     },

@@ -15,6 +15,11 @@ const styles = (theme) => ({
   textField: {
     width: "100%",
     margin: "8px",
+    [theme.breakpoints.down("xs")]: {
+      position: "absolute",
+      width: "75%",
+      left: "calc((100% - 48px - 75%) / 2)", // 48px is default width and height of icon button
+    },
     fontWeight: "normal",
     color: "white",
     backgroundColor: theme.palette.searchFieldBackground.main,
@@ -48,6 +53,7 @@ const styles = (theme) => ({
   },
   backgroundWhenTextFieldOpen: {
     backgroundColor: theme.palette.searchFieldBackground.onHover,
+    marginLeft: "-4px",
   },
   input: {
     color: "white",

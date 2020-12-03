@@ -24,15 +24,16 @@ import HoldingsTableContainer from "../../Table/AccountSummaryTable/HoldingsTabl
 const styles = (theme) => ({
   container: {
     color: "white",
+    alignSelf: "center",
   },
   avatar: {
-    width: "65px",
-    height: "65px",
+    width: "60px",
+    height: "60px",
     marginLeft: "10px",
     marginRight: "10px",
     [theme.breakpoints.down("xs")]: {
-      width: "55px",
-      height: "55px",
+      width: "50px",
+      height: "50px",
       marginLeft: "0px",
     },
   },
@@ -53,24 +54,25 @@ const styles = (theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
+    alignSelf: "center",
   },
   name: {
-    fontSize: "24px",
+    fontSize: "16px",
     fontWeight: "bold",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "20px",
+      fontSize: "12px",
     },
   },
   rank: {
-    fontSize: "18px",
+    fontSize: "16px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "14px",
+      fontSize: "12px",
     },
   },
   dailyChange: {
-    fontSize: "20px",
+    fontSize: "18px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "16px",
+      fontSize: "14px",
     },
   },
   dailyChangeGreen: {
@@ -80,10 +82,10 @@ const styles = (theme) => ({
     color: theme.palette.fail.main,
   },
   tableTitle: {
-    fontSize: "28px",
+    fontSize: "20px",
     paddingBottom: "8px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "24px",
+      fontSize: "18px",
     },
   },
 });

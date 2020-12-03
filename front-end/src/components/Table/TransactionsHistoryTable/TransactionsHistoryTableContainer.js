@@ -37,14 +37,13 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     minWidth: "100px",
     fontSize: "12px",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.purple,
+    borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
   tableCellTransactionTime: {
@@ -130,7 +129,7 @@ const styles = (theme) => ({
   },
   tablePaginationActions: {
     "& .Mui-disabled": {
-      color: theme.palette.disabled.whiteColor,
+      color: theme.palette.disabled.main,
     },
   },
   skeleton: {
@@ -154,9 +153,9 @@ const styles = (theme) => ({
         width: "110px",
       },
     },
-    backgroundColor: theme.palette.filterButton.main,
+    backgroundColor: theme.palette.primary.sub,
     "&:hover": {
-      backgroundColor: theme.palette.filterButton.onHover,
+      backgroundColor: theme.palette.primary.subHover,
     },
     color: "white",
     position: "fixed",
@@ -190,6 +189,7 @@ const styles = (theme) => ({
     opacity: 1,
     color: "white",
     fontSize: "medium",
+    transition: "font-size 0.2s",
   },
   filterWordHidden: {
     fontSize: 0,
@@ -197,7 +197,7 @@ const styles = (theme) => ({
   title: {
     marginBottom: "30px",
     fontSize: "x-large",
-    color: theme.palette.bigTitle.purple,
+    color: theme.palette.primary.main,
     fontWeight: "bold",
   },
 });

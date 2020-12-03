@@ -16,15 +16,28 @@ const styles = (theme) => ({
   mainSelect: {
     width: "100%",
     marginBottom: theme.customMargin.dialogItemsTransactionsHistoryFilters,
+    "&.MuiMenu-paper": {
+      backgroundColor: theme.palette.paperBackground.onPageLight,
+    },
   },
   select: {
-    color: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
     paddingLeft: "10px",
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: "4px",
     "&:focus": {
       backgroundColor: "rgba(255, 255, 255, 0.1)",
       borderRadius: "4px",
+    },
+  },
+  menuItem: {
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
+    "&.MuiListItem-root": {
+      "&.Mui-selected": {
+        backgroundColor: theme.palette.menuItemHover.main,
+      },
     },
   },
 });
@@ -90,11 +103,15 @@ class TypeFilter extends React.Component {
             select: classes.select,
           }}
         >
-          <MenuItem value="none">
+          <MenuItem value="none" className={classes.menuItem}>
             <em>None</em>
           </MenuItem>
-          <MenuItem value="buy">Buy_Spend</MenuItem>
-          <MenuItem value="sell">Sell_Gain</MenuItem>
+          <MenuItem value="buy" className={classes.menuItem}>
+            Buy_Spend
+          </MenuItem>
+          <MenuItem value="sell" className={classes.menuItem}>
+            Sell_Gain
+          </MenuItem>
         </Select>
       </React.Fragment>
     );

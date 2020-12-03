@@ -1,5 +1,6 @@
 import React from "react";
-import clsx from "clsx";
+
+import { changeOpacityOfRGBAString } from "../../theme/ThemeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -9,14 +10,12 @@ import { EditRounded as EditRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   avatar: {
-    height: "200px",
-    width: "200px",
+    height: "150px",
+    width: "150px",
     [theme.breakpoints.down("md")]: {
       height: "128px",
       width: "128px",
     },
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
-    color: theme.palette.appBarBlue.main,
   },
   avatarButton: {
     position: "relative",
@@ -30,8 +29,15 @@ const styles = (theme) => ({
     marginTop: -12,
     marginLeft: -12,
   },
-  hoverAvatarColor: {
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  editDiv: {
+    position: "absolute",
+    backgroundColor: changeOpacityOfRGBAString(
+      theme.palette.appBarBackground.main,
+      "0.3"
+    ),
+    borderRadius: "50%",
+    width: "100%",
+    height: "100%",
   },
 });
 
@@ -62,14 +68,14 @@ class Avatar extends React.Component {
         onMouseEnter={this.hoverOn}
         onMouseLeave={this.hoverOff}
         className={classes.avatarButton}
+        disableRipple
       >
-        <MuiAvatar
-          src={avatarUrl}
-          className={clsx(classes.avatar, {
-            [classes.hoverAvatarColor]: hover,
-          })}
-        />
-        {hover && <EditRoundedIcon className={classes.editIcon} />}
+        <MuiAvatar src={avatarUrl} className={classes.avatar} />
+        {hover && (
+          <div className={classes.editDiv}>
+            <EditRoundedIcon className={classes.editIcon} />
+          </div>
+        )}
       </IconButton>
     );
   }

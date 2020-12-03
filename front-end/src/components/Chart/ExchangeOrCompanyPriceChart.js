@@ -12,6 +12,8 @@ import { DateTime } from "luxon";
 import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { highChartDecorations } from "./HighChartOptions";
+
 import { oneMinute, oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
 import { getCachedHistoricalChart } from "../../utils/RedisUtil";
@@ -70,161 +72,23 @@ BrokenAxis(Highcharts);
 class ExchangeOrCompanyPriceChart extends React.Component {
   state = {
     highChartOptions: {
-      chart: {
-        zoomType: "x",
-        backgroundColor: "rgba(255, 255, 255, 0)",
-        style: {
-          color: "white",
-        },
-      },
-
-      title: {
-        text: "",
-        style: {
-          color: "white",
-        },
-      },
-
-      subtitle: {
-        text: "Note: DRAG to zoom (on web only)",
-        style: {
-          color: "white",
-        },
-      },
-
-      legend: {
-        align: "center",
-        verticalAlign: "bottom",
-        layout: "horizontal",
-        borderColor: "white",
-        itemHiddenStyle: {
-          color: "rgba(169, 179, 187, 1)",
-        },
-        itemHoverStyle: {
-          color: "rgba(169, 179, 187, 1)",
-        },
-        itemStyle: {
-          color: "rgba(120, 127, 246, 1)",
-          cursor: "pointer",
-          fontSize: "12px",
-          fontWeight: "bold",
-          textOverflow: "ellipsis",
-        },
-      },
-
-      tooltip: {
-        crosshairs: {
-          color: "rgba(168, 168, 168, 1)",
-          dashStyle: "solid",
-        },
-        shared: true,
-      },
-
-      xAxis: {
-        labels: {
-          enabled: true,
-          style: {
-            color: "white",
-          },
-        },
-        breaks: {},
-        type: "datetime",
-      },
+      ...highChartDecorations,
 
       yAxis: {
-        labels: {
-          enabled: true,
-          style: {
-            color: "white",
-          },
-        },
-        allowDecimals: false,
+        ...highChartDecorations.yAxis,
         title: {
+          ...highChartDecorations.yAxis.title,
           text: "Close Price",
-          style: {
-            color: "white",
-          },
         },
-        gridLineWidth: 0.5,
-        gridLineDashStyle: "Dot",
       },
 
       series: [
         {
-          type: "area",
+          ...highChartDecorations.series[0],
           name: "Close Price",
-          color: "#787ff6",
           data: [],
         },
       ],
-
-      time: {
-        useUTC: false,
-      },
-
-      plotOptions: {
-        series: {
-          boostThreshold: 2000,
-          turboThreshold: 5000,
-          marker: {
-            enabled: false,
-            fillColor: "rgb(120, 127, 246)",
-          },
-        },
-
-        area: {
-          fillColor: {
-            linearGradient: {
-              x1: 0,
-              y1: 0,
-              x2: 0,
-              y2: 1,
-            },
-            stops: [
-              [0, "rgba(120, 127, 246, 0.1)"],
-              [1, "rgba(120, 127, 246, 0.5)"],
-            ],
-          },
-          marker: {
-            radius: 2,
-          },
-          lineWidth: 2,
-          lineColor: "rgb(120, 127, 246)",
-          states: {
-            hover: {
-              lineWidth: 2.5,
-              lineColor: "rgb(120, 127, 246)",
-            },
-          },
-          threshold: null,
-        },
-      },
-
-      responsive: {
-        rules: [
-          {
-            condition: {
-              maxWidth: 400,
-            },
-            chartOptions: {
-              yAxis: {
-                labels: {
-                  enabled: false,
-                },
-                title: {
-                  text: null,
-                },
-              },
-              subtitle: {
-                text: null,
-              },
-              credits: {
-                enabled: false,
-              },
-            },
-          },
-        ],
-      },
     },
 
     historicalChart5min: [],

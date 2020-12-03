@@ -1,6 +1,5 @@
 import React from "react";
 import { withRouter } from "react-router";
-import clsx from "clsx";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
@@ -50,12 +49,12 @@ const styles = (theme) => ({
   gridTitle: {
     fontSize: "x-large",
     fontWeight: "bold",
-    color: "white",
     marginBottom: "10px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "large",
       marginTop: "20px",
     },
+    color: theme.palette.primary.main,
   },
   caption: {
     font: "caption",
@@ -64,6 +63,7 @@ const styles = (theme) => ({
     margin: "20px",
   },
   reloadButton: {
+    color: theme.palette.normalFontColor.primary,
     marginTop: "10px",
     marginBottom: "20px",
   },
@@ -111,7 +111,7 @@ class Companies extends React.Component {
     sortBy: "code",
     sortDirection: SortDirection.ASC,
     price: [0, 320000],
-    marketCap: [250, 1025], // [$1K, $2T]
+    marketCap: [250, 1040], // [$1K, $3T]
     sector: "All",
     industry: "All",
     success: false,
@@ -189,7 +189,9 @@ class Companies extends React.Component {
 
     getStockScreener({
       priceFilter: price,
-      marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
+      marketCapFilter: marketCap.map((value) =>
+        Math.round(this.getMarketCap(value))
+      ),
       sectorFilter: sector,
       industryFilter: industry,
     })
@@ -259,7 +261,7 @@ class Companies extends React.Component {
             />
           </Grid>
           <Grid item xs={12} sm={8}>
-            <Typography className={clsx(classes.gridTitle)} component="div">
+            <Typography className={classes.gridTitle} component="div">
               Companies
             </Typography>
 

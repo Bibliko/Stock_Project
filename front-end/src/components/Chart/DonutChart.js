@@ -10,6 +10,9 @@ const styles = (theme) => ({
     display: "inline-block",
     position: "relative",
     width: "80%",
+    [theme.breakpoints.down("sm")]: {
+      width: "60%",
+    },
     transition: "all 0.3s ease-in",
   },
   noProgress: {

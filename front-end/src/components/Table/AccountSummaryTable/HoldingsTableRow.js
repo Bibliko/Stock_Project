@@ -41,7 +41,7 @@ const styles = (theme) => ({
     borderBottomWidth: "0px",
     borderColor: theme.palette.secondary.main,
     borderStyle: "solid",
-    backgroundColor: theme.palette.paperBackground.main,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   cellDiv: {
     display: "flex",
@@ -96,17 +96,20 @@ const styles = (theme) => ({
   },
   codeInfoButton: {
     color: "white",
+    padding: 0,
+    marginLeft: "8px",
   },
 });
 
 const HtmlTooltip = withStyles((theme) => ({
   tooltip: {
-    backgroundColor: theme.palette.menuBackground.main,
+    backgroundColor: theme.palette.secondary.main,
+    boxShadow: theme.customShadow.popup,
     color: "white",
     maxWidth: 220,
   },
   arrow: {
-    color: theme.palette.menuBackground.main,
+    color: theme.palette.secondary.main,
   },
 }))(Tooltip);
 

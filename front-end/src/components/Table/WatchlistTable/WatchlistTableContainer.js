@@ -31,14 +31,13 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     minWidth: "100px",
-    fontSize: "12px",
+    fontSize: "medium",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.purple,
+    borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
   tableCellName: {
@@ -106,7 +105,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.purple,
+    backgroundColor: theme.palette.paperBackground.sub,
     color: "white",
   },
 }))(TableCell);

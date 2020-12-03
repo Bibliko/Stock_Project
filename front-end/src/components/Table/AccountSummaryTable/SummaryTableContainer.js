@@ -30,8 +30,7 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     color: "white",
@@ -63,10 +62,10 @@ const styles = (theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.tableRow.darkBlue,
+      backgroundColor: theme.palette.paperBackground.onPage,
     },
     "&:nth-of-type(even)": {
-      backgroundColor: theme.palette.tableRow.lightBlue,
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
   },
 }))(TableRow);

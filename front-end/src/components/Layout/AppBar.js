@@ -32,7 +32,9 @@ import {
 
 import {
   AccountCircleRounded as AccountCircleRoundedIcon,
-  CategoryRounded as CategoryRoundedIcon,
+  // CategoryRounded as CategoryRoundedIcon,
+  AppsRounded as AppsRoundedIcon,
+  ListAltRounded as ListAltRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -41,7 +43,7 @@ const styles = (theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    background: theme.palette.appBarBlue.main,
+    background: theme.palette.appBarBackground.main,
     height: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
       height: theme.customHeight.appBarHeightSmall,
@@ -54,8 +56,7 @@ const styles = (theme) => ({
     margin: "6px",
     marginRight: "12px",
     [theme.breakpoints.down("xs")]: {
-      margin: "2px",
-      marginRight: "8px",
+      marginRight: "4px",
     },
     "& .MuiIconButton-colorPrimary": {
       color: "white",
@@ -89,8 +90,8 @@ const styles = (theme) => ({
     height: "30px",
     width: "30px",
     [theme.breakpoints.down("xs")]: {
-      height: "20px",
-      width: "20px",
+      height: "25px",
+      width: "25px",
     },
     color: "white",
   },
@@ -128,27 +129,16 @@ const styles = (theme) => ({
     paddingRight: "10px",
   },
   menuPaper: {
-    backgroundColor: theme.palette.menuBackground.main,
+    backgroundColor: theme.palette.paperBackground.onPage,
     color: "white",
     minWidth: "160px",
   },
-  endMenuItem: {
-    marginBottom: "5px",
-    "&:hover": {
-      backgroundColor: theme.palette.menuItemHover.main,
-    },
-  },
-  accountMenuItem: {
-    fontSize: "medium",
+  menuItem: {
+    fontSize: "14px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "0.875rem",
-      minHeight: "40px",
+      fontSize: "12px",
+      minHeight: "20px",
     },
-    "&:hover": {
-      backgroundColor: theme.palette.menuItemHover.main,
-    },
-  },
-  menuItemHover: {
     "&:hover": {
       backgroundColor: theme.palette.menuItemHover.main,
     },
@@ -269,7 +259,7 @@ class PersistentAppBar extends React.Component {
                 aria-haspopup="true"
                 onClick={this.toggleGameMenu}
               >
-                <CategoryRoundedIcon className={classes.normalIcon} />
+                <AppsRoundedIcon className={classes.normalIcon} />
               </IconButton>
             </Tooltip>
             <Popper
@@ -301,14 +291,14 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/transactionsHistory", this.props);
                           }}
-                          className={classes.menuItemHover}
+                          className={classes.menuItem}
                         >
                           Trading History
                         </MenuItem>
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
-                          className={classes.endMenuItem}
+                          className={classes.menuItem}
                         >
                           Pending Orders
                         </MenuItem>
@@ -319,7 +309,7 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/watchlist", this.props);
                           }}
-                          className={classes.menuItemHover}
+                          className={classes.menuItem}
                         >
                           Watchlist
                         </MenuItem>
@@ -328,13 +318,13 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/companies", this.props);
                           }}
-                          className={classes.menuItemHover}
+                          className={classes.menuItem}
                         >
                           Companies
                         </MenuItem>
 
                         <MenuItem disabled>Explore</MenuItem>
-                        <MenuItem dense className={classes.menuItemHover}>
+                        <MenuItem dense className={classes.menuItem}>
                           Charts
                         </MenuItem>
                         <MenuItem
@@ -343,7 +333,7 @@ class PersistentAppBar extends React.Component {
                             redirectToPage("/ranking", this.props);
                           }}
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
-                          className={classes.menuItemHover}
+                          className={classes.menuItem}
                         >
                           Ranking
                         </MenuItem>
@@ -355,11 +345,12 @@ class PersistentAppBar extends React.Component {
             </Popper>
             <Tooltip title="Education">
               <IconButton className={classes.secondaryMenuButton}>
-                <img
+                {/* <img
                   alt="Education"
                   src="/educationIcon.png"
                   className={classes.normalIcon}
-                />
+                /> */}
+                <ListAltRoundedIcon className={classes.normalIcon} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Account">
@@ -405,7 +396,7 @@ class PersistentAppBar extends React.Component {
                         onKeyDown={this.handleListKeyDown}
                       >
                         <MenuItem
-                          className={classes.accountMenuItem}
+                          className={classes.menuItem}
                           onClick={() => {
                             redirectToPage("/accountSummary", this.props);
                           }}
@@ -413,7 +404,7 @@ class PersistentAppBar extends React.Component {
                           Account Summary
                         </MenuItem>
                         <MenuItem
-                          className={classes.accountMenuItem}
+                          className={classes.menuItem}
                           onClick={() => {
                             redirectToPage("/setting", this.props);
                           }}
@@ -421,7 +412,7 @@ class PersistentAppBar extends React.Component {
                           Account Settings
                         </MenuItem>
                         <MenuItem
-                          className={classes.accountMenuItem}
+                          className={classes.menuItem}
                           onClick={this.logout}
                         >
                           Log Out

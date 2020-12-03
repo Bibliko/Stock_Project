@@ -32,9 +32,9 @@ const styles = (theme) => ({
     borderRightWidth: "0px",
     borderTopWidth: "1px",
     borderBottomWidth: "0px",
-    borderColor: "#2D9CDB",
+    borderColor: theme.palette.secondary.main,
     borderStyle: "solid",
-    backgroundColor: theme.palette.paperBackground.deepBlueTable,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   tableRow: {
     background: "transparent",
@@ -60,10 +60,10 @@ const styles = (theme) => ({
     width: "30px",
   },
   arrowUp: {
-    color: "#219653",
+    color: theme.palette.success.main,
   },
   arrowDown: {
-    color: "#ef0808",
+    color: theme.palette.fail.sub,
   },
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",
@@ -73,7 +73,7 @@ const styles = (theme) => ({
     width: "22px",
     color: "white",
     "&:hover": {
-      color: "#e23d3d",
+      color: theme.palette.fail.sub,
       cursor: "pointer",
     },
   },

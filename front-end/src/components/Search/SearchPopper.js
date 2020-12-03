@@ -24,12 +24,13 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       width: "100vw",
     },
-    width: "450px",
+    width: "425px",
     maxHeight: "50%",
     zIndex: theme.customZIndex.searchMenu,
   },
   menuPaper: {
-    background: theme.palette.menuBackground.main,
+    background: theme.palette.appBarBackground.main,
+    boxShadow: theme.customShadow.popup,
     color: "white",
     paddingTop: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
