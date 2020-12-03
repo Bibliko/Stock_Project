@@ -20,7 +20,7 @@ const googleStrategy = new GoogleStrategy(
     const { name, picture, email } = profile._json;
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }

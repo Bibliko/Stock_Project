@@ -141,7 +141,7 @@ router.get("/checkVerificationCode", (req, res) => {
 router.use("/verification/:tokenId", (req, res) => {
   const tokenId = req.params.tokenId;
   prisma.userVerification
-    .findOne({
+    .findUnique({
       where: {
         id: tokenId
       }

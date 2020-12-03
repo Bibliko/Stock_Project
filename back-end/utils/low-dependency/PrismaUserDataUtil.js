@@ -23,7 +23,7 @@ const getUserData = (email, dataNeeded) => {
     }
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         },

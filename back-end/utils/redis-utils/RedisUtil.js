@@ -72,7 +72,7 @@ const isMarketClosedCheck = () => {
     getCachedMarketHoliday()
       .then((marketHoliday) => {
         if (!marketHoliday || !isEqual(marketHoliday.year, UTCYear)) {
-          const prismaPromise = prisma.marketHolidays.findOne({
+          const prismaPromise = prisma.marketHolidays.findUnique({
             where: {
               year: UTCYear
             }

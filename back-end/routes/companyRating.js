@@ -7,7 +7,7 @@ router.get("/getOneCompany", (req, res) => {
   const { symbol } = req.query;
 
   prisma.companyRating
-    .findOne({
+    .findUnique({
       where: {
         symbol: symbol
       }

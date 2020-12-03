@@ -23,7 +23,7 @@ const executeUpdateCompaniesRatingsList = () => {
           if (shareRating === null) return;
           tasksList.push(() => {
             prisma.companyRating
-              .findOne({
+              .findUnique({
                 where: {
                   symbol: shareRating.symbol
                 }
