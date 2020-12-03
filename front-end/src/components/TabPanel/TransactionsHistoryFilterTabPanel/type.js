@@ -23,10 +23,10 @@ const styles = (theme) => ({
   select: {
     color: theme.palette.secondary.main,
     paddingLeft: "10px",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     borderRadius: "4px",
     "&:focus": {
-      backgroundColor: "rgba(255, 255, 255, 0.1)",
+      backgroundColor: theme.palette.paperBackground.onPageSuperLight,
       borderRadius: "4px",
     },
   },

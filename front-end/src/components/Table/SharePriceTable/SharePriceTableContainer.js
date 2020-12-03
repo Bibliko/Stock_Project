@@ -25,7 +25,10 @@ const styles = (theme) => ({
     minWidth: "120px",
   },
   tableCell: {
-    fontSize: "16px",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
     borderColor: "#9ED2EF",
     borderStyle: "solid",

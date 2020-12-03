@@ -41,7 +41,10 @@ const styles = (theme) => ({
   },
   tableCell: {
     minWidth: "100px",
-    fontSize: "12px",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
     borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
@@ -51,6 +54,9 @@ const styles = (theme) => ({
   },
   cellDiv: {
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     display: "flex",
     alignItems: "center",
     "&.MuiTableSortLabel-root": {
@@ -153,9 +159,9 @@ const styles = (theme) => ({
         width: "110px",
       },
     },
-    backgroundColor: theme.palette.primary.sub,
+    backgroundColor: theme.palette.primary.subDark,
     "&:hover": {
-      backgroundColor: theme.palette.primary.subHover,
+      backgroundColor: theme.palette.primary.subDarkHover,
     },
     color: "white",
     position: "fixed",

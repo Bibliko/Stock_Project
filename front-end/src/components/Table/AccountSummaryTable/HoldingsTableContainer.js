@@ -34,6 +34,9 @@ const styles = (theme) => ({
   },
   tableCell: {
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
     borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",

@@ -36,7 +36,7 @@ export const highChartDecorations = {
       color: themeObj.palette.normalFontColor.secondary,
     },
     itemStyle: {
-      color: themeObj.palette.secondary.sub,
+      color: themeObj.palette.primary.subLight,
       cursor: "pointer",
       fontSize: "12px",
       fontWeight: "bold",
@@ -85,7 +85,7 @@ export const highChartDecorations = {
     {
       type: "area",
       name: "",
-      color: themeObj.palette.secondary.sub,
+      color: themeObj.palette.primary.subLight,
     },
   ],
 
@@ -99,7 +99,7 @@ export const highChartDecorations = {
       turboThreshold: 5000,
       marker: {
         enabled: false,
-        fillColor: themeObj.palette.secondary.sub,
+        fillColor: themeObj.palette.primary.subLight,
       },
     },
 
@@ -112,19 +112,25 @@ export const highChartDecorations = {
           y2: 1,
         },
         stops: [
-          [0, changeOpacityOfRGBAString(themeObj.palette.secondary.sub, "0.1")],
-          [1, changeOpacityOfRGBAString(themeObj.palette.secondary.sub, "0.5")],
+          [
+            0,
+            changeOpacityOfRGBAString(themeObj.palette.primary.subLight, "0.1"),
+          ],
+          [
+            1,
+            changeOpacityOfRGBAString(themeObj.palette.primary.subLight, "0.5"),
+          ],
         ],
       },
       marker: {
         radius: 2,
       },
       lineWidth: 2,
-      lineColor: themeObj.palette.secondary.sub,
+      lineColor: themeObj.palette.primary.subLight,
       states: {
         hover: {
           lineWidth: 2.5,
-          lineColor: themeObj.palette.secondary.sub,
+          lineColor: themeObj.palette.primary.subLight,
         },
       },
       threshold: null,

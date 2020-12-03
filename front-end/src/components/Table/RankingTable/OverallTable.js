@@ -32,7 +32,7 @@ const styles = (theme) => ({
       fontSize: "small",
     },
     color: "white",
-    borderColor: "#DC3D4A",
+    borderColor: theme.palette.secondary.main,
     borderWidth: "2px",
     borderStyle: "solid",
     borderBottom: "hidden",
@@ -43,7 +43,7 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   headColor: {
-    backgroundColor: "#EB5757",
+    backgroundColor: theme.palette.paperBackground.sub,
   },
   headtitle: {
     fontSize: "large",
@@ -58,10 +58,10 @@ const styles = (theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: "#FFA9A9",
+      backgroundColor: theme.palette.paperBackground.onPage,
     },
     "&:nth-of-type(even)": {
-      backgroundColor: "#FE8383",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
   },
 }))(TableRow);

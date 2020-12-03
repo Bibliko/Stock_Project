@@ -26,9 +26,9 @@ const styles = (theme) => ({
       backgroundColor: "rgba(255, 255, 255, 0.12)",
     },
     color: theme.palette.normalFontColor.primary,
-    backgroundColor: theme.palette.primary.sub,
+    backgroundColor: theme.palette.primary.subDark,
     "&:hover": {
-      backgroundColor: theme.palette.primary.subHover,
+      backgroundColor: theme.palette.primary.subDarkHover,
     },
   },
   progress: {

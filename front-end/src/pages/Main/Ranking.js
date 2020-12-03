@@ -1,6 +1,5 @@
 import React from "react";
 import { isEqual } from "lodash";
-import clsx from "clsx";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -52,43 +51,53 @@ const styles = (theme) => ({
   },
   gridTitle: {
     fontSize: "x-large",
+    color: theme.palette.primary.main,
     [theme.breakpoints.down("xs")]: {
       fontSize: "large",
     },
     fontWeight: "bold",
     marginBottom: "1px",
   },
-  titleLabel: {
-    color: "#DC3D4A",
-  },
-  statistic: {
-    color: "#619FD7",
-  },
   textField: {
-    height: "50px",
     width: "100%",
     margin: "8px",
     fontWeight: "normal",
-    "& label.Mui-focused": {
-      color: "black",
+    "& label": {
+      color: theme.palette.normalFontColor.secondary,
+      "&.Mui-focused": {
+        color: theme.palette.secondary.main,
+      },
     },
     "& .MuiFilledInput-underline:after": {
-      borderBottom: "2px solid #000000",
+      borderBottom: `2px solid ${theme.palette.secondary.main}`,
     },
     "& .MuiFilledInput-root": {
       "&.Mui-focused": {
-        backgroundColor: "rgba(225,225,225,0.5)",
+        backgroundColor: theme.palette.paperBackground.onPageSuperLight,
       },
     },
   },
+  selectIcon: {
+    color: theme.palette.normalFontColor.secondary,
+  },
   select: {
-    color: "black",
-    backgroundColor: "rgba(225,225,225,0.95)",
+    color: theme.palette.secondary.main,
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:hover": {
-      backgroundColor: "rgba(225,225,225,0.75)",
+      backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     },
     "& input": {
-      backgroundColor: "rgba(225,225,225,0)",
+      backgroundColor: theme.palette.paperBackground.onPageSuperLight,
+    },
+  },
+  menuItem: {
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
+    "&.MuiListItem-root": {
+      "&.Mui-selected": {
+        backgroundColor: theme.palette.menuItemHover.main,
+      },
     },
   },
 });
@@ -146,7 +155,7 @@ class Ranking extends React.Component {
           className={classes.fullHeightWidth}
         >
           <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
+            <Typography className={classes.gridTitle}>
               Choose a ranking level
             </Typography>
           </Grid>
@@ -161,17 +170,24 @@ class Ranking extends React.Component {
               variant="filled"
               SelectProps={{
                 className: classes.select,
+                classes: {
+                  icon: classes.selectIcon,
+                },
               }}
             >
               {levels.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
+                <MenuItem
+                  key={option.value}
+                  value={option.value}
+                  className={classes.menuItem}
+                >
                   {option.label}
                 </MenuItem>
               ))}
             </TextField>
           </Grid>
           <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.titleLabel)}>
+            <Typography className={classes.gridTitle}>
               Overall Ranking
             </Typography>
           </Grid>
@@ -179,9 +195,7 @@ class Ranking extends React.Component {
             <OverallTable />
           </Grid>
           <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={clsx(classes.gridTitle, classes.statistic)}>
-              My Stats
-            </Typography>
+            <Typography className={classes.gridTitle}>My Stats</Typography>
           </Grid>
           <Grid item xs={12} className={classes.itemGrid} align="center">
             <MyStatsTable

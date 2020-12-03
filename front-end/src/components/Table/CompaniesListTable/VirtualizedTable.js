@@ -27,6 +27,9 @@ const styles = (theme) => ({
   },
   tableHeader: {
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     padding: "0.5em",
     paddingRight: "1em",
     color: `${theme.palette.normalFontColor.primary}`,

@@ -35,7 +35,7 @@ const styles = (theme) => ({
     color: "white",
   },
   head: {
-    backgroundColor: "#5893C9",
+    backgroundColor: theme.palette.paperBackground.sub,
   },
   headtitle: {
     fontSize: "large",
@@ -50,10 +50,10 @@ const styles = (theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: "#78CBFA",
+      backgroundColor: theme.palette.paperBackground.onPage,
     },
     "&:nth-of-type(even)": {
-      backgroundColor: "#63B5E3",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
   },
 }))(TableRow);

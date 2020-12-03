@@ -103,13 +103,13 @@ const styles = (theme) => ({
 
 const HtmlTooltip = withStyles((theme) => ({
   tooltip: {
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     boxShadow: theme.customShadow.popup,
     color: "white",
     maxWidth: 220,
   },
   arrow: {
-    color: theme.palette.secondary.main,
+    color: theme.palette.paperBackground.onPageSuperLight,
   },
 }))(Tooltip);
 

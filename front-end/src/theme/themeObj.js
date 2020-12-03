@@ -10,7 +10,7 @@
   - Snack Bar
   - Speed Dial
   - Search Field
-  - Company Detailed Page
+  - Donut Chart
   - Switch dark / light mode
 */
 
@@ -64,46 +64,56 @@ const theme = {
   palette: {
     // Basic
     primary: {
+      // Purple
       main: "rgba(135, 143, 255, 1)",
       hover: "rgba(135, 143, 255, 0.3)",
-      sub: "rgba(104, 80, 230, 1)",
-      subHover: "rgba(126, 101, 255, 1)",
+
+      subLight: "rgba(120, 127, 246, 1)",
+
+      subDark: "rgba(104, 80, 230, 1)",
+      subDarkHover: "rgba(126, 101, 255, 1)",
     },
 
     secondary: {
+      // Light Blue + Green
       main: "rgba(128, 222, 255, 1)",
       hover: "rgba(128, 222, 255, 0.3)",
-      sub: "rgba(120, 127, 246, 1)",
     },
 
     succeed: {
-      main: "rgba(30, 198, 36, 1)",
-      sub: "rgba(47, 134, 165, 1)",
+      main: "rgba(30, 198, 36, 1)", // Green
+      sub: "rgba(47, 134, 165, 1)", // Light Blue + Green
       subHover: "rgba(53, 150, 185, 1)",
     },
 
     fail: {
+      // Red
       main: "rgba(200, 50, 50, 1)",
       mainHover: "rgba(230, 60, 60, 1)",
       sub: "rgba(255, 105, 105, 1)",
     },
 
     disabled: {
+      // Grey
       main: "rgba(255, 255, 255, 0.3)",
     },
 
     // App Bar
     appBarBackground: {
+      // Dark Blue
       main: "rgba(43, 12, 154, 0.95)",
     },
 
     // Paper
     paperBackground: {
-      main: "rgba(22, 26, 27, 1)",
-      sub: "rgba(54, 36, 157, 1)", // The same color as theme.palette.appBarBackground.main with full opacity
+      main: "rgba(22, 26, 27, 1)", // Black
+      sub: "rgba(54, 36, 157, 1)", // Dark Blue
+
+      // Grey
       onPage: "rgba(47, 51, 54, 1)",
       onPageLight: "rgba(59, 64, 68, 1)",
-      // secondLayer: "#141466",
+      onPageSuperLight: "rgba(89, 92, 94, 1)",
+      hoverBlur: "rgba(255, 255, 255, 0.2)",
     },
 
     // Login
@@ -137,16 +147,13 @@ const theme = {
     },
 
     // Text
-    bigTitle: {
-      lightBlue: "rgba(54, 151, 254, 1)",
-      lightBlueHover: "rgba(47, 128, 237, 1)",
-    },
     loginLink: {
       main: "#e0e0e0",
     },
+
     normalFontColor: {
       primary: "white",
-      secondary: "rgb(169, 179, 187)",
+      secondary: "rgba(169, 179, 187, 1)",
     },
 
     // Snack Bar
@@ -168,11 +175,6 @@ const theme = {
       rippleSpan: "rgba(97, 103, 208, 0.9)",
       whenOpen: "rgba(30, 30, 30, 1)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
-    },
-
-    // Company Detailed Page
-    newsCardHover: {
-      main: "rgba(255, 255, 255, 0.2)",
     },
 
     // Donut Chart

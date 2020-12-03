@@ -189,9 +189,7 @@ class Companies extends React.Component {
 
     getStockScreener({
       priceFilter: price,
-      marketCapFilter: marketCap.map((value) =>
-        Math.round(this.getMarketCap(value))
-      ),
+      marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
       sectorFilter: sector,
       industryFilter: industry,
     })
