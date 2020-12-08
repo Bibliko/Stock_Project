@@ -78,7 +78,6 @@ class ExchangeOrCompanyPriceChart extends React.Component {
         ...highChartDecorations.yAxis,
         title: {
           ...highChartDecorations.yAxis.title,
-          text: "Close Price",
         },
       },
 
@@ -170,7 +169,6 @@ class ExchangeOrCompanyPriceChart extends React.Component {
   };
 
   setStateChartAfterGettingInfoFromCache = (seriesData, xAxisBreaks) => {
-    const { exchangeOrCompany } = this.props;
     this.setState(
       {
         isChartReady: false,
@@ -181,10 +179,6 @@ class ExchangeOrCompanyPriceChart extends React.Component {
             {
               highChartOptions: {
                 ...this.state.highChartOptions,
-                title: {
-                  ...this.state.highChartOptions.title,
-                  text: `${exchangeOrCompany} Price Graph`,
-                },
                 xAxis: {
                   ...this.state.highChartOptions.xAxis,
                   breaks: xAxisBreaks,

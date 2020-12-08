@@ -17,12 +17,12 @@ export const highChartDecorations = {
     },
   },
 
-  subtitle: {
-    text: "Note: DRAG to zoom (on web only)",
-    style: {
-      color: "white",
-    },
-  },
+  // subtitle: {
+  //   text: "Note: DRAG to zoom (on web only)",
+  //   style: {
+  //     color: "white",
+  //   },
+  // },
 
   legend: {
     align: "center",
@@ -59,6 +59,8 @@ export const highChartDecorations = {
         color: "white",
       },
     },
+    lineWidth: 0,
+    tickWidth: 1,
     breaks: {},
     type: "datetime",
   },
@@ -77,8 +79,8 @@ export const highChartDecorations = {
         color: "white",
       },
     },
-    gridLineWidth: 0.5,
-    gridLineDashStyle: "Dot",
+    gridLineWidth: 0,
+    // gridLineDashStyle: "Dot",
   },
 
   series: [

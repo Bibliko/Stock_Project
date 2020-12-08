@@ -30,6 +30,7 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
     },
+    fontWeight: "bold",
     padding: "0.5em",
     paddingRight: "1em",
     color: `${theme.palette.normalFontColor.primary}`,

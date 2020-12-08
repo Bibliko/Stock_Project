@@ -4,7 +4,6 @@
   - App Bar
   - Paper
   - Login
-  - Table
   - Menu
   - Text
   - Snack Bar
@@ -18,6 +17,8 @@ const theme = {
   customShadow: {
     popup:
       "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)",
+    popupLight:
+      "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(255,255,255,0.14), 0px 1px 18px 0px rgba(255,255,255,0.12)",
     tableContainer:
       "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
   },
@@ -61,12 +62,21 @@ const theme = {
     searchMenu: 1200,
     searchFieldTextField: 1300,
   },
+
+  typography: {
+    fontFamily: `"Open Sans", sans-serif`,
+    fontSize: 14,
+    fontWeightLight: 400,
+    fontWeightRegular: 500,
+    fontWeightMedium: 600,
+  },
+
   palette: {
     // Basic
     primary: {
       // Purple
-      main: "rgba(135, 143, 255, 1)",
-      hover: "rgba(135, 143, 255, 0.3)",
+      main: "rgba(136, 120, 255, 1)",
+      hover: "rgba(136, 120, 255, 0.3)",
 
       subLight: "rgba(120, 127, 246, 1)",
 
@@ -80,10 +90,15 @@ const theme = {
       hover: "rgba(128, 222, 255, 0.3)",
     },
 
+    gradient: {
+      main:
+        "linear-gradient(90deg, rgba(138, 118, 255, 1), rgba(97, 213, 255, 1))", // Used for titles
+    },
+
     succeed: {
       main: "rgba(30, 198, 36, 1)", // Green
-      sub: "rgba(47, 134, 165, 1)", // Light Blue + Green
-      subHover: "rgba(53, 150, 185, 1)",
+      sub: "rgba(60, 140, 165, 1)", // Light Blue + Green
+      subHover: "rgba(70, 160, 185, 1)",
     },
 
     fail: {
@@ -106,14 +121,14 @@ const theme = {
 
     // Paper
     paperBackground: {
-      main: "rgba(22, 26, 27, 1)", // Black
-      sub: "rgba(54, 36, 157, 1)", // Dark Blue
+      main: "rgba(0, 0, 0, 1)", // Black
+      sub: "rgba(107, 87, 224, 1)", // Dark Purple
 
       // Grey
-      onPage: "rgba(47, 51, 54, 1)",
-      onPageLight: "rgba(59, 64, 68, 1)",
-      onPageSuperLight: "rgba(89, 92, 94, 1)",
-      hoverBlur: "rgba(255, 255, 255, 0.2)",
+      onPage: "rgba(30, 33, 36, 1)",
+      onPageLight: "rgba(40, 43, 46, 1)",
+      onPageSuperLight: "rgba(60, 63, 66, 1)",
+      hoverBlur: "rgba(255, 255, 255, 0.25)",
     },
 
     // Login
@@ -127,18 +142,6 @@ const theme = {
 
     submitButton: {
       main: "#222f80",
-    },
-
-    // Table
-    tableHeader: {
-      darkBlue: "rgba(35, 20, 150, 1)",
-      lightBlue: "rgba(0, 185, 209, 1)",
-      purple: "rgba(93, 64, 219, 1)",
-    },
-
-    tableRow: {
-      lightBlue: "rgba(54, 151, 254, 1)",
-      darkBlue: "rgba(19, 100, 186, 1)",
     },
 
     // Menu
@@ -170,10 +173,9 @@ const theme = {
 
     // Search Field
     searchFieldBackground: {
-      main: "rgba(97, 103, 208, 0.8)",
-      onHover: "rgba(97, 103, 208, 1)",
-      rippleSpan: "rgba(97, 103, 208, 0.9)",
-      whenOpen: "rgba(30, 30, 30, 1)",
+      main: "rgba(60, 60, 60, 1)",
+      onHover: "rgba(70, 70, 70, 1)",
+      rippleSpan: "rgba(100, 100, 100, 0.9)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
     },
 

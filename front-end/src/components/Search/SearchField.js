@@ -52,7 +52,6 @@ const styles = (theme) => ({
     },
   },
   backgroundWhenTextFieldOpen: {
-    backgroundColor: theme.palette.searchFieldBackground.onHover,
     marginLeft: "-4px",
   },
   input: {

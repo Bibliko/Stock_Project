@@ -32,9 +32,9 @@ import {
 
 import {
   AccountCircleRounded as AccountCircleRoundedIcon,
-  // CategoryRounded as CategoryRoundedIcon,
   AppsRounded as AppsRoundedIcon,
   ListAltRounded as ListAltRoundedIcon,
+  NotificationsRounded as NotificationsRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -43,7 +43,7 @@ const styles = (theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    background: theme.palette.appBarBackground.main,
+    background: theme.palette.paperBackground.main,
     height: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
       height: theme.customHeight.appBarHeightSmall,
@@ -130,6 +130,7 @@ const styles = (theme) => ({
   },
   menuPaper: {
     backgroundColor: theme.palette.paperBackground.onPage,
+    boxShadow: theme.customShadow.popup,
     color: "white",
     minWidth: "160px",
   },
@@ -244,12 +245,29 @@ class PersistentAppBar extends React.Component {
     const { openAccountMenu, openGameMenu } = this.state;
 
     return (
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" elevation={0} className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Grid className={classes.leftNavbarGrid}>
             <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
+            <Tooltip title="Education">
+              <IconButton className={classes.secondaryMenuButton}>
+                {/* <img
+                  alt="Education"
+                  src="/educationIcon.png"
+                  className={classes.normalIcon}
+                /> */}
+                <ListAltRoundedIcon className={classes.normalIcon} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Notification">
+              <IconButton className={classes.secondaryMenuButton}>
+                <NotificationsRoundedIcon className={classes.normalIcon} />
+              </IconButton>
+            </Tooltip>
+
             <Tooltip title="Game">
               <IconButton
                 disabled={openGameMenu}
@@ -343,16 +361,7 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
-            <Tooltip title="Education">
-              <IconButton className={classes.secondaryMenuButton}>
-                {/* <img
-                  alt="Education"
-                  src="/educationIcon.png"
-                  className={classes.normalIcon}
-                /> */}
-                <ListAltRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
+
             <Tooltip title="Account">
               <IconButton
                 className={classes.accountButton}

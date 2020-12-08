@@ -70,19 +70,6 @@ class AccountSummaryChart extends React.Component {
     highChartOptions: {
       ...highChartDecorations,
 
-      title: {
-        ...highChartDecorations.title,
-        text: "Historical Portfolio",
-      },
-
-      yAxis: {
-        ...highChartDecorations.yAxis,
-        title: {
-          ...highChartDecorations.yAxis.title,
-          text: "Portfolio Value",
-        },
-      },
-
       series: [
         {
           ...highChartDecorations.series[0],

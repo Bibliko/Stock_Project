@@ -4,7 +4,7 @@ export const shouldRedirectToLogin = (props) => {
   return isEmpty(props.userSession);
 };
 
-export const shouldRedirectToLandingPage = (props) => {
+export const shouldRedirectToHomePage = (props) => {
   return !isEmpty(props.userSession);
 };
 
@@ -25,7 +25,7 @@ export const openInNewTab = (url) => {
 
 export default {
   shouldRedirectToLogin,
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
   openInNewTab,
 };

@@ -48,13 +48,6 @@ const styles = (theme) => ({
   cellDivName: {
     justifyContent: "flex-start",
   },
-  watchlistButton: {
-    color: "#619FD7",
-    "&:hover": {
-      color: "rgba(97, 159, 215, 0.8)",
-    },
-    padding: "5px",
-  },
   watchlistIcon: {
     height: "30px",
     width: "30px",
@@ -71,9 +64,9 @@ const styles = (theme) => ({
   iconInsideIconButton: {
     height: "22px",
     width: "22px",
-    color: "white",
+    color: theme.palette.fail.main,
     "&:hover": {
-      color: theme.palette.fail.sub,
+      color: theme.palette.fail.mainHover,
       cursor: "pointer",
     },
   },

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../../utils/low-dependency/PageRedirectUtil";
 
@@ -81,13 +81,13 @@ const styles = (theme) => ({
 
 class Succeed extends React.Component {
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }

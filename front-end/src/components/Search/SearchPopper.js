@@ -29,7 +29,7 @@ const styles = (theme) => ({
     zIndex: theme.customZIndex.searchMenu,
   },
   menuPaper: {
-    background: theme.palette.appBarBackground.main,
+    background: theme.palette.paperBackground.onPage,
     boxShadow: theme.customShadow.popup,
     color: "white",
     paddingTop: theme.customHeight.appBarHeight,

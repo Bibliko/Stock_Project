@@ -6,8 +6,8 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
-import MarketWatchPaper from "../../components/Paper/LandingPage/MarketWatch";
-import AccountSummaryPaper from "../../components/Paper/LandingPage/AccountSummary";
+import MarketWatchPaper from "../../components/Paper/HomePage/MarketWatch";
+import AccountSummaryPaper from "../../components/Paper/HomePage/AccountSummary";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -27,8 +27,9 @@ const styles = (theme) => ({
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "center",
+    flexDirection: "column",
     maxWidth: "none",
   },
   center: {
@@ -48,7 +49,7 @@ const styles = (theme) => ({
   },
   itemGrid: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
@@ -57,10 +58,10 @@ const styles = (theme) => ({
   gridTitle: {
     fontSize: "large",
     [theme.breakpoints.down("sm")]: {
-      fontSize: "small",
+      fontSize: "medium",
     },
     fontWeight: "bold",
-    marginBottom: "5px",
+    marginBottom: "12px",
   },
   bigTitle: {
     color: theme.palette.primary.main,
@@ -103,9 +104,27 @@ const styles = (theme) => ({
   largeMarginBottom: {
     marginBottom: "40px",
   },
+  welcome: {
+    fontSize: "xx-large",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "x-large",
+    },
+    alignSelf: "flex-start",
+    marginBottom: "40px",
+    fontWeight: "bolder",
+    background: theme.palette.gradient.main,
+    "-webkit-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+  },
+  watchlistPaper: {
+    backgroundColor: theme.palette.paperBackground.onPage,
+    borderRadius: "4px",
+    width: "100%",
+    height: "100px",
+  },
 });
 
-class LandingPage extends React.Component {
+class HomePage extends React.Component {
   state = {
     hoverPaperAccountSetting: false,
   };
@@ -135,6 +154,7 @@ class LandingPage extends React.Component {
 
     return (
       <Container className={classes.root} disableGutters>
+        <Typography className={classes.welcome}>Welcome to Bibliko</Typography>
         {!userSession.hasFinishedSettingUp && (
           <Paper
             className={classes.paperRedirectingToAccountSetting}
@@ -158,32 +178,36 @@ class LandingPage extends React.Component {
         {userSession.hasFinishedSettingUp && (
           <Grid
             container
-            spacing={6}
+            spacing={8}
             direction="row"
             className={classes.fullHeightWidth}
           >
             <Grid
               item
               xs={12}
-              sm={12}
+              sm={8}
               className={clsx(classes.itemGrid, classes.largeMarginBottom)}
             >
-              <Typography className={clsx(classes.gridTitle, classes.bigTitle)}>
-                MARKET WATCH
-              </Typography>
               <MarketWatchPaper />
             </Grid>
+
+            <Grid item xs={12} sm={4} className={classes.itemGrid}>
+              <Paper className={classes.watchlistPaper}></Paper>
+            </Grid>
+
             <Grid container item xs={12} sm={6} className={classes.itemGrid}>
               <AccountSummaryPaper />
             </Grid>
+
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
               <Typography className={clsx(classes.gridTitle, classes.bigTitle)}>
-                RANKINGS
+                Rankings
               </Typography>
               <Paper
                 className={clsx(classes.fullHeightWidth, classes.paperColor)}
               />
             </Grid>
+
             <SpaceDivMainPages />
           </Grid>
         )}
@@ -197,5 +221,5 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(LandingPage))
+  withStyles(styles)(withRouter(HomePage))
 );

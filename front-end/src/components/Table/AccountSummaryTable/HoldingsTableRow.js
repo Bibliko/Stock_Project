@@ -49,15 +49,15 @@ const styles = (theme) => ({
     justifyContent: "center",
   },
   addWatchlistButton: {
-    color: "#619FD7",
+    color: theme.palette.succeed.sub,
     "&:hover": {
-      color: "rgba(97, 159, 215, 0.8)",
+      color: theme.palette.succeed.subHover,
     },
   },
   removeWatchlistButton: {
-    color: "white",
+    color: theme.palette.fail.main,
     "&:hover": {
-      color: "#e23d3d",
+      color: theme.palette.fail.mainHover,
     },
   },
   watchlistIcon: {
@@ -65,10 +65,10 @@ const styles = (theme) => ({
     width: "22px",
   },
   arrowUp: {
-    color: "#219653",
+    color: theme.palette.succeed.main,
   },
   arrowDown: {
-    color: "#ef0808",
+    color: theme.palette.fail.main,
   },
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",

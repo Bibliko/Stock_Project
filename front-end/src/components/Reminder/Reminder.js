@@ -21,7 +21,7 @@ const styles = (theme) => ({
     width: "100%",
     height: "40px",
     padding: "10px",
-    backgroundColor: "#e23d3d",
+    backgroundColor: theme.palette.primary.main,
     zIndex: theme.customZIndex.reminder,
     top: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {

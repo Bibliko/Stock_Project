@@ -46,10 +46,10 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   arrowUp: {
-    color: "#219653",
+    color: theme.palette.succeed.main,
   },
   arrowDown: {
-    color: "#ef0808",
+    color: theme.palette.fail.main,
   },
   summaryTableItem: {
     fontSize: "medium",

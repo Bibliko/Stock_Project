@@ -5,7 +5,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import {
@@ -290,13 +290,13 @@ class ForgotPassword extends React.Component {
   };
 
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
@@ -311,7 +311,7 @@ class ForgotPassword extends React.Component {
       error,
     } = this.state;
 
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       return null;
     }
 
