@@ -9,11 +9,13 @@ const {
 } = require("../utils/low-dependency/PromisesUtil");
 const {
   accountSummaryChart,
-  sharesList
+  sharesList,
+  cachedMostGainers
 } = require("../utils/redis-utils/RedisUtil");
 const {
   getCachedHistoricalChart
 } = require("../utils/redis-utils/HistoricalChart");
+const { parseCachedMostGainer } = require("../utils/low-dependency/ParserUtil");
 
 const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
 const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
@@ -27,6 +29,8 @@ const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
 const getHistoricalChart = "getHistoricalChart";
+
+const getMostGainers = "getMostGainers";
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
@@ -190,6 +194,17 @@ router.get(`/${getHistoricalChart}`, (req, res) => {
   getCachedHistoricalChart(exchangeOrCompany, typeChart, getFromCacheDirectly)
     .then((historicalChartData) => {
       res.send(historicalChartData);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+router.get(`/${getMostGainers}`, (req, res) => {
+  listRangeAsync(cachedMostGainers, 0, -1)
+    .then((gainers) => {
+      res.send(gainers.map((gainer) => parseCachedMostGainer(gainer)));
     })
     .catch((err) => {
       console.log(err);

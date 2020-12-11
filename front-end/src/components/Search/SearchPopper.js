@@ -54,8 +54,8 @@ const styles = (theme) => ({
     top: "5px",
     right: "10px",
     [theme.breakpoints.down("xs")]: {
-      top: "0px",
       right: "8px",
+      padding: "8px",
     },
     color: "white",
     "&:hover": {

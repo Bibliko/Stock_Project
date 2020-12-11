@@ -56,7 +56,7 @@ const styles = (theme) => ({
     color: theme.palette.success.main,
   },
   arrowDown: {
-    color: theme.palette.fail.sub,
+    color: theme.palette.fail.main,
   },
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",

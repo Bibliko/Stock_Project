@@ -17,6 +17,8 @@ const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
 const getHistoricalChart = "getHistoricalChart";
 
+const getMostGainers = "getMostGainers";
+
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/redis/${getAccountSummaryChartWholeList}`, {
@@ -170,6 +172,21 @@ export const getCachedHistoricalChart = (
   });
 };
 
+export const getCachedMostGainers = () => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/${getMostGainers}`, {
+      method: "get",
+      withCredentials: true,
+    })
+      .then((gainers) => {
+        resolve(gainers.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export default {
   getCachedAccountSummaryChartInfo,
 
@@ -182,4 +199,6 @@ export default {
   getManyStockInfosUsingPrismaShares,
 
   getCachedHistoricalChart,
+
+  getCachedMostGainers,
 };

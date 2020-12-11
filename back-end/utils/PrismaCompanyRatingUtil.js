@@ -77,7 +77,7 @@ const updateCompaniesRatingsList = (forceUpdate = false) => {
             return executeUpdateCompaniesRatingsList();
           }
           console.log(
-            "[DEVELOPER MODE] Unnecessary ratings update has been prevented."
+            "[DEVELOPMENT MODE] Unnecessary ratings update has been prevented."
           );
         })
         .catch((err) => reject(err));

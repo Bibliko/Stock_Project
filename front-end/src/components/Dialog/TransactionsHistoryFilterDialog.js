@@ -50,7 +50,7 @@ const styles = (theme) => ({
     },
   },
   dialogAppBar: {
-    background: theme.palette.appBarBackground.main,
+    background: theme.palette.primary.subDarker,
   },
   tab: {
     "&.MuiTab-textColorPrimary": {
@@ -89,7 +89,7 @@ const styles = (theme) => ({
     position: "absolute",
     bottom: "0px",
     right: "50px",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   clearAll: {
     alignSelf: "flex-end",

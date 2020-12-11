@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import MarketWatchPaper from "../../components/Paper/HomePage/MarketWatch";
+import MostGainersPaper from "../../components/Paper/HomePage/MostGainers";
 import AccountSummaryPaper from "../../components/Paper/HomePage/AccountSummary";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
@@ -55,15 +56,13 @@ const styles = (theme) => ({
     minHeight: "125px",
     //maxHeight: '300px'
   },
-  gridTitle: {
+  title: {
     fontSize: "large",
     [theme.breakpoints.down("sm")]: {
       fontSize: "medium",
     },
     fontWeight: "bold",
     marginBottom: "12px",
-  },
-  bigTitle: {
     color: theme.palette.primary.main,
   },
   paperRedirectingToAccountSetting: {
@@ -115,12 +114,6 @@ const styles = (theme) => ({
     background: theme.palette.gradient.main,
     "-webkit-background-clip": "text",
     "-webkit-text-fill-color": "transparent",
-  },
-  watchlistPaper: {
-    backgroundColor: theme.palette.paperBackground.onPage,
-    borderRadius: "4px",
-    width: "100%",
-    height: "100px",
   },
 });
 
@@ -185,14 +178,14 @@ class HomePage extends React.Component {
             <Grid
               item
               xs={12}
-              sm={8}
+              md={7}
               className={clsx(classes.itemGrid, classes.largeMarginBottom)}
             >
               <MarketWatchPaper />
             </Grid>
 
-            <Grid item xs={12} sm={4} className={classes.itemGrid}>
-              <Paper className={classes.watchlistPaper}></Paper>
+            <Grid item xs={12} md={5} className={classes.itemGrid}>
+              <MostGainersPaper title={"Most Gainers"} />
             </Grid>
 
             <Grid container item xs={12} sm={6} className={classes.itemGrid}>
@@ -200,9 +193,7 @@ class HomePage extends React.Component {
             </Grid>
 
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography className={clsx(classes.gridTitle, classes.bigTitle)}>
-                Rankings
-              </Typography>
+              <Typography className={classes.title}>Rankings</Typography>
               <Paper
                 className={clsx(classes.fullHeightWidth, classes.paperColor)}
               />

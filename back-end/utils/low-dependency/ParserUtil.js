@@ -407,10 +407,31 @@ const parseCachedHistoricalChartFullItem = (redisString) => {
   };
 };
 
+/**
+ * @param {object} mostGainer Object most gainer from FMP
+ */
+const createRedisValueFromMostGainer = (mostGainer) => {
+  const { ticker, changes, price, changesPercentage, companyName } = mostGainer;
+  return `${ticker}|${changes}|${price}|${changesPercentage}|${companyName}`;
+};
+
+const parseCachedMostGainer = (redisString) => {
+  const valuesArray = redisString.split("|");
+  return {
+    ticker: valuesArray[0],
+    changes: parseFloat(valuesArray[1]),
+    prices: parseFloat(valuesArray[2]),
+    changesPercentage: valuesArray[3],
+    companyName: valuesArray[4]
+  };
+};
+
 module.exports = {
+  // Market Holiday
   parseCachedMarketHoliday,
   createRedisValueFromMarketHoliday,
 
+  // Share
   parseCachedShareQuote,
   createRedisValueFromStockQuoteJSON,
 
@@ -420,17 +441,24 @@ module.exports = {
   combineFMPStockQuoteAndProfile,
   createSymbolsStringFromCachedSharesList,
 
+  // Transaction
   createRedisValueFromFinishedTransaction,
 
   createPrismaFiltersObject,
   createRedisValueFromTransactionsHistoryFilters,
   parseRedisTransactionsHistoryFilters,
 
+  // Account Summary
   parseAccountSummaryTimestamp,
 
+  // Historical Chart
   createRedisValueFromHistoricalChart5min,
   parseCachedHistoricalChart5minItem,
 
   createRedisValueFromHistoricalChartFull,
-  parseCachedHistoricalChartFullItem
+  parseCachedHistoricalChartFullItem,
+
+  // Most Gainers
+  createRedisValueFromMostGainer,
+  parseCachedMostGainer
 };

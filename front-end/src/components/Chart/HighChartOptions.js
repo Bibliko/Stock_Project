@@ -1,3 +1,4 @@
+import theme from "../../theme/themeObj";
 import themeObj from "../../theme/themeObj";
 import { changeOpacityOfRGBAString } from "../../theme/ThemeUtil";
 
@@ -7,6 +8,7 @@ export const highChartDecorations = {
     backgroundColor: "rgba(255, 255, 255, 0)",
     style: {
       color: "white",
+      fontFamily: theme.typography.fontFamily,
     },
   },
 
@@ -57,6 +59,7 @@ export const highChartDecorations = {
       enabled: true,
       style: {
         color: "white",
+        fontSize: theme.typography.fontSize,
       },
     },
     lineWidth: 0,
@@ -70,6 +73,7 @@ export const highChartDecorations = {
       enabled: true,
       style: {
         color: "white",
+        fontSize: theme.typography.fontSize,
       },
     },
     allowDecimals: false,

@@ -1,7 +1,6 @@
 /* 
   palette:
   - Basic
-  - App Bar
   - Paper
   - Login
   - Menu
@@ -17,14 +16,15 @@ const theme = {
   customShadow: {
     popup:
       "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)",
-    popupLight:
-      "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(255,255,255,0.14), 0px 1px 18px 0px rgba(255,255,255,0.12)",
     tableContainer:
       "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
   },
   customWidth: {
     maxSearchFieldWithLogo: "370px",
     maxSearchFieldWidth: "240px",
+
+    maxMostGainers: "400px",
+    maxMostGainersChip: "85px",
 
     mainPageWidth: "90%",
     mainSkeletonWidth: "100%",
@@ -39,6 +39,8 @@ const theme = {
 
     settingTextField: "45px",
     settingTextFieldSmall: "35px",
+
+    mostGainersCard: "50px",
   },
   customMargin: {
     appBarPadding: "20px",
@@ -82,12 +84,15 @@ const theme = {
 
       subDark: "rgba(104, 80, 230, 1)",
       subDarkHover: "rgba(126, 101, 255, 1)",
+
+      subDarker: "rgba(80, 60, 190, 1)",
     },
 
     secondary: {
       // Light Blue + Green
       main: "rgba(128, 222, 255, 1)",
       hover: "rgba(128, 222, 255, 0.3)",
+      mainHover: "rgba(52, 198, 246, 1)",
     },
 
     gradient: {
@@ -95,28 +100,16 @@ const theme = {
         "linear-gradient(90deg, rgba(138, 118, 255, 1), rgba(97, 213, 255, 1))", // Used for titles
     },
 
-    succeed: {
-      main: "rgba(30, 198, 36, 1)", // Green
-      sub: "rgba(60, 140, 165, 1)", // Light Blue + Green
-      subHover: "rgba(70, 160, 185, 1)",
-    },
-
     fail: {
       // Red
-      main: "rgba(200, 50, 50, 1)",
+      main: "rgba(255, 105, 105, 1)",
+      hover: "rgba(255, 105, 105, 0.3)",
       mainHover: "rgba(230, 60, 60, 1)",
-      sub: "rgba(255, 105, 105, 1)",
     },
 
     disabled: {
       // Grey
       main: "rgba(255, 255, 255, 0.3)",
-    },
-
-    // App Bar
-    appBarBackground: {
-      // Dark Blue
-      main: "rgba(43, 12, 154, 0.95)",
     },
 
     // Paper

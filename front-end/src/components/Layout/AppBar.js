@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { isEmpty, isEqual, pick } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { socket } from "../../App";
@@ -18,8 +18,7 @@ import { withStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Toolbar,
-  IconButton,
-  Avatar,
+  Button,
   Grid,
   ClickAwayListener,
   Grow,
@@ -27,15 +26,8 @@ import {
   Popper,
   MenuItem,
   MenuList,
-  Tooltip,
+  Typography,
 } from "@material-ui/core";
-
-import {
-  AccountCircleRounded as AccountCircleRoundedIcon,
-  AppsRounded as AppsRoundedIcon,
-  ListAltRounded as ListAltRoundedIcon,
-  NotificationsRounded as NotificationsRoundedIcon,
-} from "@material-ui/icons";
 
 const styles = (theme) => ({
   appBar: {
@@ -49,42 +41,27 @@ const styles = (theme) => ({
       height: theme.customHeight.appBarHeightSmall,
     },
   },
-  accountButton: {
+  menuButton: {
+    textTransform: "none",
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: "6px",
-    marginRight: "12px",
+    minWidth: "0px",
+    margin: "8px",
     [theme.breakpoints.down("xs")]: {
-      marginRight: "4px",
-    },
-    "& .MuiIconButton-colorPrimary": {
-      color: "white",
-    },
-    "& .MuiTouchRipple-root": {
-      color: "white",
-    },
-    "&:hover": {
-      backgroundColor: theme.palette.menuItemHover.main,
+      margin: "4px",
     },
   },
-  secondaryMenuButton: {
-    height: "fit-content",
-    width: "fit-content",
-    padding: "4px",
-    margin: "6px",
-    [theme.breakpoints.down("xs")]: {
-      margin: "2px",
-    },
-    "& .MuiIconButton-colorPrimary": {
-      color: "white",
-    },
-    "& .MuiTouchRipple-root": {
-      color: "white",
-    },
+  menuButtonTitle: {
+    color: theme.palette.normalFontColor.primary,
     "&:hover": {
-      backgroundColor: theme.palette.menuItemHover.main,
+      color: theme.palette.secondary.main,
     },
+    fontSize: "small",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "xx-small",
+    },
+    fontWeight: "bold",
   },
   normalIcon: {
     height: "30px",
@@ -92,15 +69,6 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       height: "25px",
       width: "25px",
-    },
-    color: "white",
-  },
-  avatarIcon: {
-    height: "40px",
-    width: "40px",
-    [theme.breakpoints.down("xs")]: {
-      height: "30px",
-      width: "30px",
     },
     color: "white",
   },
@@ -240,7 +208,7 @@ class PersistentAppBar extends React.Component {
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { classes } = this.props;
 
     const { openAccountMenu, openGameMenu } = this.state;
 
@@ -251,35 +219,29 @@ class PersistentAppBar extends React.Component {
             <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
-            <Tooltip title="Education">
-              <IconButton className={classes.secondaryMenuButton}>
-                {/* <img
-                  alt="Education"
-                  src="/educationIcon.png"
-                  className={classes.normalIcon}
-                /> */}
-                <ListAltRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
+            <Button disableRipple className={classes.menuButton}>
+              <Typography className={classes.menuButtonTitle}>
+                Education
+              </Typography>
+            </Button>
 
-            <Tooltip title="Notification">
-              <IconButton className={classes.secondaryMenuButton}>
-                <NotificationsRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
+            <Button disableRipple className={classes.menuButton}>
+              <Typography className={classes.menuButtonTitle}>
+                Notifications
+              </Typography>
+            </Button>
 
-            <Tooltip title="Game">
-              <IconButton
-                disabled={openGameMenu}
-                className={classes.secondaryMenuButton}
-                ref={this.gameAnchorRef}
-                aria-controls={openGameMenu ? "menu-list-grow" : undefined}
-                aria-haspopup="true"
-                onClick={this.toggleGameMenu}
-              >
-                <AppsRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
+            <Button
+              disableRipple
+              disabled={openGameMenu}
+              className={classes.menuButton}
+              ref={this.gameAnchorRef}
+              aria-controls={openGameMenu ? "menu-list-grow" : undefined}
+              aria-haspopup="true"
+              onClick={this.toggleGameMenu}
+            >
+              <Typography className={classes.menuButtonTitle}>Game</Typography>
+            </Button>
             <Popper
               open={openGameMenu}
               anchorEl={this.gameAnchorRef.current}
@@ -362,26 +324,19 @@ class PersistentAppBar extends React.Component {
               )}
             </Popper>
 
-            <Tooltip title="Account">
-              <IconButton
-                className={classes.accountButton}
-                disabled={openAccountMenu}
-                ref={this.accountAnchorRef}
-                aria-label="Account Menu"
-                aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
-                aria-haspopup="true"
-                onClick={this.toggleAccountMenu}
-              >
-                {isEmpty(userSession.avatarUrl) ? (
-                  <AccountCircleRoundedIcon className={classes.avatarIcon} />
-                ) : (
-                  <Avatar
-                    className={classes.avatarIcon}
-                    src={userSession.avatarUrl}
-                  />
-                )}
-              </IconButton>
-            </Tooltip>
+            <Button
+              className={classes.menuButton}
+              disabled={openAccountMenu}
+              ref={this.accountAnchorRef}
+              aria-label="Account Menu"
+              aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
+              aria-haspopup="true"
+              onClick={this.toggleAccountMenu}
+            >
+              <Typography className={classes.menuButtonTitle}>
+                Account
+              </Typography>
+            </Button>
             <Popper
               open={openAccountMenu}
               anchorEl={this.accountAnchorRef.current}

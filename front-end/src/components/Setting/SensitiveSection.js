@@ -95,7 +95,7 @@ const styles = (theme) => ({
     display: "none",
   },
   emailSuccess: {
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
     fontSize: "small",
     marginBottom: "8px",
     [theme.breakpoints.down("xs")]: {

@@ -37,6 +37,8 @@ const {
  * - 'cachedHistoricalChart5min|${exchangeOrCompany}': list, last item is timestamp when last updated
  * - 'cachedHistoricalChartFull|${exchangeOrCompany}': list, last item is timestamp when last updated
  *
+ * - 'cachedMostGainers': list
+ *
  * - 'cachedShares': list
  * - 'cachedShares|${companyCode}|quote': value
  * - 'cachedShares|${companyCode}|profile': value
@@ -57,6 +59,7 @@ const clientTimestampLastJoinInSocketRoom =
 const cachedMarketHoliday = "cachedMarketHoliday";
 const cachedHistoricalChart5min = "cachedHistoricalChart5min";
 const cachedHistoricalChartFull = "cachedHistoricalChartFull";
+const cachedMostGainers = "cachedMostGainers";
 const cachedShares = "cachedShares";
 const rankingList = "RANKING_LIST";
 
@@ -259,6 +262,7 @@ module.exports = {
   cachedMarketHoliday,
   cachedHistoricalChart5min,
   cachedHistoricalChartFull,
+  cachedMostGainers,
   cachedShares,
   rankingList,
 

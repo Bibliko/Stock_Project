@@ -76,7 +76,7 @@ const styles = (theme) => ({
     },
   },
   dailyChangeGreen: {
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   dailyChangeRed: {
     color: theme.palette.fail.main,

@@ -32,7 +32,7 @@ const styles = (theme) => ({
   editDiv: {
     position: "absolute",
     backgroundColor: changeOpacityOfRGBAString(
-      theme.palette.appBarBackground.main,
+      theme.palette.primary.subDarker,
       "0.3"
     ),
     borderRadius: "50%",

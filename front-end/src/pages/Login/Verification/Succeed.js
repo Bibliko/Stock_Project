@@ -56,7 +56,7 @@ const styles = (theme) => ({
   title: {
     fontSize: "large",
     fontWeight: "bold",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   avatar: {
     height: "130px",
@@ -66,7 +66,7 @@ const styles = (theme) => ({
   succeedIcon: {
     height: "100px",
     width: "100px",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   mainGridOfPaper: {
     display: "flex",

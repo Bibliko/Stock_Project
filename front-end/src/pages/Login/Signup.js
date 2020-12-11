@@ -103,7 +103,7 @@ const styles = (theme) => ({
   successText: {
     fontSize: "medium",
     fontWeight: "bold",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   form: {
     flexDirection: "column",

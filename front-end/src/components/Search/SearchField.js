@@ -30,6 +30,9 @@ const styles = (theme) => ({
     zIndex: theme.customZIndex.searchFieldTextField,
     "& .MuiInputBase-root": {
       height: "40px",
+      [theme.breakpoints.down("xs")]: {
+        height: "30px",
+      },
       borderRadius: theme.customMargin.appBarPadding,
     },
     "& .MuiInputLabel-outlined": {
@@ -57,15 +60,26 @@ const styles = (theme) => ({
   input: {
     color: "white",
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
   },
   iconButton: {
     padding: "8px",
   },
   clearIcon: {
     color: "rgba(255, 255, 255, 0.8)",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+      width: "20px",
+    },
   },
   searchIcon: {
     color: "rgba(255, 255, 255, 0.6)",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+      width: "20px",
+    },
   },
   hide: {
     display: "none",

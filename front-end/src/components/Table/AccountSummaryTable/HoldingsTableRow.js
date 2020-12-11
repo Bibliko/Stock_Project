@@ -49,9 +49,9 @@ const styles = (theme) => ({
     justifyContent: "center",
   },
   addWatchlistButton: {
-    color: theme.palette.succeed.sub,
+    color: theme.palette.secondary.main,
     "&:hover": {
-      color: theme.palette.succeed.subHover,
+      color: theme.palette.secondary.mainHover,
     },
   },
   removeWatchlistButton: {
@@ -65,7 +65,7 @@ const styles = (theme) => ({
     width: "22px",
   },
   arrowUp: {
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   arrowDown: {
     color: theme.palette.fail.main,

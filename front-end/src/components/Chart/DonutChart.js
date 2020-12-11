@@ -55,7 +55,7 @@ const TEXT_COLOR = themeObj.palette.normalFontColor.primary;
 
 const CustomTooltip = withStyles((theme) => ({
   tooltip: {
-    fontSize: "14px",
+    fontSize: "12px",
     backgroundColor: theme.palette.primary.main,
   },
 }))(Tooltip);

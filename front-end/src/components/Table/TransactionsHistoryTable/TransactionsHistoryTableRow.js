@@ -30,10 +30,10 @@ const styles = (theme) => ({
     justifyContent: "flex-start",
   },
   greenIcon: {
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   redIcon: {
-    color: theme.palette.fail.sub,
+    color: theme.palette.fail.main,
   },
 
   // border section

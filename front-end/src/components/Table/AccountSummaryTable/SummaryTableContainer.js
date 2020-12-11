@@ -46,7 +46,7 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   arrowUp: {
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   arrowDown: {
     color: theme.palette.fail.main,
