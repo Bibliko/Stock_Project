@@ -13,7 +13,7 @@ import {
 
 import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
 
-import { getParsedCachedSharesList } from "../../../utils/RedisUtil";
+import { getCachedSharesList } from "../../../utils/RedisUtil";
 
 import { Grid, Typography, Avatar, Paper } from "@material-ui/core";
 import { StorefrontRounded as StorefrontRoundedIcon } from "@material-ui/icons";
@@ -122,7 +122,7 @@ class AccountSummary extends React.Component {
   };
 
   componentDidMount() {
-    getParsedCachedSharesList(this.props.userSession.email)
+    getCachedSharesList(this.props.userSession.email)
       .then((shares) => {
         this.setState(
           {

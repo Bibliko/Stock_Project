@@ -29,7 +29,7 @@ const styles = (theme) => ({
     background: "rgba(0,0,0,0)",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     flexDirection: "column",
     maxWidth: "none",
   },
@@ -86,11 +86,12 @@ const styles = (theme) => ({
     marginRight: "10px",
   },
   "@keyframes rotateAccountSetting": {
-    from: { transform: "rotate(0deg)" },
-    to: { transform: "rotate(359deg)" },
+    "0%": { transform: "rotate(0deg)" },
+    "60%": { transform: "rotate(359deg)" },
+    "100%": { transform: "rotate(359deg)" },
   },
   accountSettingIconAnimation: {
-    animation: "2.5s infinite $rotateAccountSetting",
+    animation: "5s infinite $rotateAccountSetting",
   },
   accountSettingWords: {
     color: "white",
@@ -118,22 +119,6 @@ const styles = (theme) => ({
 });
 
 class HomePage extends React.Component {
-  state = {
-    hoverPaperAccountSetting: false,
-  };
-
-  hoverPaper = () => {
-    this.setState({
-      hoverPaperAccountSetting: true,
-    });
-  };
-
-  notHoverPaper = () => {
-    this.setState({
-      hoverPaperAccountSetting: false,
-    });
-  };
-
   shouldComponentUpdate(nextProps, nextState) {
     return (
       !isEqual(nextProps.userSession, this.props.userSession) ||
@@ -143,7 +128,6 @@ class HomePage extends React.Component {
 
   render() {
     const { classes, userSession } = this.props;
-    const { hoverPaperAccountSetting } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
@@ -155,13 +139,12 @@ class HomePage extends React.Component {
             onClick={() => {
               redirectToPage("/setting", this.props);
             }}
-            onMouseEnter={this.hoverPaper}
-            onMouseLeave={this.notHoverPaper}
           >
             <SettingsRoundedIcon
-              className={clsx(classes.accountSettingIcon, {
-                [classes.accountSettingIconAnimation]: hoverPaperAccountSetting,
-              })}
+              className={clsx(
+                classes.accountSettingIcon,
+                classes.accountSettingIconAnimation
+              )}
             />
             <Typography className={classes.accountSettingWords}>
               Setup Your Account Now To Start!

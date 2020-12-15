@@ -332,6 +332,7 @@ class PersistentAppBar extends React.Component {
               aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
               aria-haspopup="true"
               onClick={this.toggleAccountMenu}
+              disableRipple
             >
               <Typography className={classes.menuButtonTitle}>
                 Account

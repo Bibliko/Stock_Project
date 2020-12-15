@@ -283,6 +283,7 @@ class Signup extends React.Component {
                       redirectToPage("/login", this.props);
                     }}
                     className={classes.link}
+                    disableRipple
                   >
                     Back to Login
                   </Button>

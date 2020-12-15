@@ -22,21 +22,24 @@ const styles = (theme) => ({
     marginTop: "5px",
   },
   input: {
-    color: "black",
-    backgroundColor: "rgba(225,225,225,0.6)",
+    color: "white",
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:hover": {
-      backgroundColor: "rgba(225,225,225,0.8)",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
     fontSize: "medium",
-    height: "40px",
+    height: "45px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
-      height: "30px",
+      height: "35px",
     },
   },
   title: {
     color: "white",
-    fontSize: "medium",
+    fontSize: "large",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "medium",
+    },
     paddingLeft: "5px",
     fontWeight: "bold",
   },

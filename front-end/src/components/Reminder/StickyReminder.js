@@ -22,6 +22,11 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "12px",
     },
+    backgroundColor: theme.palette.primary.subDark,
+    color: theme.palette.normalFontColor.primary,
+  },
+  alertIcon: {
+    color: `${theme.palette.secondary.main} !important`,
   },
 });
 
@@ -51,6 +56,9 @@ class StickyReminder extends React.Component {
           <Alert
             severity="warning"
             className={classes.alert}
+            classes={{
+              icon: classes.alertIcon,
+            }}
             action={
               <span>
                 {this.props.children} {/* Custom button */}

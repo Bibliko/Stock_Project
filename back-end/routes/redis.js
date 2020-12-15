@@ -15,7 +15,11 @@ const {
 const {
   getCachedHistoricalChart
 } = require("../utils/redis-utils/HistoricalChart");
-const { parseCachedMostGainer } = require("../utils/low-dependency/ParserUtil");
+const {
+  parseCachedMostGainer,
+  createRedisValueFromSharesList,
+  parseRedisSharesListItem
+} = require("../utils/low-dependency/ParserUtil");
 
 const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
 const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
@@ -81,7 +85,8 @@ router.get(`/${getAccountSummaryChartWholeList}`, (req, res) => {
 
   listRangeAsync(redisKey, 0, -1)
     .then((timestampArray) => {
-      res.send(timestampArray);
+      // [timestamp, value]
+      res.send(timestampArray.map((timestamp) => timestamp.split("|")));
     })
     .catch((err) => {
       console.log(err);
@@ -96,7 +101,7 @@ router.get(`/${getAccountSummaryChartLatestItem}`, (req, res) => {
 
   listRangeAsync(redisKey, -1, -1)
     .then((timestampArray) => {
-      res.send(timestampArray);
+      res.send(timestampArray.map((timestamp) => timestamp.split("|")));
     })
     .catch((err) => {
       console.log(err);
@@ -116,9 +121,9 @@ router.put(`/${updateSharesList}`, (req, res) => {
   const tasksList = [];
 
   shares.forEach((share) => {
-    const { id, companyCode, quantity, buyPriceAvg, userID } = share;
-    const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
-    tasksList.push(() => listPushAsync(redisKey, newValue));
+    tasksList.push(() =>
+      listPushAsync(redisKey, createRedisValueFromSharesList(share))
+    );
   });
 
   SequentialPromisesWithResultsArray(tasksList)
@@ -138,7 +143,9 @@ router.get(`/${getSharesList}`, (req, res) => {
 
   listRangeAsync(redisKey, 0, -1)
     .then((sharesList) => {
-      res.send(sharesList);
+      res.send(
+        sharesList.map((userShare) => parseRedisSharesListItem(userShare))
+      );
     })
     .catch((err) => {
       console.log(err);

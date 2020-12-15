@@ -291,6 +291,7 @@ class Login extends React.Component {
                     redirectToPage("/signup", this.props);
                   }}
                   className={classes.link}
+                  disableRipple
                 >
                   Create an account
                 </Button>
@@ -305,6 +306,7 @@ class Login extends React.Component {
                     redirectToPage("/forgotpassword", this.props);
                   }}
                   className={classes.link}
+                  disableRipple
                 >
                   Forgot password
                 </Button>

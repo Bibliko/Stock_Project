@@ -122,8 +122,10 @@ class WatchlistTableContainer extends React.Component {
     openSnackbar: false,
     companyCodeRemoved: "",
 
-    hoverWatchlistPaper: false,
+    hoverWatchlistPaper: true,
   };
+
+  timeoutStartAnimationAgain;
 
   hoverPaper = () => {
     this.setState({
@@ -135,6 +137,12 @@ class WatchlistTableContainer extends React.Component {
     this.setState({
       hoverWatchlistPaper: false,
     });
+
+    this.timeoutStartAnimationAgain = setTimeout(() => {
+      this.setState({
+        hoverWatchlistPaper: true,
+      });
+    }, 3 * oneSecond);
   };
 
   handleOpenSnackbar = (companyCode) => {
@@ -173,6 +181,10 @@ class WatchlistTableContainer extends React.Component {
       </StyledTableCell>
     );
   };
+
+  componentWillUnmount() {
+    clearTimeout(this.timeoutStartAnimationAgain);
+  }
 
   render() {
     const { classes, rows } = this.props;

@@ -42,14 +42,17 @@ const styles = (theme) => ({
   },
   fullWidth: {
     width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   itemGrid: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "column",
-    minWidth: "150px",
     marginBottom: "10px",
+    width: "100%",
   },
   passwordGridContainer: {
     marginTop: "20px",
@@ -57,27 +60,20 @@ const styles = (theme) => ({
       marginTop: "10px",
     },
   },
-  passwordGridItem: {
-    paddingLeft: "30px !important",
-    paddingRight: "10px !important",
-    [theme.breakpoints.down("xs")]: {
-      paddingLeft: "25px !important",
-      paddingRight: "5px !important",
-    },
-  },
   passwordTitle: {
     color: "white",
-    fontSize: "20px",
+    alignSelf: "flex-start",
+    fontSize: "large",
     marginLeft: "5px",
     marginBottom: "3px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
+      fontSize: "medium",
       marginLeft: "8px",
     },
     fontWeight: "bold",
   },
   text: {
-    fontSize: "18px",
+    fontSize: "medium",
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
     },
@@ -115,13 +111,14 @@ const PasswordAccordion = withStyles((theme) => ({
 
 const PasswordAccordionSummary = withStyles((theme) => ({
   root: {
+    color: "white",
     borderRadius: "4px",
-    backgroundColor: "rgba(225,225,225,0.6)",
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:hover": {
-      backgroundColor: "rgba(225,225,225,0.7)",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
     "&:focus": {
-      backgroundColor: "rgba(225,225,225,0.7)",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
     minHeight: theme.customHeight.settingTextFieldSmall,
     height: theme.customHeight.settingTextField,
@@ -438,11 +435,7 @@ class SensitiveSection extends React.Component {
             </Container>
           </Grid>
 
-          <Grid
-            item
-            xs={12}
-            className={clsx(classes.itemGrid, classes.passwordGridItem)}
-          >
+          <Grid item xs={12} className={classes.itemGrid}>
             <Typography className={classes.passwordTitle}>Password</Typography>
             <PasswordAccordion expanded={show} onChange={this.toggle}>
               <PasswordAccordionSummary
@@ -453,7 +446,7 @@ class SensitiveSection extends React.Component {
                   Change Password
                 </Typography>
               </PasswordAccordionSummary>
-              <AccordionDetails>
+              <AccordionDetails className={classes.fullWidth}>
                 <Grid
                   container
                   spacing={2}

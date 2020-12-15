@@ -10,6 +10,7 @@ import { EditRounded as EditRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   avatar: {
+    color: theme.palette.paperBackground.onPageSuperLight,
     height: "150px",
     width: "150px",
     [theme.breakpoints.down("md")]: {

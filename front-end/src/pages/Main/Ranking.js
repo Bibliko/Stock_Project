@@ -30,7 +30,8 @@ const styles = (theme) => ({
     background: "rgba(0,0,0,0)",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   center: {

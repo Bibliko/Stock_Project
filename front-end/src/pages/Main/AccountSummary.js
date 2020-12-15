@@ -15,7 +15,7 @@ import {
 
 import { getUserData } from "../../utils/UserUtil";
 
-import { getParsedCachedSharesList } from "../../utils/RedisUtil";
+import { getCachedSharesList } from "../../utils/RedisUtil";
 import {
   numberWithCommas,
   roundNumber,
@@ -45,7 +45,8 @@ const styles = (theme) => ({
     background: "rgba(0,0,0,0)",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   center: {
@@ -158,7 +159,7 @@ class AccountSummary extends React.Component {
   };
 
   componentDidMount() {
-    getParsedCachedSharesList(this.props.userSession.email)
+    getCachedSharesList(this.props.userSession.email)
       .then((shares) => {
         this.setState(
           {
@@ -222,6 +223,7 @@ class AccountSummary extends React.Component {
       totalPortfolioLastClosure,
       ranking,
       email,
+      hasFinishedSettingUp,
     } = this.props.userSession;
 
     const userDailyChange = totalPortfolio - totalPortfolioLastClosure;
@@ -267,7 +269,10 @@ class AccountSummary extends React.Component {
             <Typography className={classes.subtitleChart}>
               Portfolio Now
             </Typography>
-            <AccountSummaryChart email={email} />
+            <AccountSummaryChart
+              email={email}
+              hasFinishedSettingUp={hasFinishedSettingUp}
+            />
           </Container>
           <SpaceDivMainPages />
         </Grid>

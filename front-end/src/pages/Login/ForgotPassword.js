@@ -451,12 +451,14 @@ class ForgotPassword extends React.Component {
               >
                 <Grid item xs className={classes.center}>
                   <Button
+                    color="primary"
                     classes={{
                       root: classes.backToLoginText,
                     }}
                     onClick={() => {
                       redirectToPage("/login", this.props);
                     }}
+                    disableRipple
                   >
                     Login
                   </Button>

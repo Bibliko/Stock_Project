@@ -426,6 +426,49 @@ const parseCachedMostGainer = (redisString) => {
   };
 };
 
+/**
+ * @param {object} share Prisma object Share of User
+ */
+export const createRedisValueFromSharesList = (share) => {
+  const { id, companyCode, quantity, buyPriceAvg, userID } = share;
+  return `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
+};
+
+/**
+ * redisString: "id|companyCode|quantity|buyPriceAvg|userID"
+ */
+export const parseRedisSharesListItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+
+  return {
+    id: valuesArray[0],
+    companyCode: valuesArray[1],
+    quantity: parseInt(valuesArray[2], 10),
+    buyPriceAvg: parseFloat(valuesArray[3]),
+    userID: valuesArray[4]
+  };
+};
+
+/**
+ * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|isTypeBuy|userID"
+ */
+export const parseRedisTransactionsHistoryListItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+
+  return {
+    id: valuesArray[0],
+    createdAt: valuesArray[1],
+    companyCode: valuesArray[2],
+    quantity: parseInt(valuesArray[3], 10),
+    priceAtTransaction: parseFloat(valuesArray[4]),
+    brokerage: parseFloat(valuesArray[5]),
+    spendOrGain: parseFloat(valuesArray[6]),
+    finishedTime: valuesArray[7],
+    isTypeBuy: valuesArray[8] === "true",
+    userID: valuesArray[9]
+  };
+};
+
 module.exports = {
   // Market Holiday
   parseCachedMarketHoliday,
@@ -441,12 +484,18 @@ module.exports = {
   combineFMPStockQuoteAndProfile,
   createSymbolsStringFromCachedSharesList,
 
+  // User Shares List
+  createRedisValueFromSharesList,
+  parseRedisSharesListItem,
+
   // Transaction
   createRedisValueFromFinishedTransaction,
 
   createPrismaFiltersObject,
   createRedisValueFromTransactionsHistoryFilters,
   parseRedisTransactionsHistoryFilters,
+
+  parseRedisTransactionsHistoryListItem,
 
   // Account Summary
   parseAccountSummaryTimestamp,
