@@ -408,7 +408,6 @@ class TransactionsHistoryTableContainer extends React.Component {
   };
 
   componentDidMount() {
-    console.log(this.props.userSession);
     this.getUserTransactionsHistoryPageData();
 
     this.scrollPosition = window.scrollY;

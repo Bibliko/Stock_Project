@@ -78,6 +78,7 @@ const getSingleCachedShareInfo = (companyCode) => {
             profile[0]
           );
           resolve(shareInfoObject);
+
           return Promise.all([
             pushManyCodesToCachedShares([companyCode]),
             updatePriceChangeStatus(quote[0]),

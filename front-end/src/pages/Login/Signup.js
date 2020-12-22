@@ -45,7 +45,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    background: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -72,9 +72,9 @@ const styles = (theme) => ({
     padding: theme.spacing(1),
     height: "40px",
     width: "120px",
-    background: "black",
+    background: theme.palette.submitButton.main,
     "&:hover": {
-      backgroundColor: "black",
+      backgroundColor: theme.palette.submitButton.main,
       opacity: 0.8,
     },
     borderRadius: "40px",
@@ -84,7 +84,7 @@ const styles = (theme) => ({
   link: {
     marginTop: "6px",
     backgroundColor: "transparent",
-    color: "black",
+    color: theme.palette.loginLink.main,
     fontWeight: "bold",
     textTransform: "none",
     fontSize: "16px",
@@ -93,9 +93,17 @@ const styles = (theme) => ({
     marginTop: 5,
     display: "flex",
     justifyContent: "center",
+    minHeight: "30px",
   },
   announcementText: {
-    fontSize: "small",
+    fontSize: "medium",
+    fontWeight: "bold",
+    color: theme.palette.fail.main,
+  },
+  successText: {
+    fontSize: "medium",
+    fontWeight: "bold",
+    color: theme.palette.succeed.main,
   },
   form: {
     flexDirection: "column",
@@ -251,7 +259,6 @@ class Signup extends React.Component {
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.announcement}>
                     <Typography
-                      color="error"
                       align="center"
                       className={classes.announcementText}
                     >
@@ -261,11 +268,7 @@ class Signup extends React.Component {
                 )}
                 {!isEmpty(success) && (
                   <Grid item xs className={classes.announcement}>
-                    <Typography
-                      color="primary"
-                      align="center"
-                      className={classes.announcementText}
-                    >
+                    <Typography align="center" className={classes.successText}>
                       Success: {success}
                     </Typography>
                   </Grid>

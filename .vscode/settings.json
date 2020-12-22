@@ -3,10 +3,7 @@
   "flow.useNPMPackagedFlow": true,
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
-  "eslint.workingDirectories": [
-    "./back-end",
-    "./front-end"
-  ],
+  "eslint.workingDirectories": ["./back-end", "./front-end"],
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,

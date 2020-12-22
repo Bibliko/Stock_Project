@@ -28,9 +28,8 @@ const updateUserSessionInitialMessage =
   "I'm the first socket to update user session.";
 
 const checkMarketClosedString = "checkMarketClosed";
-const updatedAllUsersFlag = "updatedAllUsersFlag";
-const updatedRankingListFlag = "updatedRankingListFlag";
-const updatedExchangeHistoricalChartFlag = "updatedExchangeHistoricalChartFlag";
+const updatedUserDataFlags = "updatedUserDataFlags";
+const updatedExchangeHistoricalChartFlags = "updatedExchangeHistoricalChartFlags";
 const finishedSettingUpUserCacheSession = "finishedSettingUpUserCacheSession";
 
 const setupIntervalUpdateCacheSession = (intervalID, userEmail) => {
@@ -193,14 +192,15 @@ const startSocketIO = (server, globalBackendVariables) => {
       intervalIOSendInfo = setInterval(() => {
         io.emit(checkMarketClosedString, globalBackendVariables.isMarketClosed);
         io.emit(
-          updatedAllUsersFlag,
-          globalBackendVariables.updatedAllUsersFlag
+          updatedUserDataFlags, {
+            updatedAllUsersFlag: globalBackendVariables.updatedAllUsersFlag,
+            updatedRankingListFlag: globalBackendVariables.updatedRankingListFlag
+          }
         );
         io.emit(
-          updatedRankingListFlag,
           globalBackendVariables.updatedRankingListFlag
         );
-        io.emit(updatedExchangeHistoricalChartFlag, {
+        io.emit(updatedExchangeHistoricalChartFlags, {
           NYSE: globalBackendVariables.NYSE,
           NASDAQ: globalBackendVariables.NASDAQ
         });

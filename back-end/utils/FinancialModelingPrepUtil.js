@@ -55,6 +55,10 @@ const updateMarketHolidaysFromFMP = (globalBackendVariables) => {
       })
       .then((marketHoursJSON) => {
         if (marketHoursJSON && marketHoursJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil updateMarketHolidaysFromFMP"
+          );
           reject(marketHoursJSON["Error Message"]);
           return;
         }
@@ -113,6 +117,10 @@ const getFullStockQuotesFromFMP = (shareSymbolsString) => {
         if (isEmpty(stockQuotesJSON)) {
           reject(new Error(`Share symbols do not exist in FMP.`));
         } else if (stockQuotesJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil getFullStockQuotesFromFMP"
+          );
           reject(stockQuotesJSON["Error Message"]);
         } else {
           resolve(stockQuotesJSON);
@@ -140,6 +148,10 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
         if (isEmpty(stockProfilesJSON)) {
           reject(new Error(`Share symbols do not exist in FMP.`));
         } else if (stockProfilesJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil getFullStockProfilesFromFMP"
+          );
           reject(stockProfilesJSON["Error Message"]);
         } else {
           resolve(stockProfilesJSON);
@@ -152,17 +164,17 @@ const getFullStockProfilesFromFMP = (shareSymbolsString) => {
 };
 
 /**
- *  @param {string} exchange NYSE or NASDAQ
+ *  @param {string} exchangeOrCompany NYSE or NASDAQ or company code
  *  @param {string} typeChart 5min or full
  */
-const getExchangeHistoricalChartFromFMP = (exchange, typeChart) => {
+const getHistoricalChartFromFMP = (exchangeOrCompany, typeChart) => {
   return new Promise((resolve, reject) => {
-    const index =
-      exchange.toUpperCase() === "NYSE"
+    const searchQuery =
+      exchangeOrCompany.toUpperCase() === "NYSE"
         ? "^NYA"
-        : exchange.toUpperCase() === "NASDAQ"
+        : exchangeOrCompany.toUpperCase() === "NASDAQ"
         ? "^IXIC"
-        : "";
+        : exchangeOrCompany.toUpperCase();
 
     const fmpTypeChart =
       typeChart === "5min"
@@ -171,25 +183,29 @@ const getExchangeHistoricalChartFromFMP = (exchange, typeChart) => {
         ? "historical-price-full"
         : "";
 
-    if (index === "" || fmpTypeChart === "") {
-      reject(
-        new Error(
-          `Exchange should be NYSE or NASDAQ. FMP Chart Type should be 5min or full.`
-        )
-      );
+    if (fmpTypeChart === "") {
+      reject(new Error(`FMP Chart Type should be 5min or full.`));
       return;
     }
 
     fetch(
-      `https://financialmodelingprep.com/api/v3/${fmpTypeChart}/${index}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      `https://financialmodelingprep.com/api/v3/${fmpTypeChart}/${searchQuery}?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
       .then((historicalChart) => {
         return historicalChart.json();
       })
       .then((historicalChartJSON) => {
         if (isEmpty(historicalChartJSON)) {
-          reject(new Error(`Share symbols do not exist in FMP.`));
+          reject(
+            new Error(
+              `Share symbol's or exchange's historical chart does not exist in FMP.`
+            )
+          );
         } else if (historicalChartJSON["Error Message"]) {
+          console.log(
+            FINANCIAL_MODELING_PREP_API_KEY,
+            "FinancialModelingPrepUtil getHistoricalChartFromFMP"
+          );
           reject(historicalChartJSON["Error Message"]);
         } else {
           const result =
@@ -303,5 +319,5 @@ module.exports = {
   getFullStockProfilesFromFMP,
   getFullStockRatingsFromFMP,
 
-  getExchangeHistoricalChartFromFMP
+  getHistoricalChartFromFMP
 };

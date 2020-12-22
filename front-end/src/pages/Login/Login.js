@@ -51,7 +51,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -69,17 +69,20 @@ const styles = (theme) => ({
     padding: theme.spacing(1),
     height: "40px",
     width: "120px",
-    background: "black",
-    "&:hover": {
-      backgroundColor: "black",
-      opacity: 0.8,
-    },
     borderRadius: "40px",
     color: "white",
     fontWeight: "bold",
+    backgroundColor: theme.palette.submitButton.main,
+    "&:hover": {
+      backgroundColor: theme.palette.submitButton.main,
+      opacity: 0.8,
+    },
+    "& .MuiTouchRipple-root span": {
+      backgroundColor: "rgba(255, 255, 255, 0.5)",
+    },
   },
   link: {
-    color: "black",
+    color: theme.palette.loginLink.main,
     fontWeight: "bold",
     fontSize: "small",
   },
@@ -93,10 +96,6 @@ const styles = (theme) => ({
     width: "120px",
     margin: theme.spacing(1),
   },
-  rememberMe: {
-    color: "black",
-    fontSize: "small",
-  },
   alternativeLoginButton: {
     maxHeight: "fit-content",
     maxWidth: "fit-content",
@@ -108,18 +107,20 @@ const styles = (theme) => ({
   },
   orLogInWith: {
     marginTop: 0,
-    fontWeight: "500",
-    color: theme.palette.subText.main,
+    fontWeight: "normal",
+    color: theme.palette.loginLink.main,
     fontSize: "15px",
   },
   error: {
     marginTop: "5px",
     display: "flex",
     justifyContent: "center",
-    minHeight: "20px",
+    minHeight: "30px",
   },
   errorText: {
-    fontSize: "small",
+    fontSize: "medium",
+    fontWeight: "bold",
+    color: theme.palette.fail.main,
   },
   input: {
     color: "black",
@@ -147,6 +148,9 @@ const styles = (theme) => ({
   },
   form: {
     flexDirection: "column",
+  },
+  dividerLine: {
+    backgroundColor: theme.palette.loginLink.main,
   },
 });
 
@@ -269,11 +273,7 @@ class Login extends React.Component {
                 </form>
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
-                    <Typography
-                      color="error"
-                      align="center"
-                      className={classes.errorText}
-                    >
+                    <Typography align="center" className={classes.errorText}>
                       Error: {error}
                     </Typography>
                   </Grid>
@@ -294,7 +294,11 @@ class Login extends React.Component {
                 >
                   Create an account
                 </Button>
-                <Divider orientation="vertical" flexItem />
+                <Divider
+                  orientation="vertical"
+                  flexItem
+                  className={classes.dividerLine}
+                />
                 <Button
                   color="primary"
                   onClick={() => {
@@ -315,7 +319,7 @@ class Login extends React.Component {
               >
                 <Grid item xs className={classes.center}>
                   <Typography className={classes.orLogInWith}>
-                    or login with
+                    OR login with
                   </Typography>
                 </Grid>
                 <Grid item xs className={classes.center}>

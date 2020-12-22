@@ -34,9 +34,9 @@ const styles = (theme) => ({
     minWidth: "120px",
   },
   tableCell: {
-    fontSize: "12px",
+    fontSize: "medium",
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.lightBlue,
+    borderColor: theme.palette.primary.main,
     borderStyle: "solid",
   },
   cellDiv: {
@@ -59,7 +59,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.lightBlue,
+    backgroundColor: theme.palette.primary.main,
     color: "white",
   },
 }))(TableCell);
@@ -77,7 +77,7 @@ class HoldingsTableContainer extends React.Component {
         align="center"
         className={clsx(classes.tableCell, {
           [classes.tableCellProfitOrLoss]: type === "Profit/Loss",
-          [classes.stickyCell]: type === "Code",
+          [classes.stickyCell]: type === "Code" && !this.props.minimal,
           [classes.lastElementTopRightRounded]: type === "Watchlist",
         })}
       >
@@ -115,7 +115,7 @@ class HoldingsTableContainer extends React.Component {
   }
 
   render() {
-    const { classes, rows } = this.props;
+    const { classes, rows, minimal } = this.props;
     const { openSnackbar, companyCodeOnAction } = this.state;
 
     return (
@@ -124,17 +124,17 @@ class HoldingsTableContainer extends React.Component {
           <TableHead>
             <TableRow>
               {this.chooseTableCell("Code", classes)}
-              {this.chooseTableCell("Holding", classes)}
-              {this.chooseTableCell("Buy Price (Avg)", classes)}
-              {this.chooseTableCell("Last Price", classes)}
+              {!minimal && this.chooseTableCell("Holding", classes)}
+              {!minimal && this.chooseTableCell("Buy Price (Avg)", classes)}
+              {!minimal && this.chooseTableCell("Last Price", classes)}
               {this.chooseTableCell("Profit/Loss", classes)}
-              {this.chooseTableCell("Actions", classes)}
-              {this.chooseTableCell("Watchlist", classes)}
+              {!minimal && this.chooseTableCell("Watchlist", classes)}
             </TableRow>
           </TableHead>
           <TableBody className={classes.tableBody}>
             {rows.map((row, index) => (
               <HoldingsTableRow
+                minimal={minimal}
                 key={row.id}
                 rowData={row}
                 rowIndex={index}
@@ -145,6 +145,7 @@ class HoldingsTableContainer extends React.Component {
           </TableBody>
         </Table>
         <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           open={openSnackbar}
           autoHideDuration={6 * oneSecond}
           onClose={this.handleCloseSnackbar}

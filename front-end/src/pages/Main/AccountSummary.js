@@ -1,13 +1,26 @@
 import React from "react";
 import clsx from "clsx";
-import { isEqual, isEmpty } from "lodash";
+import { isEqual, isEmpty, pick } from "lodash";
 import { withRouter } from "react-router";
+
+import { socket } from "../../App";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
+import {
+  offSocketListeners,
+  updatedUserDataFlags,
+  checkSocketUpdatedUserDataFlags,
+} from "../../utils/SocketUtil";
+
+import { getUserData } from "../../utils/UserUtil";
+
 import { getParsedCachedSharesList } from "../../utils/RedisUtil";
-import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../utils/low-dependency/NumberUtil";
 
 import HoldingsTableContainer from "../../components/Table/AccountSummaryTable/HoldingsTableContainer";
 import SummaryTableContainer from "../../components/Table/AccountSummaryTable/SummaryTableContainer";
@@ -74,7 +87,7 @@ const styles = (theme) => ({
     color: theme.palette.bigTitle.lighterBlue,
   },
   portfolioChart: {
-    color: theme.palette.bigTitle.blue,
+    color: theme.palette.bigTitle.lightBlue,
   },
   paperAccountSummary: {
     display: "flex",
@@ -124,6 +137,8 @@ class AccountSummary extends React.Component {
   state = {
     userShares: [],
     holdingsRows: [],
+    updatedAllUsersFlag: false,
+    updatedRankingListFlag: false,
   };
 
   createHoldingData = (id, code, holding, buyPriceAvg) => {
@@ -152,7 +167,6 @@ class AccountSummary extends React.Component {
   };
 
   componentDidMount() {
-    console.log(this.props.userSession);
     getParsedCachedSharesList(this.props.userSession.email)
       .then((shares) => {
         this.setState(
@@ -167,10 +181,38 @@ class AccountSummary extends React.Component {
       .catch((err) => {
         console.log(err);
       });
+
+    checkSocketUpdatedUserDataFlags(socket, this);
   }
 
-  componentDidUpdate() {
-    // console.log("updateAccountSummary");
+  componentDidUpdate(prevProps, prevState) {
+    const { email } = this.props.userSession;
+
+    const compareKeys = ["updatedRankingListFlag", "updatedAllUsersFlag"];
+    const stateForCompare = pick(this.state, compareKeys);
+    const prevStateForCompare = pick(prevState, compareKeys);
+
+    const dataNeeded = {
+      cash: true,
+      totalPortfolio: true,
+      totalPortfolioLastClosure: true,
+      ranking: true,
+      email: true,
+    };
+
+    if (!isEqual(stateForCompare, prevStateForCompare)) {
+      getUserData(dataNeeded, email)
+        .then((userData) => {
+          this.props.mutateUser(userData);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  componentWillUnmount() {
+    offSocketListeners(socket, updatedUserDataFlags);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -206,10 +248,10 @@ class AccountSummary extends React.Component {
               Summary
             </Typography>
             <SummaryTableContainer
-              cash={cash.toFixed(2)}
-              totalPortfolio={totalPortfolio.toFixed(2)}
+              cash={roundNumber(cash, 2)}
+              totalPortfolio={roundNumber(totalPortfolio, 2)}
               ranking={ranking}
-              userDailyChange={userDailyChange.toFixed(2)}
+              userDailyChange={roundNumber(userDailyChange, 2)}
             />
           </Container>
           <Container className={classes.itemContainer}>
@@ -235,7 +277,7 @@ class AccountSummary extends React.Component {
               Portfolio Chart
             </Typography>
             <Typography className={classes.titleChart}>
-              ${numberWithCommas(totalPortfolio.toFixed(2))}
+              ${numberWithCommas(roundNumber(totalPortfolio, 2))}
             </Typography>
             <Typography className={classes.subtitleChart}>
               Portfolio Now
