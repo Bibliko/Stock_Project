@@ -80,6 +80,7 @@ const getSingleCachedShareInfo = (companyCode) => {
           resolve(shareInfoObject);
           return Promise.all([
             pushManyCodesToCachedShares([companyCode]),
+            updatePriceChangeStatus(quote[0]),
             updateSingleCachedShareQuote(quote[0]),
             updateSingleCachedShareProfile(profile[0])
           ]);
@@ -315,6 +316,31 @@ const updateCachedShareProfilesUsingCache = () => {
   });
 };
 
+const updatePriceChangeStatus = (stockQuoteJSON) => {
+  return new Promise((resolve, reject) => {
+    const { symbol } = stockQuoteJSON;
+
+    const redisKey = `cachedShares|${symbol.companyCode}|priceStatus`;
+    const redisKeyQuote = `cachedShares|${symbol.companyCode}|quote`;
+
+    getAsync(redisKeyQuote)
+      .then((quote) => {
+        if (quote) return parseCachedShareQuote(quote);
+        else reject(new Error(`No quote was found for ${symbol.companyCode}`));
+      })
+      .then((quoteJSON) => {
+        if (quoteJSON.price > symbol.companyCode) return "1";
+        else return "-1";
+      })
+      .then((valueString) => {
+        setAsync(redisKey, valueString)
+          .then((quote) => resolve(`Update ${redisKey} successfully`))
+          .catch((err) => reject(err));
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 module.exports = {
   getCachedShares,
   getSingleCachedShareInfo,
@@ -328,5 +354,7 @@ module.exports = {
   updateCachedShareProfiles,
 
   updateCachedShareQuotesUsingCache,
-  updateCachedShareProfilesUsingCache
+  updateCachedShareProfilesUsingCache,
+
+  updatePriceChangeStatus
 };

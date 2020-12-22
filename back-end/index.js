@@ -221,6 +221,7 @@ const setupBackendIntervals = () => {
         !globalBackendVariables.isMarketClosed
       ) {
         updateCachedShareQuotesUsingCache()
+        .then((finishedUpdateCachedShareQuotes) => update)
         .catch(err => console.log(err));
       }
     }, 2 * oneSecond);
