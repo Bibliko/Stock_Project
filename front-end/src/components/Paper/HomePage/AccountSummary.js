@@ -88,6 +88,33 @@ const styles = (theme) => ({
       fontSize: "18px",
     },
   },
+  paperAccountSummary: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    height: "120px",
+    width: "100%",
+    color: "white",
+    padding: 20,
+    backgroundColor: theme.palette.paperBackground.onPage,
+  },
+  storeIcon: {
+    height: "30px",
+    width: "auto",
+    marginBottom: "5px",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+    },
+  },
+  holdingsText: {
+    color: "white",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+    textAlign: "center",
+  },
 });
 
 class AccountSummary extends React.Component {

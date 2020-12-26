@@ -30,7 +30,6 @@ const {
  * - '${email}|changeEmailVerification': value
  * - '${email}|accountSummaryChart': list
  * - '${email}|sharesList': list
- * - '${email}|clientTimestampLastJoinInSocketRoom': value
  *
  * - 'cachedMarketHoliday': value
  *
@@ -53,8 +52,6 @@ const passwordVerification = "passwordVerification";
 const changeEmailVerification = "changeEmailVerification";
 const accountSummaryChart = "accountSummaryChart";
 const sharesList = "sharesList";
-const clientTimestampLastJoinInSocketRoom =
-  "clientTimestampLastJoinInSocketRoom";
 
 const cachedMarketHoliday = "cachedMarketHoliday";
 const cachedHistoricalChart5min = "cachedHistoricalChart5min";
@@ -225,30 +222,6 @@ const updateCachedMarketHoliday = (marketHoliday) => {
   });
 };
 
-/**
- * @description Update timestamp if client joins in socket room
- * @change Redis value "numberOfClients|timestamp"
- * @param email User email
- */
-const updateClientTimestampLastJoinInSocketRoom = (email) => {
-  return new Promise((resolve, reject) => {
-    const redisKey = `${email}|${clientTimestampLastJoinInSocketRoom}`;
-
-    getAsync(redisKey)
-      .then((numberOfClients) => {
-        const time = new Date().getTime();
-
-        return setAsync(redisKey, time);
-      })
-      .then((finished) => {
-        resolve("Successful");
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
 module.exports = {
   // Keys
   transactionsHistoryList,
@@ -257,7 +230,6 @@ module.exports = {
   changeEmailVerification,
   accountSummaryChart,
   sharesList,
-  clientTimestampLastJoinInSocketRoom,
 
   cachedMarketHoliday,
   cachedHistoricalChart5min,
@@ -280,8 +252,5 @@ module.exports = {
 
   // Market Holiday
   getCachedMarketHoliday,
-  updateCachedMarketHoliday,
-
-  // Socket
-  updateClientTimestampLastJoinInSocketRoom
+  updateCachedMarketHoliday
 };

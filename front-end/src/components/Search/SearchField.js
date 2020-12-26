@@ -18,7 +18,7 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       position: "absolute",
       width: "75%",
-      left: "calc((100% - 48px - 75%) / 2)", // 48px is default width and height of icon button
+      left: "calc((100% - 40px - 75%) / 2)", // 40px is default width and height of icon button
     },
     fontWeight: "normal",
     color: "white",
