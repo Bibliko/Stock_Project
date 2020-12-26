@@ -9,7 +9,10 @@ import { userAction } from "../../../redux/storeActions/actions";
 
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -36,9 +39,9 @@ const styles = (theme) => ({
     borderRightWidth: "0px",
     borderTopWidth: "1px",
     borderBottomWidth: "0px",
-    borderColor: "#2D9CDB",
+    borderColor: theme.palette.secondary.main,
     borderStyle: "solid",
-    backgroundColor: theme.palette.paperBackground.deepBlueTable,
+    backgroundColor: theme.palette.paperBackground.main,
   },
   cellDiv: {
     display: "flex",
@@ -137,16 +140,14 @@ class HoldingsTableRow extends React.Component {
         return `${numberWithCommas(rowData.holding)}`;
 
       case "Buy Price (Avg)":
-        return `$${numberWithCommas(rowData.buyPriceAvg.toFixed(2))}`;
+        return `$${numberWithCommas(roundNumber(rowData.buyPriceAvg, 2))}`;
 
       case "Last Price":
         return `$${numberWithCommas(this.state.lastPrice)}`;
 
       case "Profit/Loss":
-        if (parseFloat(this.state.profitOrLoss, 10) < 0) {
-          return `-$${numberWithCommas(
-            Math.abs(parseFloat(this.state.profitOrLoss, 10))
-          )}`;
+        if ((this.state.profitOrLoss, 10 < 0)) {
+          return `-$${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
         }
         return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
@@ -308,8 +309,9 @@ class HoldingsTableRow extends React.Component {
 
     if (lastPrice && !isEqual(this.state.lastPrice, lastPrice)) {
       this.setState({
-        lastPrice: lastPrice.toFixed(2),
-        profitOrLoss: ((lastPrice - buyPriceAvg) * holding - brokerage).toFixed(
+        lastPrice: roundNumber(lastPrice, 2),
+        profitOrLoss: roundNumber(
+          (lastPrice - buyPriceAvg) * holding - brokerage,
           2
         ),
       });
@@ -370,7 +372,7 @@ class HoldingsTableRow extends React.Component {
         {!minimal && this.chooseTableCell("Buy Price (Avg)", classes)}
         {!minimal && this.chooseTableCell("Last Price", classes)}
         {this.chooseTableCell("Profit/Loss", classes)}
-        {!minimal && 
+        {!minimal && (
           <TableCell
             align="center"
             className={clsx(classes.tableCell, {
@@ -397,7 +399,7 @@ class HoldingsTableRow extends React.Component {
               )}
             </div>
           </TableCell>
-        }
+        )}
       </TableRow>
     );
   }

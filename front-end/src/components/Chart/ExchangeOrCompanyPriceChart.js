@@ -12,25 +12,21 @@ import { DateTime } from "luxon";
 import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
-import { socket } from "../../App";
-
 import { oneMinute, oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
-import { getCachedExchangeHistoricalChart } from "../../utils/RedisUtil";
-import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
-import {
-  offSocketListeners,
-  checkSocketUpdatedExchangeHistoricalChartFlags,
-  updatedExchangeHistoricalChartFlags,
-} from "../../utils/SocketUtil";
+import { getCachedHistoricalChart } from "../../utils/RedisUtil";
+
+import SegmentedBar from "../ProgressBar/SegmentedBar";
 
 import { withStyles, withTheme } from "@material-ui/core/styles";
-import { Typography, CircularProgress } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
+
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 
 const styles = (theme) => ({
   mainDiv: {
     height: "100%",
+    minHeight: "400px",
     display: "flex",
     justifyContent: "space-around",
     alignItems: "center",
@@ -50,23 +46,28 @@ const styles = (theme) => ({
   },
   toggleButton: {
     "&.MuiToggleButton-root": {
-      color: "rgba(255, 255, 255, 0.6)",
-      border: "1px solid rgba(255, 255, 255, 0.3)",
+      color: theme.palette.primary.main,
+      border: `1px solid ${theme.palette.primary.main}`,
       "&.Mui-selected": {
-        color: "rgba(255, 255, 255, 0.8)",
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
+        color: theme.palette.secondary.main,
+        backgroundColor: theme.palette.secondary.hover,
       },
       "&:hover": {
-        backgroundColor: "rgba(255, 255, 255, 0.4)",
+        backgroundColor: theme.palette.primary.hover,
       },
     },
+  },
+  segmentedBar: {
+    position: "absolute",
+    left: "calc((100% - 100px) / 2)", // default width of segmented bar
+    top: "calc((100% - 20px) / 2)", // default height of segmented bar
   },
 });
 
 Boost(Highcharts);
 BrokenAxis(Highcharts);
 
-class MarketWatch extends React.Component {
+class ExchangeOrCompanyPriceChart extends React.Component {
   state = {
     highChartOptions: {
       chart: {
@@ -78,7 +79,7 @@ class MarketWatch extends React.Component {
       },
 
       title: {
-        text: "NYSE Composite",
+        text: "",
         style: {
           color: "white",
         },
@@ -97,18 +98,26 @@ class MarketWatch extends React.Component {
         layout: "horizontal",
         borderColor: "white",
         itemHiddenStyle: {
-          color: "white",
+          color: "rgba(169, 179, 187, 1)",
         },
         itemHoverStyle: {
-          color: "#2196f3",
+          color: "rgba(169, 179, 187, 1)",
         },
         itemStyle: {
-          color: "#2196f3",
+          color: "rgba(120, 127, 246, 1)",
           cursor: "pointer",
           fontSize: "12px",
           fontWeight: "bold",
           textOverflow: "ellipsis",
         },
+      },
+
+      tooltip: {
+        crosshairs: {
+          color: "rgba(168, 168, 168, 1)",
+          dashStyle: "solid",
+        },
+        shared: true,
       },
 
       xAxis: {
@@ -136,12 +145,15 @@ class MarketWatch extends React.Component {
             color: "white",
           },
         },
+        gridLineWidth: 0.5,
+        gridLineDashStyle: "Dot",
       },
 
       series: [
         {
           type: "area",
           name: "Close Price",
+          color: "#787ff6",
           data: [],
         },
       ],
@@ -154,6 +166,10 @@ class MarketWatch extends React.Component {
         series: {
           boostThreshold: 2000,
           turboThreshold: 5000,
+          marker: {
+            enabled: false,
+            fillColor: "rgb(120, 127, 246)",
+          },
         },
 
         area: {
@@ -165,17 +181,19 @@ class MarketWatch extends React.Component {
               y2: 1,
             },
             stops: [
-              [0, "rgba(33, 150, 243, 0.1)"],
-              [1, "rgba(33, 150, 243, 0.5)"],
+              [0, "rgba(120, 127, 246, 0.1)"],
+              [1, "rgba(120, 127, 246, 0.5)"],
             ],
           },
           marker: {
             radius: 2,
           },
-          lineWidth: 1,
+          lineWidth: 2,
+          lineColor: "rgb(120, 127, 246)",
           states: {
             hover: {
-              lineWidth: 1,
+              lineWidth: 2.5,
+              lineColor: "rgb(120, 127, 246)",
             },
           },
           threshold: null,
@@ -213,11 +231,17 @@ class MarketWatch extends React.Component {
     historicalChartFull: [],
     chartTimeLimitChoices: ["1D", "1W", "1M", "6M", "Full"],
     chartTimeLimit: "1D",
-    updatedExchangeHistoricalChart5minFlag: false,
-    updatedExchangeHistoricalChartFullFlag: false,
     isChartReady: false,
   };
 
+  intervalUpdateChart;
+
+  /**
+   * @returns {Date} Min Date
+   * - Min date according to the chosen chartTimeLimit (1D, 1W, 1M, 6M, or Full)
+   * - The chart to draw from that date
+   * @param {Array} historicalChart Array of historical chart information obtained from FMP
+   */
   chooseMinDate = (historicalChart) => {
     const { chartTimeLimit } = this.state;
 
@@ -250,25 +274,30 @@ class MarketWatch extends React.Component {
     return minDate;
   };
 
-  initializeHistoricalChartUsingDataFromCache = () => {
-    const { exchange } = this.props;
+  updateHistoricalChartUsingDataFromCache = () => {
+    const { exchangeOrCompany } = this.props;
 
     return new Promise((resolve, reject) => {
       Promise.all([
-        getCachedExchangeHistoricalChart(exchange, "5min"),
-        getCachedExchangeHistoricalChart(exchange, "full"),
+        getCachedHistoricalChart(exchangeOrCompany, "5min"),
+        getCachedHistoricalChart(exchangeOrCompany, "full"),
       ])
         .then(([historicalChart5min, historicalChartFull]) => {
-          this.setState(
-            {
-              historicalChart5min,
-              historicalChartFull,
-            },
-            () => {
-              this.updateChartSeriesBasedOnState();
-              resolve("Done");
-            }
-          );
+          if (
+            !isEqual(historicalChart5min, this.state.historicalChart5min) ||
+            !isEqual(historicalChartFull, this.state.historicalChartFull)
+          ) {
+            this.setState(
+              {
+                historicalChart5min,
+                historicalChartFull,
+              },
+              () => {
+                this.updateChartSeriesBasedOnState();
+                resolve("Done");
+              }
+            );
+          }
         })
         .catch((err) => {
           reject(err);
@@ -277,7 +306,7 @@ class MarketWatch extends React.Component {
   };
 
   setStateChartAfterGettingInfoFromCache = (seriesData, xAxisBreaks) => {
-    const { exchange } = this.props;
+    const { exchangeOrCompany } = this.props;
     this.setState(
       {
         isChartReady: false,
@@ -290,7 +319,7 @@ class MarketWatch extends React.Component {
                 ...this.state.highChartOptions,
                 title: {
                   ...this.state.highChartOptions.title,
-                  text: `${exchange} Composite`,
+                  text: `${exchangeOrCompany} Price Graph`,
                 },
                 xAxis: {
                   ...this.state.highChartOptions.xAxis,
@@ -329,11 +358,13 @@ class MarketWatch extends React.Component {
     // highcharts xAxis.breaks
     let xAxisBreaks = [];
 
+    // Choose historical chart information that fits in with chartTimeLimit
     const historicalChart =
       chartTimeLimit === "1D" || chartTimeLimit === "1W"
         ? historicalChart5min
         : historicalChartFull;
 
+    // Choose min timestampt that chart starts to draw from
     const minTimestamp = DateTime.fromJSDate(
       this.chooseMinDate(historicalChart),
       {
@@ -341,12 +372,17 @@ class MarketWatch extends React.Component {
       }
     ).toMillis();
 
-    for (let i = historicalChart.length - 1; i >= 0; i--) {
+    // Loop from the end of historicalChart since historicalChart is arranged descendingly.
+    for (
+      let i = historicalChart.length - 1;
+      i >= 0;
+      i -= chartTimeLimit === "1D" ? 1 : 2
+    ) {
       const { date, close } = historicalChart[i];
 
       // - length === 10 when '2020-10-20' without time following after
       // - 16:00:00 is the time when NYSE and NASDAQ closes market
-      const localTimestamp =
+      const timestampItem =
         date.length === 10
           ? DateTime.fromISO(date, { zone: "America/New_York" })
               .set({ hour: 16, minute: 0, second: 0 })
@@ -355,23 +391,31 @@ class MarketWatch extends React.Component {
               zone: "America/New_York",
             }).toMillis();
 
-      if (localTimestamp >= minTimestamp) {
+      // If larger than min timestamp, then the chart needs to draw this timestampItem.
+      if (timestampItem >= minTimestamp) {
+        // - There are huge gaps between the closure time from the last day and open time of next day
+        // - To erase the gap, create a xAxisBreaks array for Highcharts
         if (seriesData.length > 0 && chartTimeLimit === "1W") {
           const latestItemInSeriesData = seriesData[seriesData.length - 1][0];
 
-          if (localTimestamp > latestItemInSeriesData + 5 * oneMinute) {
+          if (timestampItem > latestItemInSeriesData + 10 * oneMinute) {
             xAxisBreaks.push({
               from: latestItemInSeriesData,
-              to: localTimestamp,
-              breakSize: 5 * oneMinute,
+              to: timestampItem,
+              breakSize: 10 * oneMinute,
             });
           }
         }
-        const chartItem = [localTimestamp, close];
+
+        const chartItem = [
+          timestampItem,
+          Math.round((close + Number.EPSILON) * 100) / 100,
+        ];
         seriesData.push(chartItem);
       }
     }
 
+    console.log();
     this.setStateChartAfterGettingInfoFromCache(seriesData, xAxisBreaks);
   };
 
@@ -400,52 +444,33 @@ class MarketWatch extends React.Component {
     );
   };
 
-  setupMarketWatchChart = () => {
-    const { exchange } = this.props;
-
-    Promise.all([
-      this.initializeHistoricalChartUsingDataFromCache(),
-      getGlobalBackendVariablesFlags(),
-    ])
-      .then(([done, flags]) => {
-        const {
-          updatedExchangeHistoricalChart5minFlag,
-          updatedExchangeHistoricalChartFullFlag,
-        } = flags[exchange];
-        this.setState(
-          {
-            updatedExchangeHistoricalChart5minFlag,
-            updatedExchangeHistoricalChartFullFlag,
-          },
-          () => {
-            checkSocketUpdatedExchangeHistoricalChartFlags(
-              socket,
-              this
-            );
-          }
+  componentDidMount() {
+    this.updateHistoricalChartUsingDataFromCache()
+      .then(() => {
+        this.intervalUpdateChart = setInterval(
+          () => this.updateHistoricalChartUsingDataFromCache(),
+          oneMinute
         );
       })
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  componentDidMount() {
-    this.setupMarketWatchChart();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!isEqual(this.props.exchange, prevProps.exchange)) {
-      this.setupMarketWatchChart();
+    if (!isEqual(this.props.exchangeOrCompany, prevProps.exchangeOrCompany)) {
+      this.updateHistoricalChartUsingDataFromCache().catch((err) =>
+        console.log(err)
+      );
     }
   }
 
   componentWillUnmount() {
-    offSocketListeners(socket, updatedExchangeHistoricalChartFlags);
+    clearInterval(this.intervalUpdateChart);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["exchange"];
+    const compareKeys = ["exchangeOrCompany"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
@@ -467,10 +492,22 @@ class MarketWatch extends React.Component {
 
     return (
       <div className={classes.mainDiv}>
-        {!isChartReady && <CircularProgress />}
+        {!isChartReady && (
+          <div
+            style={{
+              height: "400px",
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            <SegmentedBar className={classes.segmentedBar} />
+          </div>
+        )}
+
         {isChartReady && isEmpty(highChartOptions.series[0].data) && (
           <Typography className={classes.note}>No Data</Typography>
         )}
+
         {isChartReady && !isEmpty(highChartOptions.series[0].data) && (
           <HighchartsReact
             containerProps={{
@@ -498,11 +535,13 @@ class MarketWatch extends React.Component {
   }
 }
 
-MarketWatch.propTypes = {
+ExchangeOrCompanyPriceChart.propTypes = {
   classes: PropTypes.object.isRequired,
-  exchange: PropTypes.string.isRequired,
+  exchangeOrCompany: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(
-  withTheme(withRouter(withMediaQuery("(max-width:600px)")(MarketWatch)))
+  withTheme(
+    withRouter(withMediaQuery("(max-width:600px)")(ExchangeOrCompanyPriceChart))
+  )
 );

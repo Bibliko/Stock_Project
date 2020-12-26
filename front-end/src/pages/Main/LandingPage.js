@@ -62,17 +62,8 @@ const styles = (theme) => ({
     fontWeight: "bold",
     marginBottom: "5px",
   },
-  marketWatch: {
-    color: "#FF3747",
-  },
-  stocksOnTheMove: {
-    color: "#74E0EF",
-  },
-  accountSummary: {
-    color: "#F2C94C",
-  },
-  rankings: {
-    color: "#9ED2EF",
+  bigTitle: {
+    color: theme.palette.primary.main,
   },
   paperRedirectingToAccountSetting: {
     height: theme.customHeight.redirectingPaper,
@@ -177,9 +168,7 @@ class LandingPage extends React.Component {
               sm={12}
               className={clsx(classes.itemGrid, classes.largeMarginBottom)}
             >
-              <Typography
-                className={clsx(classes.gridTitle, classes.marketWatch)}
-              >
+              <Typography className={clsx(classes.gridTitle, classes.bigTitle)}>
                 MARKET WATCH
               </Typography>
               <MarketWatchPaper />
@@ -188,7 +177,7 @@ class LandingPage extends React.Component {
               <AccountSummaryPaper />
             </Grid>
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography className={clsx(classes.gridTitle, classes.rankings)}>
+              <Typography className={clsx(classes.gridTitle, classes.bigTitle)}>
                 RANKINGS
               </Typography>
               <Paper

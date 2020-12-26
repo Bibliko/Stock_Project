@@ -13,7 +13,7 @@ generator client {
 }
 
 model User {
-  id                        String                    @default(cuid()) @id
+  id                        String                    @id @default(cuid())
   email                     String?                   @unique
   password                  String?
   firstName                 String?
@@ -39,32 +39,36 @@ model User {
 }
 
 model AccountSummaryTimestamp {
-  id             String @default(cuid()) @id
+  id             String   @id @default(cuid())
   UTCDateString  String
   UTCDateKey     String
   year           Int
   portfolioValue Float
-  user           User   @relation(fields: [userID], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+  user           User     @relation(fields: [userID], references: [id])
   userID         String
 
   @@unique([UTCDateKey, userID])
 }
 
 model RankingTimestamp {
-  id              String @default(cuid()) @id
+  id              String   @id @default(cuid())
   UTCDateString   String
   UTCDateKey      String
   year            Int
   ranking         Int
   regionalRanking Int
-  user            User   @relation(fields: [userID], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  user            User     @relation(fields: [userID], references: [id])
   userID          String
 
   @@unique([UTCDateKey, userID])
 }
 
 model Share {
-  id          String   @default(cuid()) @id
+  id          String   @id @default(cuid())
   companyCode String?
   quantity    Int?
   buyPriceAvg Float?
@@ -75,7 +79,7 @@ model Share {
 }
 
 model UserTransaction {
-  id                 String    @default(cuid()) @id
+  id                 String    @id @default(cuid())
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @default(now()) @updatedAt
   companyCode        String?
@@ -93,7 +97,7 @@ model UserTransaction {
 }
 
 model MarketHolidays {
-  id                    String  @default(cuid()) @id
+  id                    String  @id @default(cuid())
   year                  Int?    @unique
   newYearsDay           String?
   martinLutherKingJrDay String?
@@ -107,8 +111,18 @@ model MarketHolidays {
 }
 
 model UserVerification {
-  id        String  @default(cuid()) @id
+  id        String   @id @default(cuid())
   email     String?
   password  String?
   expiredAt String? //handle specially -> don't need to use DateTime type
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model CompanyRating {
+  id                   String @id @default(cuid())
+  symbol               String @unique
+  rating               String
+  ratingScore          Int
+  ratingRecommendation String
 }

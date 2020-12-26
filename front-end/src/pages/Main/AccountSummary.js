@@ -17,7 +17,10 @@ import {
 import { getUserData } from "../../utils/UserUtil";
 
 import { getParsedCachedSharesList } from "../../utils/RedisUtil";
-import { numberWithCommas } from "../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../utils/low-dependency/NumberUtil";
 
 import HoldingsTableContainer from "../../components/Table/AccountSummaryTable/HoldingsTableContainer";
 import SummaryTableContainer from "../../components/Table/AccountSummaryTable/SummaryTableContainer";
@@ -84,7 +87,7 @@ const styles = (theme) => ({
     color: theme.palette.bigTitle.lighterBlue,
   },
   portfolioChart: {
-    color: theme.palette.bigTitle.blue,
+    color: theme.palette.bigTitle.lightBlue,
   },
   paperAccountSummary: {
     display: "flex",
@@ -245,10 +248,10 @@ class AccountSummary extends React.Component {
               Summary
             </Typography>
             <SummaryTableContainer
-              cash={cash.toFixed(2)}
-              totalPortfolio={totalPortfolio.toFixed(2)}
+              cash={roundNumber(cash, 2)}
+              totalPortfolio={roundNumber(totalPortfolio, 2)}
               ranking={ranking}
-              userDailyChange={userDailyChange.toFixed(2)}
+              userDailyChange={roundNumber(userDailyChange, 2)}
             />
           </Container>
           <Container className={classes.itemContainer}>
@@ -274,7 +277,7 @@ class AccountSummary extends React.Component {
               Portfolio Chart
             </Typography>
             <Typography className={classes.titleChart}>
-              ${numberWithCommas(totalPortfolio.toFixed(2))}
+              ${numberWithCommas(roundNumber(totalPortfolio, 2))}
             </Typography>
             <Typography className={classes.subtitleChart}>
               Portfolio Now

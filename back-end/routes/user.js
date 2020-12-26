@@ -140,7 +140,7 @@ router.get("/getOverallRanking", (req, res) => {
         return {
           firstName: data[0],
           lastName: data[1],
-          totalPortfolio: parseInt(data[2]),
+          totalPortfolio: parseInt(data[2], 10),
           region: data[3]
         };
       });
@@ -166,7 +166,7 @@ router.get("/getRegionalRanking", (req, res) => {
         return {
           firstName: data[0],
           lastName: data[1],
-          totalPortfolio: parseInt(data[2]),
+          totalPortfolio: parseInt(data[2], 10),
           region: data[3]
         };
       });

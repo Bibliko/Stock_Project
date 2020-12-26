@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { isEqual, isEmpty } from "lodash";
@@ -71,6 +72,12 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "16px",
     },
+  },
+  dailyChangeGreen: {
+    color: theme.palette.succeed.main,
+  },
+  dailyChangeRed: {
+    color: theme.palette.fail.main,
   },
   tableTitle: {
     fontSize: "28px",
@@ -189,10 +196,14 @@ class AccountSummary extends React.Component {
           className={classes.gridItem}
           style={{
             justifyContent: "center",
-            color: dailyChange >= 0 ? "#219653" : "#ef0808",
           }}
         >
-          <Typography className={classes.dailyChange}>
+          <Typography
+            className={clsx(classes.dailyChange, {
+              [classes.dailyChangeGreen]: dailyChange >= 0,
+              [classes.dailyChangeRed]: dailyChange < 0,
+            })}
+          >
             {`Daily Change $${dailyChange}`}
           </Typography>
         </Grid>

@@ -11,8 +11,10 @@ import { withMediaQuery } from "../../theme/ThemeUtil";
 import { getCachedAccountSummaryChartInfo } from "../../utils/RedisUtil";
 import { parseRedisAccountSummaryChartItem } from "../../utils/low-dependency/ParserUtil";
 
+import SegmentedBar from "../ProgressBar/SegmentedBar";
+
 import { withStyles, withTheme } from "@material-ui/core/styles";
-import { Typography, CircularProgress } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 
 const styles = (theme) => ({
   mainDiv: {
@@ -283,7 +285,7 @@ class AccountSummaryChart extends React.Component {
 
     return (
       <div className={classes.mainDiv}>
-        {!isChartReady && <CircularProgress />}
+        {!isChartReady && <SegmentedBar />}
         {isChartReady && !isEmpty(highChartOptions.series[0].data) && (
           <HighchartsReact
             containerProps={{
