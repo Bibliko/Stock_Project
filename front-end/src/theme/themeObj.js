@@ -29,6 +29,9 @@ const theme = {
     appBarHeight: "60px",
     appBarHeightSmall: "50px",
 
+    subBarHeight: "80px",
+    subBarHeightSmall: "25px",
+
     redirectingPaper: "200px",
 
     settingTextField: "45px",
@@ -37,7 +40,7 @@ const theme = {
   customMargin: {
     appBarPadding: "20px",
 
-    topLayout: "80px",
+    topLayout: "100px",
     topLayoutSmall: "70px",
 
     topFloatingToolButton: "110px",
@@ -52,6 +55,7 @@ const theme = {
     floatingToolButton: 5,
     floatingActionButton: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
+    subNavbar: 20,
     searchFieldContainer: 1000,
     searchMenu: 1200,
     searchFieldTextField: 1300,
@@ -89,7 +93,7 @@ const theme = {
     // App Bar
     appBarBlue: {
       // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
-      main: "rgba(31, 47, 152, 0.95)",
+      main: "rgba(31, 47, 152, 1)",
     },
 
     // Paper

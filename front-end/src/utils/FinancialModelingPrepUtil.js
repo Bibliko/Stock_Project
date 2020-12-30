@@ -143,6 +143,23 @@ export const getStockNews = (companyCode, limit) => {
   });
 };
 
+export const getMostActiveStocks = () => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/actives?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stocks) => {
+        return stocks.json();
+      })
+      .then((stocksJSON) => {
+        resolve(stocksJSON);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const shortenCompanyNameToFourWords = (companyName) => {
   let resultName = "";
   let numberOfSpaces = 0;

@@ -27,6 +27,7 @@ import {
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
 
 import AppBar from "./AppBar";
+import SubNavbar from "./SubNavbar";
 import Reminder from "../Reminder/Reminder";
 import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
@@ -184,6 +185,7 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar />
+        <SubNavbar />
         <Reminder />
         <main className={classes.main}>
           <div className={classes.contentHeader} />

@@ -7,28 +7,43 @@ import {
   Container,
 } from "@material-ui/core";
 
-const styles = {
+import {
+  ArrowDropUpRounded as ArrowDropUpRoundedIcon,
+  ArrowDropDownRounded as ArrowDropDownRoundedIcon,
+} from "@material-ui/icons";
+
+const styles = (theme) => ({
   container: {
     display: "grid",
     paddingTop: "5px",
     paddingBottom: "5px",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "1fr 1.25fr",
     gridTemplateRows: "1fr 1fr",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#1D212D",
+    gridGap: "2px",
   },
   smallText: {
     fontSize: "13.5px",
+    color: theme.palette.normalFontColor.primary,
   },
   mediumText: {
-    fontSize: "20px",
-    color: "#00E825",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "22px",
   },
   border: {
-    borderLeft: "rgba(255, 255, 255, 0.55) solid 1px",
+    borderLeft: "rgba(62, 117, 200, 1) solid 1px",
   },
-};
+  arrowUp: {
+    color: "#00E825",
+  },
+  arrowDown: {
+    color: "#fd2222",
+  },
+});
 
 function InfoCard(props) {
   const {
@@ -44,16 +59,35 @@ function InfoCard(props) {
       id={`info-card-${index}`}
       maxWidth={false}
     >
-      <Typography align={"center"} className={classes.smallText} style={{gridArea: "1 / 1 / 2 / 2"}}>
+      <Typography
+        align={"center"}
+        style={{gridArea: "1 / 1 / 2 / 2"}}
+        className={classes.smallText} 
+      >
         {name}
       </Typography>
 
-      <Typography align={"center"} className={classes.smallText} style={{gridArea: "2 / 1 / 3 / 2"}}>
+      <Typography
+        align={"center"}
+        style={{gridArea: "2 / 1 / 3 / 2"}}
+        className={classes.smallText}
+      >
         {price}
       </Typography>
-
-      <Typography align={"center"} className={classes.mediumText} style={{gridArea: "1 / 2 / 3 / 3"}}>
-        {change}
+        
+      <Typography
+        align={"center"}
+        style={{gridArea: "1 / 2 / 3 / 3"}}
+        className={clsx(classes.mediumText, {
+          [classes.arrowUp]: change >= 0,
+          [classes.arrowDown]: change < 0,
+        })}
+      >
+        { change >= 0
+          ? <ArrowDropUpRoundedIcon size={30} className={classes.arrowUp} />
+          : <ArrowDropDownRoundedIcon size={30} className={classes.arrowDown} />
+        }
+        {`${change}%`}
       </Typography>
     </Container>
   );
