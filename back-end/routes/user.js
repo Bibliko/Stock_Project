@@ -30,6 +30,8 @@ const {
   getUserData
 } = require("../utils/low-dependency/PrismaUserDataUtil");
 
+const { parseRedisTransactionsHistoryListItem } = require("../utils/low-dependency/ParserUtil");
+
 // const { indices } = require('../algolia');
 
 /*
@@ -298,7 +300,7 @@ router.get("/getUserTransactionsHistory", (req, res) => {
       const transactions = transactionsAndLength.slice(
         startIndex,
         excludedEndIndex
-      );
+      ).map(transaction => parseRedisTransactionsHistoryListItem(transaction));
 
       res.send({ transactions, length });
     })

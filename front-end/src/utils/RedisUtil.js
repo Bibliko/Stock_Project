@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getBackendHost } from "./low-dependency/NetworkUtil";
-import { parseRedisSharesListItem } from "./low-dependency/ParserUtil";
 
 const BACKEND_HOST = getBackendHost();
 
@@ -16,6 +15,8 @@ const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
 const getHistoricalChart = "getHistoricalChart";
+
+const getMostGainers = "getMostGainers";
 
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
@@ -45,28 +46,10 @@ export const getCachedSharesList = (email) => {
       withCredentials: true,
     })
       .then((res) => {
-        resolve(res);
+        resolve(res.data);
       })
       .catch((e) => {
         reject(e);
-      });
-  });
-};
-
-export const getParsedCachedSharesList = (email) => {
-  return new Promise((resolve, reject) => {
-    getCachedSharesList(email)
-      .then((res) => {
-        const { data: redisSharesString } = res;
-        let shares = [];
-
-        redisSharesString.map((shareString) => {
-          return shares.push(parseRedisSharesListItem(shareString));
-        });
-        resolve(shares);
-      })
-      .catch((err) => {
-        reject(err);
       });
   });
 };
@@ -170,11 +153,25 @@ export const getCachedHistoricalChart = (
   });
 };
 
+export const getCachedMostGainers = () => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/${getMostGainers}`, {
+      method: "get",
+      withCredentials: true,
+    })
+      .then((gainers) => {
+        resolve(gainers.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export default {
   getCachedAccountSummaryChartInfo,
 
   getCachedSharesList, // Layout.js
-  getParsedCachedSharesList, // AccountSummary, UserUtil
 
   getFullStockInfo,
   getManyFullStocksInfo,
@@ -182,4 +179,6 @@ export default {
   getManyStockInfosUsingPrismaShares,
 
   getCachedHistoricalChart,
+
+  getCachedMostGainers,
 };

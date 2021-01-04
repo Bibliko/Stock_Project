@@ -1,7 +1,3 @@
-const {
-  updateClientTimestampLastJoinInSocketRoom
-} = require("../utils/redis-utils/RedisUtil");
-
 const { cleanUserCache } = require("../utils/redis-utils/UserCachedDataUtil");
 
 const {
@@ -11,6 +7,7 @@ const {
 
 const {
   oneSecond,
+  oneMinute,
   getYearUTCString,
   newDate
 } = require("../utils/low-dependency/DayTimeUtil");
@@ -29,7 +26,8 @@ const updateUserSessionInitialMessage =
 
 const checkMarketClosedString = "checkMarketClosed";
 const updatedUserDataFlags = "updatedUserDataFlags";
-const updatedExchangeHistoricalChartFlags = "updatedExchangeHistoricalChartFlags";
+const updatedExchangeHistoricalChartFlags =
+  "updatedExchangeHistoricalChartFlags";
 const finishedSettingUpUserCacheSession = "finishedSettingUpUserCacheSession";
 
 const setupIntervalUpdateCacheSession = (intervalID, userEmail) => {
@@ -44,6 +42,23 @@ const cleanUpTheRoom = (userID, userEmail) => {
   cleanUserCache(userEmail).catch((err) => console.log(err));
 };
 
+const setTimeCleaningRoom = (userID, userEmail, timeoutCleaningRooms) => {
+  // Create new timeout
+  const timeoutCleanUserRoom = setTimeout(() => {
+    cleanUpTheRoom(userID, userEmail);
+    clearTimeout(timeoutCleanUserRoom);
+    timeoutCleaningRooms.delete(userID);
+  }, 30 * oneMinute);
+
+  // Remove current timeout in Map
+  if (timeoutCleaningRooms.get(userID)) {
+    clearTimeout(timeoutCleaningRooms.get(userID));
+  }
+
+  // Set new timeout
+  timeoutCleaningRooms.set(userID, timeoutCleanUserRoom);
+};
+
 /**
  * @param server backend server
  * @param hasRoomSetupCache Global backend Set where we store userID with boolean hasRoomSetupCache
@@ -56,6 +71,9 @@ const startSocketIO = (server, globalBackendVariables) => {
   let countSocketsInMainHall = 0;
 
   let intervalIOSendInfo = null;
+
+  // Timers for cleaning rooms in which there is no user. Map: userID -> timeoutID
+  const timeoutCleaningRooms = new Map();
 
   io.on(connection, (socket) => {
     console.log(`New client connected ${socket.id}\n`);
@@ -82,9 +100,10 @@ const startSocketIO = (server, globalBackendVariables) => {
       console.log(`Client ${socket.id} joins room ${userID}`);
       console.log(`${numberOfClients} client(s) is/are in ${userID} room.\n`);
 
-      updateClientTimestampLastJoinInSocketRoom(userEmail).catch((err) =>
-        console.log(err)
-      );
+      if (timeoutCleaningRooms.get(userID)) {
+        clearTimeout(timeoutCleaningRooms.get(userID));
+        timeoutCleaningRooms.delete(userID);
+      }
 
       if (numberOfClients > 1) {
         intervalUpdateCacheSession = setupIntervalUpdateCacheSession(
@@ -116,8 +135,9 @@ const startSocketIO = (server, globalBackendVariables) => {
       socket.leave(userID);
 
       if (!io.sockets.adapter.rooms[userID]) {
-        cleanUpTheRoom(userID, userEmail);
+        setTimeCleaningRoom(userID, userEmail, timeoutCleaningRooms);
       }
+
       clearInterval(intervalUpdateCacheSession);
     });
 
@@ -170,7 +190,7 @@ const startSocketIO = (server, globalBackendVariables) => {
       clearInterval(intervalUpdateCacheSession);
 
       if (userID && userEmail && !io.sockets.adapter.rooms[userID]) {
-        cleanUpTheRoom(userID, userEmail);
+        setTimeCleaningRoom(userID, userEmail, timeoutCleaningRooms);
       }
 
       if (countSocketsInMainHall === 0) {
@@ -191,15 +211,11 @@ const startSocketIO = (server, globalBackendVariables) => {
 
       intervalIOSendInfo = setInterval(() => {
         io.emit(checkMarketClosedString, globalBackendVariables.isMarketClosed);
-        io.emit(
-          updatedUserDataFlags, {
-            updatedAllUsersFlag: globalBackendVariables.updatedAllUsersFlag,
-            updatedRankingListFlag: globalBackendVariables.updatedRankingListFlag
-          }
-        );
-        io.emit(
-          globalBackendVariables.updatedRankingListFlag
-        );
+        io.emit(updatedUserDataFlags, {
+          updatedAllUsersFlag: globalBackendVariables.updatedAllUsersFlag,
+          updatedRankingListFlag: globalBackendVariables.updatedRankingListFlag
+        });
+        io.emit(globalBackendVariables.updatedRankingListFlag);
         io.emit(updatedExchangeHistoricalChartFlags, {
           NYSE: globalBackendVariables.NYSE,
           NASDAQ: globalBackendVariables.NASDAQ

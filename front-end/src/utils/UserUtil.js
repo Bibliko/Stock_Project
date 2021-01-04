@@ -3,7 +3,7 @@ import { isEmpty, isEqual } from "lodash";
 
 import { getBackendHost } from "./low-dependency/NetworkUtil";
 import {
-  getParsedCachedSharesList,
+  getCachedSharesList,
   getManyStockInfosUsingPrismaShares,
 } from "./RedisUtil";
 
@@ -373,7 +373,7 @@ export const calculateTotalSharesValue = (
  */
 export const checkStockQuotesForUser = (email) => {
   return new Promise((resolve, reject) => {
-    getParsedCachedSharesList(email)
+    getCachedSharesList(email)
       .then((shares) => {
         if (isEmpty(shares)) {
           return [[], []];

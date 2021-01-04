@@ -24,12 +24,13 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       width: "100vw",
     },
-    width: "450px",
+    width: "425px",
     maxHeight: "50%",
     zIndex: theme.customZIndex.searchMenu,
   },
   menuPaper: {
-    background: theme.palette.menuBackground.main,
+    background: theme.palette.paperBackground.onPage,
+    boxShadow: theme.customShadow.popup,
     color: "white",
     paddingTop: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
@@ -53,8 +54,8 @@ const styles = (theme) => ({
     top: "5px",
     right: "10px",
     [theme.breakpoints.down("xs")]: {
-      top: "0px",
       right: "8px",
+      padding: "8px",
     },
     color: "white",
     "&:hover": {

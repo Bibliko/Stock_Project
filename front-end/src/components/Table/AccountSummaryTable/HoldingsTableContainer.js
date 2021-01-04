@@ -27,16 +27,18 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCellProfitOrLoss: {
     minWidth: "120px",
   },
   tableCell: {
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
-    borderColor: theme.palette.primary.main,
+    borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
   cellDiv: {
@@ -59,7 +61,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.paperBackground.sub,
     color: "white",
   },
 }))(TableCell);

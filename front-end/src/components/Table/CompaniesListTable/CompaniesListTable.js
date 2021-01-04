@@ -9,7 +9,7 @@ import VirtualizedTable from "./VirtualizedTable";
 
 const styles = (theme) => ({
   paper: {
-    background: theme.palette.tableBackground.gradient,
+    background: theme.palette.paperBackground.onPage,
     overflowX: "auto",
     overflowY: "hidden",
   },

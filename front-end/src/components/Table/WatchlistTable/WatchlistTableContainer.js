@@ -31,14 +31,16 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     minWidth: "100px",
-    fontSize: "12px",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.purple,
+    borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
   tableCellName: {
@@ -106,7 +108,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.purple,
+    backgroundColor: theme.palette.paperBackground.sub,
     color: "white",
   },
 }))(TableCell);
@@ -120,8 +122,10 @@ class WatchlistTableContainer extends React.Component {
     openSnackbar: false,
     companyCodeRemoved: "",
 
-    hoverWatchlistPaper: false,
+    hoverWatchlistPaper: true,
   };
+
+  timeoutStartAnimationAgain;
 
   hoverPaper = () => {
     this.setState({
@@ -133,6 +137,12 @@ class WatchlistTableContainer extends React.Component {
     this.setState({
       hoverWatchlistPaper: false,
     });
+
+    this.timeoutStartAnimationAgain = setTimeout(() => {
+      this.setState({
+        hoverWatchlistPaper: true,
+      });
+    }, 3 * oneSecond);
   };
 
   handleOpenSnackbar = (companyCode) => {
@@ -171,6 +181,10 @@ class WatchlistTableContainer extends React.Component {
       </StyledTableCell>
     );
   };
+
+  componentWillUnmount() {
+    clearTimeout(this.timeoutStartAnimationAgain);
+  }
 
   render() {
     const { classes, rows } = this.props;

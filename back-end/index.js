@@ -49,6 +49,11 @@ const {
   updateCompaniesRatingsList
 } = require("./utils/PrismaCompanyRatingUtil");
 
+const {
+  getMostGainersAndCache,
+  updateMostGainersDaily
+} = require("./utils/redis-utils/MostGLA");
+
 const { startSocketIO } = require("./socketIO");
 
 const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
@@ -117,12 +122,15 @@ setupPassport(passport);
  */
 var globalBackendVariables = {
   isMarketClosed: false,
-  hasUpdatedAllUsersToday: false,
   isPrismaMarketHolidaysInitialized: false,
+
   hasReplacedAllExchangesHistoricalChart: false,
+  hasUpdatedAllUsersToday: false,
+  hasUpdatedMostGainersToday: false,
 
   updatedAllUsersFlag: false, // value true or false does not mean anything. This is just a flag
-  updatedRankingListFlag: false // value true or false does not mean anything. This is just a flag
+  updatedRankingListFlag: false, // value true or false does not mean anything. This is just a flag
+  updatedMostGainersFlag: false
 };
 
 const tasksList = [];
@@ -132,9 +140,11 @@ tasksList.push(() => updateMarketHolidaysFromFMP(globalBackendVariables));
 
 tasksList.push(() => updateRankingList(globalBackendVariables));
 
-SequentialPromisesWithResultsArray(tasksList).catch((err) => console.log(err));
+tasksList.push(() => updateCompaniesRatingsList());
 
-updateCompaniesRatingsList();
+tasksList.push(() => getMostGainersAndCache(globalBackendVariables));
+
+SequentialPromisesWithResultsArray(tasksList).catch((err) => console.log(err));
 
 const setupBackendIntervals = () => {
   // Check Market Closed
@@ -170,6 +180,8 @@ const setupBackendIntervals = () => {
   //     .catch(err => console.log(err));
   //   }
   // }, oneMinute);
+
+  setInterval(() => updateMostGainersDaily(globalBackendVariables), oneSecond);
 
   // Change flag and update all users data in database
   setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);

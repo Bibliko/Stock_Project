@@ -6,7 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { signupUser } from "../../utils/UserUtil";
@@ -103,7 +103,7 @@ const styles = (theme) => ({
   successText: {
     fontSize: "medium",
     fontWeight: "bold",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   form: {
     flexDirection: "column",
@@ -186,13 +186,13 @@ class Signup extends React.Component {
   };
 
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
@@ -202,7 +202,7 @@ class Signup extends React.Component {
 
     const { error, success } = this.state;
 
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       return null;
     }
 
@@ -283,6 +283,7 @@ class Signup extends React.Component {
                       redirectToPage("/login", this.props);
                     }}
                     className={classes.link}
+                    disableRipple
                   >
                     Back to Login
                   </Button>

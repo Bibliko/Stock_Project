@@ -23,13 +23,16 @@ const styles = (theme) => ({
   },
   fullWidth: {
     width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   itemGrid: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "column",
-    minWidth: "150px",
+    width: "100%",
     marginBottom: "10px",
   },
   textFieldContainer: {
@@ -42,9 +45,9 @@ const styles = (theme) => ({
   },
   title: {
     color: "white",
-    fontSize: "20px",
+    fontSize: "large",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
+      fontSize: "medium",
     },
     paddingLeft: "5px",
     fontWeight: "bold",

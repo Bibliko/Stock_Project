@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { isEqual, isEmpty, pick } from "lodash";
 import { withRouter } from "react-router";
 
@@ -16,7 +15,7 @@ import {
 
 import { getUserData } from "../../utils/UserUtil";
 
-import { getParsedCachedSharesList } from "../../utils/RedisUtil";
+import { getCachedSharesList } from "../../utils/RedisUtil";
 import {
   numberWithCommas,
   roundNumber,
@@ -46,7 +45,8 @@ const styles = (theme) => ({
     background: "rgba(0,0,0,0)",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   center: {
@@ -79,15 +79,7 @@ const styles = (theme) => ({
     },
     fontWeight: "bold",
     marginBottom: "5px",
-  },
-  summary: {
-    color: theme.palette.bigTitle.lightBlue,
-  },
-  holdings: {
-    color: theme.palette.bigTitle.lighterBlue,
-  },
-  portfolioChart: {
-    color: theme.palette.bigTitle.lightBlue,
+    color: theme.palette.primary.main,
   },
   paperAccountSummary: {
     display: "flex",
@@ -167,7 +159,7 @@ class AccountSummary extends React.Component {
   };
 
   componentDidMount() {
-    getParsedCachedSharesList(this.props.userSession.email)
+    getCachedSharesList(this.props.userSession.email)
       .then((shares) => {
         this.setState(
           {
@@ -231,6 +223,7 @@ class AccountSummary extends React.Component {
       totalPortfolioLastClosure,
       ranking,
       email,
+      hasFinishedSettingUp,
     } = this.props.userSession;
 
     const userDailyChange = totalPortfolio - totalPortfolioLastClosure;
@@ -244,9 +237,7 @@ class AccountSummary extends React.Component {
           className={classes.fullHeightWidth}
         >
           <Container className={classes.itemContainer}>
-            <Typography className={clsx(classes.gridTitle, classes.summary)}>
-              Summary
-            </Typography>
+            <Typography className={classes.gridTitle}>Summary</Typography>
             <SummaryTableContainer
               cash={roundNumber(cash, 2)}
               totalPortfolio={roundNumber(totalPortfolio, 2)}
@@ -255,9 +246,7 @@ class AccountSummary extends React.Component {
             />
           </Container>
           <Container className={classes.itemContainer}>
-            <Typography className={clsx(classes.gridTitle, classes.holdings)}>
-              Holdings
-            </Typography>
+            <Typography className={classes.gridTitle}>Holdings</Typography>
             {isEmpty(this.state.holdingsRows) && (
               <Paper className={classes.paperAccountSummary} elevation={2}>
                 <StorefrontRoundedIcon className={classes.storeIcon} />
@@ -271,9 +260,7 @@ class AccountSummary extends React.Component {
             )}
           </Container>
           <Container className={classes.itemContainer}>
-            <Typography
-              className={clsx(classes.gridTitle, classes.portfolioChart)}
-            >
+            <Typography className={classes.gridTitle}>
               Portfolio Chart
             </Typography>
             <Typography className={classes.titleChart}>
@@ -282,7 +269,10 @@ class AccountSummary extends React.Component {
             <Typography className={classes.subtitleChart}>
               Portfolio Now
             </Typography>
-            <AccountSummaryChart email={email} />
+            <AccountSummaryChart
+              email={email}
+              hasFinishedSettingUp={hasFinishedSettingUp}
+            />
           </Container>
           <SpaceDivMainPages />
         </Grid>

@@ -3,6 +3,9 @@ import clsx from "clsx";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router";
 
+import themeObj from "../../theme/themeObj";
+import { changeOpacityOfRGBAString } from "../../theme/ThemeUtil";
+
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -26,10 +29,10 @@ class SegmentedBar extends React.Component {
   state = {
     colorWhiteArray: [
       // themeObj palette secondary main
-      "rgba(102, 189, 219, 0.2)",
-      "rgba(102, 189, 219, 0.4)",
-      "rgba(102, 189, 219, 0.6)",
-      "rgba(102, 189, 219, 0.8)",
+      changeOpacityOfRGBAString(themeObj.palette.secondary.main, "0.2"),
+      changeOpacityOfRGBAString(themeObj.palette.secondary.main, "0.4"),
+      changeOpacityOfRGBAString(themeObj.palette.secondary.main, "0.6"),
+      changeOpacityOfRGBAString(themeObj.palette.secondary.main, "0.8"),
     ],
   };
 

@@ -15,6 +15,11 @@ const styles = (theme) => ({
   textField: {
     width: "100%",
     margin: "8px",
+    [theme.breakpoints.down("xs")]: {
+      position: "absolute",
+      width: "75%",
+      left: "calc((100% - 40px - 75%) / 2)", // 40px is default width and height of icon button
+    },
     fontWeight: "normal",
     color: "white",
     backgroundColor: theme.palette.searchFieldBackground.main,
@@ -25,6 +30,9 @@ const styles = (theme) => ({
     zIndex: theme.customZIndex.searchFieldTextField,
     "& .MuiInputBase-root": {
       height: "40px",
+      [theme.breakpoints.down("xs")]: {
+        height: "30px",
+      },
       borderRadius: theme.customMargin.appBarPadding,
     },
     "& .MuiInputLabel-outlined": {
@@ -47,20 +55,31 @@ const styles = (theme) => ({
     },
   },
   backgroundWhenTextFieldOpen: {
-    backgroundColor: theme.palette.searchFieldBackground.onHover,
+    marginLeft: "-4px",
   },
   input: {
     color: "white",
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
   },
   iconButton: {
     padding: "8px",
   },
   clearIcon: {
     color: "rgba(255, 255, 255, 0.8)",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+      width: "20px",
+    },
   },
   searchIcon: {
     color: "rgba(255, 255, 255, 0.6)",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+      width: "20px",
+    },
   },
   hide: {
     display: "none",
