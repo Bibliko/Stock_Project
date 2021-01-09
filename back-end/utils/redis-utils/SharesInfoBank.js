@@ -207,7 +207,10 @@ const updateCachedShareQuotes = (shareSymbols) => {
           const updateAllChunks = stockQuotesJSONArray.map(
             (stockQuotesJSON) => {
               const updateOneChunk = stockQuotesJSON.map((stockQuote) => {
-                return updateSingleCachedShareQuote(stockQuote);
+                return [
+                  updateSingleCachedShareQuote(stockQuote),
+                  updatePriceChangeStatus(stockQuote[0])
+                ];
               });
               return Promise.all(updateOneChunk);
             }
