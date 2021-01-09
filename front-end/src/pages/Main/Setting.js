@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { withRouter } from "react-router";
 import { socket } from "../../App";
 
@@ -33,9 +34,9 @@ const styles = (theme) => ({
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   divider: {
@@ -50,6 +51,13 @@ const styles = (theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "10px",
       margin: "0px",
+    },
+  },
+  saveButton: {
+    color: theme.palette.normalFontColor.primary,
+    backgroundColor: `${theme.palette.primary.main} !important`,
+    "&:hover": {
+      backgroundColor: `${theme.palette.primary.hover} !important`,
     },
   },
 });
@@ -234,11 +242,10 @@ class AccountSetting extends React.Component {
           </Button>
           <Button
             aria-label="save changes"
-            color="primary"
             size="small"
             variant="contained"
             disableElevation
-            className={classes.reminderButton}
+            className={clsx(classes.reminderButton, classes.saveButton)}
             onClick={this.submit}
           >
             Save

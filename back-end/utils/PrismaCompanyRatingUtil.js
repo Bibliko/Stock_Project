@@ -23,7 +23,7 @@ const executeUpdateCompaniesRatingsList = () => {
           if (shareRating === null) return;
           tasksList.push(() => {
             prisma.companyRating
-              .findOne({
+              .findUnique({
                 where: {
                   symbol: shareRating.symbol
                 }
@@ -77,7 +77,7 @@ const updateCompaniesRatingsList = (forceUpdate = false) => {
             return executeUpdateCompaniesRatingsList();
           }
           console.log(
-            "[DEVELOPER MODE] Unnecessary ratings update has been prevented."
+            "[DEVELOPMENT MODE] Unnecessary ratings update has been prevented."
           );
         })
         .catch((err) => reject(err));

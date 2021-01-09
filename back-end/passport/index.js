@@ -13,7 +13,7 @@ const setupPassport = (passport) => {
 
   passport.deserializeUser((email, done) => {
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }

@@ -23,50 +23,53 @@ const styles = (theme) => ({
     },
   },
   sortLabel: {
-    color: theme.palette.succeed.tableSorted + " !important",
+    color: `${theme.palette.normalFontColor.primary} !important`,
   },
   tableHeader: {
-    fontSize: "17px",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     fontWeight: "bold",
     padding: "0.5em",
     paddingRight: "1em",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "14px",
-    },
-    color: "white",
+    color: `${theme.palette.normalFontColor.primary}`,
     "& .MuiTableSortLabel-root:hover": {
-      color: theme.palette.succeed.tableSorted,
+      color: `${theme.palette.normalFontColor.primary}`,
+      fontStyle: "italic",
     },
     "& .MuiTableSortLabel-root:focus": {
-      color: theme.palette.succeed.tableSorted,
+      color: `${theme.palette.normalFontColor.primary}`,
+      fontStyle: "italic",
     },
     "& .MuiTableSortLabel-active": {
-      color: theme.palette.succeed.tableSorted,
+      color: `${theme.palette.normalFontColor.primary} !important`,
+      fontStyle: "italic",
       "& .MuiTableSortLabel-icon": {
-        color: theme.palette.succeed.tableSortIcon + " !important",
+        color: `${theme.palette.normalFontColor.primary} !important`,
       },
     },
     "& .MuiTableSortLabel-icon": {
-      color: theme.palette.succeed.tableSortIcon,
+      color: `${theme.palette.normalFontColor.primary}`,
     },
     alignItems: "center",
   },
   tableHeaderHover: {
     "&:hover": {
-      color: theme.palette.succeed.tableSorted + " !important",
+      color: `${theme.palette.normalFontColor.primary} !important`,
     },
   },
   tableHeaderRow: {
-    borderBottom: "1px solid #9ED2EF",
-    backgroundColor: theme.palette.tableHeader.purple,
+    borderBottom: `1px solid ${theme.palette.secondary.main}`,
+    backgroundColor: theme.palette.paperBackground.sub,
   },
   tableRow: {
     cursor: "pointer",
-    borderBottom: "1px solid #9ED2EF",
+    borderBottom: `1px solid ${theme.palette.secondary.main}`,
     backgroundColor: "transparent",
-    color: "white",
+    color: `${theme.palette.normalFontColor.primary}`,
     "&:hover": {
-      color: theme.palette.primary.main,
+      color: theme.palette.secondary.main,
     },
   },
   tableNameCell: {

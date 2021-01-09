@@ -1,3 +1,5 @@
+import { roundNumber } from "./NumberUtil";
+
 export const oneSecond = 1000; // 1000 ms = 1 second
 export const oneMinute = 60 * oneSecond;
 export const oneHour = 60 * oneMinute;
@@ -142,15 +144,15 @@ export const isLeapYear = (year) => {
  */
 export const simplifyMiliseconds = (miliseconds) => {
   if (miliseconds < 60 * oneMinute) {
-    return `${Math.round(miliseconds / oneMinute)}m`;
+    return `${roundNumber(miliseconds / oneMinute)}m`;
   }
 
   if (miliseconds < 24 * oneHour) {
-    return `${Math.round(miliseconds / oneHour)}h`;
+    return `${roundNumber(miliseconds / oneHour)}h`;
   }
 
   if (miliseconds < 30 * oneDay) {
-    return `${Math.round(miliseconds / oneDay)}d`;
+    return `${roundNumber(miliseconds / oneDay)}d`;
   }
 
   return "A long time ago";

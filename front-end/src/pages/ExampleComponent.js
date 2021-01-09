@@ -20,8 +20,9 @@ const styles = (theme) => ({
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "center",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
 });

@@ -13,9 +13,9 @@ const styles = (theme) => ({
     borderRightWidth: "0px",
     borderTopWidth: "1px",
     borderBottomWidth: "0px",
-    borderColor: "#2D9CDB",
+    borderColor: theme.palette.secondary.main,
     borderStyle: "solid",
-    backgroundColor: theme.palette.paperBackground.deepBlueTable,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   tableRow: {
     background: "transparent",
@@ -30,10 +30,10 @@ const styles = (theme) => ({
     justifyContent: "flex-start",
   },
   greenIcon: {
-    color: "#27AE60",
+    color: theme.palette.secondary.main,
   },
   redIcon: {
-    color: "#EB5757",
+    color: theme.palette.fail.main,
   },
 
   // border section

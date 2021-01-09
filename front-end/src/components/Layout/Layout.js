@@ -63,15 +63,15 @@ const styles = (theme) => ({
     },
     justifyContent: "flex-start",
   },
-  gradientBackground: {
-    background: theme.palette.paperBackground.gradient,
-    backgroundSize: "cover",
-    height: "100%",
-    width: "100%",
-    position: "fixed",
-  },
-  secondLayerBackground: {
-    background: theme.palette.paperBackground.secondLayer,
+  // gradientBackground: {
+  //   background: theme.palette.paperBackground.gradient,
+  //   backgroundSize: "cover",
+  //   height: "100%",
+  //   width: "100%",
+  //   position: "fixed",
+  // },
+  background: {
+    backgroundColor: theme.palette.paperBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100%",
@@ -188,8 +188,8 @@ class Layout extends React.Component {
         <main className={classes.main}>
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
-            <div className={classes.secondLayerBackground} />
-            <div className={classes.gradientBackground} />
+            <div className={classes.background} />
+            {/* <div className={classes.gradientBackground} /> */}
             <LayoutSpeedDial />
             {!finishedSettingUp && (
               <div className={classes.skeletonDiv}>

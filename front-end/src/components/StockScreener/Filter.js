@@ -3,12 +3,7 @@ import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import {
-  Slider,
-  Typography,
-  Tooltip,
-  Grid,
-} from "@material-ui/core";
+import { Slider, Typography, Tooltip, Grid } from "@material-ui/core";
 
 import { simplifyNumber } from "../../utils/low-dependency/NumberUtil";
 import { fmpSector, fmpIndustry } from "../../utils/low-dependency/FmpHelper";
@@ -28,13 +23,10 @@ const styles = (theme) => ({
     color: "white",
   },
   label: {
-    fontSize: "20px",
+    fontSize: "medium",
     fontWeight: "bold",
     marginBottom: "5px",
     textAlign: "left",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
-    },
   },
   sectorSelectBox: {
     marginLeft: "-10px",
@@ -77,7 +69,7 @@ class Filter extends React.Component {
 
   ValueLabelComponent = (props) => {
     const { children, open, value } = props;
-  
+
     return (
       <CustomTooltip
         arrow
@@ -91,7 +83,7 @@ class Filter extends React.Component {
     );
   };
 
-  render () {
+  render() {
     const {
       classes,
       price,
@@ -119,8 +111,8 @@ class Filter extends React.Component {
           label: "$1K",
         },
         {
-          value: 1025,
-          label: "$2T",
+          value: 1040,
+          label: "$3T",
         },
       ],
     };
@@ -132,12 +124,10 @@ class Filter extends React.Component {
         container
         spacing={4}
         direction="row"
-        className={clsx(classes.fullWidth,classes.container)}
+        className={clsx(classes.fullWidth, classes.container)}
       >
         <Grid item xs={6} sm={12} className={classes.itemGrid}>
-          <Typography className={classes.label}>
-            Price
-          </Typography>
+          <Typography className={classes.label}>Price</Typography>
           <CustomSlider
             value={price}
             min={0}
@@ -152,13 +142,11 @@ class Filter extends React.Component {
           />
         </Grid>
         <Grid item xs={6} sm={12} className={classes.itemGrid}>
-          <Typography className={classes.label}>
-            Market Cap
-          </Typography>
+          <Typography className={classes.label}>Market Cap</Typography>
           <CustomSlider
             value={marketCap}
             min={250}
-            max={1025}
+            max={1040}
             step={10}
             scale={getMarketCap}
             onChange={(event, value) => handleChange("marketCap", value)}
@@ -170,7 +158,12 @@ class Filter extends React.Component {
             ValueLabelComponent={this.ValueLabelComponent}
           />
         </Grid>
-        <Grid item xs={6} sm={12} className={clsx(classes.sectorSelectBox, classes.itemGrid)}>
+        <Grid
+          item
+          xs={6}
+          sm={12}
+          className={clsx(classes.sectorSelectBox, classes.itemGrid)}
+        >
           <SelectBox
             name={"Sector"}
             items={sectors}
@@ -179,7 +172,12 @@ class Filter extends React.Component {
             onChange={(event) => handleChange("sector", event.target.value)}
           />
         </Grid>
-        <Grid item xs={6} sm={12} className={clsx(classes.industrySelectBox, classes.itemGrid)}>
+        <Grid
+          item
+          xs={6}
+          sm={12}
+          className={clsx(classes.industrySelectBox, classes.itemGrid)}
+        >
           <SelectBox
             name={"Industry"}
             items={industries}
@@ -189,7 +187,7 @@ class Filter extends React.Component {
           />
         </Grid>
       </Grid>
-    )
+    );
   }
 }
 

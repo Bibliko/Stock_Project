@@ -24,9 +24,9 @@ const styles = (theme) => ({
     borderRadius: "4px",
     paddingLeft: "10px",
     paddingRight: "10px",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:focus": {
-      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     },
   },
   iconButton: {

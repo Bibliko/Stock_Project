@@ -8,7 +8,7 @@ const loginStrategy = new LocalStrategy(
   },
   (email, password, done) => {
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }

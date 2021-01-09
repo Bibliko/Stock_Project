@@ -11,9 +11,8 @@ import {
   paperWhenHistoryEmpty,
   tablePagination,
 } from "./helperComponents";
-import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
-import { parseRedisTransactionsHistoryListItem } from "../../../utils/low-dependency/ParserUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { getUserTransactionsHistory } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -37,14 +36,16 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     minWidth: "100px",
-    fontSize: "12px",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.purple,
+    borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
   tableCellTransactionTime: {
@@ -52,6 +53,9 @@ const styles = (theme) => ({
   },
   cellDiv: {
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     display: "flex",
     alignItems: "center",
     "&.MuiTableSortLabel-root": {
@@ -130,7 +134,7 @@ const styles = (theme) => ({
   },
   tablePaginationActions: {
     "& .Mui-disabled": {
-      color: theme.palette.disabled.whiteColor,
+      color: theme.palette.disabled.main,
     },
   },
   skeleton: {
@@ -154,9 +158,9 @@ const styles = (theme) => ({
         width: "110px",
       },
     },
-    backgroundColor: theme.palette.filterButton.main,
+    backgroundColor: theme.palette.primary.subDark,
     "&:hover": {
-      backgroundColor: theme.palette.filterButton.onHover,
+      backgroundColor: theme.palette.primary.subDarkHover,
     },
     color: "white",
     position: "fixed",
@@ -190,6 +194,7 @@ const styles = (theme) => ({
     opacity: 1,
     color: "white",
     fontSize: "medium",
+    transition: "font-size 0.2s",
   },
   filterWordHidden: {
     fontSize: 0,
@@ -197,14 +202,14 @@ const styles = (theme) => ({
   title: {
     marginBottom: "30px",
     fontSize: "x-large",
-    color: theme.palette.bigTitle.purple,
+    color: theme.palette.primary.main,
     fontWeight: "bold",
   },
 });
 
 class TransactionsHistoryTableContainer extends React.Component {
   state = {
-    hoverPaper: false,
+    hoverPaper: true,
     loading: true,
     openFilterDialog: false,
     isScrollingUp: true,
@@ -249,6 +254,8 @@ class TransactionsHistoryTableContainer extends React.Component {
 
   timeoutToChangePage;
 
+  timeoutStartAnimationAgain;
+
   hoverPaper = () => {
     this.setState({
       hoverPaper: true,
@@ -258,6 +265,12 @@ class TransactionsHistoryTableContainer extends React.Component {
     this.setState({
       hoverPaper: false,
     });
+
+    this.timeoutStartAnimationAgain = setTimeout(() => {
+      this.setState({
+        hoverPaper: true,
+      });
+    }, 3 * oneSecond);
   };
 
   openFilterDialog = () => {
@@ -289,16 +302,11 @@ class TransactionsHistoryTableContainer extends React.Component {
   setStateTransactions = (redisTransactions, needScrollToTop) => {
     const { loading } = this.state;
 
-    let newTransactions = [];
-
     const { transactions, transactionsLength } = redisTransactions;
 
-    transactions.forEach((transaction) => {
-      newTransactions.push(parseRedisTransactionsHistoryListItem(transaction));
-    });
     this.setState(
       {
-        transactions: newTransactions,
+        transactions,
         transactionsLength,
         isFirstInitializationEmpty:
           transactionsLength === 0 && loading ? true : false,
@@ -336,8 +344,8 @@ class TransactionsHistoryTableContainer extends React.Component {
       orderBy,
       orderQuery
     )
-      .then((redisTransactions) => {
-        this.setStateTransactions(redisTransactions, needScrollToTop);
+      .then((transactions) => {
+        this.setStateTransactions(transactions, needScrollToTop);
       })
       .catch((err) => {
         console.log(err);
@@ -416,6 +424,9 @@ class TransactionsHistoryTableContainer extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
+
+    clearTimeout(this.timeoutToChangePage);
+    clearTimeout(this.timeoutStartAnimationAgain);
   }
 
   shouldComponentUpdate(nextProps, nextState) {

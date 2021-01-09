@@ -9,11 +9,17 @@ const {
 } = require("../utils/low-dependency/PromisesUtil");
 const {
   accountSummaryChart,
-  sharesList
+  sharesList,
+  cachedMostGainers
 } = require("../utils/redis-utils/RedisUtil");
 const {
   getCachedHistoricalChart
 } = require("../utils/redis-utils/HistoricalChart");
+const {
+  parseCachedMostGainer,
+  createRedisValueFromSharesList,
+  parseRedisSharesListItem
+} = require("../utils/low-dependency/ParserUtil");
 
 const updateAccountSummaryChartWholeList = "updateAccountSummaryChartWholeList";
 const updateAccountSummaryChartOneItem = "updateAccountSummaryChartOneItem";
@@ -27,6 +33,8 @@ const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
 const getHistoricalChart = "getHistoricalChart";
+
+const getMostGainers = "getMostGainers";
 
 /**
  * 'doanhtu07@gmail.com|accountSummaryChart' : list -> "timestamp1|value1", "timestamp2|value2", ...
@@ -77,7 +85,8 @@ router.get(`/${getAccountSummaryChartWholeList}`, (req, res) => {
 
   listRangeAsync(redisKey, 0, -1)
     .then((timestampArray) => {
-      res.send(timestampArray);
+      // [timestamp, value]
+      res.send(timestampArray.map((timestamp) => timestamp.split("|")));
     })
     .catch((err) => {
       console.log(err);
@@ -92,7 +101,7 @@ router.get(`/${getAccountSummaryChartLatestItem}`, (req, res) => {
 
   listRangeAsync(redisKey, -1, -1)
     .then((timestampArray) => {
-      res.send(timestampArray);
+      res.send(timestampArray.map((timestamp) => timestamp.split("|")));
     })
     .catch((err) => {
       console.log(err);
@@ -112,9 +121,9 @@ router.put(`/${updateSharesList}`, (req, res) => {
   const tasksList = [];
 
   shares.forEach((share) => {
-    const { id, companyCode, quantity, buyPriceAvg, userID } = share;
-    const newValue = `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
-    tasksList.push(() => listPushAsync(redisKey, newValue));
+    tasksList.push(() =>
+      listPushAsync(redisKey, createRedisValueFromSharesList(share))
+    );
   });
 
   SequentialPromisesWithResultsArray(tasksList)
@@ -134,7 +143,9 @@ router.get(`/${getSharesList}`, (req, res) => {
 
   listRangeAsync(redisKey, 0, -1)
     .then((sharesList) => {
-      res.send(sharesList);
+      res.send(
+        sharesList.map((userShare) => parseRedisSharesListItem(userShare))
+      );
     })
     .catch((err) => {
       console.log(err);
@@ -190,6 +201,17 @@ router.get(`/${getHistoricalChart}`, (req, res) => {
   getCachedHistoricalChart(exchangeOrCompany, typeChart, getFromCacheDirectly)
     .then((historicalChartData) => {
       res.send(historicalChartData);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+router.get(`/${getMostGainers}`, (req, res) => {
+  listRangeAsync(cachedMostGainers, 0, -1)
+    .then((gainers) => {
+      res.send(gainers.map((gainer) => parseCachedMostGainer(gainer)));
     })
     .catch((err) => {
       console.log(err);

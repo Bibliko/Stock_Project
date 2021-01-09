@@ -73,8 +73,17 @@ export const toggleTheme = () => {
   prefersDarkMode = !prefersDarkMode;
 };
 
+/**
+ * @param {string} rgbaColor e.g: "rgba(0, 0, 0, 1)"
+ * @param {string} opacity e.g: "0.5"
+ */
+export const changeOpacityOfRGBAString = (rgbaColor, opacity) => {
+  return rgbaColor.replace(/[^,]+(?=\))/, opacity);
+};
+
 export default {
   toggleTheme,
   createTheme,
   withMediaQuery,
+  changeOpacityOfRGBAString,
 };
