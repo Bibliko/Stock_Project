@@ -330,14 +330,9 @@ const updatePriceChangeStatus = (stockQuoteJSON) => {
         else reject(new Error(`No quote was found for ${symbol.companyCode}`));
       })
       .then((quoteJSON) => {
-        if (quoteJSON.price > symbol.companyCode) return "1";
-        else return "-1";
+        if (quoteJSON) return quoteJSON.change > 0 ? "1" : "-1";
       })
-      .then((valueString) => {
-        setAsync(redisKey, valueString)
-          .then((quote) => resolve(`Update ${redisKey} successfully`))
-          .catch((err) => reject(err));
-      })
+      .then((valueString) => setAsync(redisKey, valueString))
       .catch((err) => reject(err));
   });
 };
