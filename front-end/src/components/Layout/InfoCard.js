@@ -72,7 +72,7 @@ function InfoCard(props) {
         style={{gridArea: "2 / 1 / 3 / 2"}}
         className={classes.smallText}
       >
-        {price}
+        {`$${price}`}
       </Typography>
         
       <Typography

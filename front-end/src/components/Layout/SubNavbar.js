@@ -1,7 +1,6 @@
 import React from "react";
 import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -16,16 +15,20 @@ import {
   getFullStockInfo,
 } from "../../utils/RedisUtil";
 import { getMostActiveStocks } from "../../utils/FinancialModelingPrepUtil";
-import { roundNumber } from "../../utils/low-dependency/NumberUtil";
+import { withMediaQuery } from "../../theme/ThemeUtil";
+
+import {
+  HideOnScroll,
+  getTopShare,
+  processExchangeData,
+  processCompanyData,
+} from "./SubNavbarHelper";
 
 import {
   AppBar,
   Typography,
   Container,
-  Slide,
   CircularProgress,
-  useMediaQuery,
-  useScrollTrigger,
 } from "@material-ui/core";
 
 import InfoCard from "./InfoCard";
@@ -64,27 +67,6 @@ const styles = (theme) => ({
 const fullHeight = themeObj.customHeight.subBarHeight;
 const smallHeight = themeObj.customHeight.subBarHeightSmall;
 
-const withMediaQuery = (...args) => Component => props => {
-  const mediaQuery = useMediaQuery(...args);
-  return <Component mediaQuery={mediaQuery} {...props} />;
-};
-
-function HideOnScroll(props) {
-  const {
-    children,
-  } = props;
-  const trigger = useScrollTrigger({threshold: 10});
-  return (
-    <Slide appear={false} direction="down" in={!trigger}>
-      {children}
-    </Slide>
-  );
-}
-
-HideOnScroll.propTypes = {
-  children: PropTypes.element.isRequired,
-};
-
 class SubNavbar extends React.Component {
   state = {
     countdown: "",
@@ -96,56 +78,33 @@ class SubNavbar extends React.Component {
 
   updateData = () => {
     let newData = [];
-
     Promise.all([
       getMostActiveStocks(),
       getParsedCachedSharesList(this.props.userSession.email),
     ])
     .then(([mostActiveStocks, shares]) => {
-      const topShare = shares.length !== 0 ? shares.sort((firstShare, secondShare) => {
-        return secondShare.quantity * secondShare.buyPriceAvg - firstShare.quantity * firstShare.buyPriceAvg;  // sorted by value
-      })[0].companyCode : mostActiveStocks[1].ticker;  // default to second most active stock
-
-      Promise.all([
+      const topShare = getTopShare(shares, mostActiveStocks[1]);
+      return Promise.all([
         getCachedHistoricalChart("NASDAQ", "5min"),
         getCachedHistoricalChart("NYSE", "5min"),
         getFullStockInfo(topShare),
+        mostActiveStocks,
         getFullStockInfo("AAPL"),
-      ])
-      .then(([NasdaqHistorical, NyseHistorical, topShareInfo, largestCompanyInfo]) => {
-        const processExchangeData = (exchange, exchangeHistorical) => {
-          const currentDay = exchangeHistorical[0].date.slice(8, 10);  // extract current day
-          const currentValue = exchangeHistorical[0].close;
-          const lastValue = exchangeHistorical.find((data) => data.date.slice(8, 10) !== currentDay).close;
-          newData.push([
-            exchange,
-            roundNumber(currentValue, 2),
-            roundNumber((currentValue - lastValue) / lastValue * 100, 1)
-          ]);
-        };
-        const processCompanyData = (companyInfo) => {
-          newData.push([
-            companyInfo.symbol,
-            roundNumber(companyInfo.price, 2),
-            roundNumber(companyInfo.changesPercentage, 1)
-          ]);
-        };
-
-        processExchangeData("NASDAQ", NasdaqHistorical);
-        processExchangeData("NYSE", NyseHistorical);
-        processCompanyData(topShareInfo);
-        processCompanyData({
-          symbol: mostActiveStocks[0].ticker,
-          price: mostActiveStocks[0].price,
-          changesPercentage: parseFloat(mostActiveStocks[0].changesPercentage.slice(1))
-        });
-        processCompanyData(largestCompanyInfo);
-
-        this.setState({data: newData});
-      })
-      .catch((error) => {
-        console.log(error);
+      ]);
+    })
+    .then(([NasdaqHistorical, NyseHistorical, topShareInfo, mostActiveStocks, largestCompanyInfo]) => {
+      processExchangeData(newData, "NASDAQ", NasdaqHistorical);
+      processExchangeData(newData, "NYSE", NyseHistorical);
+      processCompanyData(newData, topShareInfo);
+      processCompanyData(newData, {
+        symbol: mostActiveStocks[0].ticker,
+        price: mostActiveStocks[0].price,
+        changesPercentage: parseFloat(mostActiveStocks[0].changesPercentage.slice(1))
       });
+      processCompanyData(newData, largestCompanyInfo);
+
+      if(!isEqual(this.state.data, newData))
+        this.setState({data: newData});
     })
     .catch((error) => {
         console.log(error);
@@ -180,7 +139,7 @@ class SubNavbar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["isMarketClosed", "mediaQuery"];
+    const compareKeys = ["isMarketClosed", "mediaQuery", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
