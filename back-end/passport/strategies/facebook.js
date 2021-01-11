@@ -41,7 +41,7 @@ const facebookStrategy = new FacebookStrategy(
     }
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }

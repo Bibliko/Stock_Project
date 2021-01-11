@@ -26,7 +26,7 @@ const setupCachedSharesListForUserIfNecessary = (email) => {
     listRangeAsync(redisKey, 0, -1)
       .then((sharesList) => {
         if (isEmpty(sharesList)) {
-          return prisma.user.findOne({
+          return prisma.user.findUnique({
             where: {
               email
             },
@@ -113,7 +113,7 @@ const updateUserCacheSession = (email) => {
     getLastItemOfCachedAccountSummaryTimestamps(email)
       .then((timestampString) => {
         if (!timestampString) {
-          return prisma.user.findOne({
+          return prisma.user.findUnique({
             where: { email },
             select: { totalPortfolio: true }
           });
@@ -124,7 +124,7 @@ const updateUserCacheSession = (email) => {
         const milisecInCache = new Date(UTCDateString).getTime();
 
         if (milisecNow >= milisecInCache + oneMinute) {
-          return prisma.user.findOne({
+          return prisma.user.findUnique({
             where: { email },
             select: { totalPortfolio: true }
           });

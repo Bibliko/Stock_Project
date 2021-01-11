@@ -43,7 +43,7 @@ const deleteExpiredVerification = () => {
 const createAccountSummaryChartTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.accountSummaryTimestamp
-      .findOne({
+      .findUnique({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
@@ -81,7 +81,7 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.rankingTimestamp
-      .findOne({
+      .findUnique({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
@@ -321,7 +321,7 @@ const getChunkUserTransactionsHistoryForRedisM5RU = (
     }
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }
@@ -345,7 +345,7 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
     const filtering = createPrismaFiltersObject(filters);
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }

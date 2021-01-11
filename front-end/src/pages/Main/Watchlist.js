@@ -21,8 +21,9 @@ const styles = (theme) => ({
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "center",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   fullWidth: {
@@ -48,8 +49,6 @@ const styles = (theme) => ({
 });
 
 class WatchlistPage extends React.Component {
-
-
   shouldComponentUpdate(nextProps, nextState) {
     const compareKeys = ["email", "watchlist"];
     const nextPropsCompare = pick(nextProps.userSession, compareKeys);

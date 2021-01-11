@@ -44,7 +44,7 @@ const styles = (theme) => ({
     backgroundColor: "transparent",
     "&:hover": {
       cursor: "pointer",
-      backgroundColor: theme.palette.newsCardHover.main,
+      backgroundColor: theme.palette.paperBackground.hoverBlur,
     },
   },
   imageContainer: {

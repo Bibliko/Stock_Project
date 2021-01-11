@@ -48,7 +48,7 @@ router.get("/getData", (req, res) => {
    *      }
    */
   prisma.share
-    .findOne({
+    .findUnique({
       where: {
         id
       },

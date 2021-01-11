@@ -24,13 +24,16 @@ const styles = (theme) => ({
   },
   fullWidth: {
     width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   itemGrid: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "column",
-    minWidth: "150px",
+    width: "100%",
   },
 });
 

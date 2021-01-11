@@ -1,6 +1,8 @@
 import fetch from "node-fetch";
 import { isEqual } from "lodash";
 
+import { roundNumber } from "./low-dependency/NumberUtil";
+
 const {
   REACT_APP_FINANCIAL_MODELING_PREP_API_KEY: FINANCIAL_MODELING_PREP_API_KEY,
 } = process.env;
@@ -86,13 +88,14 @@ export const getStockScreener = ({
   const sectorString = sectorFilter !== "All" ? "&sector=" + sectorFilter : "";
   const industryString =
     industryFilter !== "All" ? "&industry=" + industryFilter : "";
+
   return new Promise((resolve, reject) => {
     fetch(
-      `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${
+      `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${roundNumber(
         marketCapFilter[0]
-      }&marketCapLowerThan=${
+      )}&marketCapLowerThan=${roundNumber(
         marketCapFilter[1]
-      }${sectorString}${industryString}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      )}${sectorString}${industryString}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
       .then((stockScreener) => {
         return stockScreener.json();

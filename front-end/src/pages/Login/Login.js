@@ -6,7 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
@@ -209,13 +209,13 @@ class Login extends React.Component {
   };
 
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
@@ -224,7 +224,7 @@ class Login extends React.Component {
     const { classes } = this.props;
     const { error } = this.state;
 
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       return null;
     }
 
@@ -291,6 +291,7 @@ class Login extends React.Component {
                     redirectToPage("/signup", this.props);
                   }}
                   className={classes.link}
+                  disableRipple
                 >
                   Create an account
                 </Button>
@@ -305,6 +306,7 @@ class Login extends React.Component {
                     redirectToPage("/forgotpassword", this.props);
                   }}
                   className={classes.link}
+                  disableRipple
                 >
                   Forgot password
                 </Button>

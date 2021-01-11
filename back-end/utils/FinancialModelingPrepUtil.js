@@ -309,6 +309,31 @@ const getFullStockRatingsFromFMP = () => {
   });
 };
 
+/**
+ * @description Get most gainers (companies) from NYSE and NASDAQ (default exchanges of FMP).
+ * @return {Promise<object[]>} array of objects (those found in endpoint gainers FMP)
+ */
+const getMostGainersFromFMP = () => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/gainers?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((gainers) => {
+        return gainers.json();
+      })
+      .then((gainers) => {
+        if (isEmpty(gainers)) {
+          reject(new Error("There is a problem with FMP API key."));
+        } else if (gainers["Error Message"]) {
+          reject(gainers["Error Message"]);
+        } else {
+          resolve(gainers);
+        }
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 module.exports = {
   updateMarketHolidaysFromFMP,
 
@@ -319,5 +344,7 @@ module.exports = {
   getFullStockProfilesFromFMP,
   getFullStockRatingsFromFMP,
 
-  getHistoricalChartFromFMP
+  getHistoricalChartFromFMP,
+
+  getMostGainersFromFMP
 };

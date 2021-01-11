@@ -46,9 +46,9 @@ const styles = (theme) => ({
     paddingLeft: "5px",
     fontSize: "smaller",
     fontWeight: "bold",
-    color: theme.palette.bigTitle.lightBlue,
+    color: theme.palette.secondary.main,
     "&:hover": {
-      color: theme.palette.bigTitle.lightBlueHover,
+      color: theme.palette.primary.subDark,
     },
   },
   title3: {

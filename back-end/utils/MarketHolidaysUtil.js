@@ -8,7 +8,7 @@ const deletePrismaMarketHolidays = () => {
   var yearNow = getYearUTCString(timeNow);
 
   prisma.marketHolidays
-    .findOne({
+    .findUnique({
       where: {
         year: yearNow - 1
       }
@@ -74,7 +74,7 @@ const updatePrismaMarketHolidays = (stockMarketHoliday) => {
 
   return new Promise((resolve, reject) => {
     prisma.marketHolidays
-      .findOne({
+      .findUnique({
         where: {
           year
         },

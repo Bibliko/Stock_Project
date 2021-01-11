@@ -11,7 +11,7 @@ import {
 } from "../../utils/low-dependency/DayTimeUtil";
 import {
   getCachedHistoricalChart,
-  getParsedCachedSharesList,
+  getCachedSharesList,
   getFullStockInfo,
 } from "../../utils/RedisUtil";
 import { getMostActiveStocks } from "../../utils/FinancialModelingPrepUtil";
@@ -80,7 +80,7 @@ class SubNavbar extends React.Component {
     let newData = [];
     Promise.all([
       getMostActiveStocks(),
-      getParsedCachedSharesList(this.props.userSession.email),
+      getCachedSharesList(this.props.userSession.email),
     ])
     .then(([mostActiveStocks, shares]) => {
       const topShare = getTopShare(shares, mostActiveStocks[1]);
