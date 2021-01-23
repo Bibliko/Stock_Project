@@ -5,6 +5,7 @@ const {
   queueGetRangeByScore
 } = require("../../redis/redis-client");
 const { parseCachedShareQuote } = require("../low-dependency/ParserUtil");
+const { proceedTransaction } = require("../top-layer/UserUtil");
 
 /**
  *
@@ -52,8 +53,8 @@ const emptyPendingTransactionsListOneCompany = (companyCode, recentPrice) => {
             ? `cachedShares|${companyCode}|pendingSell`
             : `cachedShares|${companyCode}|pendingBuy`;
 
-        const valueStringUp = status === "1" ? `${recentPrice}` : `)`;
-        const valueStringDown = status === "1" ? `(` : `${recentPrice}`;
+        const valueStringUp = status === "1" ? `${recentPrice}` : `+inf`;
+        const valueStringDown = status === "1" ? `-inf` : `${recentPrice}`;
 
         return [
           queueGetRangeByScore(redisKey, valueStringDown, valueStringUp),
@@ -61,20 +62,13 @@ const emptyPendingTransactionsListOneCompany = (companyCode, recentPrice) => {
         ];
       })
       .then(([arrayToEmpty, redisKey]) => {
-        const arrayToEmptyPromises = arrayToEmpty
-          .forEach((transactionID, id) => {
-            // Buy or sell... -> then
-            const queueRemovePromise = queueRemove(
-              redisKey,
-              transactionID
-            ).then((finishedPopOutOneTransaction) => {
+        const arrayToEmptyPromises = arrayToEmpty.map((transactionID, id) => {
+          return proceedTransaction(transactionID, recentPrice)
+            .then(() => queueRemove(redisKey, transactionID))
+            .then((finishedPopOutOneTransaction) => {
               resolve(`Successfully pop out ${id + 1} transaction`);
             });
-
-            // Buy or sell promise will be added after being constructed
-            return [queueRemovePromise];
-          })
-          .catch((err) => reject(err));
+        });
 
         return Promise.all(arrayToEmptyPromises);
       })
@@ -97,23 +91,21 @@ const emptyPendingTransactionsListAllCompanies = (companyCodes) => {
       .map((companyCode, id) => {
         const redisKeyQuote = `cachedShares|${companyCode}|quote`;
 
-        getAsync(redisKeyQuote)
+        return getAsync(redisKeyQuote)
           .then((quote) => {
             if (quote) {
               const quoteJSON = parseCachedShareQuote(quote);
-              if (quoteJSON)
-                emptyPendingTransactionsListOneCompany(
-                  companyCode,
-                  quoteJSON.price
-                );
+              return emptyPendingTransactionsListOneCompany(
+                companyCode,
+                quoteJSON.price
+              );
             } else reject(new Error(`No quote was found for ${companyCode}`));
           })
           .then((finishedEmptyPendingTransactionsListAllCompanies) =>
             console.log(
               "Successfully pop out all possible transactions of all companies"
             )
-          )
-          .catch((err) => reject(err));
+          );
       })
       .catch((err) => reject(err));
 

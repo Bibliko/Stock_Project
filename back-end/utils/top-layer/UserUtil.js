@@ -362,6 +362,45 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
   });
 };
 
+/**
+ * Buy or Sell a single transaction
+ * @param {string} transactionID
+ * @param {number} recentPrice
+ */
+const proceedTransaction = (transactionID, recentPrice) => {
+  return new Promise((resolve, reject) => {
+    return prisma.userTransaction
+      .findUnique({
+        where: {
+          id: transactionID
+        },
+        distinct: ["user", "isTypeBuy", "quantity"]
+      })
+      .then((userTransaction) => {
+        const { user, isTypeBuy, quantity } = userTransaction;
+        if (!isTypeBuy || !user || !quantity) {
+          reject(new Error("The user's transaction is invalid."));
+          return;
+        }
+
+        const realPendingPrice = recentPrice * quantity;
+        if (isTypeBuy) {
+          if (user.cash < realPendingPrice)
+            reject(
+              new Error(
+                "The user does not have enough money to buy the pending stock"
+              )
+            );
+          else user.cash -= realPendingPrice;
+        } else user.cash += realPendingPrice;
+      })
+      .then((finishedProceedingTransaction) =>
+        resolve("Successfully proceeded the transaction")
+      )
+      .catch((err) => reject(err));
+  });
+};
+
 module.exports = {
   deleteExpiredVerification,
 
@@ -374,5 +413,7 @@ module.exports = {
   updateRankingList,
 
   getChunkUserTransactionsHistoryForRedisM5RU,
-  getLengthUserTransactionsHistoryForRedisM5RU
+  getLengthUserTransactionsHistoryForRedisM5RU,
+
+  proceedTransaction
 };

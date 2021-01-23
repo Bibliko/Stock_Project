@@ -81,7 +81,6 @@ const getSingleCachedShareInfo = (companyCode) => {
 
           return Promise.all([
             pushManyCodesToCachedShares([companyCode]),
-            updatePriceChangeStatus(quote[0]),
             updateSingleCachedShareQuote(quote[0]),
             updateSingleCachedShareProfile(profile[0])
           ]);
@@ -142,8 +141,10 @@ const updateSingleCachedShareQuote = (stockQuoteJSON) => {
 
     setAsync(redisKey, valueString)
       .then((quote) => {
-        resolve(`Updated ${redisKey} successfully`);
+        const oldPrice = symbol.price;
+        return updatePriceChangeStatus(stockQuoteJSON, oldPrice, quote.price);
       })
+      .then(() => resolve(`Updated ${redisKey} successfully`))
       .catch((err) => {
         reject(err);
       });
@@ -207,10 +208,7 @@ const updateCachedShareQuotes = (shareSymbols) => {
           const updateAllChunks = stockQuotesJSONArray.map(
             (stockQuotesJSON) => {
               const updateOneChunk = stockQuotesJSON.map((stockQuote) => {
-                return [
-                  updateSingleCachedShareQuote(stockQuote),
-                  updatePriceChangeStatus(stockQuote)
-                ];
+                return [updateSingleCachedShareQuote(stockQuote)];
               });
               return Promise.all(updateOneChunk);
             }
@@ -320,22 +318,19 @@ const updateCachedShareProfilesUsingCache = () => {
   });
 };
 
-const updatePriceChangeStatus = (stockQuoteJSON) => {
+const updatePriceChangeStatus = (stockQuoteJSON, oldPrice, recentPrice) => {
   return new Promise((resolve, reject) => {
     const { symbol } = stockQuoteJSON;
 
     const redisKey = `cachedShares|${symbol.companyCode}|priceStatus`;
-    const redisKeyQuote = `cachedShares|${symbol.companyCode}|quote`;
+    const valueString = oldPrice < recentPrice ? "1" : "-1";
 
-    getAsync(redisKeyQuote)
-      .then((quote) => {
-        if (quote) return parseCachedShareQuote(quote);
-        else reject(new Error(`No quote was found for ${symbol.companyCode}`));
+    return setAsync(redisKey, valueString)
+      .then((finishedUpdatingThePriceStatus) => {
+        resolve(
+          `Successfully updated price change status for company ${symbol.companyCode}`
+        );
       })
-      .then((quoteJSON) => {
-        if (quoteJSON) return quoteJSON.change > 0 ? "1" : "-1";
-      })
-      .then((valueString) => setAsync(redisKey, valueString))
       .catch((err) => reject(err));
   });
 };
