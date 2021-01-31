@@ -64,6 +64,7 @@ const theme = {
     floatingActionButton: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     subNavbar: 20,
+    subNavbarCard: 18,
     searchFieldContainer: 1000,
     searchMenu: 1200,
     searchFieldTextField: 1300,
@@ -119,9 +120,6 @@ const theme = {
     appBarBlue: {
       // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
       main: "rgba(31, 47, 152, 1)",
-
-      // Grey
-      main: "rgba(255, 255, 255, 0.3)",
     },
 
     // Paper

@@ -26,51 +26,69 @@ import {
 
 import {
   AppBar,
+  Slide,
+  IconButton,
   Typography,
   Container,
   CircularProgress,
 } from "@material-ui/core";
+
+import {
+  ExpandMore,
+  ExpandLess,
+} from '@material-ui/icons';
 
 import InfoCard from "./InfoCard";
 import themeObj from "../../theme/themeObj";
 
 const styles = (theme) => ({
   subnav: {
+    height: themeObj.customHeight.subBarHeight,
     position: "fixed",
     top: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
       top: theme.customHeight.appBarHeightSmall,
     },
     zIndex: theme.customZIndex.subNavbar,
-    backgroundColor: "#1D212D",
+    backgroundColor: "transparent",
   },
   gridContainer: {
     display: "grid",
     justifyContent: "center",
     alignItems: "center",
     gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
-    gridTemplateRows: "0.6fr 1fr",
+    gridTemplateRows: "0.5fr 1fr",
     height: "100%",
   },
   clockContainer: {
+    height: "100%",
+    zIndex: theme.customZIndex.subNavbar,
     backgroundColor: "#080E33",
     fontSize: "medium",
     color: theme.palette.normalFontColor.primary,
     padding: "2px",
   },
-  progress: {
-    justifySelf: "center",
-    gridArea: "2 / 3 / 3 / 4",
+  progressContainer: {
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gridArea: "2 / 1 / 3 / 6",
+    backgroundColor: "#1D212D",
+  },
+  collapseButton: {
+    color: "white",
+    position: "absolute",
+    right: "5px",
+    padding: "0px",
   },
 });
-
-const fullHeight = themeObj.customHeight.subBarHeight;
-const smallHeight = themeObj.customHeight.subBarHeightSmall;
 
 class SubNavbar extends React.Component {
   state = {
     countdown: "",
     data: [],
+    collapse: false,
   }
 
   marketCountdownInterval;
@@ -109,6 +127,11 @@ class SubNavbar extends React.Component {
     .catch((error) => {
         console.log(error);
     });
+  };
+
+  toggle = () => {
+    const { collapse } = this.state;
+    this.setState({collapse: !collapse});
   };
 
   componentDidMount() {
@@ -156,15 +179,20 @@ class SubNavbar extends React.Component {
     } = this.props;
 
     const {
+      collapse,
       countdown,
       data,
     } = this.state;
 
+    const showCards = mediaQuery && !collapse;
+
     return (
         <HideOnScroll>
-          <AppBar className={classes.subnav} style={{height: mediaQuery ? fullHeight : smallHeight}}>
+          <AppBar
+            className={classes.subnav}
+            style={{boxShadow: showCards || "none"}}
+          >
             <Container
-              container
               disableGutters
               className={classes.gridContainer}
               maxWidth={false}
@@ -175,21 +203,38 @@ class SubNavbar extends React.Component {
                 style={{gridArea: mediaQuery ? "1 / 1 / 2 / 6" : "1 / 1 / 3 / 6"}}
               >
                 {isMarketClosed ? "Market Closed" : "Market closed in " + countdown}
+
+                { mediaQuery &&
+                  <IconButton
+                    className={classes.collapseButton}
+                    component="span"
+                    aria-label="collapse"
+                    onClick={this.toggle}
+                  >
+                    { collapse
+                      ? <ExpandMore />
+                      : <ExpandLess />
+                    }
+                  </IconButton>
+                }
               </Typography>
 
-              { mediaQuery && (
-                  data.length !== 0 ?
-                    data.map((data, index) => { return (
-                      <InfoCard
-                        name={data[0]}
-                        price={data[1]}
-                        change={data[2]}
-                        index={index}
-                        key={`infoCard-${index}`}
-                      />
-                    )})
-                    : <CircularProgress size={24} className={classes.progress}/>
-                )
+              { data.length
+                ? data.map((data, index) => { return (
+                  <InfoCard
+                    name={data[0]}
+                    price={data[1]}
+                    change={data[2]}
+                    index={index}
+                    key={`infoCard-${index}`}
+                    show={showCards}
+                  />
+                )})
+                : <Slide appear={false} direction="down" in={showCards}>
+                    <div className={classes.progressContainer}>
+                      <CircularProgress size={24}/>
+                    </div>
+                  </Slide>
               }
             </Container>
           </AppBar>
