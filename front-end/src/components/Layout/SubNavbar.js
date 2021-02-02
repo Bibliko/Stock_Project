@@ -62,6 +62,7 @@ const styles = (theme) => ({
     zIndex: theme.customZIndex.subNavbar,
     backgroundColor: theme.palette.paperBackground.sub,
     fontSize: "medium",
+    fontWeight: "bold",
     color: theme.palette.normalFontColor.primary,
     padding: "2px",
   },
