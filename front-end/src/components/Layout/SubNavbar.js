@@ -33,10 +33,7 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 
-import {
-  ExpandMore,
-  ExpandLess,
-} from '@material-ui/icons';
+import { ExpandMore, ExpandLess } from "@material-ui/icons";
 
 import InfoCard from "./InfoCard";
 import themeObj from "../../theme/themeObj";
@@ -63,7 +60,7 @@ const styles = (theme) => ({
   clockContainer: {
     height: "100%",
     zIndex: theme.customZIndex.subNavbar,
-    backgroundColor: "#080E33",
+    backgroundColor: theme.palette.paperBackground.sub,
     fontSize: "medium",
     color: theme.palette.normalFontColor.primary,
     padding: "2px",
@@ -89,7 +86,7 @@ class SubNavbar extends React.Component {
     countdown: "",
     data: [],
     collapse: false,
-  }
+  };
 
   marketCountdownInterval;
   dataInterval;
@@ -100,38 +97,48 @@ class SubNavbar extends React.Component {
       getMostActiveStocks(),
       getCachedSharesList(this.props.userSession.email),
     ])
-    .then(([mostActiveStocks, shares]) => {
-      const topShare = getTopShare(shares, mostActiveStocks[1]);
-      return Promise.all([
-        getCachedHistoricalChart("NASDAQ", "5min"),
-        getCachedHistoricalChart("NYSE", "5min"),
-        getFullStockInfo(topShare),
-        mostActiveStocks,
-        getFullStockInfo("AAPL"),
-      ]);
-    })
-    .then(([NasdaqHistorical, NyseHistorical, topShareInfo, mostActiveStocks, largestCompanyInfo]) => {
-      processExchangeData(newData, "NASDAQ", NasdaqHistorical);
-      processExchangeData(newData, "NYSE", NyseHistorical);
-      processCompanyData(newData, topShareInfo);
-      processCompanyData(newData, {
-        symbol: mostActiveStocks[0].ticker,
-        price: mostActiveStocks[0].price,
-        changesPercentage: parseFloat(mostActiveStocks[0].changesPercentage.slice(1))
-      });
-      processCompanyData(newData, largestCompanyInfo);
+      .then(([mostActiveStocks, shares]) => {
+        const topShare = getTopShare(shares, mostActiveStocks[1]);
+        return Promise.all([
+          getCachedHistoricalChart("NASDAQ", "5min"),
+          getCachedHistoricalChart("NYSE", "5min"),
+          getFullStockInfo(topShare),
+          mostActiveStocks,
+          getFullStockInfo("AAPL"),
+        ]);
+      })
+      .then(
+        ([
+          NasdaqHistorical,
+          NyseHistorical,
+          topShareInfo,
+          mostActiveStocks,
+          largestCompanyInfo,
+        ]) => {
+          processExchangeData(newData, "NASDAQ", NasdaqHistorical);
+          processExchangeData(newData, "NYSE", NyseHistorical);
+          processCompanyData(newData, topShareInfo);
+          processCompanyData(newData, {
+            symbol: mostActiveStocks[0].ticker,
+            price: mostActiveStocks[0].price,
+            changesPercentage: parseFloat(
+              mostActiveStocks[0].changesPercentage.slice(1)
+            ),
+          });
+          processCompanyData(newData, largestCompanyInfo);
 
-      if(!isEqual(this.state.data, newData))
-        this.setState({data: newData});
-    })
-    .catch((error) => {
+          if (!isEqual(this.state.data, newData))
+            this.setState({ data: newData });
+        }
+      )
+      .catch((error) => {
         console.log(error);
-    });
+      });
   };
 
   toggle = () => {
     const { collapse } = this.state;
-    this.setState({collapse: !collapse});
+    this.setState({ collapse: !collapse });
   };
 
   componentDidMount() {
@@ -140,10 +147,7 @@ class SubNavbar extends React.Component {
       oneSecond
     );
 
-    this.dataInterval = setInterval(
-      () => this.updateData(),
-      oneMinute * 5
-    );
+    this.dataInterval = setInterval(() => this.updateData(), oneMinute * 5);
     this.updateData();
   }
 
@@ -172,55 +176,49 @@ class SubNavbar extends React.Component {
   }
 
   render() {
-    const {
-      classes,
-      mediaQuery,
-      isMarketClosed,
-    } = this.props;
+    const { classes, mediaQuery, isMarketClosed } = this.props;
 
-    const {
-      collapse,
-      countdown,
-      data,
-    } = this.state;
+    const { collapse, countdown, data } = this.state;
 
     const showCards = mediaQuery && !collapse;
 
     return (
-        <HideOnScroll>
-          <AppBar
-            className={classes.subnav}
-            style={{boxShadow: showCards || "none"}}
+      <HideOnScroll>
+        <AppBar
+          className={classes.subnav}
+          style={{ boxShadow: showCards || "none" }}
+        >
+          <Container
+            disableGutters
+            className={classes.gridContainer}
+            maxWidth={false}
           >
-            <Container
-              disableGutters
-              className={classes.gridContainer}
-              maxWidth={false}
+            <Typography
+              align={"center"}
+              className={classes.clockContainer}
+              style={{
+                gridArea: mediaQuery ? "1 / 1 / 2 / 6" : "1 / 1 / 3 / 6",
+              }}
             >
-              <Typography
-                align={"center"}
-                className={classes.clockContainer}
-                style={{gridArea: mediaQuery ? "1 / 1 / 2 / 6" : "1 / 1 / 3 / 6"}}
-              >
-                {isMarketClosed ? "Market Closed" : "Market closed in " + countdown}
+              {isMarketClosed
+                ? "Market Closed"
+                : "Market closed in " + countdown}
 
-                { mediaQuery &&
-                  <IconButton
-                    className={classes.collapseButton}
-                    component="span"
-                    aria-label="collapse"
-                    onClick={this.toggle}
-                  >
-                    { collapse
-                      ? <ExpandMore />
-                      : <ExpandLess />
-                    }
-                  </IconButton>
-                }
-              </Typography>
+              {mediaQuery && (
+                <IconButton
+                  className={classes.collapseButton}
+                  component="span"
+                  aria-label="collapse"
+                  onClick={this.toggle}
+                >
+                  {collapse ? <ExpandMore /> : <ExpandLess />}
+                </IconButton>
+              )}
+            </Typography>
 
-              { data.length
-                ? data.map((data, index) => { return (
+            {data.length ? (
+              data.map((data, index) => {
+                return (
                   <InfoCard
                     name={data[0]}
                     price={data[1]}
@@ -229,16 +227,18 @@ class SubNavbar extends React.Component {
                     key={`infoCard-${index}`}
                     show={showCards}
                   />
-                )})
-                : <Slide appear={false} direction="down" in={showCards}>
-                    <div className={classes.progressContainer}>
-                      <CircularProgress size={24}/>
-                    </div>
-                  </Slide>
-              }
-            </Container>
-          </AppBar>
-        </HideOnScroll>
+                );
+              })
+            ) : (
+              <Slide appear={false} direction="down" in={showCards}>
+                <div className={classes.progressContainer}>
+                  <CircularProgress size={24} />
+                </div>
+              </Slide>
+            )}
+          </Container>
+        </AppBar>
+      </HideOnScroll>
     );
   }
 }
