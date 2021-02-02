@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 import {
   Typography,
+  Slide,
   Container,
 } from "@material-ui/core";
 
@@ -23,6 +24,7 @@ const styles = (theme) => ({
     alignItems: "center",
     backgroundColor: "#1D212D",
     gridGap: "2px",
+    zIndex: theme.customZIndex.subNavbarCard,
   },
   smallText: {
     fontSize: "13.5px",
@@ -52,44 +54,47 @@ function InfoCard(props) {
     price,
     change,
     index,
+    show,
   } = props;
   return (
-    <Container
-      className={clsx(classes.container, {[classes.border]: index})}
-      id={`info-card-${index}`}
-      maxWidth={false}
-    >
-      <Typography
-        align={"center"}
-        style={{gridArea: "1 / 1 / 2 / 2"}}
-        className={classes.smallText} 
+    <Slide appear={false} direction="down" in={show}>
+      <Container
+        className={clsx(classes.container, {[classes.border]: index})}
+        id={`info-card-${index}`}
+        maxWidth={false}
       >
-        {name}
-      </Typography>
+        <Typography
+          align={"center"}
+          style={{gridArea: "1 / 1 / 2 / 2"}}
+          className={classes.smallText} 
+        >
+          {name}
+        </Typography>
 
-      <Typography
-        align={"center"}
-        style={{gridArea: "2 / 1 / 3 / 2"}}
-        className={classes.smallText}
-      >
-        {`$${price}`}
-      </Typography>
-        
-      <Typography
-        align={"center"}
-        style={{gridArea: "1 / 2 / 3 / 3"}}
-        className={clsx(classes.mediumText, {
-          [classes.arrowUp]: change >= 0,
-          [classes.arrowDown]: change < 0,
-        })}
-      >
-        { change >= 0
-          ? <ArrowDropUpRoundedIcon size={30} className={classes.arrowUp} />
-          : <ArrowDropDownRoundedIcon size={30} className={classes.arrowDown} />
-        }
-        {`${change}%`}
-      </Typography>
-    </Container>
+        <Typography
+          align={"center"}
+          style={{gridArea: "2 / 1 / 3 / 2"}}
+          className={classes.smallText}
+        >
+          {`$${price}`}
+        </Typography>
+          
+        <Typography
+          align={"center"}
+          style={{gridArea: "1 / 2 / 3 / 3"}}
+          className={clsx(classes.mediumText, {
+            [classes.arrowUp]: change >= 0,
+            [classes.arrowDown]: change < 0,
+          })}
+        >
+          { change >= 0
+            ? <ArrowDropUpRoundedIcon size={30} className={classes.arrowUp} />
+            : <ArrowDropDownRoundedIcon size={30} className={classes.arrowDown} />
+          }
+          {`${change}%`}
+        </Typography>
+      </Container>
+    </Slide>
   );
 }
 

@@ -98,7 +98,7 @@ class HoldingsTableContainer extends React.Component {
   handleOpenSnackbar = (companyCode, AddedOrRemoved) => {
     this.setState({
       openSnackbar: true,
-      companyCodeOnAction: `${AddedOrRemoved} ${companyCode}`,
+      companyCodeOnAction: `${AddedOrRemoved} ${companyCode} ${AddedOrRemoved === "Added" ? "to" : "from"}`,
     });
   };
 
@@ -153,7 +153,7 @@ class HoldingsTableContainer extends React.Component {
           onClose={this.handleCloseSnackbar}
         >
           <Alert onClose={this.handleCloseSnackbar} severity="success">
-            {`${companyCodeOnAction} from watchlist successfully!`}
+            {`${companyCodeOnAction} watchlist successfully!`}
           </Alert>
         </Snackbar>
       </TableContainer>
