@@ -199,7 +199,9 @@ class SubNavbar extends React.Component {
               className={classes.clockContainer}
               style={{
                 gridArea: mediaQuery ? "1 / 1 / 2 / 6" : "1 / 1 / 3 / 6",
+                cursor: mediaQuery && "pointer",
               }}
+              onClick={mediaQuery && this.toggle}
             >
               {isMarketClosed
                 ? "Market Closed"

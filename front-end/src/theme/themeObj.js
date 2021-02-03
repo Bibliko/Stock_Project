@@ -48,8 +48,8 @@ const theme = {
   customMargin: {
     appBarPadding: "20px",
 
-    topLayout: "100px",
-    topLayoutSmall: "70px",
+    topLayout: "55px",
+    topLayoutSmall: "20px",
 
     topFloatingToolButton: "110px",
     smallTopFloatingToolButton: "100px",

@@ -58,9 +58,9 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(0, 1),
-    minHeight: theme.customHeight.appBarHeight,
+    minHeight: `calc(${theme.customHeight.appBarHeight} + ${theme.customHeight.subBarHeight})`,
     [theme.breakpoints.down("xs")]: {
-      minHeight: theme.customHeight.appBarHeightSmall,
+      minHeight: `calc(${theme.customHeight.appBarHeightSmall} + ${theme.customHeight.appBarHeightSmall})`,
     },
     justifyContent: "flex-start",
   },
@@ -188,9 +188,9 @@ class Layout extends React.Component {
         <SubNavbar />
         <Reminder />
         <main className={classes.main}>
+          <div className={classes.background} />
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
-            <div className={classes.background} />
             {/* <div className={classes.gradientBackground} /> */}
             <LayoutSpeedDial />
             {!finishedSettingUp && (
