@@ -155,7 +155,7 @@ class AccountSummary extends React.Component {
           {
             userShares: shares
               .sort((firstShare, secondShare) => {
-                return secondShare.quantity - firstShare.quantity; // temporarily sorted by quantity
+                return secondShare.quantity * secondShare.buyPriceAvg - firstShare.quantity * firstShare.buyPriceAvg;  // sorted by value
               })
               .slice(0, 5),
           },

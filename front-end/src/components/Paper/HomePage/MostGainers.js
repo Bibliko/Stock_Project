@@ -29,7 +29,7 @@ const styles = (theme) => ({
   menuList: {
     width: "100%",
     maxWidth: theme.customWidth.maxMostGainers,
-    maxHeight: "100%",
+    maxHeight: "400px",
     overflow: "auto",
   },
   title: {

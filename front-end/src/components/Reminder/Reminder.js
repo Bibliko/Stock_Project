@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { withRouter } from "react-router";
 import { isUndefined, isEqual, pick } from "lodash";
 import { connect } from "react-redux";
@@ -18,17 +17,16 @@ const styles = (theme) => ({
     justifyContent: "center",
     alignItems: "center",
     color: "white",
-    width: "100%",
+    width: "80%",
     height: "40px",
     padding: "10px",
     backgroundColor: theme.palette.primary.subDark,
     boxShadow: theme.customShadow.popup,
     zIndex: theme.customZIndex.reminder,
-    top: theme.customHeight.appBarHeight,
-    [theme.breakpoints.down("xs")]: {
-      top: theme.customHeight.appBarHeightSmall,
-    },
+    bottom: "15px",
+    left: "10%",
     transition: "top 1s",
+    borderRadius: "5px",
   },
   reminderText: {
     fontSize: "small",
@@ -44,9 +42,6 @@ const styles = (theme) => ({
     marginRight: "5px",
     color: "white",
     textDecoration: "underline",
-  },
-  hide: {
-    top: "-40px",
   },
   closeButton: {
     position: "absolute",
@@ -107,11 +102,8 @@ class Reminder extends React.Component {
     const { classes, userSession } = this.props;
 
     return (
-      <div
-        className={clsx(classes.reminder, {
-          [classes.hide]: userSession.hasFinishedSettingUp || this.state.hide,
-        })}
-      >
+      (userSession.hasFinishedSettingUp && this.state.hide) &&
+      <div className={classes.reminder}>
         {!isUndefined(userSession.hasFinishedSettingUp) &&
           !userSession.hasFinishedSettingUp &&
           this.settingAccountComponent(classes, this.preventDefault)}
