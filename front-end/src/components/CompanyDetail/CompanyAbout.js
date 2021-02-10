@@ -6,6 +6,7 @@ import { withRouter } from "react-router";
 import {
   simplifyNumber,
   numberWithCommas,
+  roundNumber,
 } from "../../utils/low-dependency/NumberUtil";
 
 import { capitalizeString } from "../../utils/low-dependency/StringUtil";
@@ -117,6 +118,10 @@ class CompanyAbout extends React.Component {
       </Grid>
     );
   };
+
+  componentDidUpdate() {
+    this.setState({companyDetail: this.props.companyData.description.substring(0, 350)});
+  }
 
   shouldComponentUpdate(nextProps, nextState) {
     const compareKeys = ["companyData"];
@@ -234,35 +239,35 @@ class CompanyAbout extends React.Component {
           {showFullDetails &&
             this.gridElement(
               "Day High",
-              `$${companyData.dayHigh.toFixed(2)}`,
+              `$${roundNumber(companyData.dayHigh, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Day Low",
-              `$${companyData.dayLow.toFixed(2)}`,
+              `$${roundNumber(companyData.dayLow, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Year High",
-              `$${companyData.yearHigh.toFixed(2)}`,
+              `$${roundNumber(companyData.yearHigh, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Year Low",
-              `$${companyData.yearLow.toFixed(2)}`,
+              `$${roundNumber(companyData.yearLow, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Open Price",
-              `$${companyData.open.toFixed(2)}`,
+              `$${roundNumber(companyData.open, 2)}`,
               classes
             )}
         </Grid>

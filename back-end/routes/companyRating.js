@@ -19,4 +19,14 @@ router.get("/getOneCompany", (req, res) => {
     });
 });
 
+router.get("/getAllCompanies", (req, res) => {
+  prisma.companyRating
+    .findMany()
+    .then((data) => res.send(data))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get data of companies rating");
+    });
+});
+
 module.exports = router;

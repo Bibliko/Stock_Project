@@ -1,51 +1,60 @@
 import React from "react";
+import { withRouter } from "react-router";
+import { isEqual } from "lodash";
 import PropTypes from "prop-types";
+
+import { getFullStockInfo } from "../../utils/RedisUtil";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
+
 import SwipeableViews from "react-swipeable-views";
 import { withStyles } from "@material-ui/core/styles";
 
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Box from "@material-ui/core/Box";
+import {
+  AppBar,
+  Tabs,
+  Tab,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from "@material-ui/core";
 
-import Dialog from "@material-ui/core/Dialog";
-import Button from "@material-ui/core/Button";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-
-// import CompanyDetail from "./CompanyDetail";
-// import CompanyGraph from "./CompanyGraph";
+import CompanyAbout from "../CompanyDetail/CompanyAbout";
+import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
 
 const styles = (theme) => ({
   root: {
     width: "100%",
   },
-
   fullHeightWdith: {
     height: "100%",
     width: "100%",
   },
-
   dialogTitle: {
+    cursor: "pointer",
     color: "white",
     backgroundColor: "#000033",
   },
-
   dialogContent: {
     color: "white",
     backgroundColor: "#000066",
     padding: "0px",
     height: "500px",
   },
-
   dialogTab: {
     backgroundColor: "#000033",
     color: "white",
   },
-
   dialogAction: {
     backgroundColor: "#000033",
+  },
+  errorText: {
+    fontSize: "x-large",
+    fontWeight: "bold",
+    color: "white",
   },
 });
 
@@ -82,6 +91,8 @@ class CompanyDialog extends React.Component {
   state = {
     value: 0,
     open: false,
+    errorMessage: "",
+    companyData: {},
   };
 
   handleChange = (event, newValue) => {
@@ -96,9 +107,49 @@ class CompanyDialog extends React.Component {
     });
   };
 
+  updateCompanyData = () => {
+    const { companyCode } = this.props;
+    getFullStockInfo(companyCode)
+      .then((companyData) => {
+        this.setState( { companyData } );
+      })
+      .catch((err) => {
+        if (
+          err.response &&
+          err.response.data &&
+          err.response.data === "Share symbols do not exist in FMP."
+        ) {
+          this.setState({
+            errorMessage: `Company code ${companyCode.toUpperCase()} does not exist.`,
+          });
+        } else {
+          console.log(err);
+        }
+      });
+  };
+
+  componentDidMount() {
+    this.updateCompanyData();
+  }
+
+  componentDidUpdate() {
+    // reset tab when dialog is closed
+    if(!this.props.open)
+      this.setState({value: 0});
+
+    this.updateCompanyData();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      !isEqual(nextProps, this.props) ||
+      !isEqual(nextState, this.state)
+    );
+  }
+
   render() {
-    const { classes, handleClose, open, companyName } = this.props;
-    const { value } = this.state;
+    const { classes, handleClose, open, companyCode } = this.props;
+    const { value, errorMessage, companyData } = this.state;
 
     return (
       <div>
@@ -109,47 +160,57 @@ class CompanyDialog extends React.Component {
           fullWidth
           maxWidth="md"
         >
-          <DialogTitle className={classes.dialogTitle}>
-            {companyName}
+          <DialogTitle
+            className={classes.dialogTitle}
+            onClick={() => {redirectToPage(`/company/${companyCode}`, this.props)}}
+          >
+            {`${companyData.companyName} (${companyCode.toUpperCase()})`}
           </DialogTitle>
 
           <DialogContent className={classes.dialogContent}>
-            <AppBar position="sticky" color="default">
-              <Tabs
-                value={value}
-                onChange={this.handleChange}
-                indicatorColor="primary"
-                textColor="primary"
-                variant="fullWidth"
-                aria-label="full width tabs example"
-              >
-                <Tab
-                  label="Info"
-                  className={classes.dialogTab}
-                  {...a11yProps(0)}
-                />
-                <Tab
-                  label="Graph"
-                  className={classes.dialogTab}
-                  {...a11yProps(1)}
-                />
-                <Tab
-                  label="About"
-                  className={classes.dialogTab}
-                  {...a11yProps(2)}
-                />
-              </Tabs>
-            </AppBar>
-            <SwipeableViews
-              index={value}
-              onChangeIndex={this.handleChangeIndex}
-            >
-              <TabPanel value={value} index={0}>
-              </TabPanel>
-              <TabPanel value={value} index={1}>
-              </TabPanel>
-              <TabPanel value={value} index={2}></TabPanel>
-            </SwipeableViews>
+            {errorMessage
+              ? <Typography className={classes.errorText}> {errorMessage} </Typography>
+              : <React.Fragment>
+                  <AppBar position="sticky" color="default">
+                    <Tabs
+                      value={value}
+                      onChange={this.handleChange}
+                      indicatorColor="primary"
+                      textColor="primary"
+                      variant="fullWidth"
+                      aria-label="full width tabs"
+                    >
+                      <Tab
+                        label="About"
+                        className={classes.dialogTab}
+                        {...a11yProps(0)}
+                      />
+                      <Tab
+                        label="Graph"
+                        className={classes.dialogTab}
+                        {...a11yProps(1)}
+                      />
+                    </Tabs>
+                  </AppBar>
+                  <SwipeableViews
+                    index={value}
+                    onChangeIndex={this.handleChangeIndex}
+                  >
+                    <TabPanel value={value} index={0}>
+                      <CompanyAbout companyData={companyData} />
+                    </TabPanel>
+
+                    <TabPanel value={value} index={1}>
+                      <NamePriceGraph
+                        graphOnly
+                        companyName={companyData.companyName}
+                        companyCode={companyCode}
+                        recentPrice={companyData.price}
+                      />
+                    </TabPanel>
+                  </SwipeableViews>
+                </React.Fragment>
+            }
           </DialogContent>
 
           <DialogActions className={classes.dialogAction}>
@@ -166,4 +227,4 @@ class CompanyDialog extends React.Component {
   }
 }
 
-export default withStyles(styles)(CompanyDialog);
+export default withStyles(styles)(withRouter(CompanyDialog));
