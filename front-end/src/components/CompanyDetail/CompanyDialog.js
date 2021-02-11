@@ -134,7 +134,7 @@ class CompanyDialog extends React.Component {
 
   componentDidUpdate() {
     // reset tab when dialog is closed
-    if(!this.props.open)
+    if (!this.props.open)
       this.setState({value: 0});
 
     this.updateCompanyData();

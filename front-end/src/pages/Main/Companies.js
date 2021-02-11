@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
 import { getAllCompaniesRating } from "../../utils/CompanyUtil";
+import { ratingValue } from "../../utils/low-dependency/FmpHelper";
 
 import { SortDirection } from "react-virtualized";
 
@@ -74,16 +75,15 @@ const styles = (theme) => ({
 function descendingComparator(a, b, orderBy) {
   let items = [a[orderBy], b[orderBy]];
 
-  if (typeof items[0] === "string") {
+  if (orderBy === "rating")               // handle rating
+    items = items.map((value) => ratingValue[value]);
+  else if (typeof items[0] === "string")  // handle text data
     items = items.map((value) => value.toLowerCase());
-  }
 
-  if (items[1] < items[0]) {
-    return -1;
-  }
-  if (items[1] > items[0]) {
-    return 1;
-  }
+  if (items[1] < items[0]) return -1;
+
+  if (items[1] > items[0]) return 1;
+
   return 0;
 }
 
@@ -204,14 +204,15 @@ class Companies extends React.Component {
     })
       .then((stockData) => {
         // fetch ratingData on mount
-        if(!stockRatings)
+        if (!stockRatings)
           return Promise.all([stockData, getAllCompaniesRating()]);
+
         return ([stockData]);
       })
       .then(([stockData, newRatings]) => {
         const { sortDirection, sortBy } = this.state;
 
-        if(!stockRatings)
+        if (!stockRatings)
           stockRatings = newRatings;
 
         // attach rating to stockData
