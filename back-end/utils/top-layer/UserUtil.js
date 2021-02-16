@@ -378,21 +378,17 @@ const proceedTransaction = (transactionID, recentPrice) => {
       })
       .then((userTransaction) => {
         const { user, isTypeBuy, quantity } = userTransaction;
-        if (!isTypeBuy || !user || !quantity) {
-          reject(new Error("The user's transaction is invalid."));
-          return;
-        }
 
-        const realPendingPrice = recentPrice * quantity;
+        const totalPendingPrice = recentPrice * quantity;
         if (isTypeBuy) {
-          if (user.cash < realPendingPrice)
+          if (user.cash < totalPendingPrice)
             reject(
               new Error(
                 "The user does not have enough money to buy the pending stock"
               )
             );
-          else user.cash -= realPendingPrice;
-        } else user.cash += realPendingPrice;
+          else user.cash -= totalPendingPrice;
+        } else user.cash += totalPendingPrice;
       })
       .then((finishedProceedingTransaction) =>
         resolve("Successfully proceeded the transaction")

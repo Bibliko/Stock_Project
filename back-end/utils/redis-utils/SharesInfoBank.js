@@ -141,7 +141,7 @@ const updateSingleCachedShareQuote = (stockQuoteJSON) => {
 
     setAsync(redisKey, valueString)
       .then((quote) => {
-        const oldPrice = symbol.price;
+        const oldPrice = stockQuoteJSON.price;
         return updatePriceChangeStatus(stockQuoteJSON, oldPrice, quote.price);
       })
       .then(() => resolve(`Updated ${redisKey} successfully`))
@@ -208,7 +208,7 @@ const updateCachedShareQuotes = (shareSymbols) => {
           const updateAllChunks = stockQuotesJSONArray.map(
             (stockQuotesJSON) => {
               const updateOneChunk = stockQuotesJSON.map((stockQuote) => {
-                return [updateSingleCachedShareQuote(stockQuote)];
+                return updateSingleCachedShareQuote(stockQuote);
               });
               return Promise.all(updateOneChunk);
             }
@@ -320,15 +320,15 @@ const updateCachedShareProfilesUsingCache = () => {
 
 const updatePriceChangeStatus = (stockQuoteJSON, oldPrice, recentPrice) => {
   return new Promise((resolve, reject) => {
-    const { symbol } = stockQuoteJSON;
+    const { companyCode } = stockQuoteJSON;
 
-    const redisKey = `cachedShares|${symbol.companyCode}|priceStatus`;
+    const redisKey = `cachedShares|${companyCode}|priceStatus`;
     const valueString = oldPrice < recentPrice ? "1" : "-1";
 
     return setAsync(redisKey, valueString)
       .then((finishedUpdatingThePriceStatus) => {
         resolve(
-          `Successfully updated price change status for company ${symbol.companyCode}`
+          `Successfully updated price change status for company ${companyCode}`
         );
       })
       .catch((err) => reject(err));
