@@ -373,22 +373,98 @@ const proceedTransaction = (transactionID, recentPrice) => {
       .findUnique({
         where: {
           id: transactionID
-        },
-        distinct: ["user", "isTypeBuy", "quantity"]
+        }
       })
       .then((userTransaction) => {
-        const { user, isTypeBuy, quantity } = userTransaction;
+        const { user, isTypeBuy, quantity, companyCode } = userTransaction;
 
         const totalPendingPrice = recentPrice * quantity;
         if (isTypeBuy) {
+          /**
+           * Buy Event
+           */
           if (user.cash < totalPendingPrice)
             reject(
               new Error(
                 "The user does not have enough money to buy the pending stock"
               )
             );
-          else user.cash -= totalPendingPrice;
-        } else user.cash += totalPendingPrice;
+          else {
+            user.cash -= totalPendingPrice;
+            prisma.share
+              .findUnique({
+                where: {
+                  companyCode: companyCode
+                }
+              })
+              .then((buyShare) => {
+                if (!buyShare) {
+                  prisma.share.create({
+                    companyCode: companyCode,
+                    quantity: quantity,
+                    buyPriceAvg: recentPrice,
+                    user: user,
+                    userID: user.id
+                  });
+                } else {
+                  buyShare.buyPriceAvg =
+                    (buyShare.buyPriceAvg * buyShare.quantity +
+                      recentPrice * (buyShare.quantity + quantity)) /
+                    (quantity + buyShare.quantity);
+
+                  buyShare.quantity += quantity;
+                }
+              });
+          }
+        } else {
+          /**
+           * Sell Event
+           */
+          user.cash += totalPendingPrice;
+          prisma.share
+            .findUnique({
+              where: {
+                companyCode: companyCode
+              }
+            })
+            .then((sellShare) => {
+              if (!sellShare) reject(new Error("Couldn't find transaction"));
+              else if (quantity > sellShare.quantity) {
+                reject(new Error("Not enough available shares"));
+              } else {
+                if (quantity === sellShare.quantity) {
+                  prisma.share.delete({
+                    where: {
+                      companyCode: companyCode
+                    }
+                  });
+                } else {
+                  prisma.share
+                    .findUnique({
+                      where: {
+                        companyCode: companyCode
+                      }
+                    })
+                    .then((sellShare) => (sellShare.quantity -= quantity));
+                }
+              }
+            });
+        }
+        return userTransaction;
+      })
+      .then((transaction) => {
+        /**
+         * Update status of the transaction.
+         */
+        transaction.isFinished = true;
+        transaction.finishedTime = Date.now();
+        transaction.priceAtTransaction = recentPrice;
+
+        transaction.spendOrGain =
+          transaction.priceAtTransaction * transaction.quantity +
+          transaction.isTypeBuy
+            ? transaction.brokerage
+            : -transaction.brokerage;
       })
       .then((finishedProceedingTransaction) =>
         resolve("Successfully proceeded the transaction")

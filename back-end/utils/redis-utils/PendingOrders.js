@@ -6,7 +6,7 @@ const {
 } = require("../../redis/redis-client");
 const { parseCachedShareQuote } = require("../low-dependency/ParserUtil");
 const { proceedTransaction } = require("../top-layer/UserUtil");
-
+const { cachedShares } = require("./RedisUtil");
 /**
  *
  * @description Add a single pending order into pending queue of the assigned company.
@@ -27,8 +27,8 @@ const addSingleTransactionToQueue = (userTransactionJSON) => {
     const weight = `${limitPrice}`;
 
     const redisKey = isTypeBuy
-      ? `cachedShares|${companyCode}|pendingBuy`
-      : `cachedShares|${companyCode}|pendingSell`;
+      ? `${cachedShares}|${companyCode}|pendingBuy`
+      : `${cachedShares}|${companyCode}|pendingSell`;
 
     queueAdd(redisKey, weight, valueString)
       .then((finishedAddingAPendingOrder) =>
@@ -45,13 +45,13 @@ const addSingleTransactionToQueue = (userTransactionJSON) => {
  */
 const emptyPendingTransactionsListOneCompany = (companyCode, recentPrice) => {
   return new Promise((resolve, reject) => {
-    const redisKeyStatus = `cachedShares|${companyCode}|priceStatus`;
+    const redisKeyStatus = `${cachedShares}|${companyCode}|priceStatus`;
     getAsync(redisKeyStatus)
       .then((status) => {
         const redisKey =
           status === "1"
-            ? `cachedShares|${companyCode}|pendingSell`
-            : `cachedShares|${companyCode}|pendingBuy`;
+            ? `${cachedShares}|${companyCode}|pendingSell`
+            : `${cachedShares}|${companyCode}|pendingBuy`;
 
         const valueStringUp = status === "1" ? `${recentPrice}` : `+inf`;
         const valueStringDown = status === "1" ? `-inf` : `${recentPrice}`;
@@ -89,7 +89,7 @@ const emptyPendingTransactionsListAllCompanies = (companyCodes) => {
   return new Promise((resolve, reject) => {
     const emptyAllCompaniesPromises = companyCodes
       .map((companyCode, id) => {
-        const redisKeyQuote = `cachedShares|${companyCode}|quote`;
+        const redisKeyQuote = `${cachedShares}|${companyCode}|quote`;
 
         return getAsync(redisKeyQuote)
           .then((quote) => {

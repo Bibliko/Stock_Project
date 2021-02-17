@@ -25,6 +25,8 @@ const {
   combineFMPStockQuoteAndProfile
 } = require("../low-dependency/ParserUtil");
 
+const { cachedShares } = require("./RedisUtil");
+
 /**
  * 'cachedShares' only stores symbols using by users in server
  *
