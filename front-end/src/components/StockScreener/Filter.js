@@ -90,6 +90,7 @@ class Filter extends React.Component {
       marketCap,
       sector,
       industry,
+      getPrice,
       getMarketCap,
       handleChange,
     } = this.props;
@@ -97,11 +98,11 @@ class Filter extends React.Component {
     const marks = {
       price: [
         {
-          value: 0,
+          value: -250,
           label: "$0",
         },
         {
-          value: 320000,
+          value: 1000,
           label: "$320K",
         },
       ],
@@ -130,8 +131,9 @@ class Filter extends React.Component {
           <Typography className={classes.label}>Price</Typography>
           <CustomSlider
             value={price}
-            min={0}
-            max={320000}
+            min={-250}
+            max={1000}
+            scale={getPrice}
             onChange={(event, value) => handleChange("price", value)}
             valueLabelDisplay="auto"
             getAriaValueText={this.valueLabelFormat}

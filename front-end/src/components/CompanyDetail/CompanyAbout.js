@@ -6,6 +6,7 @@ import { withRouter } from "react-router";
 import {
   simplifyNumber,
   numberWithCommas,
+  roundNumber,
 } from "../../utils/low-dependency/NumberUtil";
 
 import { capitalizeString } from "../../utils/low-dependency/StringUtil";
@@ -40,6 +41,7 @@ const styles = (theme) => ({
   bodyText: {
     color: "white",
     marginBottom: "20px",
+    lineHeight: "1.75",
   },
   descriptionButton: {
     padding: 0,
@@ -86,20 +88,20 @@ class CompanyAbout extends React.Component {
   state = {
     showFullDescription: false,
     showFullDetails: false,
-    companyDetail: this.props.companyData.description.substring(0, 350),
+    companyDescription: this.props.companyData.description.substring(0, 350),
   };
 
   extendDescription = () => {
     this.setState({
       showFullDescription: true,
-      companyDetail: this.props.companyData.description,
+      companyDescription: this.props.companyData.description,
     });
   };
 
   shrinkDescription = () => {
     this.setState({
       showFullDescription: false,
-      companyDetail: this.props.companyData.description.substring(0, 350),
+      companyDescription: this.props.companyData.description.substring(0, 350),
     });
   };
 
@@ -118,6 +120,11 @@ class CompanyAbout extends React.Component {
     );
   };
 
+  componentDidUpdate() {
+    if (!this.state.showFullDescription)
+      this.setState({companyDescription: this.props.companyData.description.substring(0, 350)});
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
     const compareKeys = ["companyData"];
     const compareProps = pick(this.props, compareKeys);
@@ -131,7 +138,7 @@ class CompanyAbout extends React.Component {
 
   render() {
     const { classes, companyData } = this.props;
-    const { companyDetail, showFullDescription, showFullDetails } = this.state;
+    const { companyDescription, showFullDescription, showFullDetails } = this.state;
 
     return (
       <Grid
@@ -156,7 +163,7 @@ class CompanyAbout extends React.Component {
         </Typography>
         <Divider className={classes.divider} />
         <Typography className={classes.bodyText}>
-          {companyDetail}
+          {companyDescription}
           {showFullDescription && (
             <Button
               className={classes.descriptionButton}
@@ -234,35 +241,35 @@ class CompanyAbout extends React.Component {
           {showFullDetails &&
             this.gridElement(
               "Day High",
-              `$${companyData.dayHigh.toFixed(2)}`,
+              `$${roundNumber(companyData.dayHigh, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Day Low",
-              `$${companyData.dayLow.toFixed(2)}`,
+              `$${roundNumber(companyData.dayLow, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Year High",
-              `$${companyData.yearHigh.toFixed(2)}`,
+              `$${roundNumber(companyData.yearHigh, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Year Low",
-              `$${companyData.yearLow.toFixed(2)}`,
+              `$${roundNumber(companyData.yearLow, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
               "Open Price",
-              `$${companyData.open.toFixed(2)}`,
+              `$${roundNumber(companyData.open, 2)}`,
               classes
             )}
         </Grid>

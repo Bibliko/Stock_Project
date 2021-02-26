@@ -112,6 +112,12 @@ const theme = {
       mainHover: "rgba(230, 60, 60, 1)",
     },
 
+    success: {
+      // Green
+      main: "rgb(50,205,50)",
+      mainHover: "rgb(34,139,34)",
+    },
+
     disabled: {
       whiteColor: "rgba(255, 255, 255, 0.3)",
     },

@@ -44,7 +44,7 @@ class NamePriceGraph extends React.Component {
   }
 
   render() {
-    const { classes, companyName, companyCode, recentPrice } = this.props;
+    const { classes, graphOnly, companyName, companyCode, recentPrice } = this.props;
 
     return (
       <Grid
@@ -54,16 +54,20 @@ class NamePriceGraph extends React.Component {
         direction="row"
         className={classes.companyGrid}
       >
-        <Grid item xs={12}>
-          <Typography className={classes.title}>
-            {`${companyName} (${companyCode.toUpperCase()})`}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography className={classes.title2}>
-            {`$${recentPrice.toFixed(2)}`}
-          </Typography>
-        </Grid>
+        {!graphOnly &&
+          <React.Fragment>
+            <Grid item xs={12}>
+              <Typography className={classes.title}>
+                {`${companyName} (${companyCode.toUpperCase()})`}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography className={classes.title2}>
+                {`$${recentPrice.toFixed(2)}`}
+              </Typography>
+            </Grid>
+          </React.Fragment>
+        }
         <Grid item xs={12}>
           <ExchangeOrCompanyPriceChart
             exchangeOrCompany={companyCode.toUpperCase()}
