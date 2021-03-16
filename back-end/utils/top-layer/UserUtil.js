@@ -363,114 +363,170 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
 };
 
 /**
- * Buy or Sell a single transaction
+ * Perform buy action for the function proceedTransaction
+ * @param {import(".prisma/client").User} user
+ * @param {number} totalPendingPrice
+ * @param {string} companyCode
+ * @returns
+ */
+const buyShareEvent = async (
+  user,
+  totalPendingPrice,
+  companyCode,
+  quantity,
+  recentPrice
+) => {
+  try {
+    if (user.cash < totalPendingPrice) {
+      return new Error(
+        "The user does not have enough money to buy the pending stock"
+      );
+    }
+
+    user.cash -= totalPendingPrice;
+    const buyShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+    const buyShareIndex = user.shares.indexOf(buyShare);
+
+    if (!buyShare) {
+      await prisma.share.create({
+        companyCode: companyCode,
+        quantity: quantity,
+        buyPriceAvg: recentPrice,
+        user: user,
+        userID: user.id
+      });
+    } else {
+      // Update in Share
+      buyShare.buyPriceAvg =
+        (buyShare.buyPriceAvg * buyShare.quantity +
+          recentPrice * (buyShare.quantity + quantity)) /
+        (quantity + buyShare.quantity);
+      buyShare.quantity += quantity;
+      await prisma.share.update({
+        where: {
+          id: buyShare.id
+        },
+        data: {
+          buyPriceAvg: buyShare.buyPriceAvg,
+          quantity: buyShare.quantity
+        }
+      });
+
+      // Update in User
+      user.shares[buyShareIndex] = buyShare;
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          shares: user.shares
+        }
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const sellShareEvent = async (
+  user,
+  totalPendingPrice,
+  companyCode,
+  quantity,
+  recentPrice
+) => {
+  try {
+    user.cash += totalPendingPrice;
+    const sellShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+    const sellShareIndex = user.shares.indexOf(sellShare);
+
+    if (!sellShare) {
+      return new Error("Couldn't find share");
+    } else if (quantity > sellShare.quantity) {
+      return new Error("Not enough available shares");
+    }
+
+    if (quantity === sellShare.quantity) {
+      await prisma.share.delete({
+        where: {
+          companyCode: companyCode
+        }
+      });
+
+      user.shares.slice(sellShareIndex, 1);
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          shares: user.shares
+        }
+      });
+    } else {
+      sellShare.quantity -= quantity;
+      await prisma.share.update({
+        where: {
+          id: sellShare.id
+        },
+        data: {
+          quantity: sellShare.quantity
+        }
+      });
+
+      user.shares[sellShareIndex] = sellShare;
+      await prisma.user.upate({
+        where: {
+          id: user.id
+        },
+        data: {
+          shares: user.shares
+        }
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * Buy or sell if the transaction can be procceeded
  * @param {string} transactionID
  * @param {number} recentPrice
  */
-const proceedTransaction = (transactionID, recentPrice) => {
-  return new Promise((resolve, reject) => {
-    return prisma.userTransaction
-      .findUnique({
-        where: {
-          id: transactionID
-        }
-      })
-      .then((userTransaction) => {
-        const { user, isTypeBuy, quantity, companyCode } = userTransaction;
+const proceedTransaction = async (transactionID, recentPrice) => {
+  try {
+    const userTransaction = await prisma.userTransaction.findUnique({
+      where: {
+        id: transactionID
+      },
+      include: {
+        user: true
+      }
+    });
 
-        const totalPendingPrice = recentPrice * quantity;
-        if (isTypeBuy) {
-          /**
-           * Buy Event
-           */
-          if (user.cash < totalPendingPrice)
-            reject(
-              new Error(
-                "The user does not have enough money to buy the pending stock"
-              )
-            );
-          else {
-            user.cash -= totalPendingPrice;
-            prisma.share
-              .findUnique({
-                where: {
-                  companyCode: companyCode
-                }
-              })
-              .then((buyShare) => {
-                if (!buyShare) {
-                  prisma.share.create({
-                    companyCode: companyCode,
-                    quantity: quantity,
-                    buyPriceAvg: recentPrice,
-                    user: user,
-                    userID: user.id
-                  });
-                } else {
-                  buyShare.buyPriceAvg =
-                    (buyShare.buyPriceAvg * buyShare.quantity +
-                      recentPrice * (buyShare.quantity + quantity)) /
-                    (quantity + buyShare.quantity);
+    const { user, isTypeBuy, quantity, companyCode } = userTransaction;
+    const totalPendingPrice = recentPrice * quantity;
 
-                  buyShare.quantity += quantity;
-                }
-              });
-          }
-        } else {
-          /**
-           * Sell Event
-           */
-          user.cash += totalPendingPrice;
-          prisma.share
-            .findUnique({
-              where: {
-                companyCode: companyCode
-              }
-            })
-            .then((sellShare) => {
-              if (!sellShare) reject(new Error("Couldn't find transaction"));
-              else if (quantity > sellShare.quantity) {
-                reject(new Error("Not enough available shares"));
-              } else {
-                if (quantity === sellShare.quantity) {
-                  prisma.share.delete({
-                    where: {
-                      companyCode: companyCode
-                    }
-                  });
-                } else {
-                  prisma.share
-                    .findUnique({
-                      where: {
-                        companyCode: companyCode
-                      }
-                    })
-                    .then((sellShare) => (sellShare.quantity -= quantity));
-                }
-              }
-            });
-        }
-        return userTransaction;
-      })
-      .then((transaction) => {
-        /**
-         * Update status of the transaction.
-         */
-        transaction.isFinished = true;
-        transaction.finishedTime = Date.now();
-        transaction.priceAtTransaction = recentPrice;
+    if (isTypeBuy) {
+      await buyShareEvent(user, totalPendingPrice, companyCode);
+    } else await sellShareEvent(user, totalPendingPrice, companyCode);
 
-        transaction.spendOrGain =
-          transaction.priceAtTransaction * transaction.quantity +
-          transaction.isTypeBuy
-            ? transaction.brokerage
-            : -transaction.brokerage;
-      })
-      .then((finishedProceedingTransaction) =>
-        resolve("Successfully proceeded the transaction")
-      )
-      .catch((err) => reject(err));
-  });
+    // Update transaction after buying/selling
+    userTransaction.isFinished = true;
+    userTransaction.finishedTime = Date.now();
+    userTransaction.priceAtTransaction = recentPrice;
+    userTransaction.spendOrGain =
+      userTransaction.priceAtTransaction * userTransaction.quantity +
+      userTransaction.isTypeBuy
+        ? userTransaction.brokerage
+        : -userTransaction.brokerage;
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 module.exports = {

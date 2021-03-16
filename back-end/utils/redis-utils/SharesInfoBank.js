@@ -19,7 +19,6 @@ const {
 const {
   parseCachedShareQuote,
   parseCachedShareProfile,
-  createRedisValueFromStockQuoteJSON,
   createRedisValueFromStockProfileJSON,
   createSymbolsStringFromCachedSharesList,
   combineFMPStockQuoteAndProfile
@@ -40,7 +39,7 @@ const { cachedShares } = require("./RedisUtil");
  */
 const getCachedShares = () => {
   return new Promise((resolve, reject) => {
-    const redisKey = "cachedShares";
+    const redisKey = cachedShares;
     listRangeAsync(redisKey, 0, -1)
       .then((cachedSharesArray) => {
         resolve(cachedSharesArray);
@@ -59,8 +58,8 @@ const getCachedShares = () => {
  */
 const getSingleCachedShareInfo = (companyCode) => {
   return new Promise((resolve, reject) => {
-    const redisKeyQuote = `cachedShares|${companyCode}|quote`;
-    const redisKeyProfile = `cachedShares|${companyCode}|profile`;
+    const redisKeyQuote = `${cachedShares}|${companyCode}|quote`;
+    const redisKeyProfile = `${cachedShares}|${companyCode}|profile`;
 
     Promise.all([getAsync(redisKeyQuote), getAsync(redisKeyProfile)])
       .then(([quote, profile]) => {
@@ -132,25 +131,21 @@ const pushManyCodesToCachedShares = (companyCodes) => {
  * @description
  * - Change cache data of a symbol
  * - Use redis key 'cachedShares|symbol|quote'
- * @param stockQuoteJSON stock QUOTE information obtained from FMP (json object)
+ * @param {*} stockQuoteJSON stock QUOTE information obtained from FMP (json object)
  */
-const updateSingleCachedShareQuote = (stockQuoteJSON) => {
-  return new Promise((resolve, reject) => {
+const updateSingleCachedShareQuote = async (stockQuoteJSON) => {
+  try {
     const { symbol } = stockQuoteJSON;
+    const lastestPrice = stockQuoteJSON.price;
 
-    const redisKey = `cachedShares|${symbol}|quote`;
-    const valueString = createRedisValueFromStockQuoteJSON(stockQuoteJSON);
+    const redisKeyQuote = `${cachedShares}|${symbol}|quote`;
+    const oldPrice = await setAsync(redisKeyQuote);
 
-    setAsync(redisKey, valueString)
-      .then((quote) => {
-        const oldPrice = stockQuoteJSON.price;
-        return updatePriceChangeStatus(stockQuoteJSON, oldPrice, quote.price);
-      })
-      .then(() => resolve(`Updated ${redisKey} successfully`))
-      .catch((err) => {
-        reject(err);
-      });
-  });
+    await updatePriceChangeStatus(stockQuoteJSON, oldPrice, lastestPrice);
+  } catch (err) {
+    // Failed to update
+    console.error(err);
+  }
 };
 
 /**
@@ -163,7 +158,7 @@ const updateSingleCachedShareProfile = (stockProfileJSON) => {
   return new Promise((resolve, reject) => {
     const { symbol } = stockProfileJSON;
 
-    const redisKey = `cachedShares|${symbol}|profile`;
+    const redisKey = `${cachedShares}|${symbol}|profile`;
     const valueString = createRedisValueFromStockProfileJSON(stockProfileJSON);
 
     setAsync(redisKey, valueString)
@@ -324,7 +319,7 @@ const updatePriceChangeStatus = (stockQuoteJSON, oldPrice, recentPrice) => {
   return new Promise((resolve, reject) => {
     const { companyCode } = stockQuoteJSON;
 
-    const redisKey = `cachedShares|${companyCode}|priceStatus`;
+    const redisKey = `${cachedShares}|${companyCode}|priceStatus`;
     const valueString = oldPrice < recentPrice ? "1" : "-1";
 
     return setAsync(redisKey, valueString)
