@@ -241,7 +241,7 @@ class Login extends React.Component {
             >
               <Grid item xs className={classes.center}>
                 <img
-                  src="/bibOfficial.jpg"
+                  src="/bibOfficial.png"
                   alt="Bibliko"
                   className={classes.avatar}
                 />

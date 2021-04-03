@@ -328,7 +328,7 @@ class ForgotPassword extends React.Component {
             >
               <img
                 className={classes.avatar}
-                src="/bibOfficial.jpg"
+                src="/bibOfficial.png"
                 alt="Bibliko"
               />
               {!this.shouldShowSuccessOnly() && (
