@@ -8,35 +8,78 @@ import {
   Popper,
   Fade,
   Paper,
-  ClickAwayListener,
   MenuList,
   MenuItem,
   LinearProgress,
   Typography,
   Grid,
+  IconButton,
 } from "@material-ui/core";
+
+import { ArrowBackRounded as ArrowBackRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   popperSearch: {
-    minWidth: "450px",
+    position: "fixed",
     [theme.breakpoints.down("xs")]: {
-      minWidth: 0,
       width: "100vw",
     },
-    width: "40%",
-    maxWidth: "100%",
+    width: "425px",
     maxHeight: "50%",
     zIndex: theme.customZIndex.searchMenu,
   },
   menuPaper: {
-    backgroundColor: theme.palette.menuBackground.main,
+    background: theme.palette.paperBackground.onPage,
+    boxShadow: theme.customShadow.popup,
     color: "white",
+    paddingTop: theme.customHeight.appBarHeight,
+    [theme.breakpoints.down("xs")]: {
+      paddingTop: theme.customHeight.appBarHeightSmall,
+    },
   },
-  searchNote: { fontSize: "small", padding: "16px" },
-  searchItem: { fontSize: "small" },
+  searchNote: {
+    fontSize: "small",
+    padding: "16px",
+  },
+  searchItem: {
+    fontSize: "small",
+  },
+  menuItemHover: {
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
+  },
+  backButton: {
+    position: "absolute",
+    top: "5px",
+    right: "10px",
+    [theme.breakpoints.down("xs")]: {
+      right: "8px",
+      padding: "8px",
+    },
+    color: "white",
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
+  },
 });
 
 class SearchPopper extends React.Component {
+  getRectangle = () => {
+    return {
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
+    };
+  };
+
+  fakeReference = {
+    getBoundingClientRect: this.getRectangle,
+    clientWidth: this.getRectangle().width,
+    clientHeight: this.getRectangle().height,
+  };
+
   showResultTickers = (company, classes) => {
     const { symbol, name } = company;
     return (
@@ -54,8 +97,18 @@ class SearchPopper extends React.Component {
   };
 
   showLinearProgressBar = () => {
-    const { companiesNASDAQ, companiesNYSE, note } = this.props;
-    if (isEmpty(companiesNASDAQ) && isEmpty(companiesNYSE) && isEmpty(note)) {
+    const {
+      companiesNASDAQ,
+      companiesNYSE,
+      note,
+      searchCompanyKey,
+    } = this.props;
+    if (
+      isEmpty(companiesNASDAQ) &&
+      isEmpty(companiesNYSE) &&
+      isEmpty(note) &&
+      !isEmpty(searchCompanyKey)
+    ) {
       return true;
     } else {
       return false;
@@ -66,7 +119,6 @@ class SearchPopper extends React.Component {
     const {
       classes,
       openSearchMenu,
-      searchAnchorRef,
       handleClose,
       handleListKeyDown,
       note,
@@ -77,13 +129,18 @@ class SearchPopper extends React.Component {
     return (
       <Popper
         open={openSearchMenu}
-        anchorEl={searchAnchorRef.current}
         placement="bottom-start"
+        anchorEl={this.fakeReference}
         className={classes.popperSearch}
         transition
+        disablePortal={true}
         modifiers={{
           flip: {
-            enabled: false,
+            enabled: true,
+          },
+          preventOverflow: {
+            enabled: true,
+            boundariesElement: "viewport",
           },
         }}
       >
@@ -93,29 +150,31 @@ class SearchPopper extends React.Component {
             {...TransitionProps}
           >
             <Paper className={classes.menuPaper}>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                  <MenuItem dense disabled>
-                    Stocks
+              <IconButton onClick={handleClose} className={classes.backButton}>
+                <ArrowBackRoundedIcon />
+              </IconButton>
+              <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                <MenuItem dense disabled>
+                  Stocks
+                </MenuItem>
+
+                {this.showLinearProgressBar() && <LinearProgress />}
+                {!isEmpty(note) && (
+                  <Typography className={classes.searchNote}>{note}</Typography>
+                )}
+
+                {companiesNYSE.map((company, index) => (
+                  <MenuItem dense key={index} className={classes.menuItemHover}>
+                    {this.showResultTickers(company, classes)}
                   </MenuItem>
-                  {this.showLinearProgressBar() && <LinearProgress />}
-                  {!isEmpty(note) && (
-                    <Typography className={classes.searchNote}>
-                      {note}
-                    </Typography>
-                  )}
-                  {companiesNYSE.map((company, index) => (
-                    <MenuItem dense key={index}>
-                      {this.showResultTickers(company, classes)}
-                    </MenuItem>
-                  ))}
-                  {companiesNASDAQ.map((company, index) => (
-                    <MenuItem dense key={index}>
-                      {this.showResultTickers(company, classes)}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
+                ))}
+
+                {companiesNASDAQ.map((company, index) => (
+                  <MenuItem dense key={index} className={classes.menuItemHover}>
+                    {this.showResultTickers(company, classes)}
+                  </MenuItem>
+                ))}
+              </MenuList>
             </Paper>
           </Fade>
         )}

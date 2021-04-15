@@ -30,6 +30,8 @@ const {
   getUserData
 } = require("../utils/low-dependency/PrismaUserDataUtil");
 
+const { parseRedisTransactionsHistoryListItem } = require("../utils/low-dependency/ParserUtil");
+
 // const { indices } = require('../algolia');
 
 /*
@@ -140,7 +142,7 @@ router.get("/getOverallRanking", (req, res) => {
         return {
           firstName: data[0],
           lastName: data[1],
-          totalPortfolio: parseInt(data[2]),
+          totalPortfolio: parseInt(data[2], 10),
           region: data[3]
         };
       });
@@ -166,7 +168,7 @@ router.get("/getRegionalRanking", (req, res) => {
         return {
           firstName: data[0],
           lastName: data[1],
-          totalPortfolio: parseInt(data[2]),
+          totalPortfolio: parseInt(data[2], 10),
           region: data[3]
         };
       });
@@ -298,7 +300,7 @@ router.get("/getUserTransactionsHistory", (req, res) => {
       const transactions = transactionsAndLength.slice(
         startIndex,
         excludedEndIndex
-      );
+      ).map(transaction => parseRedisTransactionsHistoryListItem(transaction));
 
       res.send({ transactions, length });
     })

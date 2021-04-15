@@ -19,6 +19,9 @@ const {
 } = require("../low-dependency/DayTimeUtil");
 
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
+const {
+  SequentialPromisesWithResultsArray
+} = require("../low-dependency/PromisesUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -40,7 +43,7 @@ const deleteExpiredVerification = () => {
 const createAccountSummaryChartTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.accountSummaryTimestamp
-      .findOne({
+      .findUnique({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
@@ -78,7 +81,7 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.rankingTimestamp
-      .findOne({
+      .findUnique({
         where: {
           UTCDateKey_userID: {
             UTCDateKey: getFullDateUTCString(newDate()),
@@ -88,7 +91,7 @@ const createRankingTimestampIfNecessary = (user) => {
       })
       .then((timestamp) => {
         if (!timestamp) {
-          prisma.rankingTimestamp.create({
+          return prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
               UTCDateKey: getFullDateUTCString(newDate()),
@@ -214,20 +217,19 @@ const updateAllUsers = (globalBackendVariables) => {
       select: {
         id: true,
         email: true,
-        totalPortfolio: true
-      },
-      orderBy: [
-        {
-          totalPortfolio: "desc"
-        }
-      ]
+        totalPortfolio: true,
+        ranking: true,
+        regionalRanking: true
+      }
     })
     .then((usersArray) => {
       console.log(
         `Updating ${usersArray.length} user(s): portfolioLastClosure, accountSummaryTimestamp, rankingTimestamp`
       );
 
-      const updateAllUsersPromise = usersArray.map((user, index) => {
+      const tasksList = [];
+
+      usersArray.forEach((user, index) => {
         const updatePortfolioLastClosure = prisma.user.update({
           where: {
             id: user.id
@@ -241,16 +243,19 @@ const updateAllUsers = (globalBackendVariables) => {
           user
         );
 
-        const accountRankingPromise = createRankingTimestampIfNecessary(user);
+        const rankingPromise = createRankingTimestampIfNecessary(user);
 
-        return Promise.all([
-          updatePortfolioLastClosure,
-          accountSummaryPromise,
-          accountRankingPromise,
-          resetUserCachedAccountSummaryTimestamps(user.email)
-        ]);
+        tasksList.push(() => {
+          return Promise.all([
+            updatePortfolioLastClosure,
+            accountSummaryPromise,
+            rankingPromise,
+            resetUserCachedAccountSummaryTimestamps(user.email)
+          ]);
+        });
       });
-      return Promise.all(updateAllUsersPromise);
+
+      return SequentialPromisesWithResultsArray(tasksList);
     })
     .then(() => {
       globalBackendVariables.updatedAllUsersFlag = !globalBackendVariables.updatedAllUsersFlag;
@@ -264,7 +269,8 @@ const updateAllUsers = (globalBackendVariables) => {
 };
 
 /**
- * @description Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @description_1 Switch flag hasUpdatedAllUsersToday according to isMarketClosed
+ * @description_2 Update all users data in database
  * @param globalBackendVariables object passed in from back-end/index
  */
 const checkAndUpdateAllUsers = (globalBackendVariables) => {
@@ -315,7 +321,7 @@ const getChunkUserTransactionsHistoryForRedisM5RU = (
     }
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }
@@ -339,7 +345,7 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
     const filtering = createPrismaFiltersObject(filters);
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }
@@ -360,6 +366,7 @@ module.exports = {
   deleteExpiredVerification,
 
   createAccountSummaryChartTimestampIfNecessary,
+  createRankingTimestampIfNecessary,
 
   updateAllUsers,
   checkAndUpdateAllUsers,

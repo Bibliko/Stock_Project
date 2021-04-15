@@ -15,11 +15,25 @@ const styles = (theme) => ({
   textField: {
     width: "100%",
     margin: "8px",
+    [theme.breakpoints.down("xs")]: {
+      position: "absolute",
+      width: "75%",
+      left: "calc((100% - 40px - 75%) / 2)", // 40px is default width and height of icon button
+    },
     fontWeight: "normal",
     color: "white",
+    backgroundColor: theme.palette.searchFieldBackground.main,
+    "&:hover": {
+      backgroundColor: theme.palette.searchFieldBackground.onHover,
+    },
+    borderRadius: "20px",
+    zIndex: theme.customZIndex.searchFieldTextField,
     "& .MuiInputBase-root": {
       height: "40px",
-      borderRadius: "20px",
+      [theme.breakpoints.down("xs")]: {
+        height: "30px",
+      },
+      borderRadius: theme.customMargin.appBarPadding,
     },
     "& .MuiInputLabel-outlined": {
       transform: "translate(14px, 13px) scale(1)",
@@ -31,38 +45,41 @@ const styles = (theme) => ({
       borderBottom: "2px solid #000000",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      borderWidth: "2px",
-      borderColor: theme.palette.searchField.main,
+      borderWidth: 0,
     },
     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: theme.palette.searchField.onHover,
+      borderWidth: 0,
     },
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: theme.palette.searchField.onHover,
+      borderWidth: 0,
     },
-    "& .MuiFormLabel-root": {
-      fontSize: "small",
-      color: theme.palette.searchField.main,
-      "&.Mui-focused": {
-        color: theme.palette.searchField.onHover,
-      },
-    },
+  },
+  backgroundWhenTextFieldOpen: {
+    marginLeft: "-4px",
   },
   input: {
     color: "white",
     fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
   },
   iconButton: {
     padding: "8px",
   },
   clearIcon: {
     color: "rgba(255, 255, 255, 0.8)",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+      width: "20px",
+    },
   },
   searchIcon: {
-    color: theme.palette.searchField.main,
-  },
-  searchIconHover: {
-    color: theme.palette.searchField.onHover,
+    color: "rgba(255, 255, 255, 0.6)",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+      width: "20px",
+    },
   },
   hide: {
     display: "none",
@@ -94,9 +111,9 @@ class SearchField extends React.Component {
       forwardedRef,
       searchCompany,
       changeSearchCompany,
-      extendSearchMenu,
-      shrinkSearchMenu,
+      turnOnSearchMenu,
       clearSearchCompany,
+      focused,
     } = this.props;
 
     return (
@@ -109,12 +126,15 @@ class SearchField extends React.Component {
         autoComplete="off"
         variant="outlined"
         margin="normal"
-        className={classes.textField}
+        className={clsx(classes.textField, {
+          [classes.backgroundWhenTextFieldOpen]: focused,
+        })}
         onChange={changeSearchCompany}
-        onClick={extendSearchMenu}
-        onBlur={shrinkSearchMenu}
+        onClick={turnOnSearchMenu}
         InputProps={{
-          className: classes.input,
+          classes: {
+            input: classes.input,
+          },
           endAdornment: (
             <InputAdornment position="end">
               <IconButton

@@ -10,7 +10,7 @@ router.get("/getData", (req, res) => {
   const yearNeededInt = parseInt(yearNeeded, 10);
 
   prisma.marketHolidays
-    .findOne({
+    .findUnique({
       where: {
         year: yearNeededInt
       }

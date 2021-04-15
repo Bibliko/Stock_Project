@@ -345,9 +345,7 @@ const parseAccountSummaryTimestamp = (redisString) => {
 /**
  * @param {object} historicalChartItem historical chart item obtained from FMP (OHLCV)
  */
-const createRedisValueFromExchangeHistoricalChart5min = (
-  historicalChartItem
-) => {
+const createRedisValueFromHistoricalChart5min = (historicalChartItem) => {
   const { date, open, low, high, close, volume } = historicalChartItem;
   return `${date}|${open}|${low}|${high}|${close}|${volume}`;
 };
@@ -356,7 +354,7 @@ const createRedisValueFromExchangeHistoricalChart5min = (
  * @note date stored in cache is in New York time.
  * @param {string} redisString `date|open|low|high|close|volume`
  */
-const parseCachedExchangeHistoricalChart5minItem = (redisString) => {
+const parseCachedHistoricalChart5minItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return {
     date: valuesArray[0],
@@ -371,9 +369,7 @@ const parseCachedExchangeHistoricalChart5minItem = (redisString) => {
 /**
  * @param {object} historicalChartItem historical chart full item obtained from FMP
  */
-const createRedisValueFromExchangeHistoricalChartFull = (
-  historicalChartItem
-) => {
+const createRedisValueFromHistoricalChartFull = (historicalChartItem) => {
   const {
     date,
     open,
@@ -392,7 +388,7 @@ const createRedisValueFromExchangeHistoricalChartFull = (
   return `${date}|${open}|${low}|${high}|${close}|${adjClose}|${volume}|${unadjustedVolume}|${change}|${changePercent}|${vwap}|${label}|${changeOverTime}`;
 };
 
-const parseCachedExchangeHistoricalChartFullItem = (redisString) => {
+const parseCachedHistoricalChartFullItem = (redisString) => {
   const valuesArray = redisString.split("|");
   return {
     date: valuesArray[0],
@@ -411,10 +407,74 @@ const parseCachedExchangeHistoricalChartFullItem = (redisString) => {
   };
 };
 
+/**
+ * @param {object} mostGainer Object most gainer from FMP
+ */
+const createRedisValueFromMostGainer = (mostGainer) => {
+  const { ticker, changes, price, changesPercentage, companyName } = mostGainer;
+  return `${ticker}|${changes}|${price}|${changesPercentage}|${companyName}`;
+};
+
+const parseCachedMostGainer = (redisString) => {
+  const valuesArray = redisString.split("|");
+  return {
+    ticker: valuesArray[0],
+    changes: parseFloat(valuesArray[1]),
+    prices: parseFloat(valuesArray[2]),
+    changesPercentage: valuesArray[3],
+    companyName: valuesArray[4]
+  };
+};
+
+/**
+ * @param {object} share Prisma object Share of User
+ */
+export const createRedisValueFromSharesList = (share) => {
+  const { id, companyCode, quantity, buyPriceAvg, userID } = share;
+  return `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
+};
+
+/**
+ * redisString: "id|companyCode|quantity|buyPriceAvg|userID"
+ */
+export const parseRedisSharesListItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+
+  return {
+    id: valuesArray[0],
+    companyCode: valuesArray[1],
+    quantity: parseInt(valuesArray[2], 10),
+    buyPriceAvg: parseFloat(valuesArray[3]),
+    userID: valuesArray[4]
+  };
+};
+
+/**
+ * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|isTypeBuy|userID"
+ */
+export const parseRedisTransactionsHistoryListItem = (redisString) => {
+  const valuesArray = redisString.split("|");
+
+  return {
+    id: valuesArray[0],
+    createdAt: valuesArray[1],
+    companyCode: valuesArray[2],
+    quantity: parseInt(valuesArray[3], 10),
+    priceAtTransaction: parseFloat(valuesArray[4]),
+    brokerage: parseFloat(valuesArray[5]),
+    spendOrGain: parseFloat(valuesArray[6]),
+    finishedTime: valuesArray[7],
+    isTypeBuy: valuesArray[8] === "true",
+    userID: valuesArray[9]
+  };
+};
+
 module.exports = {
+  // Market Holiday
   parseCachedMarketHoliday,
   createRedisValueFromMarketHoliday,
 
+  // Share
   parseCachedShareQuote,
   createRedisValueFromStockQuoteJSON,
 
@@ -424,17 +484,30 @@ module.exports = {
   combineFMPStockQuoteAndProfile,
   createSymbolsStringFromCachedSharesList,
 
+  // User Shares List
+  createRedisValueFromSharesList,
+  parseRedisSharesListItem,
+
+  // Transaction
   createRedisValueFromFinishedTransaction,
 
   createPrismaFiltersObject,
   createRedisValueFromTransactionsHistoryFilters,
   parseRedisTransactionsHistoryFilters,
 
+  parseRedisTransactionsHistoryListItem,
+
+  // Account Summary
   parseAccountSummaryTimestamp,
 
-  createRedisValueFromExchangeHistoricalChart5min,
-  parseCachedExchangeHistoricalChart5minItem,
+  // Historical Chart
+  createRedisValueFromHistoricalChart5min,
+  parseCachedHistoricalChart5minItem,
 
-  createRedisValueFromExchangeHistoricalChartFull,
-  parseCachedExchangeHistoricalChartFullItem
+  createRedisValueFromHistoricalChartFull,
+  parseCachedHistoricalChartFullItem,
+
+  // Most Gainers
+  createRedisValueFromMostGainer,
+  parseCachedMostGainer
 };

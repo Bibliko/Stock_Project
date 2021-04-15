@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
-import MarketWatchChart from "../../Chart/MarketWatchChart";
+import ExchangeOrCompanyPriceChart from "../../Chart/ExchangeOrCompanyPriceChart";
 
 import { withStyles } from "@material-ui/core/styles";
 import { Container, Button } from "@material-ui/core";
@@ -21,9 +21,15 @@ const styles = (theme) => ({
   },
   marketButton: {
     color: "white",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+    },
   },
   marketButtonChosen: {
-    color: "#2196f3",
+    color: theme.palette.primary.main,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.hover,
+    },
   },
 });
 
@@ -71,7 +77,7 @@ class MarketWatch extends React.Component {
             NASDAQ
           </Button>
         </div>
-        <MarketWatchChart exchange={exchange} />
+        <ExchangeOrCompanyPriceChart exchangeOrCompany={exchange} />
       </Container>
     );
   }

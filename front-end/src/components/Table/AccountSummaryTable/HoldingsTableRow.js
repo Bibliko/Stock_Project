@@ -9,19 +9,27 @@ import { userAction } from "../../../redux/storeActions/actions";
 
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
 import { withStyles } from "@material-ui/core/styles";
-import { TableRow, TableCell, IconButton, Typography } from "@material-ui/core";
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Tooltip,
+} from "@material-ui/core";
 
 import {
   AddBoxRounded as AddBoxRoundedIcon,
   ArrowDropUpRounded as ArrowDropUpRoundedIcon,
   ArrowDropDownRounded as ArrowDropDownRoundedIcon,
-  AttachMoneyRounded as AttachMoneyRoundedIcon,
   DeleteForeverRounded as DeleteForeverRoundedIcon,
-  AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
+  InfoRounded as InfoRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -31,64 +39,36 @@ const styles = (theme) => ({
     borderRightWidth: "0px",
     borderTopWidth: "1px",
     borderBottomWidth: "0px",
-    borderColor: "#2D9CDB",
+    borderColor: theme.palette.secondary.main,
     borderStyle: "solid",
-    backgroundColor: theme.palette.paperBackground.deepBlueTable,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   cellDiv: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
-  buyButton: {
-    color: "#27AE60",
-    "&:hover": {
-      color: "rgba(39, 174, 96, 0.8)",
-    },
-    margin: "2px",
-    borderRadius: "50%",
-    fontSize: "smaller",
-    fontWeight: "bold",
-    padding: "4px",
-  },
-  sellButton: {
-    color: "#EB5757",
-    "&:hover": {
-      color: "rgba(235, 87, 87, 0.8)",
-    },
-    margin: "2px",
-    borderRadius: "50%",
-    fontSize: "smaller",
-    fontWeight: "bold",
-    padding: "4px",
-  },
   addWatchlistButton: {
-    color: "#619FD7",
+    color: theme.palette.secondary.main,
     "&:hover": {
-      color: "rgba(97, 159, 215, 0.8)",
+      color: theme.palette.secondary.mainHover,
     },
-    padding: "5px",
   },
   removeWatchlistButton: {
-    padding: "5px",
+    color: theme.palette.fail.main,
+    "&:hover": {
+      color: theme.palette.fail.mainHover,
+    },
   },
   watchlistIcon: {
     height: "22px",
     width: "22px",
   },
-  removeWatchlistIcon: {
-    height: "22px",
-    width: "22px",
-    color: "white",
-    "&:hover": {
-      color: "#e23d3d",
-    },
-  },
   arrowUp: {
-    color: "#219653",
+    color: theme.palette.secondary.main,
   },
   arrowDown: {
-    color: "#ef0808",
+    color: theme.palette.fail.main,
   },
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",
@@ -114,13 +94,31 @@ const styles = (theme) => ({
   lastRow: {
     borderBottomWidth: "1px",
   },
+  codeInfoButton: {
+    color: "white",
+    padding: 0,
+    marginLeft: "8px",
+  },
 });
+
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
+    boxShadow: theme.customShadow.popup,
+    color: "white",
+    maxWidth: 220,
+  },
+  arrow: {
+    color: theme.palette.paperBackground.onPageSuperLight,
+  },
+}))(Tooltip);
 
 class HoldingsTableRow extends React.Component {
   state = {
     lastPrice: "Updating",
     profitOrLoss: "Updating",
     isInWatchlist: false,
+    openInfo: false,
   };
 
   checkStockPriceInterval;
@@ -145,16 +143,14 @@ class HoldingsTableRow extends React.Component {
         return `${numberWithCommas(rowData.holding)}`;
 
       case "Buy Price (Avg)":
-        return `$${numberWithCommas(rowData.buyPriceAvg.toFixed(2))}`;
+        return `$${numberWithCommas(roundNumber(rowData.buyPriceAvg, 2))}`;
 
       case "Last Price":
         return `$${numberWithCommas(this.state.lastPrice)}`;
 
       case "Profit/Loss":
-        if (parseFloat(this.state.profitOrLoss, 10) < 0) {
-          return `-$${numberWithCommas(
-            Math.abs(parseFloat(this.state.profitOrLoss, 10))
-          )}`;
+        if ((this.state.profitOrLoss, 10 < 0)) {
+          return `-$${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
         }
         return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
@@ -177,7 +173,7 @@ class HoldingsTableRow extends React.Component {
           [classes.arrowDown]: this.checkIfProfitOrLoss(type) === "Loss",
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
-          [classes.stickyCell]: type === "Code",
+          [classes.stickyCell]: type === "Code" && !this.props.minimal,
         })}
       >
         <div
@@ -189,6 +185,27 @@ class HoldingsTableRow extends React.Component {
           <Typography className={classes.holdingsTableItem}>
             {this.chooseTableCellValue(type)}
           </Typography>
+          {type === "Code" && (
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  <Typography color="inherit">Logo</Typography>
+                  <Typography color="inherit">Name</Typography>
+                </React.Fragment>
+              }
+              arrow
+              open={this.state.openInfo}
+            >
+              <IconButton
+                className={classes.codeInfoButton}
+                onClick={this.switchInfoTooltip}
+                onMouseEnter={this.openInfoTooltip}
+                onMouseLeave={this.closeInfoTooltip}
+              >
+                <InfoRoundedIcon onBlur={this.closeInfoTooltip} />
+              </IconButton>
+            </HtmlTooltip>
+          )}
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -198,6 +215,24 @@ class HoldingsTableRow extends React.Component {
         </div>
       </TableCell>
     );
+  };
+
+  switchInfoTooltip = () => {
+    this.setState({
+      openInfo: !this.state.openInfo,
+    });
+  };
+
+  openInfoTooltip = () => {
+    this.setState({
+      openInfo: true,
+    });
+  };
+
+  closeInfoTooltip = () => {
+    this.setState({
+      openInfo: false,
+    });
   };
 
   addToWatchlist = () => {
@@ -277,8 +312,9 @@ class HoldingsTableRow extends React.Component {
 
     if (lastPrice && !isEqual(this.state.lastPrice, lastPrice)) {
       this.setState({
-        lastPrice: lastPrice.toFixed(2),
-        profitOrLoss: ((lastPrice - buyPriceAvg) * holding - brokerage).toFixed(
+        lastPrice: roundNumber(lastPrice, 2),
+        profitOrLoss: roundNumber(
+          (lastPrice - buyPriceAvg) * holding - brokerage,
           2
         ),
       });
@@ -329,61 +365,44 @@ class HoldingsTableRow extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, minimal } = this.props;
     const { isInWatchlist } = this.state;
 
     return (
       <TableRow>
         {this.chooseTableCell("Code", classes)}
-        {this.chooseTableCell("Holding", classes)}
-        {this.chooseTableCell("Buy Price (Avg)", classes)}
-        {this.chooseTableCell("Last Price", classes)}
+        {!minimal && this.chooseTableCell("Holding", classes)}
+        {!minimal && this.chooseTableCell("Buy Price (Avg)", classes)}
+        {!minimal && this.chooseTableCell("Last Price", classes)}
         {this.chooseTableCell("Profit/Loss", classes)}
-
-        <TableCell
-          align="center"
-          className={clsx(classes.tableCell, {
-            [classes.lastRow]: this.isTableRowTheLast(),
-          })}
-        >
-          <div className={classes.cellDiv}>
-            <IconButton className={classes.buyButton}>
-              <AddCircleOutlineRoundedIcon />
-            </IconButton>
-            <IconButton className={classes.sellButton}>
-              <AttachMoneyRoundedIcon />
-            </IconButton>
-          </div>
-        </TableCell>
-
-        <TableCell
-          align="center"
-          className={clsx(classes.tableCell, {
-            [classes.lastRightCell]: this.isTableRowTheLast(),
-            [classes.lastRow]: this.isTableRowTheLast(),
-          })}
-        >
-          <div className={classes.cellDiv}>
-            {!isInWatchlist && (
-              <IconButton
-                className={classes.addWatchlistButton}
-                onClick={this.addToWatchlist}
-              >
-                <AddBoxRoundedIcon className={classes.watchlistIcon} />
-              </IconButton>
-            )}
-            {isInWatchlist && (
-              <IconButton
-                className={classes.removeWatchlistButton}
-                onClick={this.removeFromWatchlist}
-              >
-                <DeleteForeverRoundedIcon
-                  className={classes.removeWatchlistIcon}
-                />
-              </IconButton>
-            )}
-          </div>
-        </TableCell>
+        {!minimal && (
+          <TableCell
+            align="center"
+            className={clsx(classes.tableCell, {
+              [classes.lastRightCell]: this.isTableRowTheLast(),
+              [classes.lastRow]: this.isTableRowTheLast(),
+            })}
+          >
+            <div className={classes.cellDiv}>
+              {!isInWatchlist && (
+                <IconButton
+                  className={classes.addWatchlistButton}
+                  onClick={this.addToWatchlist}
+                >
+                  <AddBoxRoundedIcon className={classes.watchlistIcon} />
+                </IconButton>
+              )}
+              {isInWatchlist && (
+                <IconButton
+                  className={classes.removeWatchlistButton}
+                  onClick={this.removeFromWatchlist}
+                >
+                  <DeleteForeverRoundedIcon className={classes.watchlistIcon} />
+                </IconButton>
+              )}
+            </div>
+          </TableCell>
+        )}
       </TableRow>
     );
   }

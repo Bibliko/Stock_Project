@@ -1,6 +1,6 @@
 // @flow
 
-import * as Prisma from "@prisma/client";
+import * as PrismaClient from "@prisma/client";
 import writeFileSyncRecursive from "./WriteFileSyncRecursive";
 import {
   extractTypeInfo,
@@ -8,11 +8,11 @@ import {
 } from "./ModelTypeDefExtractor";
 // We only need DMMF for this file and may not need flow-typed for @prisma/client/runtime
 // $FlowFixMe
-import { DMMF } from "@prisma/client/runtime";
+import { Prisma } from "@prisma/client/runtime";
 
 // We are generating flow-typed for Prisma, so we should not do flow check here
 // $FlowFixMe
-const mModelMappings: DMMF.Mapping[] = Prisma.dmmf.mappings;
+const mModelMappings: Prisma.DMMF.Mapping[] = PrismaClient.dmmf.mappings;
 
 let mModuleDeclaration = "declare module '@prisma/client' {\n}";
 function addDeclaration(declarationText: string): void {

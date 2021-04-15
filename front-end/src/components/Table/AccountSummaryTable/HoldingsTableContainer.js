@@ -27,16 +27,18 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCellProfitOrLoss: {
     minWidth: "120px",
   },
   tableCell: {
-    fontSize: "12px",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
     borderWidth: "1px",
-    borderColor: theme.palette.tableHeader.lightBlue,
+    borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
   cellDiv: {
@@ -59,7 +61,7 @@ const styles = (theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.tableHeader.lightBlue,
+    backgroundColor: theme.palette.paperBackground.sub,
     color: "white",
   },
 }))(TableCell);
@@ -77,7 +79,7 @@ class HoldingsTableContainer extends React.Component {
         align="center"
         className={clsx(classes.tableCell, {
           [classes.tableCellProfitOrLoss]: type === "Profit/Loss",
-          [classes.stickyCell]: type === "Code",
+          [classes.stickyCell]: type === "Code" && !this.props.minimal,
           [classes.lastElementTopRightRounded]: type === "Watchlist",
         })}
       >
@@ -96,7 +98,7 @@ class HoldingsTableContainer extends React.Component {
   handleOpenSnackbar = (companyCode, AddedOrRemoved) => {
     this.setState({
       openSnackbar: true,
-      companyCodeOnAction: `${AddedOrRemoved} ${companyCode}`,
+      companyCodeOnAction: `${AddedOrRemoved} ${companyCode} ${AddedOrRemoved === "Added" ? "to" : "from"}`,
     });
   };
 
@@ -115,7 +117,7 @@ class HoldingsTableContainer extends React.Component {
   }
 
   render() {
-    const { classes, rows } = this.props;
+    const { classes, rows, minimal } = this.props;
     const { openSnackbar, companyCodeOnAction } = this.state;
 
     return (
@@ -124,17 +126,17 @@ class HoldingsTableContainer extends React.Component {
           <TableHead>
             <TableRow>
               {this.chooseTableCell("Code", classes)}
-              {this.chooseTableCell("Holding", classes)}
-              {this.chooseTableCell("Buy Price (Avg)", classes)}
-              {this.chooseTableCell("Last Price", classes)}
+              {!minimal && this.chooseTableCell("Holding", classes)}
+              {!minimal && this.chooseTableCell("Buy Price (Avg)", classes)}
+              {!minimal && this.chooseTableCell("Last Price", classes)}
               {this.chooseTableCell("Profit/Loss", classes)}
-              {this.chooseTableCell("Actions", classes)}
-              {this.chooseTableCell("Watchlist", classes)}
+              {!minimal && this.chooseTableCell("Watchlist", classes)}
             </TableRow>
           </TableHead>
           <TableBody className={classes.tableBody}>
             {rows.map((row, index) => (
               <HoldingsTableRow
+                minimal={minimal}
                 key={row.id}
                 rowData={row}
                 rowIndex={index}
@@ -145,12 +147,13 @@ class HoldingsTableContainer extends React.Component {
           </TableBody>
         </Table>
         <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           open={openSnackbar}
           autoHideDuration={6 * oneSecond}
           onClose={this.handleCloseSnackbar}
         >
           <Alert onClose={this.handleCloseSnackbar} severity="success">
-            {`${companyCodeOnAction} from watchlist successfully!`}
+            {`${companyCodeOnAction} watchlist successfully!`}
           </Alert>
         </Snackbar>
       </TableContainer>

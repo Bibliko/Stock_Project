@@ -2,13 +2,10 @@ import React from "react";
 import { isEqual, pick, isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
+import SegmentedBar from "../ProgressBar/SegmentedBar";
+
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Dialog,
-  DialogTitle,
-  Typography,
-  CircularProgress,
-} from "@material-ui/core";
+import { Dialog, DialogTitle, Typography } from "@material-ui/core";
 
 const styles = (theme) => ({
   textInsideDialog: {
@@ -76,7 +73,7 @@ class MarketTimeDialog extends React.Component {
             {remainingTime}
           </Typography>
         )}
-        {!isMarketClosed && isEmpty(remainingTime) && <CircularProgress />}
+        {!isMarketClosed && isEmpty(remainingTime) && <SegmentedBar />}
         {isMarketClosed && (
           <Typography className={classes.textInsideDialog}>
             Market Closed

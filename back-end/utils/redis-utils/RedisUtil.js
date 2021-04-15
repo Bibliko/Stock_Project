@@ -30,12 +30,13 @@ const {
  * - '${email}|changeEmailVerification': value
  * - '${email}|accountSummaryChart': list
  * - '${email}|sharesList': list
- * - '${email}|clientTimestampLastJoinInSocketRoom': value
  *
  * - 'cachedMarketHoliday': value
  *
- * - 'cachedExchangeHistoricalChart5min|${exchange}': list
- * - 'cachedExchangeHistoricalChartFull|${exchange}': list
+ * - 'cachedHistoricalChart5min|${exchangeOrCompany}': list, last item is timestamp when last updated
+ * - 'cachedHistoricalChartFull|${exchangeOrCompany}': list, last item is timestamp when last updated
+ *
+ * - 'cachedMostGainers': list
  *
  * - 'cachedShares': list
  * - 'cachedShares|${companyCode}|quote': value
@@ -51,12 +52,11 @@ const passwordVerification = "passwordVerification";
 const changeEmailVerification = "changeEmailVerification";
 const accountSummaryChart = "accountSummaryChart";
 const sharesList = "sharesList";
-const clientTimestampLastJoinInSocketRoom =
-  "clientTimestampLastJoinInSocketRoom";
 
 const cachedMarketHoliday = "cachedMarketHoliday";
-const cachedExchangeHistoricalChart5min = "cachedExchangeHistoricalChart5min";
-const cachedExchangeHistoricalChartFull = "cachedExchangeHistoricalChartFull";
+const cachedHistoricalChart5min = "cachedHistoricalChart5min";
+const cachedHistoricalChartFull = "cachedHistoricalChartFull";
+const cachedMostGainers = "cachedMostGainers";
 const cachedShares = "cachedShares";
 const rankingList = "RANKING_LIST";
 
@@ -72,7 +72,7 @@ const isMarketClosedCheck = () => {
     getCachedMarketHoliday()
       .then((marketHoliday) => {
         if (!marketHoliday || !isEqual(marketHoliday.year, UTCYear)) {
-          const prismaPromise = prisma.marketHolidays.findOne({
+          const prismaPromise = prisma.marketHolidays.findUnique({
             where: {
               year: UTCYear
             }
@@ -222,30 +222,6 @@ const updateCachedMarketHoliday = (marketHoliday) => {
   });
 };
 
-/**
- * @description Update timestamp if client joins in socket room
- * @change Redis value "numberOfClients|timestamp"
- * @param email User email
- */
-const updateClientTimestampLastJoinInSocketRoom = (email) => {
-  return new Promise((resolve, reject) => {
-    const redisKey = `${email}|${clientTimestampLastJoinInSocketRoom}`;
-
-    getAsync(redisKey)
-      .then((numberOfClients) => {
-        const time = new Date().getTime();
-
-        return setAsync(redisKey, time);
-      })
-      .then((finished) => {
-        resolve("Successful");
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
 module.exports = {
   // Keys
   transactionsHistoryList,
@@ -254,11 +230,11 @@ module.exports = {
   changeEmailVerification,
   accountSummaryChart,
   sharesList,
-  clientTimestampLastJoinInSocketRoom,
 
   cachedMarketHoliday,
-  cachedExchangeHistoricalChart5min,
-  cachedExchangeHistoricalChartFull,
+  cachedHistoricalChart5min,
+  cachedHistoricalChartFull,
+  cachedMostGainers,
   cachedShares,
   rankingList,
 
@@ -276,8 +252,5 @@ module.exports = {
 
   // Market Holiday
   getCachedMarketHoliday,
-  updateCachedMarketHoliday,
-
-  // Socket
-  updateClientTimestampLastJoinInSocketRoom
+  updateCachedMarketHoliday
 };

@@ -3,7 +3,10 @@ import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 import clsx from "clsx";
 
-import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil";
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -27,8 +30,7 @@ const styles = (theme) => ({
   },
   tableContainer: {
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     color: "white",
@@ -44,10 +46,10 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   arrowUp: {
-    color: "#219653",
+    color: theme.palette.secondary.main,
   },
   arrowDown: {
-    color: "#ef0808",
+    color: theme.palette.fail.main,
   },
   summaryTableItem: {
     fontSize: "medium",
@@ -60,10 +62,10 @@ const styles = (theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.tableRow.darkBlue,
+      backgroundColor: theme.palette.paperBackground.onPage,
     },
     "&:nth-of-type(even)": {
-      backgroundColor: theme.palette.tableRow.lightBlue,
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
   },
 }))(TableRow);
@@ -81,7 +83,7 @@ class SummaryTableContainer extends React.Component {
 
       case "Shares":
         return `$${numberWithCommas(
-          (this.props.totalPortfolio - this.props.cash).toFixed(2)
+          roundNumber(this.props.totalPortfolio - this.props.cash, 2)
         )}`;
 
       case "Total Portfolio Value":

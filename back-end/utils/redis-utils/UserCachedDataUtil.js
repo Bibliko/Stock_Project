@@ -1,7 +1,6 @@
 const { isEmpty } = require("lodash");
 
 const {
-  getAsync,
   keysAsync,
   renameAsync,
   delAsync,
@@ -9,11 +8,7 @@ const {
   listRangeAsync
 } = require("../../redis/redis-client");
 
-const {
-  sharesList,
-  accountSummaryChart,
-  clientTimestampLastJoinInSocketRoom
-} = require("./RedisUtil");
+const { sharesList, accountSummaryChart } = require("./RedisUtil");
 
 const {
   SequentialPromisesWithResultsArray
@@ -126,10 +121,7 @@ const getLastItemOfCachedAccountSummaryTimestamps = (email) => {
  */
 const cleanUserCache = (email) => {
   return new Promise((resolve, reject) => {
-    getAsync(`${email}|${clientTimestampLastJoinInSocketRoom}`)
-      .then((timestamp) => {
-        return keysAsync(`${email}*`);
-      })
+    keysAsync(`${email}*`)
       .then((keys) => {
         if (keys && !isEmpty(keys)) {
           return delAsync(keys);

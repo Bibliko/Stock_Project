@@ -6,8 +6,10 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
-import RankingPaper from "../../components/Paper/LandingPage/RankingPaper";
-import MarketWatchPaper from "../../components/Paper/LandingPage/MarketWatch";
+import RankingPaper from "../../components/Paper/HomePage/RankingPaper";
+import MarketWatchPaper from "../../components/Paper/HomePage/MarketWatch";
+import MostGainersPaper from "../../components/Paper/HomePage/MostGainers";
+import AccountSummaryPaper from "../../components/Paper/HomePage/AccountSummary";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -27,8 +29,9 @@ const styles = (theme) => ({
     },
     background: "rgba(0,0,0,0)",
     display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "center",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   center: {
@@ -42,38 +45,26 @@ const styles = (theme) => ({
     height: "100%",
     width: "100%",
     minHeight: "200px",
-    padding: "24px",
   },
   paperColor: {
     backgroundColor: theme.palette.paperBackground.onPage,
   },
   itemGrid: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
     //maxHeight: '300px'
   },
-  gridTitle: {
+  title: {
     fontSize: "large",
     [theme.breakpoints.down("sm")]: {
-      fontSize: "small",
+      fontSize: "medium",
     },
     fontWeight: "bold",
-    marginBottom: "5px",
-  },
-  marketWatch: {
-    color: "#FF3747",
-  },
-  stocksOnTheMove: {
-    color: "#74E0EF",
-  },
-  accountSummary: {
-    color: "#F2C94C",
-  },
-  rankings: {
-    color: "#9ED2EF",
+    marginBottom: "12px",
+    color: theme.palette.primary.main,
   },
   paperRedirectingToAccountSetting: {
     height: theme.customHeight.redirectingPaper,
@@ -96,11 +87,12 @@ const styles = (theme) => ({
     marginRight: "10px",
   },
   "@keyframes rotateAccountSetting": {
-    from: { transform: "rotate(0deg)" },
-    to: { transform: "rotate(359deg)" },
+    "0%": { transform: "rotate(0deg)" },
+    "60%": { transform: "rotate(359deg)" },
+    "100%": { transform: "rotate(359deg)" },
   },
   accountSettingIconAnimation: {
-    animation: "2.5s infinite $rotateAccountSetting",
+    animation: "5s infinite $rotateAccountSetting",
   },
   accountSettingWords: {
     color: "white",
@@ -110,29 +102,24 @@ const styles = (theme) => ({
     },
     textAlign: "center",
   },
+  largeMarginBottom: {
+    marginBottom: "40px",
+  },
+  welcome: {
+    fontSize: "xx-large",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "x-large",
+    },
+    alignSelf: "flex-start",
+    marginBottom: "40px",
+    fontWeight: "bolder",
+    background: theme.palette.gradient.main,
+    "-webkit-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+  },
 });
 
-class LandingPage extends React.Component {
-  state = {
-    hoverPaperAccountSetting: false,
-  };
-
-  hoverPaper = () => {
-    this.setState({
-      hoverPaperAccountSetting: true,
-    });
-  };
-
-  notHoverPaper = () => {
-    this.setState({
-      hoverPaperAccountSetting: false,
-    });
-  };
-
-  componentDidMount() {
-    console.log(this.props.userSession);
-  }
-
+class HomePage extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     return (
       !isEqual(nextProps.userSession, this.props.userSession) ||
@@ -142,10 +129,10 @@ class LandingPage extends React.Component {
 
   render() {
     const { classes, userSession } = this.props;
-    const { hoverPaperAccountSetting } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
+        <Typography className={classes.welcome}>Welcome to Bibliko</Typography>
         {!userSession.hasFinishedSettingUp && (
           <Paper
             className={classes.paperRedirectingToAccountSetting}
@@ -153,13 +140,12 @@ class LandingPage extends React.Component {
             onClick={() => {
               redirectToPage("/setting", this.props);
             }}
-            onMouseEnter={this.hoverPaper}
-            onMouseLeave={this.notHoverPaper}
           >
             <SettingsRoundedIcon
-              className={clsx(classes.accountSettingIcon, {
-                [classes.accountSettingIconAnimation]: hoverPaperAccountSetting,
-              })}
+              className={clsx(
+                classes.accountSettingIcon,
+                classes.accountSettingIconAnimation
+              )}
             />
             <Typography className={classes.accountSettingWords}>
               Setup Your Account Now To Start!
@@ -169,47 +155,32 @@ class LandingPage extends React.Component {
         {userSession.hasFinishedSettingUp && (
           <Grid
             container
-            spacing={6}
+            spacing={8}
             direction="row"
             className={classes.fullHeightWidth}
           >
-            <Grid item xs={12} sm={12} className={classes.itemGrid}>
-              <Typography
-                className={clsx(classes.gridTitle, classes.marketWatch)}
-              >
-                MARKET WATCH
-              </Typography>
+            <Grid
+              item
+              xs={12}
+              md={7}
+              className={clsx(classes.itemGrid, classes.largeMarginBottom)}
+            >
               <MarketWatchPaper />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography
-                className={clsx(classes.gridTitle, classes.stocksOnTheMove)}
-              >
-                STOCKS ON THE MOVE
-              </Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
+
+            <Grid item xs={12} md={5} className={classes.itemGrid}>
+              <MostGainersPaper title={"Most Gainers"} />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography
-                className={clsx(classes.gridTitle, classes.accountSummary)}
-              >
-                ACCOUNT SUMMARY
-              </Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
+
+            <Grid container item xs={12} sm={6} className={classes.itemGrid}>
+              <AccountSummaryPaper />
             </Grid>
+
             <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography className={clsx(classes.gridTitle, classes.rankings)}>
-                RANKINGS
-              </Typography>
+              <Typography className={classes.title}>Rankings</Typography>
               <RankingPaper />
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
             </Grid>
+
             <SpaceDivMainPages />
           </Grid>
         )}
@@ -223,5 +194,5 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(LandingPage))
+  withStyles(styles)(withRouter(HomePage))
 );

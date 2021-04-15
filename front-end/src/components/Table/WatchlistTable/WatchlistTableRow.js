@@ -9,7 +9,8 @@ import { userAction } from "../../../redux/storeActions/actions";
 
 import {
   numberWithCommas,
-  shortenNumber,
+  simplifyNumber,
+  roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
@@ -31,9 +32,9 @@ const styles = (theme) => ({
     borderRightWidth: "0px",
     borderTopWidth: "1px",
     borderBottomWidth: "0px",
-    borderColor: "#2D9CDB",
+    borderColor: theme.palette.secondary.main,
     borderStyle: "solid",
-    backgroundColor: theme.palette.paperBackground.deepBlueTable,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   tableRow: {
     background: "transparent",
@@ -47,22 +48,15 @@ const styles = (theme) => ({
   cellDivName: {
     justifyContent: "flex-start",
   },
-  watchlistButton: {
-    color: "#619FD7",
-    "&:hover": {
-      color: "rgba(97, 159, 215, 0.8)",
-    },
-    padding: "5px",
-  },
   watchlistIcon: {
     height: "30px",
     width: "30px",
   },
   arrowUp: {
-    color: "#219653",
+    color: theme.palette.success.main,
   },
   arrowDown: {
-    color: "#ef0808",
+    color: theme.palette.fail.main,
   },
   marginLeftIfProfitOrLoss: {
     marginLeft: "12px",
@@ -70,9 +64,9 @@ const styles = (theme) => ({
   iconInsideIconButton: {
     height: "22px",
     width: "22px",
-    color: "white",
+    color: theme.palette.fail.main,
     "&:hover": {
-      color: "#e23d3d",
+      color: theme.palette.fail.mainHover,
       cursor: "pointer",
     },
   },
@@ -164,21 +158,23 @@ class WatchlistTableRow extends React.Component {
         return `${this.state.name}`;
 
       case "Price":
-        return `$${numberWithCommas(this.state.price.toFixed(2))}`;
+        return `$${numberWithCommas(roundNumber(this.state.price, 2))}`;
 
       case "Volume":
-        return `${shortenNumber(this.state.volume.toFixed(2))}`;
+        return `${simplifyNumber(this.state.volume, 2)}`;
 
       case "Change %":
         if (this.state.changesPercentage < 0) {
           return `-${numberWithCommas(
-            Math.abs(this.state.changesPercentage).toFixed(2)
+            roundNumber(Math.abs(this.state.changesPercentage), 2)
           )}%`;
         }
-        return `${numberWithCommas(this.state.changesPercentage.toFixed(2))}%`;
+        return `${numberWithCommas(
+          roundNumber(this.state.changesPercentage, 2)
+        )}%`;
 
       case "Market Cap":
-        return `${shortenNumber(this.state.marketCap)}`;
+        return `${simplifyNumber(this.state.marketCap)}`;
 
       default:
         return;

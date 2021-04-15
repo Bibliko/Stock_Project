@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { isEmpty, isEqual, pick } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { socket } from "../../App";
@@ -18,8 +18,7 @@ import { withStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Toolbar,
-  IconButton,
-  Avatar,
+  Button,
   Grid,
   ClickAwayListener,
   Grow,
@@ -27,13 +26,8 @@ import {
   Popper,
   MenuItem,
   MenuList,
-  Tooltip,
+  Typography,
 } from "@material-ui/core";
-
-import {
-  AccountCircleRounded as AccountCircleRoundedIcon,
-  CategoryRounded as CategoryRoundedIcon,
-} from "@material-ui/icons";
 
 const styles = (theme) => ({
   appBar: {
@@ -41,65 +35,40 @@ const styles = (theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: theme.palette.appBarBlue.main,
+    background: theme.palette.paperBackground.main,
     height: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
       height: theme.customHeight.appBarHeightSmall,
     },
   },
-  accountButton: {
+  menuButton: {
+    textTransform: "none",
     height: "fit-content",
     width: "fit-content",
     padding: 0,
-    margin: "6px",
-    marginRight: "12px",
+    minWidth: "0px",
+    margin: "8px",
     [theme.breakpoints.down("xs")]: {
-      margin: "2px",
-      marginRight: "8px",
-    },
-    "& .MuiIconButton-colorPrimary": {
-      color: "white",
-    },
-    "& .MuiTouchRipple-root": {
-      color: "white",
-    },
-    "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      margin: "4px",
     },
   },
-  secondaryMenuButton: {
-    height: "fit-content",
-    width: "fit-content",
-    padding: "4px",
-    margin: "6px",
-    [theme.breakpoints.down("xs")]: {
-      margin: "2px",
-    },
-    "& .MuiIconButton-colorPrimary": {
-      color: "white",
-    },
-    "& .MuiTouchRipple-root": {
-      color: "white",
-    },
+  menuButtonTitle: {
+    color: theme.palette.normalFontColor.primary,
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      color: theme.palette.secondary.main,
     },
+    fontSize: "small",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "xx-small",
+    },
+    fontWeight: "bold",
   },
   normalIcon: {
     height: "30px",
     width: "30px",
     [theme.breakpoints.down("xs")]: {
-      height: "20px",
-      width: "20px",
-    },
-    color: "white",
-  },
-  avatarIcon: {
-    height: "40px",
-    width: "40px",
-    [theme.breakpoints.down("xs")]: {
-      height: "30px",
-      width: "30px",
+      height: "25px",
+      width: "25px",
     },
     color: "white",
   },
@@ -125,20 +94,22 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
+    paddingRight: "10px",
   },
   menuPaper: {
-    backgroundColor: theme.palette.menuBackground.main,
+    backgroundColor: theme.palette.paperBackground.onPage,
+    boxShadow: theme.customShadow.popup,
     color: "white",
     minWidth: "160px",
   },
-  endMenuItem: {
-    marginBottom: "5px",
-  },
-  accountMenuItem: {
-    fontSize: "medium",
+  menuItem: {
+    fontSize: "14px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "0.875rem",
-      minHeight: "40px",
+      fontSize: "12px",
+      minHeight: "20px",
+    },
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
     },
   },
 });
@@ -237,29 +208,40 @@ class PersistentAppBar extends React.Component {
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { classes } = this.props;
 
     const { openAccountMenu, openGameMenu } = this.state;
 
     return (
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" elevation={0} className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Grid className={classes.leftNavbarGrid}>
             <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
-            <Tooltip title="Game">
-              <IconButton
-                disabled={openGameMenu}
-                className={classes.secondaryMenuButton}
-                ref={this.gameAnchorRef}
-                aria-controls={openGameMenu ? "menu-list-grow" : undefined}
-                aria-haspopup="true"
-                onClick={this.toggleGameMenu}
-              >
-                <CategoryRoundedIcon className={classes.normalIcon} />
-              </IconButton>
-            </Tooltip>
+            <Button disableRipple className={classes.menuButton}>
+              <Typography className={classes.menuButtonTitle}>
+                Education
+              </Typography>
+            </Button>
+
+            <Button disableRipple className={classes.menuButton}>
+              <Typography className={classes.menuButtonTitle}>
+                Notifications
+              </Typography>
+            </Button>
+
+            <Button
+              disableRipple
+              disabled={openGameMenu}
+              className={classes.menuButton}
+              ref={this.gameAnchorRef}
+              aria-controls={openGameMenu ? "menu-list-grow" : undefined}
+              aria-haspopup="true"
+              onClick={this.toggleGameMenu}
+            >
+              <Typography className={classes.menuButtonTitle}>Game</Typography>
+            </Button>
             <Popper
               open={openGameMenu}
               anchorEl={this.gameAnchorRef.current}
@@ -289,13 +271,14 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/transactionsHistory", this.props);
                           }}
+                          className={classes.menuItem}
                         >
                           Trading History
                         </MenuItem>
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
-                          className={classes.endMenuItem}
+                          className={classes.menuItem}
                         >
                           Pending Orders
                         </MenuItem>
@@ -306,6 +289,7 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/watchlist", this.props);
                           }}
+                          className={classes.menuItem}
                         >
                           Watchlist
                         </MenuItem>
@@ -314,18 +298,22 @@ class PersistentAppBar extends React.Component {
                           onClick={() => {
                             redirectToPage("/companies", this.props);
                           }}
+                          className={classes.menuItem}
                         >
                           Companies
                         </MenuItem>
 
                         <MenuItem disabled>Explore</MenuItem>
-                        <MenuItem dense>Charts</MenuItem>
+                        <MenuItem dense className={classes.menuItem}>
+                          Charts
+                        </MenuItem>
                         <MenuItem
                           dense
                           onClick={() => {
                             redirectToPage("/ranking", this.props);
                           }}
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          className={classes.menuItem}
                         >
                           Ranking
                         </MenuItem>
@@ -335,35 +323,21 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
-            <Tooltip title="Education">
-              <IconButton className={classes.secondaryMenuButton}>
-                <img
-                  alt="Education"
-                  src="/educationIcon.png"
-                  className={classes.normalIcon}
-                />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Account">
-              <IconButton
-                className={classes.accountButton}
-                disabled={openAccountMenu}
-                ref={this.accountAnchorRef}
-                aria-label="Account Menu"
-                aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
-                aria-haspopup="true"
-                onClick={this.toggleAccountMenu}
-              >
-                {isEmpty(userSession.avatarUrl) ? (
-                  <AccountCircleRoundedIcon className={classes.avatarIcon} />
-                ) : (
-                  <Avatar
-                    className={classes.avatarIcon}
-                    src={userSession.avatarUrl}
-                  />
-                )}
-              </IconButton>
-            </Tooltip>
+
+            <Button
+              className={classes.menuButton}
+              disabled={openAccountMenu}
+              ref={this.accountAnchorRef}
+              aria-label="Account Menu"
+              aria-controls={openAccountMenu ? "menu-list-grow" : undefined}
+              aria-haspopup="true"
+              onClick={this.toggleAccountMenu}
+              disableRipple
+            >
+              <Typography className={classes.menuButtonTitle}>
+                Account
+              </Typography>
+            </Button>
             <Popper
               open={openAccountMenu}
               anchorEl={this.accountAnchorRef.current}
@@ -387,7 +361,7 @@ class PersistentAppBar extends React.Component {
                         onKeyDown={this.handleListKeyDown}
                       >
                         <MenuItem
-                          className={classes.accountMenuItem}
+                          className={classes.menuItem}
                           onClick={() => {
                             redirectToPage("/accountSummary", this.props);
                           }}
@@ -395,7 +369,7 @@ class PersistentAppBar extends React.Component {
                           Account Summary
                         </MenuItem>
                         <MenuItem
-                          className={classes.accountMenuItem}
+                          className={classes.menuItem}
                           onClick={() => {
                             redirectToPage("/setting", this.props);
                           }}
@@ -403,7 +377,7 @@ class PersistentAppBar extends React.Component {
                           Account Settings
                         </MenuItem>
                         <MenuItem
-                          className={classes.accountMenuItem}
+                          className={classes.menuItem}
                           onClick={this.logout}
                         >
                           Log Out

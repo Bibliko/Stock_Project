@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getBackendHost } from "./low-dependency/NetworkUtil";
-import { parseRedisSharesListItem } from "./low-dependency/ParserUtil";
 
 const BACKEND_HOST = getBackendHost();
 
@@ -15,7 +14,9 @@ const getSharesList = "getSharesList";
 const getCachedShareInfo = "getCachedShareInfo";
 const getManyCachedSharesInfo = "getManyCachedSharesInfo";
 
-const getExchangeHistoricalChart = "getExchangeHistoricalChart";
+const getHistoricalChart = "getHistoricalChart";
+
+const getMostGainers = "getMostGainers";
 
 export const getCachedAccountSummaryChartInfo = (email) => {
   return new Promise((resolve, reject) => {
@@ -45,28 +46,10 @@ export const getCachedSharesList = (email) => {
       withCredentials: true,
     })
       .then((res) => {
-        resolve(res);
+        resolve(res.data);
       })
       .catch((e) => {
         reject(e);
-      });
-  });
-};
-
-export const getParsedCachedSharesList = (email) => {
-  return new Promise((resolve, reject) => {
-    getCachedSharesList(email)
-      .then((res) => {
-        const { data: redisSharesString } = res;
-        let shares = [];
-
-        redisSharesString.map((shareString) => {
-          return shares.push(parseRedisSharesListItem(shareString));
-        });
-        resolve(shares);
-      })
-      .catch((err) => {
-        reject(err);
       });
   });
 };
@@ -140,17 +123,23 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
 };
 
 /**
- * @param {string} exchange NYSE or NASDAQ
+ * @param {string} exchangeOrCompany NYSE or NASDAQ or company code
  * @param {string} typeChart 5min or full
+ * @param {boolean} getFromCacheDirectly default: TRUE if NODE_ENV is in development & FALSE if in production
  * @return {Promise<object[]>} historicalChart: array of historical chart timestamp storing OHLCV
  */
-export const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
+export const getCachedHistoricalChart = (
+  exchangeOrCompany,
+  typeChart,
+  getFromCacheDirectly = process.env.NODE_ENV === "development" ? true : false
+) => {
   return new Promise((resolve, reject) => {
-    axios(`${BACKEND_HOST}/redis/${getExchangeHistoricalChart}`, {
+    axios(`${BACKEND_HOST}/redis/${getHistoricalChart}`, {
       method: "get",
       params: {
-        exchange,
+        exchangeOrCompany,
         typeChart,
+        getFromCacheDirectly,
       },
       withCredentials: true,
     })
@@ -164,16 +153,32 @@ export const getCachedExchangeHistoricalChart = (exchange, typeChart) => {
   });
 };
 
+export const getCachedMostGainers = () => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/redis/${getMostGainers}`, {
+      method: "get",
+      withCredentials: true,
+    })
+      .then((gainers) => {
+        resolve(gainers.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export default {
   getCachedAccountSummaryChartInfo,
 
   getCachedSharesList, // Layout.js
-  getParsedCachedSharesList, // AccountSummary, UserUtil
 
   getFullStockInfo,
   getManyFullStocksInfo,
 
   getManyStockInfosUsingPrismaShares,
 
-  getCachedExchangeHistoricalChart,
+  getCachedHistoricalChart,
+
+  getCachedMostGainers,
 };

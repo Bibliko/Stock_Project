@@ -41,15 +41,15 @@ const styles = (theme) => ({
     },
   },
   input: {
-    color: "black",
-    backgroundColor: "rgba(225,225,225,0.6)",
+    color: "white",
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:hover": {
-      backgroundColor: "rgba(225,225,225,0.8)",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
     "& input": {
-      backgroundColor: "rgba(225,225,225,0)",
+      backgroundColor: "transparent",
     },
-    fontSize: "18px",
+    fontSize: "medium",
     height: theme.customHeight.settingTextField,
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
@@ -66,18 +66,18 @@ const styles = (theme) => ({
   },
   title: {
     color: "white",
-    fontSize: "20px",
+    fontSize: "large",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
+      fontSize: "medium",
     },
     paddingLeft: "5px",
     fontWeight: "bold",
   },
   iconButton: {
     color: "white",
-    fontSize: "20px",
+    fontSize: "large",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
+      fontSize: "medium",
     },
     padding: 0,
     margin: "5px",
@@ -162,7 +162,11 @@ class SettingNormalTextField extends React.Component {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton disabled edge="start">
-                  {onHover && <EditRoundedIcon style={{ margin: "-12px" }} />}
+                  {onHover && (
+                    <EditRoundedIcon
+                      style={{ margin: "-12px", color: "white" }}
+                    />
+                  )}
                 </IconButton>
               </InputAdornment>
             ),

@@ -37,17 +37,22 @@ const {
 } = require("./utils/FinancialModelingPrepUtil");
 
 const {
-  updateCachedExchangeHistoricalChartWholeList
-  // updateCachedExchangeHistoricalChartOneItem,
-  // resetAllExchangesHistoricalChart
-} = require("./utils/redis-utils/ExchangeHistoricalChart");
+  SequentialPromisesWithResultsArray
+} = require("./utils/low-dependency/PromisesUtil");
 
-/*
+// const {
+//   updateCachedShareQuotesUsingCache,
+//   updateCachedShareProfilesUsingCache
+// } = require("./utils/redis-utils/SharesInfoBank");
+
 const {
-  updateCachedShareQuotesUsingCache,
-  updateCachedShareProfilesUsingCache
-} = require("./utils/redis-utils/SharesInfoBank");
-*/
+  updateCompaniesRatingsList
+} = require("./utils/PrismaCompanyRatingUtil");
+
+const {
+  getMostGainersAndCache,
+  updateMostGainersDaily
+} = require("./utils/redis-utils/MostGLA");
 
 const { startSocketIO } = require("./socketIO");
 
@@ -117,53 +122,29 @@ setupPassport(passport);
  */
 var globalBackendVariables = {
   isMarketClosed: false,
-  hasUpdatedAllUsersToday: false,
   isPrismaMarketHolidaysInitialized: false,
+
   hasReplacedAllExchangesHistoricalChart: false,
+  hasUpdatedAllUsersToday: false,
+  hasUpdatedMostGainersToday: false,
 
   updatedAllUsersFlag: false, // value true or false does not mean anything. This is just a flag
   updatedRankingListFlag: false, // value true or false does not mean anything. This is just a flag
-  NYSE: {
-    updatedExchangeHistoricalChart5minFlag: false,
-    updatedExchangeHistoricalChartFullFlag: false
-  },
-  NASDAQ: {
-    updatedExchangeHistoricalChart5minFlag: false,
-    updatedExchangeHistoricalChartFullFlag: false
-  }
+  updatedMostGainersFlag: false
 };
 
+const tasksList = [];
+
 // This function helps initialize prisma market holidays at first run
-updateMarketHolidaysFromFMP(globalBackendVariables);
+tasksList.push(() => updateMarketHolidaysFromFMP(globalBackendVariables));
 
-// This function helps initialize exchange NYSE historical chart 5min at first run
-updateCachedExchangeHistoricalChartWholeList(
-  "NYSE",
-  "5min",
-  false,
-  globalBackendVariables
-);
-updateCachedExchangeHistoricalChartWholeList(
-  "NYSE",
-  "full",
-  false,
-  globalBackendVariables
-);
-updateCachedExchangeHistoricalChartWholeList(
-  "NASDAQ",
-  "5min",
-  false,
-  globalBackendVariables
-);
-updateCachedExchangeHistoricalChartWholeList(
-  "NASDAQ",
-  "full",
-  false,
-  globalBackendVariables
-);
-globalBackendVariables.hasReplacedAllExchangesHistoricalChart = true;
+tasksList.push(() => updateRankingList(globalBackendVariables));
 
-updateRankingList(globalBackendVariables);
+tasksList.push(() => updateCompaniesRatingsList());
+
+tasksList.push(() => getMostGainersAndCache(globalBackendVariables));
+
+SequentialPromisesWithResultsArray(tasksList).catch((err) => console.log(err));
 
 const setupBackendIntervals = () => {
   // Check Market Closed
@@ -178,63 +159,40 @@ const setupBackendIntervals = () => {
   );
   setInterval(deletePrismaMarketHolidays, oneDay);
 
-  // setInterval(
-  //   () => resetAllExchangesHistoricalChart(globalBackendVariables),
-  //   oneSecond
-  // );
+  // // Update Cached Shares
 
   // setInterval(() => {
-  //   if (
+  //   if(
   //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
   //     !globalBackendVariables.isMarketClosed
   //   ) {
-  //     updateCachedExchangeHistoricalChartOneItem(
-  //       "NYSE",
-  //       "5min",
-  //       globalBackendVariables
-  //     );
-  //     // updateCachedExchangeHistoricalChartOneItem("NASDAQ", "5min", globalBackendVariables)
+  //     updateCachedShareQuotesUsingCache()
+  //     .catch(err => console.log(err));
   //   }
-  // }, 5 * oneMinute);
+  // }, 2 * oneSecond);
+
   // setInterval(() => {
-  //   if (
+  //   if(
   //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
   //     !globalBackendVariables.isMarketClosed
   //   ) {
-  //     updateCachedExchangeHistoricalChartOneItem("NYSE", "full", globalBackendVariables)
-  //     updateCachedExchangeHistoricalChartOneItem("NASDAQ", "full", globalBackendVariables)
+  //     updateCachedShareProfilesUsingCache()
+  //     .catch(err => console.log(err));
   //   }
-  // }, oneDay);
+  // }, oneMinute);
 
-  /*
-    // Update Cached Shares
+  setInterval(() => updateMostGainersDaily(globalBackendVariables), oneSecond);
 
-    setInterval(() => {
-      if(
-        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
-        !globalBackendVariables.isMarketClosed
-      ) {
-        updateCachedShareQuotesUsingCache()
-        .catch(err => console.log(err));
-      }
-    }, 2 * oneSecond);
-
-    setInterval(() => {
-      if(
-        globalBackendVariables.isPrismaMarketHolidaysInitialized && 
-        !globalBackendVariables.isMarketClosed
-      ) {
-        updateCachedShareProfilesUsingCache()
-        .catch(err => console.log(err));
-      }
-    }, oneMinute);
-  */
-
-  // Update all users portfolioLastClosure
+  // Change flag and update all users data in database
   setInterval(() => checkAndUpdateAllUsers(globalBackendVariables), oneSecond);
 
   // All Users Ranking List
   setInterval(() => updateRankingList(globalBackendVariables), 10 * oneMinute);
+
+  // Update the companies' ratings
+  // parameter: forceUpdate <Boolean>
+  // If forceUpdate is true and system is in developer mode, does not need to call API.
+  setInterval(() => updateCompaniesRatingsList(), oneDay);
 };
 
 setupBackendIntervals();
@@ -262,14 +220,10 @@ app.use("/marketHolidaysData", require("./routes/marketHolidays"));
 app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
+app.use("/companyRating", require("./routes/companyRating"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
-  const flags = [
-    "updatedAllUsersFlag",
-    "updatedRankingListFlag",
-    "NYSE",
-    "NASDAQ"
-  ];
+  const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];
   const flagsResult = pick(globalBackendVariables, flags);
   res.send(flagsResult);
 });

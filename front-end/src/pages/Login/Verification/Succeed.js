@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../../utils/low-dependency/PageRedirectUtil";
 
@@ -40,7 +40,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -55,7 +55,8 @@ const styles = (theme) => ({
   },
   title: {
     fontSize: "large",
-    color: theme.palette.succeed.main,
+    fontWeight: "bold",
+    color: theme.palette.secondary.main,
   },
   avatar: {
     height: "130px",
@@ -65,7 +66,7 @@ const styles = (theme) => ({
   succeedIcon: {
     height: "100px",
     width: "100px",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   mainGridOfPaper: {
     display: "flex",
@@ -80,14 +81,13 @@ const styles = (theme) => ({
 
 class Succeed extends React.Component {
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    console.log(this.props.userSession);
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }

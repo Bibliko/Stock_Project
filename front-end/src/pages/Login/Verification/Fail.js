@@ -3,7 +3,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../../utils/low-dependency/PageRedirectUtil";
 
@@ -39,7 +39,7 @@ const styles = (theme) => ({
     background: theme.palette.gradientPaper.main,
   },
   div: {
-    backgroundColor: "black",
+    backgroundColor: theme.palette.loginBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100vw",
@@ -54,6 +54,7 @@ const styles = (theme) => ({
   },
   title: {
     fontSize: "large",
+    fontWeight: "bold",
     color: theme.palette.fail.main,
   },
   avatar: {
@@ -78,18 +79,19 @@ const styles = (theme) => ({
   backToLoginText: {
     fontSize: "15px",
     fontWeight: "600",
+    color: theme.palette.loginLink.main,
   },
 });
 
 class Fail extends React.Component {
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
@@ -97,7 +99,7 @@ class Fail extends React.Component {
   render() {
     const { classes } = this.props;
 
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       return null;
     }
 
