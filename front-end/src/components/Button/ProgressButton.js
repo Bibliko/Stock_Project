@@ -10,9 +10,9 @@ const styles = (theme) => ({
     width: "100%",
   },
   buttonSuccess: {
-    backgroundColor: `${theme.palette.secondary.main} !important`,
+    backgroundColor: `${theme.palette.success.main} !important`,
     "&:hover": {
-      backgroundColor: `${theme.palette.secondary.mainHover} !important`,
+      backgroundColor: `${theme.palette.success.mainHover} !important`,
     },
   },
   buttonFail: {

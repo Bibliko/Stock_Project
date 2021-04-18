@@ -1,23 +1,39 @@
+export const ratingValue = {
+	"-": 0,
+	"C-": 1,
+	"C": 2,
+	"C+": 3,
+	"B-": 4,
+	"B": 5,
+	"B+": 6,
+	"A-": 7,
+	"A": 8,
+	"A+": 9,
+	"S-": 10,
+	"S": 11,
+	"S+": 12,
+};
+
 export const fmpSector = [
 	"All",
-  "Basic Materials",
-  "Building",
-  "Communication Services",
-  "Conglomerates",
-  "Consumer Cyclical",
-  "Consumer Defensive",
-  "Energy",
-  "Financial",
-  "Financial Services",
-  "Healthcare",
-  "Industrial Goods",
-  "Industrials",
-  "Media",
-  "Pharmaceuticals",
-  "Real Estate",
-  "Services",
-  "Technology",
-  "Utilities",
+	"Basic Materials",
+	"Building",
+	"Communication Services",
+	"Conglomerates",
+	"Consumer Cyclical",
+	"Consumer Defensive",
+	"Energy",
+	"Financial",
+	"Financial Services",
+	"Healthcare",
+	"Industrial Goods",
+	"Industrials",
+	"Media",
+	"Pharmaceuticals",
+	"Real Estate",
+	"Services",
+	"Technology",
+	"Utilities",
 ];
 
 export const fmpIndustry = [
@@ -192,6 +208,7 @@ export const fmpIndustry = [
 ];
 
 export default {
-  fmpSector,
-  fmpIndustry,
+	ratingValue,
+	fmpSector,
+	fmpIndustry,
 };

@@ -55,7 +55,6 @@ const styles = (theme) => ({
     alignItems: "center",
     gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
     gridTemplateRows: "0.5fr 1fr",
-    height: "100%",
   },
   clockContainer: {
     height: "100%",
@@ -73,6 +72,8 @@ const styles = (theme) => ({
     justifyContent: "center",
     gridArea: "2 / 1 / 3 / 6",
     backgroundColor: "#1D212D",
+    paddingTop: "14px",
+    paddingBottom: "14px",
   },
   collapseButton: {
     color: "white",
@@ -232,7 +233,7 @@ class SubNavbar extends React.Component {
                   />
                 );
               })
-            ) : (
+            ) : (mediaQuery &&
               <Slide appear={false} direction="down" in={showCards}>
                 <div className={classes.progressContainer}>
                   <CircularProgress size={24} />
