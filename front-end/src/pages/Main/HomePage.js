@@ -57,15 +57,6 @@ const styles = (theme) => ({
     minHeight: "125px",
     //maxHeight: '300px'
   },
-  title: {
-    fontSize: "large",
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "medium",
-    },
-    fontWeight: "bold",
-    marginBottom: "12px",
-    color: theme.palette.primary.main,
-  },
   paperRedirectingToAccountSetting: {
     height: theme.customHeight.redirectingPaper,
     width: theme.customWidth.redirectingPaper,
@@ -172,12 +163,11 @@ class HomePage extends React.Component {
               <MostGainersPaper title={"Most Gainers"} />
             </Grid>
 
-            <Grid container item xs={12} sm={6} className={classes.itemGrid}>
+            <Grid container item xs={12} sm={6} md={7} className={classes.itemGrid}>
               <AccountSummaryPaper />
             </Grid>
 
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography className={classes.title}>Rankings</Typography>
+            <Grid item xs={12} sm={6} md={5} className={classes.itemGrid}>
               <RankingPaper />
             </Grid>
 

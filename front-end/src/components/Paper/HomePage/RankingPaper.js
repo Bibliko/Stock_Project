@@ -1,175 +1,187 @@
 import React from "react";
-import { AppBar, Tabs, Tab, Box, Typography, Button } from "@material-ui/core";
-import PropTypes from "prop-types";
+import { withRouter } from "react-router";
+import { Typography, Avatar } from "@material-ui/core";
 import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
-import { getOverallRanking, getRegionalRanking } from "../../../utils/UserUtil";
+import { getOverallRanking, getUserData } from "../../../utils/UserUtil";
 import { withStyles } from "@material-ui/core/styles";
-import SwipeableViews from "react-swipeable-views";
+
+import HomePageRankingTable from "../../Table/RankingTable/HomePageRankingTable";
 
 const styles = (theme) => ({
-  root: {
-    // width: theme.customWidth.redirectingPaper,
-    // height: theme.customHeight.redirectingPaper,
-    backgroundColor: theme.palette.paperBackground.onPage,
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100%",
-    width: "100%",
-    minHeight: "200px",
-  },
-  appBar: {
-    flexGrow: 1,
-    width: "100%",
-    backgroundColor: "white",
-  },
-  tab: {
-    color: "#9ED2EF",
-  },
-  button: {
-    marginRight: "30px",
-    marginBottom: "40px",
-    color: "#9ED2EF",
-    fontWeight: "bold",
-  },
+	root: {
+		width: "100%",
+		height: "100%",
+	},
+	title: {
+		cursor: "pointer",
+		fontSize: "x-large",
+		[theme.breakpoints.down("sm")]: {
+			fontSize: "large",
+		},
+		fontWeight: "bold",
+		marginBottom: "12px",
+		color: theme.palette.primary.main,
+		"&:hover": {
+			color: theme.palette.primary.hover,
+		},
+	},
+	rank: {
+		fontSize: "20px",
+		[theme.breakpoints.down("sm")]: {
+			fontSize: "16px",
+		},
+		fontWeight: "bold",
+		color: theme.palette.secondary.main,
+	},
+	name: {
+		fontSize: "18px",
+		[theme.breakpoints.down("sm")]: {
+			fontSize: "16px",
+		},
+		fontWeight: "300",
+		color: theme.palette.secondary.main,
+	},
+	portfolioValue: {
+		fontSize: "14px",
+		[theme.breakpoints.down("sm")]: {
+			fontSize: "13px",
+		},
+		fontWeight: "light",
+		color: "gray",
+	},
+	topUser: {
+		width: "100%",
+		marginTop: "20px",
+		marginBottom: "40px",
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	avatar: {
+		width: "120px",
+		height: "120px",
+		[theme.breakpoints.down("sm")]: {
+			width: "105px",
+			height: "105px",
+		},
+		border: "4px solid",
+		borderColor: theme.palette.primary.subDark,
+		boxShadow: "0px 3px 20px rgba(200, 200, 200, 0.5)",
+	},
+	firstPlace: {
+		transform: "scale(1.2)",
+		zIndex: "5",
+	},
+	footer: {
+		cursor: "pointer",
+		padding: "7px",
+		fontSize: "small",
+		color: "white",
+		"&:hover": {
+			textDecoration: "underline",
+			color: theme.palette.normalFontColor.secondary,
+		},
+	},
 });
 
-function TabPanel(props) {
-  const { children, selectedTab, index, ...other } = props;
+function avatarFrame (user, rank, classes) {
+	if (!user) return;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={selectedTab !== index}
-      id={`scrollable-auto-tabpanel-${index}`}
-      aria-labelledby={`scrollable-auto-tab-${index}`}
-      {...other}
-    >
-      {selectedTab === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
+	const position = ["1st", "2nd", "3rd"];
+	const { avatarUrl, firstName, lastName, totalPortfolio } = user;
+	const fullName = firstName + " " + lastName;
 
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  selectedTab: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `scrollable-auto-tab-${index}`,
-    "aria-controls": `scrollable-auto-tabpanel-${index}`,
-  };
+	return (
+		<React.Fragment>
+			<Typography align="center" className={classes.rank}> {position[rank]} </Typography>
+			<Avatar
+					src={avatarUrl}
+					className={classes.avatar}
+			/> 
+			<Typography align="center" className={classes.name}> {fullName} </Typography>
+			<Typography align="center" className={classes.portfolioValue}> {`$${totalPortfolio}`} </Typography>
+		</React.Fragment>
+	)
 }
 
 class RankingPaper extends React.Component {
-  state = {
-    overall: [],
-    region: [],
-    selectedTab: 0,
-  };
+	state = {
+		top3Users: [],
+		top4To8Users: [],
+	};
 
-  handleChange = (event, newSelectedTab) => {
-    this.setState({
-      selectedTab: newSelectedTab,
-    });
-  };
+	componentDidMount() {
+		getOverallRanking(1)
+			.then((top8Users) => {
+				let top3Users = top8Users.slice(0, 3);
+				const dataNeeded = {
+					avatarUrl: true,
+				};
 
-  handleChangeIndex = (index) => {
-    this.setState({
-      selectedTab: index,
-    });
-  };
+				return Promise.all([
+					top3Users,
+					top8Users.slice(3, 8),
+					// Get avatarUrls of top 3 users
+					getUserData(dataNeeded, top3Users[0].email),
+					getUserData(dataNeeded, top3Users[1].email),
+					getUserData(dataNeeded, top3Users[2].email)
+				]);
+			})
+			.then(([top3Users, top4To8Users, ...top3UsersAvatar]) => {
+				// attach avatarUrl to top3Users
+				top3Users.forEach((user, id) => {
+					user.avatarUrl = top3UsersAvatar[id].avatarUrl;
+				});
 
-  componentDidMount() {
-    getOverallRanking(1).then((top8UsersOnPage1) => {
-      console.log(top8UsersOnPage1);
-      this.setState({
-        overall: top8UsersOnPage1,
-      });
-    });
-    const region = this.state;
-    getRegionalRanking(1, region).then((top8UsersOnPage1) => {
-      console.log(top8UsersOnPage1);
-      this.setState({
-        region: top8UsersOnPage1,
-      });
-    });
-  }
+				this.setState({
+					top3Users: top3Users,
+					top4To8Users: top4To8Users
+				});
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
 
-  render() {
-    const { overall, region, selectedTab } = this.state;
-    const { classes } = this.props;
-    return (
-      <div className={classes.root}>
-        <AppBar className={classes.appBar} position="static">
-          <Tabs
-            value={selectedTab}
-            onChange={this.handleChange}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="scrollable"
-            scrollButtons="auto"
-            className={classes.tab}
-          >
-            <Tab label="Overall Ranking" {...a11yProps(0)} />
-            <Tab label="Region Ranking" {...a11yProps(1)} />
-            <Tab label="Top 5 User" {...a11yProps(2)} />
-          </Tabs>
-        </AppBar>
-        <SwipeableViews
-          index={selectedTab}
-          onChangeIndex={this.handleChangeIndex}
-        >
-          <TabPanel value={selectedTab} index={0}>
-            {this.state.overall}
-            <Button
-              variant="text"
-              size="small"
-              onClick={() => {
-                redirectToPage("/ranking", this.props);
-              }}
-              className={classes.button}
-            >
-              See more
-            </Button>
-          </TabPanel>
-          <TabPanel value={selectedTab} index={1}>
-            {this.state.region}
-            <Button
-              variant="text"
-              size="small"
-              onClick={() => {
-                redirectToPage("/ranking", this.props);
-              }}
-              className={classes.button}
-            >
-              See more
-            </Button>
-          </TabPanel>
-          <TabPanel value={selectedTab} index={2}>
-            {this.state.overall.slice(0, 5)}
-            {this.state.region.slice(0, 5)}
-            <Button
-              variant="text"
-              size="small"
-              color="primary"
-              onClick={() => {
-                redirectToPage("/ranking", this.props);
-              }}
-              className={classes.button}
-            >
-              See more
-            </Button>
-          </TabPanel>
-        </SwipeableViews>
-      </div>
-    );
-  }
+	render() {
+		const { top3Users, top4To8Users } = this.state;
+		const { classes } = this.props;
+
+		return (
+			<div className={classes.root}>
+				<Typography
+					className={classes.title}
+					onClick={() => {redirectToPage("/ranking", this.props);}}
+				>
+					{"Ranking"}
+				</Typography>
+
+				<div className={classes.topUser}>
+					<div style={{transform: "translateX(15px) translateY(10px)"}}>
+						{avatarFrame(top3Users[1], 1, classes)}
+					</div>
+
+					<div className={classes.firstPlace}>
+						{avatarFrame(top3Users[0], 0, classes)}
+					</div>
+
+					<div style={{transform: "translateX(-15px) translateY(10px)"}}>
+						{avatarFrame(top3Users[2], 2, classes)}
+					</div>
+				</div>
+
+				<HomePageRankingTable users={top4To8Users} />
+
+				<Typography
+					className={classes.footer}
+					onClick={() => {redirectToPage("/ranking", this.props);}}
+					align={"right"}
+				>
+					{"View full ranking"}
+				</Typography>
+			</div>
+		);
+	}
 }
 
-export default withStyles(styles)(RankingPaper);
+export default withStyles(styles)(withRouter(RankingPaper));

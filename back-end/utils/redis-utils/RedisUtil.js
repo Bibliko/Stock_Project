@@ -171,7 +171,7 @@ const removeCachedVerificationCode = (email, cacheKey) => {
  * @param user User object containing attributes as in Prisma User Model
  */
 const redisUpdateOverallRankingList = (user) => {
-  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}|${user.email}`;
   return listPushAsync(rankingList, value);
 };
 
@@ -181,7 +181,7 @@ const redisUpdateOverallRankingList = (user) => {
  * @param user User object containing attributes as in Prisma User Model
  */
 const redisUpdateRegionalRankingList = (region, user) => {
-  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}|${user.email}`;
   return listPushAsync(`${rankingList}_${region}`, value);
 };
 
