@@ -31,7 +31,6 @@ COPY bin/ bin/
 RUN npm run deps
 
 COPY . .
-
 RUN npm run build
 
 EXPOSE 4000

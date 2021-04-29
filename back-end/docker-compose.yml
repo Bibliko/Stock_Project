@@ -10,16 +10,12 @@ services:
     environment:
       POSTGRES_USER: funstockmarket
       POSTGRES_PASSWORD: funstockmarket
-    networks:
-      - back-end-networks
     volumes:
       - db:/var/lib/postgresql/data
 
   adminer:
     image: adminer
     restart: always
-    networks:
-      - back-end-networks
     ports:
       - 8080:8080
 
@@ -28,8 +24,6 @@ services:
     ports:
       - 6379:6379
     command: redis-server --requirepass funstockmarket
-    networks:
-      - back-end-networks
     volumes:
       - redis:/data
 
@@ -42,8 +36,6 @@ services:
       - back-end:/Stock_Project/back-end
     env_file: .env
     restart: always
-    networks:
-      - back-end-networks
     build:
       context: .
       dockerfile: Dockerfile
@@ -69,8 +61,6 @@ services:
         MAILGUN_API_KEY: ${MAILGUN_API_KEY}
         SENDGRID_API_KEY: ${SENDGRID_API_KEY}
 
-networks:
-  back-end-networks:
 
 volumes:
   db:

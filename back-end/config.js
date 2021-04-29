@@ -1,5 +1,5 @@
 require('dotenv').config();
-module.exports.default = {
+module.exports = {
     PORT: process.env.PORT,
     NODE_ENV: process.env.NODE_ENV,
     FRONTEND_HOST: process.env.FRONTEND_HOST,

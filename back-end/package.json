@@ -25,7 +25,7 @@
     "deps:default": "sh ./bin/Deps/Deps.sh",
     "help": "npx babel-node bin/Help",
     "clean": "npx rimraf ./build",
-    "build": "npm run clean-build && npx babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*','bin/*'"
+    "build": "npm run clean && npx babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*','bin/*'"
   },
   "keywords": [],
   "author": "",
