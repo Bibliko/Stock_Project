@@ -2,7 +2,7 @@ const ip = require("ip");
 const myIPAddress = ip.address();
 
 const getFrontendHost = () => {
-  const { NODE_ENV, FRONTEND_HOST } = process.env;
+  const { NODE_ENV, FRONTEND_HOST } = require('../../config');
 
   if (NODE_ENV === "development") {
     console.log(myIPAddress, "NetworkUtil.js 8");
@@ -13,7 +13,7 @@ const getFrontendHost = () => {
 };
 
 const getPassportCallbackHost = () => {
-  const { NODE_ENV, PASSPORT_CALLBACK_HOST } = process.env;
+  const { NODE_ENV, PASSPORT_CALLBACK_HOST } = require('../../config');
 
   if (NODE_ENV === "development") {
     return `http://${myIPAddress}:3000/api`;

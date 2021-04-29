@@ -10,7 +10,7 @@ const {
 
 const { updatePrismaMarketHolidays } = require("./MarketHolidaysUtil");
 
-const { FINANCIAL_MODELING_PREP_API_KEY } = process.env;
+const { FINANCIAL_MODELING_PREP_API_KEY } = require('../config');
 
 /**
  *  @description

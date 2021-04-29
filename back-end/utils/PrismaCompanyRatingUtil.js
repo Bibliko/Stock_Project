@@ -9,6 +9,8 @@ const {
   getFullStockRatingsFromFMP
 } = require("./FinancialModelingPrepUtil.js");
 
+const { NODE_ENV } = require('../config');
+
 const executeUpdateCompaniesRatingsList = () => {
   return new Promise((resolve, reject) => {
     console.log("Updating companies' ratings");
@@ -69,7 +71,7 @@ const executeUpdateCompaniesRatingsList = () => {
  */
 const updateCompaniesRatingsList = (forceUpdate = false) => {
   return new Promise((resolve, reject) => {
-    if (!forceUpdate && process.env.NODE_ENV === "development") {
+    if (!forceUpdate && NODE_ENV === "development") {
       prisma.companyRating
         .count()
         .then((countModels) => {

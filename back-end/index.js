@@ -8,12 +8,6 @@
  * - 6th part: socket
  */
 
-try {
-  require("./config/config");
-} catch (err) {
-  console.log("No config found. Using default ENV.");
-}
-
 const {
   oneSecond,
   oneDay,
@@ -56,7 +50,7 @@ const {
 
 const { startSocketIO } = require("./socketIO");
 
-const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const { PORT, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = require('./config');
 const express = require("express");
 const app = express();
 const { pick } = require("lodash");
@@ -234,6 +228,6 @@ app.use("/getGlobalBackendVariablesFlags", (_, res) => {
 startSocketIO(server, globalBackendVariables);
 
 // back-end server listen
-server.listen(port, () => {
-  console.log(`server is listening on port ${port}\n`);
+server.listen(PORT, () => {
+  console.log(`server is listening on port ${PORT}\n`);
 });
