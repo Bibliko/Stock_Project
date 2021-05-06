@@ -66,7 +66,7 @@ const setTimeCleaningRoom = (userID, userEmail, timeoutCleaningRooms) => {
  * @param userSessions Map containing userSession information for each room
  */
 const startSocketIO = (server, globalBackendVariables) => {
-  const io = socketIO(server);
+  const io = socketIO(server, { transports: ['websocket', 'polling', 'flashsocket'] });
 
   let countSocketsInMainHall = 0;
 

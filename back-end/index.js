@@ -86,7 +86,7 @@ const corsOptions = {
     if (NODE_ENV === "development") {
       callback(null, true);
     } else {
-      if (whitelist.indexOf(origin) !== -1) {
+      if (whitelist.indexOf(origin) !== -1 || (NODE_ENV === 'qa' && origin === undefined)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));

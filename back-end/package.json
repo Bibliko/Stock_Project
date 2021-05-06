@@ -16,7 +16,7 @@
     "docker-stop-containers:default": "docker stop $(docker ps -a -q)",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "start": "node ./build/index.js",
-    "dev": "node ./bin/etc/CheckConfigFolder.js && npm run update-db && npx nodemon --exec npx babel-node index.js",
+    "dev": "npm run update-db && npx nodemon --exec npx babel-node index.js",
     "devWithChangedConfig": "npm run update-db && npx nodemon --exec npx babel-node index.js",
     "prettier": "npx prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
     "fix": "npm run prettier && (npx flow & npx eslint . --fix)",

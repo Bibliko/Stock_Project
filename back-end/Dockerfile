@@ -28,10 +28,11 @@ COPY package-lock.json package-lock.json
 COPY .flowconfig .flowconfig
 COPY bin/ bin/
 
-RUN npm run deps
+RUN npm i
 
 COPY . .
 RUN npm run build
+RUN npx prisma generate
 
 EXPOSE 4000
 CMD npm start
