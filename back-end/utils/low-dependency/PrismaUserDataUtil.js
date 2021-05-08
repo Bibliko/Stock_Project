@@ -23,7 +23,7 @@ const getUserData = (email, dataNeeded) => {
     }
 
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         },
@@ -54,7 +54,12 @@ const getUserAccountSummaryChartTimestamps = (email, afterOrEqualThisYear) => {
           year: {
             gte: afterOrEqualThisYear
           }
-        }
+        },
+        orderBy: [
+          {
+            createdAt: "asc"
+          }
+        ]
       })
       .then((data) => {
         resolve(data);
@@ -80,7 +85,12 @@ const getUserRankingTimestamps = (email, afterOrEqualThisYear) => {
           year: {
             gte: afterOrEqualThisYear
           }
-        }
+        },
+        orderBy: [
+          {
+            createdAt: "asc"
+          }
+        ]
       })
       .then((data) => {
         resolve(data);

@@ -1,5 +1,3 @@
-// @flow
-
 const { PrismaClient } = require("@prisma/client");
 const LocalStrategy = require("passport-local").Strategy;
 const prisma = new PrismaClient();
@@ -22,7 +20,7 @@ const signupStrategy = new LocalStrategy(
   (email, password, done) => {
     console.log(email);
     prisma.user
-      .findOne({
+      .findUnique({
         where: {
           email
         }

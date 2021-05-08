@@ -6,7 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
@@ -69,14 +69,17 @@ const styles = (theme) => ({
     padding: theme.spacing(1),
     height: "40px",
     width: "120px",
-    background: "black",
-    "&:hover": {
-      backgroundColor: "black",
-      opacity: 0.8,
-    },
     borderRadius: "40px",
     color: "white",
     fontWeight: "bold",
+    backgroundColor: theme.palette.submitButton.main,
+    "&:hover": {
+      backgroundColor: theme.palette.submitButton.main,
+      opacity: 0.8,
+    },
+    "& .MuiTouchRipple-root span": {
+      backgroundColor: "rgba(255, 255, 255, 0.5)",
+    },
   },
   link: {
     color: theme.palette.loginLink.main,
@@ -112,7 +115,7 @@ const styles = (theme) => ({
     marginTop: "5px",
     display: "flex",
     justifyContent: "center",
-    minHeight: "20px",
+    minHeight: "30px",
   },
   errorText: {
     fontSize: "medium",
@@ -206,13 +209,13 @@ class Login extends React.Component {
   };
 
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
@@ -221,7 +224,7 @@ class Login extends React.Component {
     const { classes } = this.props;
     const { error } = this.state;
 
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       return null;
     }
 
@@ -288,6 +291,7 @@ class Login extends React.Component {
                     redirectToPage("/signup", this.props);
                   }}
                   className={classes.link}
+                  disableRipple
                 >
                   Create an account
                 </Button>
@@ -302,6 +306,7 @@ class Login extends React.Component {
                     redirectToPage("/forgotpassword", this.props);
                   }}
                   className={classes.link}
+                  disableRipple
                 >
                   Forgot password
                 </Button>

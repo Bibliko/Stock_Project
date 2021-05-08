@@ -5,7 +5,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import {
-  shouldRedirectToLandingPage,
+  shouldRedirectToHomePage,
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import {
@@ -102,7 +102,7 @@ const styles = (theme) => ({
   successText: {
     fontSize: "medium",
     fontWeight: "bold",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   orLogInWith: {
     fontWeight: "normal",
@@ -128,9 +128,9 @@ const styles = (theme) => ({
     padding: theme.spacing(1),
     height: "40px",
     width: "120px",
-    background: "black",
+    background: theme.palette.submitButton.main,
     "&:hover": {
-      backgroundColor: "black",
+      backgroundColor: theme.palette.submitButton.main,
       opacity: 0.8,
     },
     borderRadius: "40px",
@@ -290,13 +290,13 @@ class ForgotPassword extends React.Component {
   };
 
   componentDidMount() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
 
   componentDidUpdate() {
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
     }
   }
@@ -311,7 +311,7 @@ class ForgotPassword extends React.Component {
       error,
     } = this.state;
 
-    if (shouldRedirectToLandingPage(this.props)) {
+    if (shouldRedirectToHomePage(this.props)) {
       return null;
     }
 
@@ -451,12 +451,14 @@ class ForgotPassword extends React.Component {
               >
                 <Grid item xs className={classes.center}>
                   <Button
+                    color="primary"
                     classes={{
                       root: classes.backToLoginText,
                     }}
                     onClick={() => {
                       redirectToPage("/login", this.props);
                     }}
+                    disableRipple
                   >
                     Login
                   </Button>

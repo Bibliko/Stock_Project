@@ -4,6 +4,8 @@ import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import SwipeableViews from "react-swipeable-views";
 
+import { changeOpacityOfRGBAString } from "../../theme/ThemeUtil";
+
 import Type from "../TabPanel/TransactionsHistoryFilterTabPanel/type";
 import Code from "../TabPanel/TransactionsHistoryFilterTabPanel/code";
 import TransactionTime from "../TabPanel/TransactionsHistoryFilterTabPanel/transactionTime";
@@ -48,15 +50,18 @@ const styles = (theme) => ({
     },
   },
   dialogAppBar: {
-    backgroundColor: theme.palette.appBarBlue.main,
+    background: theme.palette.primary.subDarker,
   },
   tab: {
     "&.MuiTab-textColorPrimary": {
       "&.Mui-selected": {
-        color: theme.palette.primary.main,
+        color: theme.palette.secondary.main,
       },
-      color: "white",
+      color: theme.palette.normalFontColor.primary,
     },
+  },
+  tabs: {
+    color: theme.palette.secondary.main,
   },
   views: {
     width: "100%",
@@ -84,7 +89,7 @@ const styles = (theme) => ({
     position: "absolute",
     bottom: "0px",
     right: "50px",
-    color: theme.palette.succeed.main,
+    color: theme.palette.secondary.main,
   },
   clearAll: {
     alignSelf: "flex-end",
@@ -93,9 +98,12 @@ const styles = (theme) => ({
     right: "10px",
     color: theme.palette.fail.main,
     fontWeight: "bold",
-    backgroundColor: theme.palette.fail.backgroundColor,
+    backgroundColor: changeOpacityOfRGBAString(theme.palette.fail.main, "0.1"),
     "&:hover": {
-      backgroundColor: theme.palette.fail.backgroundColorHover,
+      backgroundColor: changeOpacityOfRGBAString(
+        theme.palette.fail.main,
+        "0.2"
+      ),
     },
     zIndex: theme.customZIndex.floatingActionButton,
   },
@@ -244,10 +252,9 @@ class TransactionsHistoryFilterDialog extends React.Component {
           <Tabs
             value={tabPage}
             onChange={this.handleChangeTabPage}
-            indicatorColor="primary"
-            textColor="primary"
             variant="fullWidth"
             aria-label="full width tabs example"
+            className={classes.tabs}
           >
             <Tab label="Strings" {...tabProps(0)} className={classes.tab} />
             <Tab label="Numbers" {...tabProps(1)} className={classes.tab} />

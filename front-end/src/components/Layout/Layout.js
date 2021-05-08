@@ -27,6 +27,7 @@ import {
 import { getGlobalBackendVariablesFlags } from "../../utils/BackendUtil";
 
 import AppBar from "./AppBar";
+import SubNavbar from "./SubNavbar";
 import Reminder from "../Reminder/Reminder";
 import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
 
@@ -57,21 +58,21 @@ const styles = (theme) => ({
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(0, 1),
-    minHeight: theme.customHeight.appBarHeight,
+    minHeight: `calc(${theme.customHeight.appBarHeight} + ${theme.customHeight.subBarHeight})`,
     [theme.breakpoints.down("xs")]: {
-      minHeight: theme.customHeight.appBarHeightSmall,
+      minHeight: `calc(${theme.customHeight.appBarHeightSmall} + ${theme.customHeight.appBarHeightSmall})`,
     },
     justifyContent: "flex-start",
   },
-  gradientBackground: {
-    background: theme.palette.paperBackground.gradient,
-    backgroundSize: "cover",
-    height: "100%",
-    width: "100%",
-    position: "fixed",
-  },
-  secondLayerBackground: {
-    background: theme.palette.paperBackground.secondLayer,
+  // gradientBackground: {
+  //   background: theme.palette.paperBackground.gradient,
+  //   backgroundSize: "cover",
+  //   height: "100%",
+  //   width: "100%",
+  //   position: "fixed",
+  // },
+  background: {
+    backgroundColor: theme.palette.paperBackground.main,
     backgroundSize: "cover",
     height: "100vh",
     width: "100%",
@@ -184,12 +185,13 @@ class Layout extends React.Component {
       <div className={classes.root}>
         <CssBaseline />
         <AppBar />
+        <SubNavbar />
         <Reminder />
         <main className={classes.main}>
+          <div className={classes.background} />
           <div className={classes.contentHeader} />
           <div className={classes.mainContent}>
-            <div className={classes.secondLayerBackground} />
-            <div className={classes.gradientBackground} />
+            {/* <div className={classes.gradientBackground} /> */}
             <LayoutSpeedDial />
             {!finishedSettingUp && (
               <div className={classes.skeletonDiv}>

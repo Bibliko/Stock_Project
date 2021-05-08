@@ -26,8 +26,7 @@ const styles = (theme) => ({
     },
     alignSelf: "center",
     borderRadius: "4px",
-    boxShadow:
-      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+    boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
     fontSize: "medium",
@@ -35,7 +34,7 @@ const styles = (theme) => ({
       fontSize: "small",
     },
     color: "white",
-    borderColor: "#DC3D4A",
+    borderColor: theme.palette.secondary.main,
     borderWidth: "2px",
     borderStyle: "solid",
     borderBottom: "hidden",
@@ -46,7 +45,7 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   headColor: {
-    backgroundColor: "#EB5757",
+    backgroundColor: theme.palette.paperBackground.sub,
   },
   headtitle: {
     fontSize: "large",
@@ -61,10 +60,10 @@ const styles = (theme) => ({
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: "#FFA9A9",
+      backgroundColor: theme.palette.paperBackground.onPage,
     },
     "&:nth-of-type(even)": {
-      backgroundColor: "#FE8383",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
   },
 }))(TableRow);

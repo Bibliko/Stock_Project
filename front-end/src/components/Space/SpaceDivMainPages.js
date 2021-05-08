@@ -10,7 +10,7 @@ const styles = (theme) => ({
   },
 });
 
-class LayoutSpeedDial extends React.Component {
+class SpaceDivMainPages extends React.Component {
   render() {
     const { classes } = this.props;
 
@@ -18,4 +18,4 @@ class LayoutSpeedDial extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(LayoutSpeedDial));
+export default withStyles(styles)(withRouter(SpaceDivMainPages));

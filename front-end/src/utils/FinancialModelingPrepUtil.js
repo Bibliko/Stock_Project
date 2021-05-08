@@ -1,6 +1,8 @@
 import fetch from "node-fetch";
 import { isEqual } from "lodash";
 
+import { roundNumber } from "./low-dependency/NumberUtil";
+
 const {
   REACT_APP_FINANCIAL_MODELING_PREP_API_KEY: FINANCIAL_MODELING_PREP_API_KEY,
 } = process.env;
@@ -86,13 +88,14 @@ export const getStockScreener = ({
   const sectorString = sectorFilter !== "All" ? "&sector=" + sectorFilter : "";
   const industryString =
     industryFilter !== "All" ? "&industry=" + industryFilter : "";
+
   return new Promise((resolve, reject) => {
     fetch(
-      `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${
+      `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${roundNumber(
         marketCapFilter[0]
-      }&marketCapLowerThan=${
+      )}&marketCapLowerThan=${roundNumber(
         marketCapFilter[1]
-      }${sectorString}${industryString}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+      )}${sectorString}${industryString}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
     )
       .then((stockScreener) => {
         return stockScreener.json();
@@ -121,6 +124,45 @@ export const getStockScreener = ({
   });
 };
 
+/**
+ *
+ * @param {String} companyCode company code needed
+ * @param {Number} limit how many news do you need?
+ */
+export const getStockNews = (companyCode, limit) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/stock_news?tickers=${companyCode}&limit=${limit}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((news) => {
+        return news.json();
+      })
+      .then((newsJSON) => {
+        resolve(newsJSON);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getMostActiveStocks = () => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/actives?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stocks) => {
+        return stocks.json();
+      })
+      .then((stocksJSON) => {
+        resolve(stocksJSON);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const shortenCompanyNameToFourWords = (companyName) => {
   let resultName = "";
   let numberOfSpaces = 0;
@@ -141,5 +183,7 @@ export default {
   searchNASDAQTickers,
   searchCompanyTickers,
   getStockScreener,
+  getStockNews,
+
   shortenCompanyNameToFourWords,
 };

@@ -22,12 +22,12 @@ const styles = (theme) => ({
     marginTop: "5px",
   },
   input: {
-    color: "black",
-    backgroundColor: "rgba(225,225,225,0.6)",
+    color: "white",
+    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:hover": {
-      backgroundColor: "rgba(225,225,225,0.8)",
+      backgroundColor: theme.palette.paperBackground.onPageLight,
     },
-    fontSize: "18px",
+    fontSize: "medium",
     height: "45px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "small",
@@ -36,16 +36,26 @@ const styles = (theme) => ({
   },
   title: {
     color: "white",
-    fontSize: "20px",
+    fontSize: "large",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "15px",
+      fontSize: "medium",
     },
     paddingLeft: "5px",
     fontWeight: "bold",
   },
   menuList: {
-    backgroundColor: theme.palette.menuBackground.main,
+    backgroundColor: theme.palette.paperBackground.onPage,
     color: "white",
+  },
+  menuItem: {
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+    },
+    "&.MuiListItem-root": {
+      "&.Mui-selected": {
+        backgroundColor: theme.palette.menuItemHover.main,
+      },
+    },
   },
   hide: {
     display: "none",
@@ -72,7 +82,7 @@ function SelectBox(props) {
             </MenuItem>
           )}
           {items.map((item) => (
-            <MenuItem key={item} value={item}>
+            <MenuItem key={item} value={item} className={classes.menuItem}>
               {item}
             </MenuItem>
           ))}

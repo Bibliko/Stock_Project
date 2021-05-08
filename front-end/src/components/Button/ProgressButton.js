@@ -3,34 +3,36 @@ import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import {
-  Button,
-  CircularProgress,
-} from "@material-ui/core";
+import { Button, CircularProgress } from "@material-ui/core";
 
 const styles = (theme) => ({
   fullWidth: {
     width: "100%",
   },
   buttonSuccess: {
-    backgroundColor: "rgb(50,205,50)",
+    backgroundColor: `${theme.palette.success.main} !important`,
     "&:hover": {
-      backgroundColor: "rgb(34,139,34)",
+      backgroundColor: `${theme.palette.success.mainHover} !important`,
     },
   },
   buttonFail: {
-    backgroundColor: "red",
+    backgroundColor: `${theme.palette.fail.main} !important`,
     "&:hover": {
-      backgroundColor: "rgb(178,34,34)",
+      backgroundColor: `${theme.palette.fail.mainHover} !important`,
     },
   },
   button: {
     "&.Mui-disabled": {
       backgroundColor: "rgba(255, 255, 255, 0.12)",
     },
+    color: theme.palette.normalFontColor.primary,
+    backgroundColor: theme.palette.primary.subDark,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.subDarkHover,
+    },
   },
   progress: {
-    color: "green",
+    color: theme.palette.secondary.main,
     position: "absolute",
     top: "50%",
     left: "50%",
@@ -42,46 +44,47 @@ const styles = (theme) => ({
   },
 });
 
-function ProgressButton(props) {
-  const {
-    classes,
-    containerClass,
-    disabled,
-    size,
-    success, 
-    fail,
-    loading,
-    handleClick,
-    children,
-  } = props;
-  const buttonClassname = clsx(
-    classes.button,{
-    [classes.buttonSuccess]: success,
-    [classes.buttonFail]: fail,
-  });
+class ProgressButton extends React.Component {
+  render() {
+    const {
+      classes,
+      containerClass,
+      disabled,
+      size,
+      success,
+      fail,
+      loading,
+      handleClick,
+      children,
+    } = this.props;
 
-  return (
-    <div
-      className={clsx(classes.buttonWrapper, classes.fullWidth, containerClass)}
-    >
-      <Button
-        fullWidth
-        aria-label="save file"
-        color="primary"
-        size={size}
-        variant="contained"
-        disableElevation
-        disabled={loading || disabled}
-        className={buttonClassname}
-        onClick={handleClick}
+    return (
+      <div
+        className={clsx(
+          classes.buttonWrapper,
+          classes.fullWidth,
+          containerClass
+        )}
       >
-        {children}
-      </Button>
-      {loading && (
-        <CircularProgress size={24} className={classes.progress} />
-      )}
-    </div>
-  );
+        <Button
+          fullWidth
+          aria-label="Save"
+          size={size}
+          variant="contained"
+          disableElevation
+          disabled={loading || disabled}
+          className={clsx(classes.button, {
+            [classes.buttonSuccess]: success,
+            [classes.buttonFail]: fail,
+          })}
+          onClick={handleClick}
+        >
+          {children}
+        </Button>
+        {loading && <CircularProgress size={24} className={classes.progress} />}
+      </div>
+    );
+  }
 }
 
 export default withStyles(styles)(ProgressButton);

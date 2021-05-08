@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { isEqual, isEmpty } from "lodash";
@@ -12,7 +13,7 @@ import {
 
 import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
 
-import { getParsedCachedSharesList } from "../../../utils/RedisUtil";
+import { getCachedSharesList } from "../../../utils/RedisUtil";
 
 import { Grid, Typography, Avatar, Paper } from "@material-ui/core";
 import { StorefrontRounded as StorefrontRoundedIcon } from "@material-ui/icons";
@@ -23,15 +24,16 @@ import HoldingsTableContainer from "../../Table/AccountSummaryTable/HoldingsTabl
 const styles = (theme) => ({
   container: {
     color: "white",
+    alignSelf: "center",
   },
   avatar: {
-    width: "65px",
-    height: "65px",
+    width: "60px",
+    height: "60px",
     marginLeft: "10px",
     marginRight: "10px",
     [theme.breakpoints.down("xs")]: {
-      width: "55px",
-      height: "55px",
+      width: "50px",
+      height: "50px",
       marginLeft: "0px",
     },
   },
@@ -52,32 +54,66 @@ const styles = (theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
+    alignSelf: "center",
   },
   name: {
-    fontSize: "24px",
+    fontSize: "16px",
     fontWeight: "bold",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "20px",
+      fontSize: "12px",
     },
   },
   rank: {
+    fontSize: "16px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "12px",
+    },
+  },
+  dailyChange: {
     fontSize: "18px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "14px",
     },
   },
-  dailyChange: {
-    fontSize: "20px",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "16px",
-    },
+  dailyChangeGreen: {
+    color: theme.palette.secondary.main,
+  },
+  dailyChangeRed: {
+    color: theme.palette.fail.main,
   },
   tableTitle: {
-    fontSize: "28px",
+    fontSize: "20px",
     paddingBottom: "8px",
     [theme.breakpoints.down("xs")]: {
-      fontSize: "24px",
+      fontSize: "18px",
     },
+  },
+  paperAccountSummary: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    height: "120px",
+    width: "100%",
+    color: "white",
+    padding: 20,
+    backgroundColor: theme.palette.paperBackground.onPage,
+  },
+  storeIcon: {
+    height: "30px",
+    width: "auto",
+    marginBottom: "5px",
+    [theme.breakpoints.down("xs")]: {
+      height: "20px",
+    },
+  },
+  holdingsText: {
+    color: "white",
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+    textAlign: "center",
   },
 });
 
@@ -113,13 +149,13 @@ class AccountSummary extends React.Component {
   };
 
   componentDidMount() {
-    getParsedCachedSharesList(this.props.userSession.email)
+    getCachedSharesList(this.props.userSession.email)
       .then((shares) => {
         this.setState(
           {
             userShares: shares
               .sort((firstShare, secondShare) => {
-                return secondShare.quantity - firstShare.quantity; // temporarily sorted by quantity
+                return secondShare.quantity * secondShare.buyPriceAvg - firstShare.quantity * firstShare.buyPriceAvg;  // sorted by value
               })
               .slice(0, 5),
           },
@@ -189,10 +225,14 @@ class AccountSummary extends React.Component {
           className={classes.gridItem}
           style={{
             justifyContent: "center",
-            color: dailyChange >= 0 ? "#219653" : "#ef0808",
           }}
         >
-          <Typography className={classes.dailyChange}>
+          <Typography
+            className={clsx(classes.dailyChange, {
+              [classes.dailyChangeGreen]: dailyChange >= 0,
+              [classes.dailyChangeRed]: dailyChange < 0,
+            })}
+          >
             {`Daily Change $${dailyChange}`}
           </Typography>
         </Grid>

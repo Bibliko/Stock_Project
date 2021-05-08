@@ -16,12 +16,13 @@ import ForgotPassword from "./pages/Login/ForgotPassword";
 import Succeed from "./pages/Login/Verification/Succeed";
 import Fail from "./pages/Login/Verification/Fail";
 
-import LandingPage from "./pages/Main/LandingPage";
+import HomePage from "./pages/Main/HomePage";
 import AccountSummary from "./pages/Main/AccountSummary";
 import Watchlist from "./pages/Main/Watchlist";
 import Ranking from "./pages/Main/Ranking";
 import Setting from "./pages/Main/Setting";
 import Companies from "./pages/Main/Companies";
+import CompanyDetail from "./pages/Main/CompanyDetail";
 import TransactionsHistory from "./pages/Main/TransactionsHistory";
 
 import Layout from "./components/Layout/Layout";
@@ -125,8 +126,12 @@ class App extends React.Component {
 
               {!this.specialLinks.includes(this.state.path) && (
                 <Layout toggleTheme={this.toggleTheme}>
-                  <Route exact path="/" component={LandingPage} />
+                  <Route exact path="/" component={HomePage} />
                   <Route path="/companies" component={Companies} />
+                  <Route
+                    path="/company/:companyCode"
+                    component={CompanyDetail}
+                  />
                   <Route path="/accountSummary" component={AccountSummary} />
                   <Route path="/watchlist" component={Watchlist} />
                   <Route path="/setting" component={Setting} />

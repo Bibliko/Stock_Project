@@ -1,3 +1,5 @@
+import { roundNumber } from "./NumberUtil";
+
 export const oneSecond = 1000; // 1000 ms = 1 second
 export const oneMinute = 60 * oneSecond;
 export const oneHour = 60 * oneMinute;
@@ -132,7 +134,28 @@ export const marketCountdownUpdate = (thisComponent) => {
 };
 
 export const isLeapYear = (year) => {
-  return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+};
+
+/**
+ * @description Simplify miliseconds to minutes or hours or days or A long time ago
+ * @returns {String} time string: 5m, 1d, ...
+ * @param {Number} miliseconds
+ */
+export const simplifyMiliseconds = (miliseconds) => {
+  if (miliseconds < 60 * oneMinute) {
+    return `${roundNumber(miliseconds / oneMinute)}m`;
+  }
+
+  if (miliseconds < 24 * oneHour) {
+    return `${roundNumber(miliseconds / oneHour)}h`;
+  }
+
+  if (miliseconds < 30 * oneDay) {
+    return `${roundNumber(miliseconds / oneDay)}d`;
+  }
+
+  return "A long time ago";
 };
 
 export default {
@@ -150,4 +173,5 @@ export default {
   newDate,
   marketCountdownUpdate,
   isLeapYear,
+  simplifyMiliseconds,
 };

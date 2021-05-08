@@ -42,9 +42,14 @@ const styles = (theme) => ({
   },
   searchIcon: {
     color: theme.palette.searchFieldBackground.searchIcon,
+    width: "80%",
+    height: "80%",
   },
   iconButton: {
     left: "95px",
+    [theme.breakpoints.down("xs")]: {
+      left: "90px",
+    },
     backgroundColor: theme.palette.searchFieldBackground.main,
     "&:hover": {
       backgroundColor: theme.palette.searchFieldBackground.onHover,
@@ -54,8 +59,8 @@ const styles = (theme) => ({
     },
     padding: 0,
     position: "absolute",
-    height: "40px",
-    width: "40px",
+    height: "25px",
+    width: "25px",
     borderRadius: "50%",
     opacity: 1,
     transition: "left 0.2s ease-in-out, opacity 0.25s ease-in",
@@ -278,6 +283,7 @@ class SearchFieldLayout extends React.Component {
             redirectToPage("/", this.props);
           }}
         />
+
         <IconButton
           className={clsx(classes.iconButton, {
             [classes.hideFadeIcon]: openSearchMenu,
@@ -287,6 +293,7 @@ class SearchFieldLayout extends React.Component {
         >
           <SearchRoundedIcon className={classes.searchIcon} />
         </IconButton>
+
         <ClickAwayListener
           onClickAway={!isScreenSmall ? this.turnOffSearchMenu : () => {}}
         >

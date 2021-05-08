@@ -1,22 +1,30 @@
 /* 
   palette:
   - Basic
-  - App Bar
   - Paper
-  - Table
+  - Login
   - Menu
   - Text
-  - Filter
   - Snack Bar
   - Speed Dial
   - Search Field
+  - Donut Chart
   - Switch dark / light mode
 */
 
 const theme = {
+  customShadow: {
+    popup:
+      "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)",
+    tableContainer:
+      "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+  },
   customWidth: {
     maxSearchFieldWithLogo: "370px",
     maxSearchFieldWidth: "240px",
+
+    maxMostGainers: "400px",
+    maxMostGainersChip: "95px",
 
     mainPageWidth: "90%",
     mainSkeletonWidth: "100%",
@@ -27,47 +35,87 @@ const theme = {
     appBarHeight: "60px",
     appBarHeightSmall: "50px",
 
+    subBarHeight: "80px",
+    subBarHeightSmall: "25px",
+
     redirectingPaper: "200px",
 
     settingTextField: "45px",
     settingTextFieldSmall: "35px",
+
+    mostGainersCard: "50px",
   },
   customMargin: {
     appBarPadding: "20px",
 
-    topLayout: "80px",
-    topLayoutSmall: "70px",
+    topLayout: "55px",
+    topLayoutSmall: "20px",
 
     topFloatingToolButton: "110px",
     smallTopFloatingToolButton: "100px",
 
     dialogItemsTransactionsHistoryFilters: "20px",
+
+    companyDetailPageSectionMarginBottom: "10px",
   },
   customZIndex: {
     reminder: 10,
     floatingToolButton: 5,
     floatingActionButton: 5,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
+    subNavbar: 20,
+    subNavbarCard: 18,
     searchFieldContainer: 1000,
     searchMenu: 1200,
     searchFieldTextField: 1300,
   },
+
+  typography: {
+    fontFamily: `"Open Sans", sans-serif`,
+    fontSize: 14,
+    fontWeightLight: 400,
+    fontWeightRegular: 500,
+    fontWeightMedium: 600,
+  },
+
   palette: {
     // Basic
     primary: {
-      main: "#2196f3",
+      // Purple
+      main: "rgba(136, 120, 255, 1)",
+      hover: "rgba(136, 120, 255, 0.3)",
+
+      subLight: "rgba(120, 127, 246, 1)",
+
+      subDark: "rgba(104, 80, 230, 1)",
+      subDarkHover: "rgba(126, 101, 255, 1)",
+
+      subDarker: "rgba(80, 60, 190, 1)",
     },
 
-    succeed: {
-      main: "rgba(32, 154, 85, 1)",
-      tableSorted: "rgba(255, 56, 73, 1)",
-      tableSortIcon: "rgba(255, 56, 73, 0.8)",
+    secondary: {
+      // Light Blue + Green
+      main: "rgba(128, 222, 255, 1)",
+      hover: "rgba(128, 222, 255, 0.3)",
+      mainHover: "rgba(52, 198, 246, 1)",
+    },
+
+    gradient: {
+      main:
+        "linear-gradient(90deg, rgba(138, 118, 255, 1), rgba(97, 213, 255, 1))", // Used for titles
     },
 
     fail: {
-      main: "#ff3848",
-      backgroundColor: "rgba(220, 61, 74, 0.2)",
-      backgroundColorHover: "rgba(220, 61, 74, 0.3)",
+      // Red
+      main: "rgba(255, 105, 105, 1)",
+      hover: "rgba(255, 105, 105, 0.3)",
+      mainHover: "rgba(230, 60, 60, 1)",
+    },
+
+    success: {
+      // Green
+      main: "rgb(50,205,50)",
+      mainHover: "rgb(34,139,34)",
     },
 
     disabled: {
@@ -76,68 +124,48 @@ const theme = {
 
     // App Bar
     appBarBlue: {
-      main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
+      // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
+      main: "rgba(31, 47, 152, 1)",
     },
 
     // Paper
     paperBackground: {
-      main: "#1E1E1E",
-      onPage: "rgba(46, 44, 48, 1)",
-      deepBlueTable: "rgba(26,22,75,1)",
-      gradient: "linear-gradient(180deg, #1E1E1E 10%, #141466 80%)",
-      secondLayer: "#141466"
+      main: "rgba(0, 0, 0, 1)", // Black
+      sub: "rgba(107, 87, 224, 1)", // Dark Purple
+
+      // Grey
+      onPage: "rgba(30, 33, 36, 1)",
+      onPageLight: "rgba(40, 43, 46, 1)",
+      onPageSuperLight: "rgba(60, 63, 66, 1)",
+      hoverBlur: "rgba(255, 255, 255, 0.25)",
     },
 
+    // Login
     loginBackground: {
       main: "#0d0d0d",
     },
 
     gradientPaper: {
-      // main:
-      //   "linear-gradient(180deg, #300B66 0%, rgba(255,255,255,0) 70%),linear-gradient(180deg, #FF3747 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, #FFFFFF 50%, rgba(255,255,255,0) 100%), #9ED2EF",
-      main: "linear-gradient(-45deg, #6677CC 10%, #2929CC 70%)",
+      main: "rgba(90, 105, 201, 1)",
     },
 
-    // Table
-    tableBackground: {
-      gradient: "linear-gradient(180deg, #1b163d 0%, #180f56 100%)",
-    },
-
-    tableHeader: {
-      darkBlue: "rgba(35, 20, 150, 1)",
-      lightBlue: "rgba(0, 185, 209, 1)",
-      purple: "rgba(93, 64, 219, 1)",
-    },
-
-    tableRow: {
-      lightBlue: "rgba(54, 151, 254, 1)",
-      darkBlue: "rgba(19, 100, 186, 1)",
+    submitButton: {
+      main: "#222f80",
     },
 
     // Menu
-    menuBackground: {
-      main: "#141466",
-    },
     menuItemHover: {
       main: "rgba(255, 255, 255, 0.2)",
     },
 
     // Text
-    bigTitle: {
-      purple: "rgba(110, 80, 240, 1)",
-      lightBlue: "rgba(54, 151, 254, 1)",
-      lighterBlue: "rgba(116, 224, 239, 1)",
-      blue: "rgba(47, 128, 237, 1)",
-      red: "rgba(220, 61, 74, 1)",
-    },
     loginLink: {
       main: "#e0e0e0",
     },
 
-    // Filter
-    filterButton: {
-      main: "rgba(74, 50, 209, 1)",
-      onHover: "rgba(90, 70, 220, 1)",
+    normalFontColor: {
+      primary: "white",
+      secondary: "rgba(169, 179, 187, 1)",
     },
 
     // Snack Bar
@@ -153,15 +181,10 @@ const theme = {
     },
 
     // Search Field
-    searchField: {
-      main: "rgba(41, 41, 204, 0.7)",
-      onHover: "rgba(41, 41, 204, 1)",
-    },
-
     searchFieldBackground: {
-      main: "rgba(102, 119, 204, 0.5)",
-      onHover: "rgba(102, 119, 204, 0.7)",
-      rippleSpan: "rgba(102, 119, 204, 0.6)",
+      main: "rgba(60, 60, 60, 1)",
+      onHover: "rgba(70, 70, 70, 1)",
+      rippleSpan: "rgba(100, 100, 100, 0.9)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
     },
 
@@ -180,8 +203,8 @@ const theme = {
     // Mui Pickers
     MuiPickersToolbar: {
       root: {
-        backgroundColor: "#000033",
-        color: "#3399FF",
+        backgroundColor: "rgba(0, 0, 0, 1)",
+        color: "rgba(128, 222, 255, 1)",
       },
       dateTitleContainer: {
         color: "white",
@@ -190,7 +213,7 @@ const theme = {
 
     MuiPickersCalendarHeader: {
       root: {
-        backgroundColor: "#3399FF",
+        backgroundColor: "rgba(104, 80, 230, 1)",
         marginTop: "0px",
         marginBottom: "0px",
         minHeight: "50px",
@@ -198,48 +221,52 @@ const theme = {
         color: "white",
       },
       monthTitleContainer: {
-        color: "black",
+        color: "white",
+      },
+      yearSelectionSwitcher: {
+        color: "white",
       },
     },
     MuiPickersCalendar: {
       daysHeader: {
-        backgroundColor: "#000066",
+        backgroundColor: "rgba(0, 0, 0, 1)",
         "& span": {
           color: "white",
         },
       },
       root: {
-        backgroundColor: "#000066",
+        backgroundColor: "rgba(0, 0, 0, 1)",
       },
     },
     MuiPickersArrowSwitcher: {
       iconButton: {
         backgroundColor: "unset",
+        color: "white",
       },
     },
 
     MuiPickersYear: {
       yearButton: {
         "&:hover": {
-          backgroundColor: "#3399FF",
+          backgroundColor: "rgba(104, 80, 230, 1)",
         },
         "&$selected": {
-          backgroundColor: "#3399FF",
+          backgroundColor: "rgba(104, 80, 230, 1)",
         },
         "&$disabled": {
-          color: "rgba(255,255,255,0.2)",
-          backgroundColor: "rgba(255,255,255,0.02)",
+          color: "rgba(255, 255 , 255, 0.2)",
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
         },
       },
     },
     MuiPickersMonth: {
       root: {
         "&:hover": {
-          backgroundColor: "rgba(51, 153, 255, 0.4)",
+          backgroundColor: "rgba(136, 120, 255, 1)",
           color: "white",
         },
         "&.Mui-selected": {
-          color: "#3399FF",
+          color: "rgba(136, 120, 255, 1)",
         },
       },
     },
@@ -247,26 +274,26 @@ const theme = {
       root: {
         color: "white",
         border: "unset",
-        backgroundColor: "rgba(255,255,255,0.2)",
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
         transition: "unset",
         "&:hover": {
-          backgroundColor: "rgba(51, 153, 255, 0.7)",
+          backgroundColor: "rgba(104, 80, 230, 0.8)",
           "&.Mui-selected": {
-            backgroundColor: "rgba(51, 153, 255, 0.7)",
+            backgroundColor: "rgba(104, 80, 230, 0.8)",
           },
         },
         "&:focus": {
-          backgroundColor: "rgba(51, 153, 255, 0.9)",
+          backgroundColor: "rgba(104, 80, 230, 1)",
           "&.Mui-selected": {
-            backgroundColor: "rgba(51, 153, 255, 0.9)",
+            backgroundColor: "rgba(104, 80, 230, 1)",
           },
         },
         "&$selected": {
-          backgroundColor: "#3399FF",
+          backgroundColor: "rgba(104, 80, 230, 1)",
         },
         "&$disabled": {
-          backgroundColor: "rgba(255,255,255,0.1)",
-          color: "rgba(255,255,255,0.5)",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          color: "rgba(255, 255, 255, 0.5)",
         },
       },
       today: {
@@ -278,14 +305,14 @@ const theme = {
     },
     MuiPickersYearSelection: {
       root: {
-        backgroundColor: "#000066",
+        backgroundColor: "rgba(0, 0, 0, 1)",
         margin: "none",
         color: "white",
       },
     },
     MuiPickersMonthSelection: {
       root: {
-        backgroundColor: "#000066",
+        backgroundColor: "rgba(0, 0, 0, 1)",
         margin: "none",
         color: "white",
         width: "unset",
@@ -294,26 +321,26 @@ const theme = {
 
     MuiFormHelperText: {
       root: {
-        color: "#3399FF",
+        color: "rgba(128, 222, 255, 1)",
       },
     },
 
     MuiPickersBasePicker: {
       pickerViewLandscape: {
         padding: "none",
-        backgroundColor: "#303030",
+        backgroundColor: "rgba(30, 33, 36, 1)",
       },
       pickerView: {
-        backgroundColor: "#303030",
+        backgroundColor: "rgba(30, 33, 36, 1)",
       },
     },
     MuiPickersModalDialog: {
       dialogAction: {
-        backgroundColor: "#000033",
+        backgroundColor: "rgba(0, 0, 0, 1)",
         "& button": {
-          color: "#3399FF",
+          color: "rgba(128, 222, 255, 1)",
           "&:hover": {
-            backgroundColor: "rgba(51, 153, 255, 0.2)",
+            backgroundColor: "rgba(128, 222, 255, 0.2)",
           },
         },
       },
@@ -321,19 +348,40 @@ const theme = {
 
     MuiPickersCalendarView: {
       viewTransitionContainer: {
-        backgroundColor: "#000066",
+        backgroundColor: "rgba(0, 0, 0, 1)",
       },
     },
     MuiPickersMobileKeyboardInputView: {
       root: {
-        backgroundColor: "#000066",
+        backgroundColor: "rgba(0, 0, 0, 1)",
       },
     },
 
     // Mui Popover
     MuiPopover: {
       paper: {
-        backgroundColor: "rgba(46, 44, 48, 1)",
+        backgroundColor: "rgba(59, 64, 68, 1)", // theme.palette.paperBackground.onPageLight
+        color: "white",
+      },
+    },
+
+    // Mui TextField
+    MuiTextField: {
+      root: {
+        borderRadius: "4px",
+      },
+    },
+
+    // Mui Select
+    MuiSelect: {
+      icon: {
+        color: "white",
+      },
+    },
+
+    // Mui IconButton
+    MuiIconButton: {
+      root: {
         color: "white",
       },
     },

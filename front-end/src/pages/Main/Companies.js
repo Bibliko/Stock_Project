@@ -1,10 +1,11 @@
 import React from "react";
 import { withRouter } from "react-router";
-import clsx from "clsx";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
+import { getAllCompaniesRating } from "../../utils/CompanyUtil";
+import { ratingValue } from "../../utils/low-dependency/FmpHelper";
 
 import { SortDirection } from "react-virtualized";
 
@@ -30,7 +31,8 @@ const styles = (theme) => ({
     background: "rgba(0,0,0,0)",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
     maxWidth: "none",
   },
   fullHeightWidth: {
@@ -50,12 +52,12 @@ const styles = (theme) => ({
   gridTitle: {
     fontSize: "x-large",
     fontWeight: "bold",
-    color: "white",
     marginBottom: "10px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "large",
       marginTop: "20px",
     },
+    color: theme.palette.primary.main,
   },
   caption: {
     font: "caption",
@@ -64,6 +66,7 @@ const styles = (theme) => ({
     margin: "20px",
   },
   reloadButton: {
+    color: theme.palette.normalFontColor.primary,
     marginTop: "10px",
     marginBottom: "20px",
   },
@@ -72,16 +75,15 @@ const styles = (theme) => ({
 function descendingComparator(a, b, orderBy) {
   let items = [a[orderBy], b[orderBy]];
 
-  if (typeof items[0] === "string") {
+  if (orderBy === "rating")               // handle rating
+    items = items.map((value) => ratingValue[value]);
+  else if (typeof items[0] === "string")  // handle text data
     items = items.map((value) => value.toLowerCase());
-  }
 
-  if (items[1] < items[0]) {
-    return -1;
-  }
-  if (items[1] > items[0]) {
-    return 1;
-  }
+  if (items[1] < items[0]) return -1;
+
+  if (items[1] > items[0]) return 1;
+
   return 0;
 }
 
@@ -107,11 +109,12 @@ function stableSort(array, comparator) {
 class Companies extends React.Component {
   state = {
     openDialog: false,
+    companyCode: "AAPL",
     stockData: [],
     sortBy: "code",
     sortDirection: SortDirection.ASC,
-    price: [0, 320000],
-    marketCap: [250, 1025], // [$1K, $2T]
+    price: [-250, 1000],
+    marketCap: [250, 1040], // [$1K, $3T]
     sector: "All",
     industry: "All",
     success: false,
@@ -134,7 +137,7 @@ class Companies extends React.Component {
   handleOpenDialog = ({ rowData }) => {
     this.setState({
       openDialog: true,
-      companyName: rowData.name,
+      companyCode: rowData.code,
     });
   };
 
@@ -142,6 +145,11 @@ class Companies extends React.Component {
     this.setState({
       openDialog: false,
     });
+  };
+
+  // Price scale: y = 10 ^ (0.0055051499 * x)
+  getPrice = (value) => {
+    return 10 ** (0.0055051499 * value);
   };
 
   // MarketCap scale: y = 10 ^ (0.012 * x)
@@ -186,6 +194,7 @@ class Companies extends React.Component {
 
   updateStockScreener = (callback = () => {}, errorCallback = () => {}) => {
     const { price, marketCap, sector, industry } = this.state;
+    let { stockRatings } = this.state;
 
     getStockScreener({
       priceFilter: price,
@@ -194,18 +203,37 @@ class Companies extends React.Component {
       industryFilter: industry,
     })
       .then((stockData) => {
+        // fetch ratingData on mount
+        if (!stockRatings)
+          return Promise.all([stockData, getAllCompaniesRating()]);
+
+        return ([stockData]);
+      })
+      .then(([stockData, newRatings]) => {
         const { sortDirection, sortBy } = this.state;
+
+        if (!stockRatings)
+          stockRatings = newRatings;
+
+        // attach rating to stockData
+        stockData.map((stock) => {
+          const ratingData = stockRatings.find((stockRating) => stockRating.symbol === stock.code);
+          stock.rating = ratingData ? ratingData.rating : "-";
+          return stock;
+        });
 
         this.setState({
           stockData: stableSort(
             stockData,
             getComparator(sortDirection, sortBy)
           ),
+          stockRatings,
         });
         callback();
       })
-      .catch(() => {
+      .catch((err) => {
         errorCallback();
+        console.log(err);
       });
   };
 
@@ -217,7 +245,7 @@ class Companies extends React.Component {
     const { classes } = this.props;
     const {
       openDialog,
-      companyName,
+      companyCode,
       sortBy,
       sortDirection,
       stockData,
@@ -254,12 +282,13 @@ class Companies extends React.Component {
               marketCap={marketCap}
               sector={sector}
               industry={industry}
+              getPrice={this.getPrice}
               getMarketCap={this.getMarketCap}
               handleChange={this.handleFilterChange}
             />
           </Grid>
           <Grid item xs={12} sm={8}>
-            <Typography className={clsx(classes.gridTitle)} component="div">
+            <Typography className={classes.gridTitle} component="div">
               Companies
             </Typography>
 
@@ -282,7 +311,7 @@ class Companies extends React.Component {
         <CompanyDialog
           open={openDialog}
           handleClose={this.handleCloseDialog}
-          companyName={companyName}
+          companyCode={companyCode}
         />
       </Container>
     );
