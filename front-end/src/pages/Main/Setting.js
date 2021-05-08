@@ -168,20 +168,7 @@ class AccountSetting extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const keysCompare = [
-      "email",
-      "firstName",
-      "lastName",
-      "dateOfBirth",
-      "gender",
-      "password",
-      "region",
-      "occupation",
-    ];
-    const nextPropsCompare = pick(nextProps.userSession, keysCompare);
-    const propsCompare = pick(this.props.userSession, keysCompare);
-
-    return !isEqual(nextPropsCompare, propsCompare);
+    return !isEqual(nextProps, this.props);
   }
 
   render() {

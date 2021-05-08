@@ -73,7 +73,10 @@ class MostGainers extends React.Component {
   componentWillUnmount() {}
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextState, this.state);
+    return (
+      !isEqual(nextProps, this.props) ||
+      !isEqual(nextState, this.state)
+    );
   }
 
   render() {

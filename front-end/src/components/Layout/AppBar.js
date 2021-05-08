@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { isEqual, pick } from "lodash";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { socket } from "../../App";
@@ -197,12 +197,8 @@ class PersistentAppBar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email", "avatarUrl", "hasFinishedSettingUp"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
-
     return (
-      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextProps, this.props) ||
       !isEqual(nextState, this.state)
     );
   }

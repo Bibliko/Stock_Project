@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual, pick } from "lodash";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -72,13 +72,9 @@ class TypeFilter extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["filters"];
-    const nextPropsCompare = pick(nextProps, compareKeys);
-    const propsCompare = pick(this.props, compareKeys);
-
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextProps, this.props) ||
+      !isEqual(nextState, this.state)
     );
   }
 
