@@ -113,7 +113,10 @@ class HoldingsTableContainer extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextProps, this.props) || !isEqual(nextState, this.state);
+    return (
+      !isEqual(nextProps, this.props) ||
+      !isEqual(nextState, this.state)
+    );
   }
 
   render() {

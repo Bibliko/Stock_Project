@@ -30,7 +30,7 @@ const styles = (theme) => ({
 class ComponentName extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextProps, this.props) ||
       !isEqual(nextState, this.state)
     );
   }

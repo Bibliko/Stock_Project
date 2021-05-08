@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { isEqual, pick } from "lodash";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
@@ -430,12 +430,8 @@ class TransactionsHistoryTableContainer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
-
     return (
-      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextProps, this.props) ||
       !isEqual(nextState, this.state)
     );
   }

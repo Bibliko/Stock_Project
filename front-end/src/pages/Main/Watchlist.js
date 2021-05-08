@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual, pick } from "lodash";
+import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -50,11 +50,7 @@ const styles = (theme) => ({
 
 class WatchlistPage extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email", "watchlist"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
-
-    return !isEqual(nextPropsCompare, propsCompare);
+    return !isEqual(nextProps, this.props);
   }
 
   render() {

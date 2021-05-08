@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual, pick } from "lodash";
+import { isEqual } from "lodash";
 import clsx from "clsx";
 import { withRouter } from "react-router";
 import { socket } from "../../../App";
@@ -350,17 +350,9 @@ class HoldingsTableRow extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["watchlist"];
-    const nextPropsCompareUserSession = pick(
-      nextProps.userSession,
-      compareKeys
-    );
-    const propsCompareUserSession = pick(this.props.userSession, compareKeys);
-
     return (
-      !isEqual(nextProps.isMarketClosed, this.props.isMarketClosed) ||
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompareUserSession, propsCompareUserSession)
+      !isEqual(nextProps, this.props) ||
+      !isEqual(nextState, this.state)
     );
   }
 
