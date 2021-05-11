@@ -1,9 +1,8 @@
 import React from "react";
-import { withRouter } from "react-router";
-import axios from 'axios'
-//import _ from 'lodash'
-
 import { withStyles } from "@material-ui/core/styles";
+
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil.js";
+
 import {
   TableRow,
   TableCell,
@@ -20,13 +19,14 @@ const styles = (theme) => ({
     border: "hidden",
   },
   tableContainer: {
-    width: "80%",
+    padding: "12px 0px",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
+      padding: "7px 0px",
     },
-    alignSelf: "center",
     borderRadius: "4px",
     boxShadow: theme.customShadow.tableContainer,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   tableCell: {
     fontSize: "medium",
@@ -34,192 +34,88 @@ const styles = (theme) => ({
       fontSize: "small",
     },
     color: "white",
-    borderColor: theme.palette.secondary.main,
-    borderWidth: "2px",
-    borderStyle: "solid",
-    borderBottom: "hidden",
-    borderTop: "hidden",
+    borderBottom: "0px",
+    borderRight: "2px solid " + theme.palette.secondary.main,
   },
-  tableCellCenter: {
-    border: "none",
+  headCell: {
+    borderBottom: "0px",
+    borderRight: "2px solid " + theme.palette.secondary.main,
     alignItems: "center",
   },
-  headColor: {
-    backgroundColor: theme.palette.paperBackground.sub,
-  },
   headtitle: {
-    fontSize: "large",
+    fontSize: "20px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "medium",
     },
     fontWeight: "bold",
-    color: "white",
+    color: theme.palette.secondary.main,
   },
 });
 
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.paperBackground.onPage,
-    },
-    "&:nth-of-type(even)": {
-      backgroundColor: theme.palette.paperBackground.onPageLight,
-    },
-  },
-}))(TableRow);
-
 class OverallTable extends React.Component {
-  state= {overallRanking: []}
+  getTableRow = (user, id) => {
+    const { classes } = this.props;
+    const fullName = user.firstName + " " + user.lastName;
+    const data = [
+      id,
+      fullName,
+      `$${numberWithCommas(user.totalPortfolio)}`,
+      user.region === "null" ? "-" : user.region,
+    ];
 
-  componentDidMount () {
-   axios('/api/userData/getOverallRanking', {
-      method: "get",
-      params: {
-        page: 1
-
-      },
-
-    }).then(overallRankingData=>this.setState({overallRanking: overallRankingData.data})).catch(error=>console.log(error))
-  }
-
-  chooseTableRowValue = (type) => {
-    switch (type) {
-      case "":
-        return ``;
-
-      default:
-        return;
-    }
+    return (
+      <TableRow key={fullName + id}>
+        {
+          data.map((datum, id) => (
+            <TableCell
+              key={fullName + id + "-" + id}
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {datum}
+            </TableCell>
+          ))
+        }
+      </TableRow>
+    );
   };
 
-  chooseTableRow = (type, classes) => {
-    console.log(this.state.overallRanking)
-
-  const currentUser= this.state.overallRanking[type-1]
-  console.log(currentUser)
-  if (currentUser){
-    return (
-      <StyledTableRow>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        >
-          {type}
-        </TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        >{currentUser.firstName}</TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        >{currentUser.totalPortfolio}</TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        >{currentUser.region}</TableCell>
-      </StyledTableRow>
-    );
-  } else {
-    return (
-    <StyledTableRow>
-      <TableCell
-        component="th"
-        scope="row"
-        align="center"
-        className={classes.tableCell}
-      >
-        {type}
-      </TableCell>
-      <TableCell
-        component="th"
-        scope="row"
-        align="center"
-        className={classes.tableCell}
-      >No user exist</TableCell>
-      <TableCell
-        component="th"
-        scope="row"
-        align="center"
-        className={classes.tableCell}
-      ></TableCell>
-      <TableCell
-        component="th"
-        scope="row"
-        align="center"
-        className={classes.tableCell}
-      ></TableCell>
-    </StyledTableRow>
-
-)
-   }
-
-}
-
-
-
   render() {
-
-     console.log(this.state.overallRanking)
     const { classes } = this.props;
+    const users = this.props.users || [];
+    const headLabels = [
+      "#",
+      "Username",
+      "Portfolio",
+      "Region",
+    ];
 
     return (
-
       <TableContainer className={classes.tableContainer}>
-        <Table className={classes.table} aria-label="simple table">
+        <Table className={classes.table} aria-label="ranking table">
           <TableHead>
-            <TableRow className={classes.headColor}>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>#</Typography>
-              </TableCell>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>Username</Typography>
-              </TableCell>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>Portfolio</Typography>
-              </TableCell>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>Region</Typography>
-              </TableCell>
+            <TableRow>
+              { headLabels.map((label) => (
+                  <TableCell
+                    key={"head-" + label}
+                    component="th"
+                    scope="row"
+                    align="center"
+                    className={classes.headCell}
+                  >
+                    <Typography className={classes.headtitle}> {label} </Typography>
+                  </TableCell>
+                ))
+              }
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.chooseTableRow(1, classes)}
-            {this.chooseTableRow(2, classes)}
-            {this.chooseTableRow(3, classes)}
-            {this.chooseTableRow(4, classes)}
-            {this.chooseTableRow(5, classes)}
-            {this.chooseTableRow(6, classes)}
-            {this.chooseTableRow(7, classes)}
-            {this.chooseTableRow(8, classes)}
+            { users.map((user, id) => (
+                this.getTableRow(user, id + 1)
+              ))
+            }
           </TableBody>
         </Table>
       </TableContainer>
@@ -227,6 +123,4 @@ class OverallTable extends React.Component {
   }
 }
 
-
-
-export default withStyles(styles)(withRouter(OverallTable));
+export default withStyles(styles)(OverallTable);
