@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual, isEmpty } from "lodash";
+import { isEqual, isEmpty, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
@@ -166,9 +166,13 @@ class NumberFromToFilter extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["filters", "filterName", "clearFlag"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+
     return (
-      !isEqual(nextProps, this.props) ||
-      !isEqual(nextState, this.state)
+      !isEqual(nextState, this.state) ||
+      !isEqual(nextPropsCompare, propsCompare)
     );
   }
 

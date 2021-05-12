@@ -9,7 +9,7 @@ import BrokenAxis from "highcharts/modules/broken-axis";
 
 import { DateTime } from "luxon";
 
-import { isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { highChartDecorations } from "./HighChartOptions";
@@ -328,8 +328,12 @@ class ExchangeOrCompanyPriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["exchangeOrCompany"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+
     return (
-      !isEqual(nextProps, this.props) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }

@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import ExchangeOrCompanyPriceChart from "../Chart/ExchangeOrCompanyPriceChart";
@@ -33,8 +33,12 @@ const styles = (theme) => ({
 
 class NamePriceGraph extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["companyName", "companyCode", "recentPrice"];
+    const compareProps = pick(this.props, compareKeys);
+    const compareNextProps = pick(nextProps, compareKeys);
+
     return (
-      !isEqual(nextProps, this.props) ||
+      !isEqual(compareNextProps, compareProps) ||
       !isEqual(nextState, this.state)
     );
   }

@@ -49,10 +49,7 @@ class MarketWatch extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      !isEqual(nextProps, this.props) ||
-      !isEqual(nextState, this.state)
-    );
+    return !isEqual(nextState, this.state);
   }
 
   render() {

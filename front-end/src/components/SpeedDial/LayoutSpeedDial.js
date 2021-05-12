@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 
@@ -100,9 +100,12 @@ class LayoutSpeedDial extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["isMarketClosed"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps, this.props) ||
-      !isEqual(nextState, this.state)
+      !isEqual(nextState, this.state) ||
+      !isEqual(nextPropsCompare, propsCompare)
     );
   }
 
