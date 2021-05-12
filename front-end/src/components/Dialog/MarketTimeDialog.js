@@ -36,6 +36,7 @@ const styles = (theme) => ({
 class MarketTimeDialog extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     const compareKeys = [
+      "classes",
       "isMarketClosed",
       "remainingTime",
       "openMarketTimeDialog",
@@ -43,10 +44,7 @@ class MarketTimeDialog extends React.Component {
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
-    return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
-    );
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   render() {

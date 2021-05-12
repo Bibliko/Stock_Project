@@ -33,14 +33,11 @@ const styles = (theme) => ({
 
 class NamePriceGraph extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["companyName", "companyCode", "recentPrice"];
+    const compareKeys = ["classes", "companyName", "companyCode", "recentPrice"];
     const compareProps = pick(this.props, compareKeys);
     const compareNextProps = pick(nextProps, compareKeys);
 
-    return (
-      !isEqual(compareNextProps, compareProps) ||
-      !isEqual(nextState, this.state)
-    );
+    return !isEqual(compareNextProps, compareProps);
   }
 
   render() {

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 
 import { simplifyNumber } from "../../../utils/low-dependency/NumberUtil";
 
@@ -213,12 +213,10 @@ class VirtualizedTable extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      !isEqual(nextProps.rows, this.props.rows) ||
-      nextProps.sortBy !== this.props.sortBy ||
-      nextProps.sortDirection !== this.props.sortDirection ||
-      !isEqual(nextProps.cache, this.props.cache)
-    );
+    const compareKeys = ["classes", "rows", "sortBy", "sortDirection", "cache"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   componentDidUpdate() {

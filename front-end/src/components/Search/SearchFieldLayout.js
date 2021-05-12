@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { withMediaQuery } from "../../theme/ThemeUtil";
@@ -254,8 +254,11 @@ class SearchFieldLayout extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["classes", "mediaQuery"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.mediaQuery, this.props.mediaQuery) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
