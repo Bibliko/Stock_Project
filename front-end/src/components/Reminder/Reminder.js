@@ -1,6 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
-import { isUndefined, isEqual } from "lodash";
+import { isUndefined, isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
@@ -88,9 +88,13 @@ class Reminder extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["email", "hasFinishedSettingUp"];
+    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
+    const propsCompare = pick(this.props.userSession, compareKeys);
+
     return (
-      !isEqual(nextProps, this.props) ||
-      !isEqual(nextState, this.state)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState.hide, this.state.hide)
     );
   }
 

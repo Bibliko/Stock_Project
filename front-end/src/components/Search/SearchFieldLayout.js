@@ -255,7 +255,7 @@ class SearchFieldLayout extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
-      !isEqual(nextProps, this.props) ||
+      !isEqual(nextProps.mediaQuery, this.props.mediaQuery) ||
       !isEqual(nextState, this.state)
     );
   }

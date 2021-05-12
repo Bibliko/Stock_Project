@@ -213,7 +213,12 @@ class VirtualizedTable extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextProps, this.props);
+    return (
+      !isEqual(nextProps.rows, this.props.rows) ||
+      nextProps.sortBy !== this.props.sortBy ||
+      nextProps.sortDirection !== this.props.sortDirection ||
+      !isEqual(nextProps.cache, this.props.cache)
+    );
   }
 
   componentDidUpdate() {

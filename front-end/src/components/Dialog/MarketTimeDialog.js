@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual, isEmpty } from "lodash";
+import { isEqual, pick, isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
 import SegmentedBar from "../ProgressBar/SegmentedBar";
@@ -35,9 +35,17 @@ const styles = (theme) => ({
 
 class MarketTimeDialog extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = [
+      "isMarketClosed",
+      "remainingTime",
+      "openMarketTimeDialog",
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+
     return (
-      !isEqual(nextProps, this.props) ||
-      !isEqual(nextState, this.state)
+      !isEqual(nextState, this.state) ||
+      !isEqual(nextPropsCompare, propsCompare)
     );
   }
 
