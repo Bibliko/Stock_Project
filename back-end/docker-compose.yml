@@ -1,8 +1,7 @@
 # Use postgres/example user/password credentials
-version: '3.1'
+version: "3.1"
 
 services:
-
   db:
     image: postgres
     restart: always
@@ -11,12 +10,16 @@ services:
     environment:
       POSTGRES_USER: funstockmarket
       POSTGRES_PASSWORD: funstockmarket
+    networks:
+      - back-end-networks
     volumes:
       - db:/var/lib/postgresql/data
 
   adminer:
     image: adminer
     restart: always
+    networks:
+      - back-end-networks
     ports:
       - 8080:8080
 
@@ -25,9 +28,51 @@ services:
     ports:
       - 6379:6379
     command: redis-server --requirepass funstockmarket
+    networks:
+      - back-end-networks
     volumes:
       - redis:/data
+
+  back-end:
+    container_name: back-end
+    image: back-end
+    ports:
+      - 4000:4000
+    volumes:
+      - back-end:/Stock_Project/back-end
+    env_file: .env
+    restart: always
+    networks:
+      - back-end-networks
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: ${PORT}
+        NODE_ENV: ${NODE_ENV}
+        FRONTEND_HOST: ${FRONTEND_HOST}
+        PASSPORT_CALLBACK_HOST: ${PASSPORT_CALLBACK_HOST}
+        DATABASE_URL: ${DATABASE_URL}
+        REDIS_URL: ${REDIS_URL}
+        FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+        FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
+        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+        GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+        FIREBASE_API_KEY: ${FIREBASE_API_KEY}
+        FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN}
+        FIREBASE_DATABASE_URL: ${FIREBASE_DATABASE_URL}
+        FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+        FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET}
+        ALGOLIA_APPLICATION_ID: ${ALGOLIA_APPLICATION_ID}
+        ALGOLIA_API_KEY: ${ALGOLIA_API_KEY}
+        FINANCIAL_MODELING_PREP_API_KEY: ${FINANCIAL_MODELING_PREP_API_KEY}
+        MAILGUN_API_KEY: ${MAILGUN_API_KEY}
+        SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+
+networks:
+  back-end-networks:
 
 volumes:
   db:
   redis:
+  back-end:

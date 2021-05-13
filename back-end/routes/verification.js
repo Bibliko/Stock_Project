@@ -1,4 +1,4 @@
-const { SENDGRID_API_KEY } = process.env;
+const { SENDGRID_API_KEY } = require('../config');
 const { Router } = require("express");
 const router = Router();
 const { PrismaClient } = require("@prisma/client");

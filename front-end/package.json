@@ -43,7 +43,7 @@
   },
   "scripts": {
     "dev": "node checkEnvFile.js && react-scripts start",
-    "start": "react-scripts start",
+    "start": "serve -s build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

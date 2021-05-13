@@ -11,6 +11,7 @@ const {
   listPushAsync,
   listLengthAsync
 } = require("../../redis/redis-client");
+const { NODE_ENV } = require('../../config');
 
 /**
  * @description Cache all gainers in that day.
@@ -45,7 +46,7 @@ const cacheMostGainers = (mostGainers) => {
 const getMostGainersAndCache = (globalBackendVariables) => {
   listLengthAsync(cachedMostGainers)
     .then((length) => {
-      if (length > 0 && process.env.NODE_ENV === "development") {
+      if (length > 0 && NODE_ENV === "development") {
         console.log(
           "[DEVELOPMENT MODE] Unnecessary gainers (companies) update has been prevented."
         );
