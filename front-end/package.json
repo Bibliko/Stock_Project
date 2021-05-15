@@ -42,7 +42,8 @@
     "xhr2": "^0.2.0"
   },
   "scripts": {
-    "dev": "node checkEnvFile.js && react-scripts start",
+    "dev": "react-scripts start",
+    "default-env": "node checkEnvFile.js",
     "start": "serve -s build",
     "build": "react-scripts build",
     "test": "react-scripts test",
