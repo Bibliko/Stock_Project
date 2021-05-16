@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -120,10 +120,10 @@ const styles = (theme) => ({
 
 class HomePage extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
-      !isEqual(nextState, this.state)
-    );
+    const compareKeys = ["classes", "userSession"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   render() {

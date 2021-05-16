@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import { isEqual, isEmpty } from "lodash";
+import { isEqual, isEmpty, pick } from "lodash";
 
 import { socket } from "../../../App";
 import {
@@ -176,8 +176,11 @@ class AccountSummary extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["classes", "userSession"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }

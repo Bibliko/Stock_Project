@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -37,11 +37,10 @@ class CompaniesListTable extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      !isEqual(nextProps.rows, this.props.rows) ||
-      nextProps.sortBy !== this.props.sortBy ||
-      nextProps.sortDirection !== this.props.sortDirection
-    );
+    const compareKeys = ["classes", "rows", "sortBy", "sortDirection"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   componentDidUpdate() {
