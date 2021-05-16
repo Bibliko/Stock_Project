@@ -41,7 +41,10 @@ const {
  * - 'cachedShares': list
  * - 'cachedShares|${companyCode}|quote': value
  * - 'cachedShares|${companyCode}|profile': value
- *
+ * - `cachedShares|${companyCode}|pendingSell`: list
+ * - `cachedShares|${companyCode}|pendingBuy`: list
+ * - `cachedShares|${companyCode}|priceStatus`: value
+ * 
  * - 'RANKING_LIST': list
  * - 'RANKING_LIST_${region}': list
  */

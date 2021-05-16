@@ -429,7 +429,7 @@ const parseCachedMostGainer = (redisString) => {
 /**
  * @param {object} share Prisma object Share of User
  */
-export const createRedisValueFromSharesList = (share) => {
+const createRedisValueFromSharesList = (share) => {
   const { id, companyCode, quantity, buyPriceAvg, userID } = share;
   return `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
 };
@@ -437,7 +437,7 @@ export const createRedisValueFromSharesList = (share) => {
 /**
  * redisString: "id|companyCode|quantity|buyPriceAvg|userID"
  */
-export const parseRedisSharesListItem = (redisString) => {
+const parseRedisSharesListItem = (redisString) => {
   const valuesArray = redisString.split("|");
 
   return {
@@ -452,7 +452,7 @@ export const parseRedisSharesListItem = (redisString) => {
 /**
  * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|isTypeBuy|userID"
  */
-export const parseRedisTransactionsHistoryListItem = (redisString) => {
+ const parseRedisTransactionsHistoryListItem = (redisString) => {
   const valuesArray = redisString.split("|");
 
   return {

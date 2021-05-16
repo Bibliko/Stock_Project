@@ -33,5 +33,9 @@ module.exports = {
   listPushAsync: promisify(client.rpush).bind(client),
   listPopAsync: promisify(client.rpop).bind(client),
   listTrimAsync: promisify(client.ltrim).bind(client),
-  listRangeAsync: promisify(client.lrange).bind(client) // listRange: both startIndex and endIndex elements are included.
+  listRangeAsync: promisify(client.lrange).bind(client), // listRange: both startIndex and endIndex elements are included.
+
+  queueAdd: promisify(client.zadd).bind(client),
+  queueRemove: promisify(client.zrem).bind(client),
+  queueGetRangeByScore: promisify(client.zrangebyscore).bind(client)
 };

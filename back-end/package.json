@@ -13,7 +13,7 @@
     "update-db": "npm run prisma-generate && npm run prisma-migrate-dev",
     "docker-stop-containers": "npx run-script-os",
     "docker-stop-containers:windows": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./bin/DockerStopContainers/DockerStopContainers.ps1",
-    "docker-stop-containers:default": "docker stop $(docker ps -a -q)",
+    "docker-stop-containers:default": "docker stop $(docker ps -a -q) || echo 'Nothing to stop'",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "start": "node ./build/index.js",
     "dev": "npm run update-db && npx nodemon --exec npx babel-node index.js",

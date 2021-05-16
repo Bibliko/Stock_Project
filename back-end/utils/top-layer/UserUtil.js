@@ -362,6 +362,173 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
   });
 };
 
+/**
+ * Perform buy action for the function proceedTransaction
+ * @param {import(".prisma/client").User} user
+ * @param {number} totalPendingPrice
+ * @param {string} companyCode
+ * @returns
+ */
+ const buyShareEvent = async (
+  user,
+  totalPendingPrice,
+  companyCode,
+  quantity,
+  recentPrice
+) => {
+  try {
+    if (user.cash < totalPendingPrice) {
+      return new Error(
+        "The user does not have enough money to buy the pending stock"
+      );
+    }
+
+    user.cash -= totalPendingPrice;
+    const buyShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+    const buyShareIndex = user.shares.indexOf(buyShare);
+
+    if (!buyShare) {
+      await prisma.share.create({
+        companyCode: companyCode,
+        quantity: quantity,
+        buyPriceAvg: recentPrice,
+        user: user,
+        userID: user.id
+      });
+    } else {
+      // Update in Share
+      buyShare.buyPriceAvg =
+        (buyShare.buyPriceAvg * buyShare.quantity +
+          recentPrice * (buyShare.quantity + quantity)) /
+        (quantity + buyShare.quantity);
+      buyShare.quantity += quantity;
+      await prisma.share.update({
+        where: {
+          id: buyShare.id
+        },
+        data: {
+          buyPriceAvg: buyShare.buyPriceAvg,
+          quantity: buyShare.quantity
+        }
+      });
+
+      // Update in User
+      user.shares[buyShareIndex] = buyShare;
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          shares: user.shares
+        }
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const sellShareEvent = async (
+  user,
+  totalPendingPrice,
+  companyCode,
+  quantity,
+  recentPrice
+) => {
+  try {
+    user.cash += totalPendingPrice;
+    const sellShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+    const sellShareIndex = user.shares.indexOf(sellShare);
+
+    if (!sellShare) {
+      return new Error("Couldn't find share");
+    } else if (quantity > sellShare.quantity) {
+      return new Error("Not enough available shares");
+    }
+
+    if (quantity === sellShare.quantity) {
+      await prisma.share.delete({
+        where: {
+          companyCode: companyCode
+        }
+      });
+
+      user.shares.slice(sellShareIndex, 1);
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          shares: user.shares
+        }
+      });
+    } else {
+      sellShare.quantity -= quantity;
+      await prisma.share.update({
+        where: {
+          id: sellShare.id
+        },
+        data: {
+          quantity: sellShare.quantity
+        }
+      });
+
+      user.shares[sellShareIndex] = sellShare;
+      await prisma.user.upate({
+        where: {
+          id: user.id
+        },
+        data: {
+          shares: user.shares
+        }
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * Buy or sell if the transaction can be procceeded
+ * @param {string} transactionID
+ * @param {number} recentPrice
+ */
+const proceedTransaction = async (transactionID, recentPrice) => {
+  try {
+    const userTransaction = await prisma.userTransaction.findUnique({
+      where: {
+        id: transactionID
+      },
+      include: {
+        user: true
+      }
+    });
+
+    const { user, isTypeBuy, quantity, companyCode } = userTransaction;
+    const totalPendingPrice = recentPrice * quantity;
+
+    if (isTypeBuy) {
+      await buyShareEvent(user, totalPendingPrice, companyCode);
+    } else await sellShareEvent(user, totalPendingPrice, companyCode);
+
+    // Update transaction after buying/selling
+    userTransaction.isFinished = true;
+    userTransaction.finishedTime = Date.now();
+    userTransaction.priceAtTransaction = recentPrice;
+    userTransaction.spendOrGain =
+      userTransaction.priceAtTransaction * userTransaction.quantity +
+      userTransaction.isTypeBuy
+        ? userTransaction.brokerage
+        : -userTransaction.brokerage;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 module.exports = {
   deleteExpiredVerification,
 
@@ -374,5 +541,7 @@ module.exports = {
   updateRankingList,
 
   getChunkUserTransactionsHistoryForRedisM5RU,
-  getLengthUserTransactionsHistoryForRedisM5RU
+  getLengthUserTransactionsHistoryForRedisM5RU,
+
+  proceedTransaction,
 };
