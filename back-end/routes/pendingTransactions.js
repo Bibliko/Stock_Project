@@ -9,7 +9,7 @@ router.get("/user", async (req, res) => {
 
         let userTransactions =  (await prisma.user.findUnique({
             where: { 
-                id: mockUser.id,
+                id: userId,
             },
             select: {
                 transactions: true,
