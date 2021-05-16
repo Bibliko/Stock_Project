@@ -48,6 +48,11 @@ const {
   updateMostGainersDaily
 } = require("./utils/redis-utils/MostGLA");
 
+// TODO: uncomment this when adding company codes into the code base
+// const {
+//   emptyPendingTransactionsListAllCompanies
+// } = require("./utils/redis-utils/PendingOrders");
+
 const { startSocketIO } = require("./socketIO");
 
 const { PORT, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = require('./config');
@@ -187,6 +192,9 @@ const setupBackendIntervals = () => {
   // parameter: forceUpdate <Boolean>
   // If forceUpdate is true and system is in developer mode, does not need to call API.
   setInterval(() => updateCompaniesRatingsList(), oneDay);
+
+  // TODO: Add company codes into the code base and then pass them in as an array to this function
+  // setInterval(() => emptyPendingTransactionsListAllCompanies(companyCodes), 5 * oneMinute);
 };
 
 setupBackendIntervals();
@@ -215,6 +223,7 @@ app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 app.use("/companyRating", require("./routes/companyRating"));
+app.use("/pendingTransactions", require('./routes/pendingTransactions'));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];

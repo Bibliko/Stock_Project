@@ -3,20 +3,24 @@ const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-router.get("/getPendingTransactions", async (req, res) => {
-    const { userId } = req.query;
-
+router.get("/user", async (req, res) => {
     try {
-        const userTransaction =  await prisma.user.findUnique({
+        const { userId } = req.query;
+
+        let userTransactions =  (await prisma.user.findUnique({
             where: { 
-                id: userId,
+                id: mockUser.id,
             },
             select: {
                 transactions: true,
             }
-        });
+        })).transactions;
 
-        res.status(200).send(userTransaction);
+        if (userTransactions) {
+            userTransactions = userTransactions.filter(userTransaction => !userTransaction.isFinished);
+        }
+        
+        res.status(200).send(userTransactions);
     } catch (err) {
         console.error(err);
     }
