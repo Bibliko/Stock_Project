@@ -430,9 +430,13 @@ class TransactionsHistoryTableContainer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
+    const userSessionKeys = ["email"];
+    const compareKeys = [
+      "classes",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return (
       !isEqual(nextPropsCompare, propsCompare) ||

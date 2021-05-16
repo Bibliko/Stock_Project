@@ -328,7 +328,7 @@ class ExchangeOrCompanyPriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["exchangeOrCompany"];
+    const compareKeys = ["classes", "exchangeOrCompany"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 

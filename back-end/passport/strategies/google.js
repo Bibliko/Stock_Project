@@ -8,7 +8,7 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   PASSPORT_CALLBACK_HOST
-} = process.env;
+} = require('../../config');
 
 const googleStrategy = new GoogleStrategy(
   {

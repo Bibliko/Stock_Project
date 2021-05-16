@@ -1,10 +1,5 @@
 // @flow
-
-try {
-  require("../config/config");
-} catch (err) {
-  console.log("No config found. Using default ENV.");
-}
+const { REDIS_URL } = require('../config');
 
 const PromiseBlueBird = require("bluebird");
 const redis = require("redis");
@@ -12,8 +7,9 @@ const redis = require("redis");
 PromiseBlueBird.promisifyAll(redis.RedisClient.prototype);
 PromiseBlueBird.promisifyAll(redis.Multi.prototype);
 
+
 const { promisify } = require("util");
-const client = redis.createClient(process.env.REDIS_URL);
+const client = redis.createClient(REDIS_URL);
 
 module.exports = {
   ...client,

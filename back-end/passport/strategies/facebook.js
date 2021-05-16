@@ -6,7 +6,7 @@ const {
   FACEBOOK_APP_ID,
   FACEBOOK_APP_SECRET,
   PASSPORT_CALLBACK_HOST
-} = process.env;
+} = require('../../config');
 // const { indices } = require('../../algolia');
 
 const facebookStrategy = new FacebookStrategy(
