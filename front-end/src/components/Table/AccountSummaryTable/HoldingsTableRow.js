@@ -350,17 +350,18 @@ class HoldingsTableRow extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["watchlist"];
-    const nextPropsCompareUserSession = pick(
-      nextProps.userSession,
-      compareKeys
-    );
-    const propsCompareUserSession = pick(this.props.userSession, compareKeys);
+    const userSessionKeys = ["watchlist"];
+    const compareKeys = [
+      "classes",
+      "isMarketClosed",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextProps.isMarketClosed, this.props.isMarketClosed) ||
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompareUserSession, propsCompareUserSession)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 
