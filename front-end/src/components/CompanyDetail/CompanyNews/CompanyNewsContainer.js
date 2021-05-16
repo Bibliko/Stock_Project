@@ -82,7 +82,7 @@ class CompanyNewsContainer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["companyData"];
+    const compareKeys = ["classes", "companyData"];
     const compareProps = pick(this.props, compareKeys);
     const compareNextProps = pick(nextProps, compareKeys);
 

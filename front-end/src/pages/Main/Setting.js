@@ -168,7 +168,7 @@ class AccountSetting extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const keysCompare = [
+    const userSessionKeys = [
       "email",
       "firstName",
       "lastName",
@@ -178,8 +178,12 @@ class AccountSetting extends React.Component {
       "region",
       "occupation",
     ];
-    const nextPropsCompare = pick(nextProps.userSession, keysCompare);
-    const propsCompare = pick(this.props.userSession, keysCompare);
+    const compareKeys = [
+      "classes",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return !isEqual(nextPropsCompare, propsCompare);
   }

@@ -16,7 +16,7 @@
     "docker-stop-containers:default": "docker stop $(docker ps -a -q)",
     "run-db": "npm run docker-stop-containers && docker-compose up",
     "start": "node ./build/index.js",
-    "dev": "node ./bin/etc/CheckConfigFolder.js && npm run update-db && npx nodemon --exec npx babel-node index.js",
+    "dev": "npm run update-db && npx nodemon --exec npx babel-node index.js",
     "devWithChangedConfig": "npm run update-db && npx nodemon --exec npx babel-node index.js",
     "prettier": "npx prettier --config ./.prettierrc --ignore-path ./.prettierignore --loglevel warn --write './**/*.js'",
     "fix": "npm run prettier && (npx flow & npx eslint . --fix)",
@@ -25,7 +25,7 @@
     "deps:default": "sh ./bin/Deps/Deps.sh",
     "help": "npx babel-node bin/Help",
     "clean": "npx rimraf ./build",
-    "build": "npm run clean-build && npx babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*','bin/*'"
+    "build": "npm run clean && npx babel . --out-dir ./build --ignore 'node_modules/*','flow-typed/*','bin/*'"
   },
   "keywords": [],
   "author": "",
@@ -34,13 +34,14 @@
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.10.5",
     "@prisma/cli": "^2.15.0",
-    "@prisma/client": "^2.15.0",
+    "@prisma/client": "^2.21.2",
     "@sendgrid/mail": "^7.4.0",
     "algoliasearch": "^4.3.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "firebase": "^7.24.0",
@@ -55,7 +56,7 @@
     "passport-local": "^1.0.0",
     "random-key": "^0.3.2",
     "redis": "^3.1.1",
-    "socket.io": "^2.4.0",
+    "socket.io": "^2.4.1",
     "util": "^0.12.3",
     "xhr2": "^0.2.0"
   },
@@ -77,6 +78,7 @@
     "flow-typed": "^3.2.1",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
+    "prisma": "^2.21.2",
     "rimraf": "^3.0.2",
     "run-script-os": "^1.1.1"
   }
