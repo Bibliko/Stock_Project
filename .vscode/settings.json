@@ -8,5 +8,6 @@
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/.hg/store/**": true
-  } // respect .eslintignore in the back-end
+  },
+  "git.ignoreLimitWarning": true // respect .eslintignore in the back-end
 }
