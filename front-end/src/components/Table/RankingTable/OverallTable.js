@@ -4,12 +4,14 @@ import { withStyles } from "@material-ui/core/styles";
 import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil.js";
 
 import {
-  TableRow,
-  TableCell,
-  TableContainer,
   Table,
   TableBody,
+  TableCell,
+  TableContainer,
+  TableFooter,
   TableHead,
+  TablePagination,
+  TableRow,
   Typography,
 } from "@material-ui/core";
 
@@ -50,6 +52,17 @@ const styles = (theme) => ({
     fontWeight: "bold",
     color: theme.palette.secondary.main,
   },
+  tablePagination: {
+    color: "white",
+  },
+  tablePaginationSelectIcon: {
+    color: "white",
+  },
+  tablePaginationActions: {
+    "& .Mui-disabled": {
+      color: theme.palette.disabled.main,
+    },
+  },
 });
 
 class OverallTable extends React.Component {
@@ -83,7 +96,12 @@ class OverallTable extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      totalUser,
+      currentPage,
+      handleChangePage,
+    } = this.props;
     const users = this.props.users || [];
     const headLabels = [
       "#",
@@ -91,34 +109,52 @@ class OverallTable extends React.Component {
       "Portfolio",
       "Region",
     ];
+    const rowsPerPage = 8;
 
     return (
-      <TableContainer className={classes.tableContainer}>
-        <Table className={classes.table} aria-label="ranking table">
-          <TableHead>
-            <TableRow>
-              { headLabels.map((label) => (
-                  <TableCell
-                    key={"head-" + label}
-                    component="th"
-                    scope="row"
-                    align="center"
-                    className={classes.headCell}
-                  >
-                    <Typography className={classes.headtitle}> {label} </Typography>
-                  </TableCell>
+      <React.Fragment>
+        <TableContainer className={classes.tableContainer}>
+          <Table className={classes.table} aria-label="ranking table">
+            <TableHead>
+              <TableRow>
+                { headLabels.map((label) => (
+                    <TableCell
+                      key={"head-" + label}
+                      component="th"
+                      scope="row"
+                      align="center"
+                      className={classes.headCell}
+                    >
+                      <Typography className={classes.headtitle}> {label} </Typography>
+                    </TableCell>
+                  ))
+                }
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              { users.map((user, id) => (
+                  this.getTableRow(user, currentPage * rowsPerPage + id + 1)
                 ))
               }
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            { users.map((user, id) => (
-                this.getTableRow(user, id + 1)
-              ))
-            }
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <TablePagination
+          classes={{
+            selectIcon: classes.tablePaginationSelectIcon,
+            actions: classes.tablePaginationActions,
+          }}
+          className={classes.tablePagination}
+          component={"div"}
+          count={totalUser}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[]}
+          page={currentPage}
+          onChangePage={handleChangePage}
+        />
+      </React.Fragment>
     )
   }
 }

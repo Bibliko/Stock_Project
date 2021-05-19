@@ -5,9 +5,13 @@ import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
-import { getOverallRanking, getRegionalRanking } from "../../utils/UserUtil";
+import {
+  getRankingLength,
+  getOverallRanking,
+  getRegionalRanking,
+} from "../../utils/UserUtil";
 import { getCachedAccountSummaryChartInfo } from "../../utils/RedisUtil";
-import { endOfLastWeek } from "../../utils/low-dependency/DayTimeUtil";
+import { endOfLastWeek, oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import SelectNoBox from "../../components/SelectBox/SelectNoBox";
 import MyStatsTable from "../../components/Table/RankingTable/MyStatsTable";
@@ -149,18 +153,70 @@ class Ranking extends React.Component {
     this.state = {
       rankingOption: "Overall",
       rankingUsersData: {},
+      totalUser: {},
+      rankingPage: 0,
       lastWeekPortfolio: portfolioValue,
       portfolioHigh: portfolioValue,
       portfolioLow: portfolioValue,
     };
   }
 
+  timeoutToChangePage;
+
   changeRankingOption = (event) => {
     if (!isEqual(this.state.rankingOption, event.target.value)) {
       this.setState({
         rankingOption: event.target.value,
+        rankingPage: 0,
       });
     }
+  };
+
+  getRankingData = () => {
+    const {
+      rankingUsersData,
+      rankingOption,
+      rankingPage,
+    } = this.state;
+
+    if (rankingOption === "Overall") {
+      // difference in index
+      return getOverallRanking(rankingPage + 1)
+        .then((overallUsers) => {
+          this.setState({
+            rankingUsersData: {
+              ...rankingUsersData,
+              Overall: overallUsers,
+            }
+          });
+        })
+        .catch((error) => console.log(error));
+    }
+
+    // Get regional ranking
+    getRegionalRanking(rankingPage + 1, rankingOption)
+      .then((regionalUsers) => {
+        this.setState({
+          rankingUsersData: {
+            ...rankingUsersData,
+            [rankingOption]: regionalUsers,
+          }
+        });
+      })
+      .catch((error) => console.log(error));
+  };
+
+  changeRankingPage = (event, newPage) => {
+    if (this.timeoutToChangePage) {
+      clearTimeout(this.timeoutToChangePage);
+    }
+
+    this.setState({ rankingPage: newPage }, () => {
+      this.timeoutToChangePage = setTimeout(
+        () => this.getRankingData(newPage),
+        oneSecond / 10
+      );
+    });
   };
 
   componentDidMount () {
@@ -168,9 +224,27 @@ class Ranking extends React.Component {
 
     // (k, Promise a) -> Promise (k, a)
     const addRegion = ([region, regionPromise]) => (
-      regionPromise.then(users => [region, users])
+      regionPromise.then((data) => [region, data])
     );
 
+    // Fetch ranking length
+    Promise.all([
+      getRankingLength(),
+      ...regions
+        .map((region) => [region, getRankingLength(region)])
+        .map(addRegion)
+    ])
+      .then(([overallLength, ...regionalLength]) => {
+        this.setState({
+          totalUser: {
+            Overall: overallLength,
+            ...Object.fromEntries(regionalLength),
+          }
+        });
+      })
+      .catch((error) => console.log(error));
+
+    // Fetch other data
     Promise.all([
       getOverallRanking(1),
       getCachedAccountSummaryChartInfo(email),
@@ -211,7 +285,7 @@ class Ranking extends React.Component {
           portfolioLow,
         });
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.log(error));
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -234,6 +308,8 @@ class Ranking extends React.Component {
     const {
       rankingOption,
       rankingUsersData,
+      totalUser,
+      rankingPage,
       lastWeekPortfolio,
       portfolioHigh,
       portfolioLow,
@@ -256,7 +332,13 @@ class Ranking extends React.Component {
                 value={rankingOption}
                 onChange={this.changeRankingOption}
               />
-              <OverallTable style={{marginTop: "10px"}} users={rankingUsersData[rankingOption]}/>
+              <OverallTable
+                style={{marginTop: "10px"}}
+                users={rankingUsersData[rankingOption]}
+                totalUser={totalUser[rankingOption] || 0}
+                currentPage={rankingPage}
+                handleChangePage={this.changeRankingPage}
+              />
             </div>
           </Grid>
 

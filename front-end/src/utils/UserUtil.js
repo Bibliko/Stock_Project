@@ -332,6 +332,24 @@ export const getUserAccountSummaryChartTimestamps = (
   });
 };
 
+export const getRankingLength = (region = null) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getRankingLength`, {
+      method: "get",
+      params: {
+        region,
+      },
+      withCredentials: true,
+    })
+      .then((listLength) => {
+        resolve(parseInt(listLength.data));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const getOverallRanking = (
   page
 ) => {
