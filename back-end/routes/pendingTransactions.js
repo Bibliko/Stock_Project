@@ -7,18 +7,18 @@ router.get("/user", async (req, res) => {
     try {
         const { userId } = req.query;
 
-        let userTransactions =  (await prisma.user.findUnique({
+        const userTransactions =  (await prisma.user.findUnique({
             where: { 
                 id: userId,
             },
             select: {
-                transactions: true,
+                transactions: {
+                    where: {
+                        isFinished: false,
+                    },
+                },
             }
-        })).transactions;
-
-        if (userTransactions) {
-            userTransactions = userTransactions.filter(userTransaction => !userTransaction.isFinished);
-        }
+        }));
         
         res.status(200).send(userTransactions);
     } catch (err) {

@@ -365,44 +365,55 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
 /**
  * Perform buy action for the function proceedTransaction
  * @param {import(".prisma/client").User} user
- * @param {number} totalPendingPrice
+ * @param {number} totalCashChange
  * @param {string} companyCode
+ * @param {number} quantity
+ * @param {number} recentPrice 
  * @returns
  */
  const buyShareEvent = async (
   user,
-  totalPendingPrice,
+  totalCashChange,
   companyCode,
   quantity,
   recentPrice
 ) => {
   try {
-    if (user.cash < totalPendingPrice) {
+    if (user.cash < totalCashChange) {
       return new Error(
         "The user does not have enough money to buy the pending stock"
       );
     }
+    // Update user cash
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        cash: user.cash - totalCashChange,
+      }
+    });
 
-    user.cash -= totalPendingPrice;
+    // Find the stock user want to buy and update its properties (quantity and average price)
     const buyShare = user.shares.find(
       (share) => share.companyCode === companyCode
     );
-    const buyShareIndex = user.shares.indexOf(buyShare);
 
     if (!buyShare) {
       await prisma.share.create({
-        companyCode: companyCode,
-        quantity: quantity,
-        buyPriceAvg: recentPrice,
-        user: user,
-        userID: user.id
+        data: {
+          companyCode: companyCode,
+          quantity: quantity,
+          buyPriceAvg: recentPrice,
+          user: {
+            connect: {
+              id: user.id,
+            }
+          }
+        }
       });
     } else {
-      // Update in Share
-      buyShare.buyPriceAvg =
-        (buyShare.buyPriceAvg * buyShare.quantity +
-          recentPrice * (buyShare.quantity + quantity)) /
-        (quantity + buyShare.quantity);
+      buyShare.buyPriceAvg = ((buyShare.buyPriceAvg * buyShare.quantity) + (recentPrice * quantity)) / (quantity + buyShare.quantity);
       buyShare.quantity += quantity;
       await prisma.share.update({
         where: {
@@ -413,17 +424,6 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
           quantity: buyShare.quantity
         }
       });
-
-      // Update in User
-      user.shares[buyShareIndex] = buyShare;
-      await prisma.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          shares: user.shares
-        }
-      });
     }
   } catch (err) {
     console.error(err);
@@ -432,61 +432,55 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
 
 const sellShareEvent = async (
   user,
-  totalPendingPrice,
+  totalCashChange,
   companyCode,
-  quantity,
-  recentPrice
+  quantity
 ) => {
   try {
-    user.cash += totalPendingPrice;
+    // Update user cash
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        cash: user.cash + totalCashChange,
+      }
+    });
+
+    // Find the stock user want to sell and update its properties (quantity and average price)
     const sellShare = user.shares.find(
       (share) => share.companyCode === companyCode
     );
-    const sellShareIndex = user.shares.indexOf(sellShare);
 
     if (!sellShare) {
       return new Error("Couldn't find share");
     } else if (quantity > sellShare.quantity) {
       return new Error("Not enough available shares");
+    } else if (user.cash + totalCashChange < 0) {
+      return new Error("Something is wrong with user's cash")
     }
 
     if (quantity === sellShare.quantity) {
-      await prisma.share.delete({
-        where: {
-          companyCode: companyCode
-        }
-      });
-
-      user.shares.slice(sellShareIndex, 1);
-      await prisma.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          shares: user.shares
-        }
-      });
-    } else {
-      sellShare.quantity -= quantity;
-      await prisma.share.update({
-        where: {
-          id: sellShare.id
-        },
-        data: {
-          quantity: sellShare.quantity
-        }
-      });
-
-      user.shares[sellShareIndex] = sellShare;
-      await prisma.user.upate({
-        where: {
-          id: user.id
-        },
-        data: {
-          shares: user.shares
-        }
-      });
+      user.shares = user.shares.filter((share) => share !== sellShare);
     }
+
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        shares: user.shares
+      }
+    });
+    
+    await prisma.share.update({
+      where: {
+        id: sellShare.id
+      },
+      data: {
+        quantity: sellShare.quantity - quantity,
+      }
+    });
   } catch (err) {
     console.error(err);
   }
@@ -502,28 +496,23 @@ const proceedTransaction = async (transactionID, recentPrice) => {
     const userTransaction = await prisma.userTransaction.findUnique({
       where: {
         id: transactionID
-      },
-      include: {
-        user: true
       }
     });
 
     const { user, isTypeBuy, quantity, companyCode } = userTransaction;
-    const totalPendingPrice = recentPrice * quantity;
+    const totalCashChange = (isTypeBuy ? -1 : 1) * (recentPrice * quantity) - userTransaction.brokerage;
 
     if (isTypeBuy) {
-      await buyShareEvent(user, totalPendingPrice, companyCode);
-    } else await sellShareEvent(user, totalPendingPrice, companyCode);
+      buyShareEvent(user, totalCashChange, companyCode, quantity, recentPrice);
+    } else {
+      sellShareEvent(user, totalCashChange, companyCode, quantity);
+    }
 
     // Update transaction after buying/selling
     userTransaction.isFinished = true;
     userTransaction.finishedTime = Date.now();
     userTransaction.priceAtTransaction = recentPrice;
-    userTransaction.spendOrGain =
-      userTransaction.priceAtTransaction * userTransaction.quantity +
-      userTransaction.isTypeBuy
-        ? userTransaction.brokerage
-        : -userTransaction.brokerage;
+    userTransaction.spendOrGain = totalCashChange;
   } catch (err) {
     console.error(err);
   }

@@ -194,6 +194,7 @@ const setupBackendIntervals = () => {
   setInterval(() => updateCompaniesRatingsList(), oneDay);
 
   // TODO: Add company codes into the code base and then pass them in as an array to this function
+  // TODO: Remove this interval when market is closed and add it when market is opened.
   // setInterval(() => emptyPendingTransactionsListAllCompanies(companyCodes), 5 * oneMinute);
 };
 
