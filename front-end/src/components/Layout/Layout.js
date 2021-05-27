@@ -10,9 +10,10 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
-import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+// TODO: Uncomment this in production
+// import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
-import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
+// import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
 import {
   joinUserRoom,
@@ -101,6 +102,7 @@ class Layout extends React.Component {
   checkStockQuotesInterval;
 
   setupIntervals = () => {
+    // TODO: Uncomment this in production
     // if (this.props.userSession.hasFinishedSettingUp) {
     //   this.checkStockQuotesInterval = setInterval(
     //     () => checkStockQuotesToCalculateSharesValue(this),
