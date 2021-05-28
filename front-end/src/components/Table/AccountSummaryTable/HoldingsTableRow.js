@@ -7,7 +7,8 @@ import { socket } from "../../../App";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
-import { getFullStockInfo } from "../../../utils/RedisUtil";
+// TODO: Uncomment this in production
+// import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import {
   numberWithCommas,
@@ -322,6 +323,7 @@ class HoldingsTableRow extends React.Component {
   };
 
   updateHoldingInformation = () => {
+    // TODO: Uncomment this in production
     // const { code, holding, buyPriceAvg } = this.props.rowData;
     // getFullStockInfo(code)
     //   .then((fullStockInfo) => {
