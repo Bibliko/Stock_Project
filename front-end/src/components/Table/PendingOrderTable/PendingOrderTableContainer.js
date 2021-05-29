@@ -15,11 +15,14 @@ import {
 import { withStyles } from "@material-ui/core/styles";
 
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
+import { getUserPendingTransactions } from "../../../utils/UserUtil";
+
 import {
   paperWhenHistoryEmpty,
   chooseTableCellHeader,
 } from "./helperComponents";
 import PendingOrderTableRow from "./PendingOrderTableRow"
+
 
 const styles = (theme) => ({
   pendingOrderContainerDiv: {
@@ -190,37 +193,23 @@ class PendingOrderTableContainer extends React.Component {
   }
 
   componentDidMount() {
-    //FIXME: using api instead of dummy data
-    const pendingOrders = this.getDummyPendingOrders()
-
-    this.setState({
-      loading: false,
-      isFirstInitializationEmpty: false,
-      pendingOrders,
-    })
+    this.getUserPendingTransactionsData()
   }
 
-  getDummyPendingOrders = () => {
-    return [
-      {
-        isTypeBuy: true,
-        companyCode: 'code_0',
-        quantity: 'quantity_0',
-        option: 'option_0',
-        limitPrice: 'landPrice_0',
-        brokerage: 'brokerage_0',
-        tradeValue: 'tradeValue_0',
-      },
-      {
-        isTypeBuy: false,
-        companyCode: 'code_1',
-        quantity: 'quantity_1',
-        option: 'option_1',
-        limitPrice: 'landPrice_1',
-        brokerage: 'brokerage_1',
-        tradeValue: 'tradeValue_1',
-      }
-    ]
+  getUserPendingTransactionsData = () => {
+    const { email } = this.props.userSession;
+
+    getUserPendingTransactions(email)
+    .then(pendingOrders => {
+      this.setState({
+        loading: false,
+        isFirstInitializationEmpty: !pendingOrders.length,
+        pendingOrders,
+      })
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }
 
   render() {
@@ -236,7 +225,7 @@ class PendingOrderTableContainer extends React.Component {
 
     return (
       <div className={classes.pendingOrderContainerDiv}>
-        {false && isFirstInitializationEmpty &&
+        {isFirstInitializationEmpty &&
           !loading &&
           paperWhenHistoryEmpty(
             classes,

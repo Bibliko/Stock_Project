@@ -120,7 +120,7 @@ export const paperWhenHistoryEmpty = (
         })}
       />
       <Typography className={classes.assignmentWord}>
-        TODO: add message empty data here
+        No pending orders!
       </Typography>
     </Paper>
   );
