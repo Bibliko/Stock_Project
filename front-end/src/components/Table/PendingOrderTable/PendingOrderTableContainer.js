@@ -121,17 +121,6 @@ const styles = (theme) => ({
   lastElementTopRightRounded: {
     borderTopRightRadius: "4px",
   },
-  tablePagination: {
-    color: "white",
-  },
-  tablePaginationSelectIcon: {
-    color: "white",
-  },
-  tablePaginationActions: {
-    "& .Mui-disabled": {
-      color: theme.palette.disabled.main,
-    },
-  },
   skeleton: {
     width: "100%",
     height: "200px",

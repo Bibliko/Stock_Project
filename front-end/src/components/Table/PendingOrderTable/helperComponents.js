@@ -126,38 +126,9 @@ export const paperWhenHistoryEmpty = (
   );
 };
 
-export const tablePagination = (
-  rowsLengthChoices,
-  transactionsLength,
-  rowsPerPage,
-  pageBase0,
-  handleChangePage,
-  handleChangeRowsPerPage,
-  classes
-) => {
-  return (
-    <TablePagination
-      classes={{
-        selectIcon: classes.tablePaginationSelectIcon,
-        actions: classes.tablePaginationActions,
-      }}
-      className={classes.tablePagination}
-      rowsPerPageOptions={rowsLengthChoices}
-      component="div"
-      count={transactionsLength}
-      rowsPerPage={rowsPerPage}
-      page={pageBase0}
-      onChangePage={handleChangePage}
-      onChangeRowsPerPage={handleChangeRowsPerPage}
-    />
-  );
-};
-
 export default {
   chooseTableCellHeader,
   chooseTableCell,
   chooseTableCellValue,
-
   paperWhenHistoryEmpty,
-  tablePagination,
 };
