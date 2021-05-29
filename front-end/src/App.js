@@ -24,6 +24,7 @@ import Setting from "./pages/Main/Setting";
 import Companies from "./pages/Main/Companies";
 import CompanyDetail from "./pages/Main/CompanyDetail";
 import TransactionsHistory from "./pages/Main/TransactionsHistory";
+import PendingOrder from "./pages/Main/PendingOrder";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
@@ -140,6 +141,7 @@ class App extends React.Component {
                     path="/transactionsHistory"
                     component={TransactionsHistory}
                   />
+                  <Route path="/pendingOrder" component={PendingOrder} />
                 </Layout>
               )}
             </Switch>
