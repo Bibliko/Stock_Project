@@ -47,36 +47,6 @@ const styles = (theme) => ({
     borderColor: theme.palette.paperBackground.sub,
     borderStyle: "solid",
   },
-  tableCellTransactionTime: {
-    minWidth: "200px",
-  },
-  cellDiv: {
-    fontSize: "medium",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "small",
-    },
-    display: "flex",
-    alignItems: "center",
-    "&.MuiTableSortLabel-root": {
-      color: "white",
-      "&.MuiTableSortLabel-active": {
-        fontStyle: "italic",
-        "&.MuiTableSortLabel-root": {
-          "&.MuiTableSortLabel-active": {
-            "& .MuiTableSortLabel-icon": {
-              color: "white",
-            },
-          },
-        },
-      },
-      "&:hover": {
-        fontStyle: "italic",
-      },
-      "&:focus": {
-        fontStyle: "italic",
-      },
-    },
-  },
   emptyRowsPaper: {
     display: "flex",
     justifyContent: "center",
@@ -143,11 +113,9 @@ class PendingOrderTableContainer extends React.Component {
     hoverPaper: true,
     loading: true,
     openFilterDialog: false,
-    isScrollingUp: true,
     isFirstInitializationEmpty: true,
     pendingOrders: [],
-    pendingOrdersLength: 0,
-    names: [
+    labels: [
       "Type",
       "Code",
       "Quantity",
@@ -159,8 +127,6 @@ class PendingOrderTableContainer extends React.Component {
     ],
   }
 
-  scrollPosition;
-  timeoutToChangePage;
   timeoutStartAnimationAgain;
 
   hoverPaper = () => {
@@ -208,8 +174,7 @@ class PendingOrderTableContainer extends React.Component {
       loading,
       isFirstInitializationEmpty,
       pendingOrders,
-      pendingOrdersLength,
-      names,
+      labels,
     } = this.state;
 
     return (
@@ -228,7 +193,7 @@ class PendingOrderTableContainer extends React.Component {
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    {names.map((_, index) => {
+                    {labels.map((_, index) => {
                       return chooseTableCellHeader(
                         index,
                         this.state

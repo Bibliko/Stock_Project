@@ -5,11 +5,12 @@ import {
   TableCell,
   Typography,
   Paper,
-  TablePagination,
   Button,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { AssignmentRounded as AssignmentRoundedIcon } from "@material-ui/icons";
+
+import { numberWithCommas, roundNumber, } from "../../../utils/low-dependency/NumberUtil";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -55,20 +56,20 @@ export const chooseTableCellValue = (type, order, classes) => {
     option,
     limitPrice,
     brokerage,
-    tradeValue,
   } = order;
 
-  //TODO: change to correct display type
+  let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage))
+
   switch (type) {
     case "Type": return isTypeBuy ? "BUY" : "SELL";
 
     case "Code": return `${companyCode}`;
 
-    case "Quantity": return `${quantity}`;
+    case "Quantity": return `${numberWithCommas(quantity)}`;
 
     case "Option": return `${option}`;
 
-    case "Land price": return `${limitPrice}`;
+    case "Land price": return `$${limitPrice}`;
 
     case "Brokerage": return `${brokerage}`;
 

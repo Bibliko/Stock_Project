@@ -21,14 +21,6 @@ const styles = (theme) => ({
     background: "transparent",
     backgroundColor: "transparent",
   },
-  cellDiv: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  cellDivSpecialForType: {
-    justifyContent: "flex-start",
-  },
   amendButton: {
     backgroundColor: theme.palette.success.main,
     "&:hover": {
