@@ -58,7 +58,7 @@ export const chooseTableCellValue = (type, order, classes) => {
     brokerage,
   } = order;
 
-  let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage))
+  let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage, 2))
 
   switch (type) {
     case "Type": return isTypeBuy ? "BUY" : "SELL";
@@ -69,11 +69,11 @@ export const chooseTableCellValue = (type, order, classes) => {
 
     case "Option": return `${option}`;
 
-    case "Land price": return `$${limitPrice}`;
+    case "Land price": return `$${numberWithCommas(roundNumber(limitPrice, 2))}`;
 
-    case "Brokerage": return `${brokerage}`;
+    case "Brokerage": return `$${numberWithCommas(roundNumber(brokerage, 2))}`;
 
-    case "Trade value": return `${tradeValue}`;
+    case "Trade value": return `$${tradeValue}`;
 
     case "Actions":
       return <span>
@@ -103,7 +103,7 @@ export const chooseTableCellValue = (type, order, classes) => {
   }
 };
 
-export const paperWhenHistoryEmpty = (
+export const paperWhenPendingOrderEmpty = (
   classes,
   hoverPaperState,
   hoverPaperFn,
@@ -131,5 +131,5 @@ export default {
   chooseTableCellHeader,
   chooseTableCell,
   chooseTableCellValue,
-  paperWhenHistoryEmpty,
+  paperWhenPendingOrderEmpty,
 };

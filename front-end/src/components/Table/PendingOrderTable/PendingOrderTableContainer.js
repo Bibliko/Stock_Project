@@ -17,10 +17,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { getUserPendingTransactions } from "../../../utils/UserUtil";
 
-import {
-  paperWhenHistoryEmpty,
-  chooseTableCellHeader,
-} from "./helperComponents";
+import { paperWhenPendingOrderEmpty, chooseTableCellHeader } from "./helperComponents";
 import PendingOrderTableRow from "./PendingOrderTableRow"
 
 
@@ -85,34 +82,12 @@ const styles = (theme) => ({
     },
     textAlign: "center",
   },
-  firstElementTopLeftRounded: {
-    borderTopLeftRadius: "4px",
-  },
-  lastElementTopRightRounded: {
-    borderTopRightRadius: "4px",
-  },
-  skeleton: {
-    width: "100%",
-    height: "200px",
-  },
-  visuallyHidden: {
-    border: 0,
-    clip: "rect(0 0 0 0)",
-    height: 1,
-    margin: -1,
-    overflow: "hidden",
-    padding: 0,
-    position: "absolute",
-    top: 20,
-    width: 1,
-  },
 })
 
 class PendingOrderTableContainer extends React.Component {
   state = {
     hoverPaper: true,
     loading: true,
-    openFilterDialog: false,
     isFirstInitializationEmpty: true,
     pendingOrders: [],
     labels: [
@@ -181,7 +156,7 @@ class PendingOrderTableContainer extends React.Component {
       <div className={classes.pendingOrderContainerDiv}>
         {isFirstInitializationEmpty &&
           !loading &&
-          paperWhenHistoryEmpty(
+          paperWhenPendingOrderEmpty(
             classes,
             hoverPaper,
             this.hoverPaper,
@@ -189,7 +164,7 @@ class PendingOrderTableContainer extends React.Component {
           )}
         {!isFirstInitializationEmpty && !loading && (
           <React.Fragment>
-            <TableContainer>
+            <TableContainer className={classes.tableContainer}>
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                   <TableRow>
