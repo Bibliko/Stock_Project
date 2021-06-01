@@ -266,6 +266,26 @@ export const getUserData = (dataNeeded, email) => {
   });
 };
 
+export const getUserPendingTransactions = (email) => {
+  const dataNeeded = {
+    transactions: {
+      where: {
+        isFinished: false,
+      },
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    getUserData(dataNeeded, email)
+      .then((userData) => {
+        resolve(userData.transactions);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const getUserTransactionsHistory = (
   email,
   rowsLengthChoices,
@@ -455,6 +475,7 @@ export default {
   changeUserData,
   changeUserEmail,
   getUserData,
+  getUserPendingTransactions,
   getUserTransactionsHistory,
   getUserAccountSummaryChartTimestamps,
 
