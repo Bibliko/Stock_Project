@@ -60,10 +60,10 @@ class PendingOrderTableRow extends React.Component {
     return (
       <TableRow className={classes.tableRow}>
         {chooseTableCell(
-            "Type",
-            this.isLastRow,
-            classes,
-            order
+          "Type",
+          this.isLastRow,
+          classes,
+          order
         )}
         {chooseTableCell(
           "Code",
@@ -84,10 +84,10 @@ class PendingOrderTableRow extends React.Component {
           order
         )}
         {chooseTableCell(
-            "Land price",
-            this.isLastRow,
-            classes,
-            order
+          "Land price",
+          this.isLastRow,
+          classes,
+          order
         )}
         {chooseTableCell(
           "Brokerage",

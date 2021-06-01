@@ -20,8 +20,8 @@ const StyledTableCell = withStyles((theme) => ({
 }))(TableCell);
 
 export const chooseTableCellHeader = (indexColumnName, state) => {
-  const { names } = state;
-  const type = names[indexColumnName];
+  const { labels } = state;
+  const type = labels[indexColumnName];
 
   return (
     <StyledTableCell key={indexColumnName} align={'center'}>{type}</StyledTableCell>
@@ -58,7 +58,7 @@ export const chooseTableCellValue = (type, order, classes) => {
     brokerage,
   } = order;
 
-  let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage, 2))
+  let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage, 2));
 
   switch (type) {
     case "Type": return isTypeBuy ? "BUY" : "SELL";
@@ -76,28 +76,30 @@ export const chooseTableCellValue = (type, order, classes) => {
     case "Trade value": return `$${tradeValue}`;
 
     case "Actions":
-      return <span>
-        <Button
-          aria-label="amend"
-          size="small"
-          variant="contained"
-          className={classes.amendButton}
-          disableElevation
-          onClick={() => alert('Amend')}
-        >
-          Amend
-        </Button>
-        <Button
-          aria-label="delete"
-          size="small"
-          variant="contained"
-          className={classes.deleteButton}
-          disableElevation
-          onClick={() => alert('Delete')}
-        >
-          Delete
-        </Button>
-      </span>;
+      return (
+        <span>
+          <Button
+            aria-label="amend"
+            size="small"
+            variant="contained"
+            className={classes.amendButton}
+            disableElevation
+            onClick={() => alert('Amend')}
+          >
+            Amend
+          </Button>
+          <Button
+            aria-label="delete"
+            size="small"
+            variant="contained"
+            className={classes.deleteButton}
+            disableElevation
+            onClick={() => alert('Delete')}
+          >
+            Delete
+          </Button>
+        </span>
+      );
 
     default: return;
   }

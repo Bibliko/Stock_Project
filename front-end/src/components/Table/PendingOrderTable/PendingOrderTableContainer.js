@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import {
@@ -8,9 +7,6 @@ import {
   Table,
   TableHead,
   TableBody,
-  Fab,
-  Container,
-  Typography,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 
@@ -18,8 +14,7 @@ import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { getUserPendingTransactions } from "../../../utils/UserUtil";
 
 import { paperWhenPendingOrderEmpty, chooseTableCellHeader } from "./helperComponents";
-import PendingOrderTableRow from "./PendingOrderTableRow"
-
+import PendingOrderTableRow from "./PendingOrderTableRow";
 
 const styles = (theme) => ({
   pendingOrderContainerDiv: {
@@ -82,7 +77,7 @@ const styles = (theme) => ({
     },
     textAlign: "center",
   },
-})
+});
 
 class PendingOrderTableContainer extends React.Component {
   state = {
@@ -100,7 +95,7 @@ class PendingOrderTableContainer extends React.Component {
       "Trade value",
       "Actions",
     ],
-  }
+  };
 
   timeoutStartAnimationAgain;
 
@@ -108,7 +103,7 @@ class PendingOrderTableContainer extends React.Component {
     this.setState({
       hoverPaper: true,
     });
-  }
+  };
 
   notHoverPaper = () => {
     this.setState({
@@ -120,7 +115,7 @@ class PendingOrderTableContainer extends React.Component {
         hoverPaper: true,
       });
     }, 3 * oneSecond);
-  }
+  };
 
   componentDidMount() {
     this.getUserPendingTransactionsData()
@@ -140,7 +135,7 @@ class PendingOrderTableContainer extends React.Component {
     .catch((err) => {
       console.log(err);
     });
-  }
+  };
 
   render() {
     const { classes } = this.props;
@@ -161,34 +156,33 @@ class PendingOrderTableContainer extends React.Component {
             hoverPaper,
             this.hoverPaper,
             this.notHoverPaper
-          )}
+          )
+        }
         {!isFirstInitializationEmpty && !loading && (
-          <React.Fragment>
-            <TableContainer className={classes.tableContainer}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    {labels.map((_, index) => {
-                      return chooseTableCellHeader(
-                        index,
-                        this.state
-                      );
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody className={classes.tableBody}>
-                  {pendingOrders.map((row, index) => (
-                    <PendingOrderTableRow
-                      key={index}
-                      order={row}
-                      rowIndex={index}
-                      rowsLength={pendingOrders.length}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </React.Fragment>
+          <TableContainer className={classes.tableContainer}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  {labels.map((_, index) => {
+                    return chooseTableCellHeader(
+                      index,
+                      this.state
+                    );
+                  })}
+                </TableRow>
+              </TableHead>
+              <TableBody className={classes.tableBody}>
+                {pendingOrders.map((row, index) => (
+                  <PendingOrderTableRow
+                    key={index}
+                    order={row}
+                    rowIndex={index}
+                    rowsLength={pendingOrders.length}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </div>
     );
