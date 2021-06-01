@@ -175,6 +175,7 @@ class PendingOrderTableContainer extends React.Component {
                 {pendingOrders.map((row, index) => (
                   <PendingOrderTableRow
                     key={index}
+                    labels={labels}
                     order={row}
                     rowIndex={index}
                     rowsLength={pendingOrders.length}
