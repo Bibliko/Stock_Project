@@ -114,10 +114,12 @@ class SearchField extends React.Component {
       turnOnSearchMenu,
       clearSearchCompany,
       focused,
+      handleKeyDown,
     } = this.props;
 
     return (
       <TextField
+        onKeyDown={handleKeyDown}
         id="Search"
         ref={forwardedRef}
         value={searchCompany}
