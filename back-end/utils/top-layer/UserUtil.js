@@ -368,7 +368,7 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
  * @param {number} totalCashChange
  * @param {string} companyCode
  * @param {number} quantity
- * @param {number} recentPrice 
+ * @param {number} recentPrice
  * @returns
  */
  const buyShareEvent = async (
@@ -379,9 +379,10 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
   recentPrice
 ) => {
   try {
-    if (user.cash < totalCashChange) {
+    // Check conditions
+    if (user.cash + totalCashChange < 0) {
       return new Error(
-        "The user does not have enough money to buy the pending stock"
+        "The user does not have enough cash to buy the pending stock"
       );
     }
     // Update user cash
@@ -390,17 +391,19 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
         id: user.id,
       },
       data: {
-        cash: user.cash - totalCashChange,
+        cash: user.cash + totalCashChange,
       }
     });
 
-    // Find the stock user want to buy and update its properties (quantity and average price)
+    // Find out whether user has owned this share already or not
     const buyShare = user.shares.find(
       (share) => share.companyCode === companyCode
     );
 
+    // Update share
+    // Case 1: user does not own this share => create new share
     if (!buyShare) {
-      await prisma.share.create({
+      return await prisma.share.create({
         data: {
           companyCode: companyCode,
           quantity: quantity,
@@ -412,21 +415,21 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
           }
         }
       });
-    } else {
-      buyShare.buyPriceAvg = ((buyShare.buyPriceAvg * buyShare.quantity) + (recentPrice * quantity)) / (quantity + buyShare.quantity);
-      buyShare.quantity += quantity;
-      await prisma.share.update({
-        where: {
-          id: buyShare.id
-        },
-        data: {
-          buyPriceAvg: buyShare.buyPriceAvg,
-          quantity: buyShare.quantity
-        }
-      });
     }
+    // Case 2: user owns this share => update share quantity, buyPriceAvg
+    buyShare.buyPriceAvg = ((buyShare.buyPriceAvg * buyShare.quantity) + (recentPrice * quantity)) / (quantity + buyShare.quantity);
+    buyShare.quantity += quantity;
+    await prisma.share.update({
+      where: {
+        id: buyShare.id
+      },
+      data: {
+        buyPriceAvg: buyShare.buyPriceAvg,
+        quantity: buyShare.quantity
+      }
+    });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
 
@@ -437,6 +440,20 @@ const sellShareEvent = async (
   quantity
 ) => {
   try {
+    // Find the stock user want to sell and update its properties (quantity and average price)
+    const sellShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+
+    // Check conditions
+    if (!sellShare) {
+      return new Error("Couldn't find share");
+    } else if (quantity > sellShare.quantity) {
+      return new Error("Not enough available shares");
+    } else if (user.cash + totalCashChange < 0) {
+      return new Error("Not enough cash")
+    }
+
     // Update user cash
     await prisma.user.update({
       where: {
@@ -447,42 +464,26 @@ const sellShareEvent = async (
       }
     });
 
-    // Find the stock user want to sell and update its properties (quantity and average price)
-    const sellShare = user.shares.find(
-      (share) => share.companyCode === companyCode
-    );
-
-    if (!sellShare) {
-      return new Error("Couldn't find share");
-    } else if (quantity > sellShare.quantity) {
-      return new Error("Not enough available shares");
-    } else if (user.cash + totalCashChange < 0) {
-      return new Error("Something is wrong with user's cash")
-    }
-
+    // Update share
+    // Case 1: sell all shares => delete the share in prisma
     if (quantity === sellShare.quantity) {
-      user.shares = user.shares.filter((share) => share !== sellShare);
+      return await prisma.share.delete({
+        where: {
+          id: sellShare.id
+        },
+      });
     }
-
-    await prisma.user.update({
-      where: {
-        id: user.id
-      },
-      data: {
-        shares: user.shares
-      }
-    });
-    
+    // Case 2: sell some shares => update share quantity
     await prisma.share.update({
       where: {
         id: sellShare.id
       },
       data: {
-        quantity: sellShare.quantity - quantity,
+        quantity: sellShare.quantity - quantity
       }
     });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
 
@@ -496,6 +497,13 @@ const proceedTransaction = async (transactionID, recentPrice) => {
     const userTransaction = await prisma.userTransaction.findUnique({
       where: {
         id: transactionID
+      },
+      include: {
+        user: {
+          include: {
+            shares: true
+          }
+        }
       }
     });
 
@@ -509,12 +517,19 @@ const proceedTransaction = async (transactionID, recentPrice) => {
     }
 
     // Update transaction after buying/selling
-    userTransaction.isFinished = true;
-    userTransaction.finishedTime = Date.now();
-    userTransaction.priceAtTransaction = recentPrice;
-    userTransaction.spendOrGain = totalCashChange;
+    await prisma.userTransaction.update({
+      where: {
+        id: transactionID
+      },
+      data: {
+        isFinished: true,
+        finishedTime: new Date(),
+        priceAtTransaction: recentPrice,
+        spendOrGain: totalCashChange,
+      }
+    });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
 
