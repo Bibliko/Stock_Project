@@ -41,12 +41,13 @@ const {
  * - 'cachedShares': list
  * - 'cachedShares|${companyCode}|quote': value
  * - 'cachedShares|${companyCode}|profile': value
- * - `cachedShares|${companyCode}|pendingSell`: list
- * - `cachedShares|${companyCode}|pendingBuy`: list
- * - `cachedShares|${companyCode}|priceStatus`: value
- * 
+ *
  * - 'RANKING_LIST': list
  * - 'RANKING_LIST_${region}': list
+ *
+ * - 'PENDING_COMPANIES': set -> set of companies that have pending orders
+ * - `PENDING_ORDERS_${option}_${companyCode}`: sorted set
+ *   -> set of orderIDs for each options (>=, <=, at market open) of a companyCode
  */
 
 const transactionsHistoryList = "transactionsHistoryList";
@@ -62,6 +63,9 @@ const cachedHistoricalChartFull = "cachedHistoricalChartFull";
 const cachedMostGainers = "cachedMostGainers";
 const cachedShares = "cachedShares";
 const rankingList = "RANKING_LIST";
+
+const pendingCompaniesSet = "PENDING_COMPANIES";
+const pendingOrdersSet = "PENDING_ORDERS";
 
 /**
  * @returns true if market is closed, false if market is opened
@@ -240,6 +244,9 @@ module.exports = {
   cachedMostGainers,
   cachedShares,
   rankingList,
+
+  pendingCompaniesSet,
+  pendingOrdersSet,
 
   // Market Time
   isMarketClosedCheck,

@@ -224,6 +224,7 @@ app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 app.use("/companyRating", require("./routes/companyRating"));
+app.use("/transaction", require("./routes/transaction"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];

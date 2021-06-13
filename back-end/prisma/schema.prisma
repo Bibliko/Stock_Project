@@ -87,10 +87,11 @@ model UserTransaction {
   priceAtTransaction Float? // price at the moment transactions are made
   limitPrice         Float?
   brokerage          Float?
-  spendOrGain        Float? // totalValue = priceAtTransaction * quantity + (buy) or - (sell) brokerage; if buy: totalValue should be calculated then cast to negative 
+  spendOrGain        Float? // totalValue = priceAtTransaction * quantity + (buy) or - (sell) brokerage; if buy: totalValue should be calculated then cast to negative
   isFinished         Boolean?
   finishedTime       DateTime?
-  isTypeBuy          Boolean?
+  type               String? // Buy, Sell
+  option             String? // Greater/Equal, Less/Equal, At market open
   note               String?
   user               User      @relation(fields: [userID], references: [id])
   userID             String
