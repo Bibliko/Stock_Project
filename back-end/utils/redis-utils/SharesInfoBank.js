@@ -19,6 +19,7 @@ const {
 const {
   parseCachedShareQuote,
   parseCachedShareProfile,
+  createRedisValueFromStockQuoteJSON,
   createRedisValueFromStockProfileJSON,
   createSymbolsStringFromCachedSharesList,
   combineFMPStockQuoteAndProfile
@@ -133,20 +134,22 @@ const pushManyCodesToCachedShares = (companyCodes) => {
  * - Use redis key 'cachedShares|symbol|quote'
  * @param {*} stockQuoteJSON stock QUOTE information obtained from FMP (json object)
  */
-const updateSingleCachedShareQuote = async (stockQuoteJSON) => {
-  try {
+const updateSingleCachedShareQuote = (stockQuoteJSON) => {
+  return new Promise((resolve, reject) => {
     const { symbol } = stockQuoteJSON;
-    const lastestPrice = stockQuoteJSON.price;
 
-    const redisKeyQuote = `${cachedShares}|${symbol}|quote`;
-    const oldPrice = await setAsync(redisKeyQuote);
+    const redisKey = `${cachedShares}|${symbol}|quote`;
+    const valueString = createRedisValueFromStockQuoteJSON(stockQuoteJSON);
 
-    await updatePriceChangeStatus(stockQuoteJSON, oldPrice, lastestPrice);
-  } catch (err) {
-    // Failed to update
-    console.error(err);
-  }
-}
+    setAsync(redisKey, valueString)
+      .then((quote) => {
+        resolve(`Updated ${redisKey} successfully`);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
 /**
  * @description
@@ -315,23 +318,6 @@ const updateCachedShareProfilesUsingCache = () => {
   });
 };
 
-const updatePriceChangeStatus = (stockQuoteJSON, oldPrice, recentPrice) => {
-  return new Promise((resolve, reject) => {
-    const { companyCode } = stockQuoteJSON;
-
-    const redisKey = `${cachedShares}|${companyCode}|priceStatus`;
-    const valueString = oldPrice < recentPrice ? "1" : "-1";
-
-    return setAsync(redisKey, valueString)
-      .then((finishedUpdatingThePriceStatus) => {
-        resolve(
-          `Successfully updated price change status for company ${companyCode}`
-        );
-      })
-      .catch((err) => reject(err));
-  });
-};
-
 module.exports = {
   getCachedShares,
   getSingleCachedShareInfo,
@@ -346,6 +332,4 @@ module.exports = {
 
   updateCachedShareQuotesUsingCache,
   updateCachedShareProfilesUsingCache,
-
-  updatePriceChangeStatus,
 };

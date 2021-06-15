@@ -185,7 +185,7 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
 /**
  * @param filters
  * {
- *    type: buy, sell, OR none
+ *    type: Buy, Sell OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
@@ -197,7 +197,7 @@ const createPrismaFiltersObject = (filters) => {
   const { type, code, price, transactionTime } = filters;
   const filtering = {
     isFinished: true
-    // isTypeBuy
+    // type
     // companyCode
     // priceAtTransaction
     // finishedTime
@@ -207,7 +207,7 @@ const createPrismaFiltersObject = (filters) => {
 
   // type
   if (!isEqual(type, "none")) {
-    filtering.isTypeBuy = isEqual(type, "buy");
+    filtering.type = { equals: type };
   }
 
   // code
@@ -261,7 +261,7 @@ const createPrismaFiltersObject = (filters) => {
 /**
  * @param filters
  * {
- *    type: buy, sell, OR none
+ *    type: Buy, Sell, OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
@@ -325,10 +325,10 @@ const createRedisValueFromFinishedTransaction = (finishedTransaction) => {
     brokerage,
     spendOrGain,
     finishedTime,
-    isTypeBuy,
+    type,
     userID
   } = finishedTransaction;
-  return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${isTypeBuy}|${userID}`;
+  return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${type}|${userID}`;
 };
 
 /**
@@ -450,7 +450,7 @@ const parseRedisSharesListItem = (redisString) => {
 };
 
 /**
- * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|isTypeBuy|userID"
+ * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|type|userID"
  */
  const parseRedisTransactionsHistoryListItem = (redisString) => {
   const valuesArray = redisString.split("|");
@@ -464,7 +464,7 @@ const parseRedisSharesListItem = (redisString) => {
     brokerage: parseFloat(valuesArray[5]),
     spendOrGain: parseFloat(valuesArray[6]),
     finishedTime: valuesArray[7],
-    isTypeBuy: valuesArray[8] === "true",
+    type: valuesArray[8],
     userID: valuesArray[9]
   };
 };

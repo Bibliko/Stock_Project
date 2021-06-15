@@ -23,6 +23,8 @@ const {
   SequentialPromisesWithResultsArray
 } = require("../low-dependency/PromisesUtil");
 
+const { transactionTypeBuy } = require("../low-dependency/PrismaConstantUtil");
+
 const deleteExpiredVerification = () => {
   let date = new Date();
   date = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
@@ -507,10 +509,10 @@ const proceedTransaction = async (transactionID, recentPrice) => {
       }
     });
 
-    const { user, isTypeBuy, quantity, companyCode } = userTransaction;
-    const totalCashChange = (isTypeBuy ? -1 : 1) * (recentPrice * quantity) - userTransaction.brokerage;
+    const { user, type, quantity, companyCode } = userTransaction;
+    const totalCashChange = (type === transactionTypeBuy ? -1 : 1) * (recentPrice * quantity) - userTransaction.brokerage;
 
-    if (isTypeBuy) {
+    if (type === transactionTypeBuy) {
       buyShareEvent(user, totalCashChange, companyCode, quantity, recentPrice);
     } else {
       sellShareEvent(user, totalCashChange, companyCode, quantity);
