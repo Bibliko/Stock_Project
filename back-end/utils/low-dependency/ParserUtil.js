@@ -1,5 +1,4 @@
 const { isEqual } = require("lodash");
-const { transactionTypeBuy } = require("./PrismaConstantUtil");
 
 /**
  * @param redisString From 'cachedMarketHoliday' -> 'id|year|newYearsDay|martinLutherKingJrDay|washingtonBirthday|goodFriday|memorialDay|independenceDay|laborDay|thanksgivingDay|christmas'
@@ -208,7 +207,7 @@ const createPrismaFiltersObject = (filters) => {
 
   // type
   if (!isEqual(type, "none")) {
-    filtering.type = isEqual(type, transactionTypeBuy);
+    filtering.type = { equals: type };
   }
 
   // code
@@ -262,7 +261,7 @@ const createPrismaFiltersObject = (filters) => {
 /**
  * @param filters
  * {
- *    type: buy, sell, OR none
+ *    type: Buy, Sell, OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
