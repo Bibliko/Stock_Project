@@ -185,7 +185,7 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
 /**
  * @param filters
  * {
- *    type: Buy, Sell
+ *    type: Buy, Sell OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)

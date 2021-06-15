@@ -40,8 +40,8 @@ const {
           redisKey,
           weight,
           valueString,
-          )
-        ))
+        )
+      ))
       .then(() => resolve("Successfully added a pending order"))
       .catch((err) => reject(err));
   });
