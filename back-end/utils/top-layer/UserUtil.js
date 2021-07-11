@@ -383,9 +383,7 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
   try {
     // Check conditions
     if (user.cash + totalCashChange < 0) {
-      return new Error(
-        "The user does not have enough cash to buy the pending stock"
-      );
+      throw new Error("Condition failed:  Not enough cash");
     }
     // Update user cash
     await prisma.user.update({
@@ -431,7 +429,9 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    if (!err.message || err.message.search("Condition") === -1)
+      console.log(err);
+    throw err;
   }
 };
 
@@ -449,11 +449,11 @@ const sellShareEvent = async (
 
     // Check conditions
     if (!sellShare) {
-      return new Error("Couldn't find share");
+      throw new Error("Condition failed: Couldn't find share");
     } else if (quantity > sellShare.quantity) {
-      return new Error("Not enough available shares");
+      throw new Error("Condition failed: Not enough available shares");
     } else if (user.cash + totalCashChange < 0) {
-      return new Error("Not enough cash")
+      throw new Error("Condition failed: Not enough cash")
     }
 
     // Update user cash
@@ -485,7 +485,9 @@ const sellShareEvent = async (
       }
     });
   } catch (err) {
-    console.log(err);
+    if (!err.message || err.message.search("Condition") === -1)
+      console.log(err);
+    throw err;
   }
 };
 
@@ -513,9 +515,9 @@ const proceedTransaction = async (transactionID, recentPrice) => {
     const totalCashChange = (type === transactionTypeBuy ? -1 : 1) * (recentPrice * quantity) - userTransaction.brokerage;
 
     if (type === transactionTypeBuy) {
-      buyShareEvent(user, totalCashChange, companyCode, quantity, recentPrice);
+      await buyShareEvent(user, totalCashChange, companyCode, quantity, recentPrice);
     } else {
-      sellShareEvent(user, totalCashChange, companyCode, quantity);
+      await sellShareEvent(user, totalCashChange, companyCode, quantity);
     }
 
     // Update transaction after buying/selling
@@ -531,7 +533,7 @@ const proceedTransaction = async (transactionID, recentPrice) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 

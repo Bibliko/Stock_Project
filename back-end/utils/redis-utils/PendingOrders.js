@@ -6,14 +6,26 @@ const {
   sortedSetGetRangeByScoreAsync,
   setAddAsync,
   setRemoveAsync,
+  setGetAllItemsAsync,
 } = require("../../redis/redis-client");
 const { parseCachedShareQuote } = require("../low-dependency/ParserUtil");
+const {
+  SequentialPromisesWithResultsArray
+} = require("../low-dependency/PromisesUtil");
 const { proceedTransaction } = require("../top-layer/UserUtil");
 const {
   pendingCompaniesSet,
   pendingOrdersSet,
   cachedShares,
 } = require("./RedisUtil");
+const {
+  getSingleCachedShareInfo
+} = require("./SharesInfoBank");
+const {
+  transactionOptionGreater,
+  transactionOptionLess,
+  transactionOptionDefault,
+} = require("../low-dependency/PrismaConstantUtil");
 
 /**
  * @description Add a single pending order of the assigned company.
@@ -48,7 +60,7 @@ const {
 };
 
 /**
- * @description Update a single pending order the assigned company.
+ * @description Update a single pending order of the assigned company.
  * @param transaction Pending order data.
  * Eg:
  *  {
@@ -77,7 +89,7 @@ const {
 };
 
 /**
- * @description Delete a single pending order the assigned company.
+ * @description Delete a single pending order of the assigned company.
  * @param transaction Pending order data.
  * Eg:
  *  {
@@ -108,71 +120,102 @@ const {
  */
  const emptyPendingTransactionsListOneCompany = (companyCode, recentPrice) => {
   return new Promise((resolve, reject) => {
-    const redisKeyStatus = `${cachedShares}|${companyCode}|priceStatus`;
-    getAsync(redisKeyStatus)
-    .then((status) => {
-      const redisKey =
-      status === "1"
-      ? `${cachedShares}|${companyCode}|pendingSell`
-      : `${cachedShares}|${companyCode}|pendingBuy`;
+    let transactionsID;
+    const options = [transactionOptionLess, transactionOptionGreater, transactionOptionDefault];
 
-      const valueStringUp = status === "1" ? `${recentPrice}` : `+inf`;
-      const valueStringDown = status === "1" ? `-inf` : `${recentPrice}`;
+    Promise.all([
+      sortedSetGetRangeByScoreAsync(
+        `${pendingOrdersSet}_${transactionOptionLess}_${companyCode}`,
+        recentPrice.toString(),
+        "+inf"
+      ),
+      sortedSetGetRangeByScoreAsync(
+        `${pendingOrdersSet}_${transactionOptionGreater}_${companyCode}`,
+        "-inf",
+        recentPrice.toString()
+      ),
+      sortedSetGetRangeByScoreAsync(
+        `${pendingOrdersSet}_${transactionOptionDefault}_${companyCode}`,
+        "-inf",
+        "+inf"
+      ),
+    ])
+      .then((transactions) => {
+        transactionsID = transactions.flat();
 
-      return [
-      queueGetRangeByScore(redisKey, valueStringDown, valueStringUp),
-      redisKey
-      ];
-    })
-    .then(([arrayToEmpty, redisKey]) => {
-      const arrayToEmptyPromises = arrayToEmpty.map((transactionID, id) => {
-        return proceedTransaction(transactionID, recentPrice)
-        .then(() => queueRemove(redisKey, transactionID))
-        .then((finishedPopOutOneTransaction) => {
-          resolve(`Successfully pop out ${id + 1} transaction`);
-        });
-      });
-
-      return Promise.all(arrayToEmptyPromises);
-    })
-    .then((finishedPopAllPossibleTransactions) =>
-      resolve(
-        `Successfully pop out all possible transactions of ${companyCode}`
+        return Promise.allSettled(
+          transactionsID.map((transactionID) => (
+            proceedTransaction(transactionID, recentPrice)
+          ))
+        );
+      })
+      .then((proceedTransactionResults) => {
+        const taskList = [];
+        proceedTransactionResults
+          .forEach((result, id) => {
+            // Remove transaction from the set after being proceeded successfully
+            if (result.status === "fulfilled")
+              taskList.push(
+                // Remove from all options' set because flattening the transactionsID array
+                // loses info about option
+                options.map((option) => (
+                  sortedSetRemoveAsync(
+                    `${pendingOrdersSet}_${option}_${companyCode}`,
+                    transactionsID[id],
+                  )
+                ))
+              );
+          });
+        return Promise.all(taskList);
+      })
+      .then(() => (
+        Promise.all(
+          options.map((option) => (
+            sortedSetLengthAsync(`${pendingOrdersSet}_${option}_${companyCode}`)
+          ))
         )
-      )
-    .catch((err) => reject(err));
+      ))
+      .then((lengths) => {
+        // If all sets of options are empty, remove company from pendingCompaniesSet
+        if (lengths.every((length) => length === 0))
+          return setRemoveAsync(pendingCompaniesSet, companyCode);
+      })
+      .then(() => (
+        resolve(`Successfully pop out all possible transactions of ${companyCode}`)
+      ))
+      .catch((err) => reject(err));
   });
 };
 
 /**
  * @description Clear all possible pending transactions in the whole server
- * @param companyCodes The list of companies that will be processed
  */
- const emptyPendingTransactionsListAllCompanies = (companyCodes) => {
+ const emptyPendingTransactionsListAllCompanies = () => {
   return new Promise((resolve, reject) => {
-    const emptyAllCompaniesPromises = companyCodes
-    .map((companyCode, id) => {
-      const redisKeyQuote = `${cachedShares}|${companyCode}|quote`;
-
-      return getAsync(redisKeyQuote)
-      .then((quote) => {
-        if (quote) {
-          const quoteJSON = parseCachedShareQuote(quote);
-          return emptyPendingTransactionsListOneCompany(
-            companyCode,
-            quoteJSON.price
-            );
-        } else reject(new Error(`No quote was found for ${companyCode}`));
+    setGetAllItemsAsync(pendingCompaniesSet)
+      .then((companyCodes) => (
+        SequentialPromisesWithResultsArray(
+          companyCodes.map((companyCode) => () => (
+            getSingleCachedShareInfo(companyCode.toUpperCase())
+          ))
+        )
+      ))
+      .then((sharesInfoJSON) => (
+        Promise.allSettled(
+          sharesInfoJSON.map((shareInfo) => (
+            emptyPendingTransactionsListOneCompany(
+              shareInfo.symbol,
+              shareInfo.price
+            )
+          ))
+        )
+      ))
+      .then((emptyPendingTransactionsResults) => {
+        if (emptyPendingTransactionsResults.every((result) => result.status === "fulfilled"))
+          return resolve("Successfully proceeded all possible transactions of all companies");
+        throw("Failed to proceed some transactions of all companies");
       })
-      .then((finishedEmptyPendingTransactionsListAllCompanies) =>
-        console.log(
-          "Successfully pop out all possible transactions of all companies"
-          )
-        );
-    })
-    .catch((err) => reject(err));
-
-    return Promise.all(emptyAllCompaniesPromises);
+      .catch((err) => reject(err));
   });
 };
 
