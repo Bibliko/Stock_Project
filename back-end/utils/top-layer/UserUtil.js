@@ -510,6 +510,7 @@ const proceedTransaction = async (transactionID, recentPrice) => {
         }
       }
     });
+    if (!userTransaction) return;
 
     const { user, type, quantity, companyCode } = userTransaction;
     const totalCashChange = (type === transactionTypeBuy ? -1 : 1) * (recentPrice * quantity) - userTransaction.brokerage;
