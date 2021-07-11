@@ -1,5 +1,9 @@
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 const {
   getAsync,
+  delAsync,
+  keysAsync,
   sortedSetLengthAsync,
   sortedSetAddAsync,
   sortedSetRemoveAsync,
@@ -114,6 +118,28 @@ const {
 };
 
 /**
+ * @description Delete all pending transactions in the whole server without proceeding them
+ */
+const deleteAllPendingTransactions = () => {
+  return new Promise((resolve, reject) => {
+    // Get all pedningOrdersSet keys
+    keysAsync(pendingOrdersSet + "*")
+      .then((pendingOrderKeys) => (
+        // Delete pending transactions in prisma and redis
+        Promise.all([
+          prisma.userTransaction.deleteMany({
+            where: { isFinished: false }
+          }),
+          delAsync(pendingCompaniesSet),
+          ...pendingOrderKeys.map((key) => delAsync(key)),
+        ])
+      ))
+      .then(() => resolve("Successfully deleted all pending orders"))
+      .catch((err) => reject(err));
+  });
+};
+
+/**
  * @description Clear all possible pending transactions in the pending queue of an input company
  * @param companyCodes The company to clear pending queue
  * @param recentPrice The current price of that company's stock
@@ -223,6 +249,7 @@ module.exports = {
   addSinglePendingTransaction,
   updateSinglePendingTransaction,
   deleteSinglePendingTransaction,
+  deleteAllPendingTransactions,
 
   emptyPendingTransactionsListOneCompany,
   emptyPendingTransactionsListAllCompanies,
