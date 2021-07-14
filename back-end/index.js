@@ -48,10 +48,10 @@ const {
   updateMostGainersDaily
 } = require("./utils/redis-utils/MostGLA");
 
-// TODO: uncomment this when adding company codes into the code base
-// const {
-//   emptyPendingTransactionsListAllCompanies
-// } = require("./utils/redis-utils/PendingOrders");
+const {
+  emptyPendingTransactionsListAllCompanies,
+  deleteAllPendingTransactions,
+} = require("./utils/redis-utils/PendingOrders");
 
 const { startSocketIO } = require("./socketIO");
 
@@ -120,7 +120,7 @@ setupPassport(passport);
  * functions and passing in object as parameter
  */
 var globalBackendVariables = {
-  isMarketClosed: false,
+  isMarketClosed: null, // init as null because we need to check if BE has checked marketCLosed or not
   isPrismaMarketHolidaysInitialized: false,
 
   hasReplacedAllExchangesHistoricalChart: false,
@@ -147,7 +147,23 @@ SequentialPromisesWithResultsArray(tasksList).catch((err) => console.log(err));
 
 const setupBackendIntervals = () => {
   // Check Market Closed
-  setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
+  setInterval(
+    () => {
+      const previousMarketState = globalBackendVariables.isMarketClosed;
+      checkMarketClosed(globalBackendVariables)
+        .then(() => {
+          // Delete all pending transactions when market is closed
+          if (
+            previousMarketState === false &&
+            globalBackendVariables.isMarketClosed === true
+          )
+            return deleteAllPendingTransactions();
+        })
+        .then((res) => res && console.log(res))
+        .catch(err => console.log(err));
+    },
+    oneSecond
+  );
 
   setInterval(deleteExpiredVerification, oneDay);
 
@@ -193,9 +209,19 @@ const setupBackendIntervals = () => {
   // If forceUpdate is true and system is in developer mode, does not need to call API.
   setInterval(() => updateCompaniesRatingsList(), oneDay);
 
-  // TODO: Add company codes into the code base and then pass them in as an array to this function
-  // TODO: Remove this interval when market is closed and add it when market is opened.
-  // setInterval(() => emptyPendingTransactionsListAllCompanies(companyCodes), 5 * oneMinute);
+  // TODO: Uncomment in production
+  // setInterval(
+  //   () => {
+  //   if (
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //       emptyPendingTransactionsListAllCompanies()
+  //         .catch((err) => console.log(err));
+  //     }
+  //   },
+  //   5 * oneMinute
+  // );
 };
 
 setupBackendIntervals();
