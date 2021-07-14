@@ -497,6 +497,7 @@ const sellShareEvent = async (
  * @param {number} recentPrice
  */
 const proceedTransaction = async (transactionID, recentPrice) => {
+  // eslint-disable-next-line no-useless-catch
   try {
     const userTransaction = await prisma.userTransaction.findUnique({
       where: {

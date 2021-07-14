@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const {
-  getAsync,
   delAsync,
   keysAsync,
   sortedSetLengthAsync,
@@ -12,7 +11,6 @@ const {
   setRemoveAsync,
   setGetAllItemsAsync,
 } = require("../../redis/redis-client");
-const { parseCachedShareQuote } = require("../low-dependency/ParserUtil");
 const {
   SequentialPromisesWithResultsArray
 } = require("../low-dependency/PromisesUtil");
@@ -20,7 +18,6 @@ const { proceedTransaction } = require("../top-layer/UserUtil");
 const {
   pendingCompaniesSet,
   pendingOrdersSet,
-  cachedShares,
 } = require("./RedisUtil");
 const {
   getSingleCachedShareInfo
@@ -239,7 +236,8 @@ const deleteAllPendingTransactions = () => {
       .then((emptyPendingTransactionsResults) => {
         if (emptyPendingTransactionsResults.every((result) => result.status === "fulfilled"))
           return resolve("Successfully proceeded all possible transactions of all companies");
-        throw("Failed to proceed some transactions of all companies");
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject("Failed to proceed some transactions of all companies");
       })
       .catch((err) => reject(err));
   });
