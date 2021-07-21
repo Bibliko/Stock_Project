@@ -158,6 +158,18 @@ export const simplifyMiliseconds = (miliseconds) => {
   return "A long time ago";
 };
 
+/**
+ * @description Get last week's Sunday
+ * @returns {Date object}
+ */
+export const endOfLastWeek = () => {
+  const date = new Date();
+  const lastSundayDate = date.getUTCDate() - (date.getUTCDay() || 7);
+  let lastSunday = new Date(date.setUTCDate(lastSundayDate));
+  lastSunday.setUTCHours(23,59,59,999)
+  return lastSunday;
+};
+
 export default {
   oneSecond,
   oneMinute,
@@ -174,4 +186,5 @@ export default {
   marketCountdownUpdate,
   isLeapYear,
   simplifyMiliseconds,
+  endOfLastWeek,
 };
