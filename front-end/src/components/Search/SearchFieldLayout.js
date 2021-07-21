@@ -5,7 +5,8 @@ import { withRouter } from "react-router";
 
 import { withMediaQuery } from "../../theme/ThemeUtil";
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
-import { searchCompanyTickers } from "../../utils/FinancialModelingPrepUtil";
+// TODO: Uncomment this in production
+// import { searchCompanyTickers } from "../../utils/FinancialModelingPrepUtil";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import SearchPopper from "./SearchPopper";
@@ -176,6 +177,7 @@ class SearchFieldLayout extends React.Component {
         companiesNASDAQ: NASDAQ,
         note: "",
       });
+      // TODO: Uncomment this in production
       // searchCompanyTickers(this.state.searchCompany)
       //   .then((resultTickers) => {
       //     console.log(resultTickers);

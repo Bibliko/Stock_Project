@@ -12,7 +12,8 @@ import {
   simplifyNumber,
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
-import { getFullStockInfo } from "../../../utils/RedisUtil";
+// TODO: Uncomment this in production
+// import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { changeUserData } from "../../../utils/UserUtil";
 
@@ -230,6 +231,7 @@ class WatchlistTableRow extends React.Component {
   };
 
   setStateShareInfo = () => {
+    // TODO: Uncomment this in production
     // const { companyCode } = this.props;
     // getFullStockInfo(companyCode)
     //   .then((fullStockInfo) => {

@@ -3,8 +3,9 @@ import PropTypes from "prop-types";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
-import { getStockNews } from "../../../utils/FinancialModelingPrepUtil";
-import { oneMinute } from "../../../utils/low-dependency/DayTimeUtil";
+// TODO: Uncomment this in production
+// import { getStockNews } from "../../../utils/FinancialModelingPrepUtil";
+// import { oneMinute } from "../../../utils/low-dependency/DayTimeUtil";
 
 import CompanyNewsCard from "./CompanyNewsCard";
 
@@ -59,6 +60,7 @@ class CompanyNewsContainer extends React.Component {
   intervalCheckNews;
 
   checkAndSetStateNews = () => {
+    // TODO: Uncomment this in production
     // getStockNews(this.props.companyData.symbol, 10)
     //   .then((newsArray) => {
     //     if (!isEqual(newsArray, this.state.news)) {
@@ -73,6 +75,7 @@ class CompanyNewsContainer extends React.Component {
   };
 
   componentDidMount() {
+    // TODO: Uncomment this in production
     // this.checkAndSetStateNews();
     // this.intervalCheckNews = setInterval(this.checkAndSetStateNews, oneMinute)
   }
