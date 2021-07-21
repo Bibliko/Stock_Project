@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -63,10 +64,10 @@ const styles = (theme) => ({
 });
 
 function SelectBox(props) {
-  const { classes, items, name, value, onChange } = props;
+  const { classes, containerClass, items, name, value, onChange } = props;
 
   return (
-    <Container className={classes.selectBoxContainer}>
+    <Container className={clsx(classes.selectBoxContainer, containerClass)}>
       <Typography className={classes.title}>{name}</Typography>
       <FormControl variant="outlined" className={classes.selectBox}>
         <Select

@@ -122,6 +122,7 @@ class SettingNormalTextField extends React.Component {
   render() {
     const {
       classes,
+      containerClass,
       name,
       value,
       isInvalid,
@@ -132,7 +133,7 @@ class SettingNormalTextField extends React.Component {
     const { onHover } = this.state;
 
     return (
-      <Container className={classes.textFieldContainer}>
+      <Container className={clsx(classes.textFieldContainer, containerClass)}>
         <Typography className={classes.title}>
           {name}
           <IconButton

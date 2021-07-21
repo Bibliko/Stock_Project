@@ -6,9 +6,11 @@ import { connect } from "react-redux";
 import { orderAction } from "../../redux/storeActions/actions";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
+import OrderSummary from "../../components/Paper/PlaceOrderPage/OrderSummary";
+import OrderForm from "../../components/Paper/PlaceOrderPage/OrderForm";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Container } from "@material-ui/core";
+import { Container, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -25,6 +27,19 @@ const styles = (theme) => ({
     justifyContent: "flex-start",
     flexDirection: "column",
     maxWidth: "none",
+  },
+  fullHeightWidth: {
+    height: "100%",
+    width: "100%",
+    minHeight: "200px",
+  },
+  itemGrid: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    flexDirection: "column",
+    minHeight: "125px",
+    //maxHeight: '300px'
   },
 });
 
@@ -44,7 +59,30 @@ class PlaceOrder extends React.Component {
 
     return (
       <Container className={classes.root} disableGutters>
-        {/* content */}
+        <Grid
+          container
+          spacing={5}
+          direction="row"
+          className={classes.fullHeightWidth}
+        >
+          <Grid
+            item
+            xs={12}
+            md={8}
+            className={classes.itemGrid}
+          >
+            <OrderForm />
+          </Grid>
+
+          <Grid
+            item
+            xs={12}
+            md={4}
+            className={classes.itemGrid}
+          >
+            <OrderSummary />
+          </Grid>
+        </Grid>
         <SpaceDivMainPages />
       </Container>
     );
