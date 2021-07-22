@@ -334,7 +334,7 @@ class Login extends React.Component {
                     }}
                   >
                     <img
-                      src="/google-logo-png-open-2000.png"
+                      src="/google-logo-png-open-480.png"
                       alt="google"
                       className={classes.image}
                     />
