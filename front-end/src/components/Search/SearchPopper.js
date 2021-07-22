@@ -1,7 +1,9 @@
 import React from "react";
 import { isEmpty } from "lodash";
+import { withRouter } from "react-router";
 
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -45,7 +47,7 @@ const styles = (theme) => ({
     fontSize: "small",
   },
   menuItemHover: {
-    "&:hover": {
+    "&:hover, &:focus": {
       backgroundColor: theme.palette.menuItemHover.main,
     },
   },
@@ -58,7 +60,7 @@ const styles = (theme) => ({
       padding: "8px",
     },
     color: "white",
-    "&:hover": {
+    "&:hover, &:focus": {
       backgroundColor: theme.palette.menuItemHover.main,
     },
   },
@@ -115,6 +117,11 @@ class SearchPopper extends React.Component {
     }
   };
 
+  handleClickResult = (companyCode) => {
+    redirectToPage(`/company/${companyCode}`, this.props);
+    this.props.handleClose();
+  };
+
   render() {
     const {
       classes,
@@ -124,6 +131,7 @@ class SearchPopper extends React.Component {
       note,
       companiesNYSE,
       companiesNASDAQ,
+      focusItem,
     } = this.props;
 
     return (
@@ -146,14 +154,18 @@ class SearchPopper extends React.Component {
       >
         {({ TransitionProps, placement }) => (
           <Fade
-            timeout={{ enter: (2 / 10) * oneSecond, exit: (1 / 2) * oneSecond }}
+            timeout={{ enter: 0.2 * oneSecond, exit: 0.5 * oneSecond }}
             {...TransitionProps}
           >
             <Paper className={classes.menuPaper}>
               <IconButton onClick={handleClose} className={classes.backButton}>
                 <ArrowBackRoundedIcon />
               </IconButton>
-              <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
+              <MenuList
+                id="menu-list-grow"
+                onKeyDown={handleListKeyDown}
+                autoFocusItem={focusItem}
+              >
                 <MenuItem dense disabled>
                   Stocks
                 </MenuItem>
@@ -164,13 +176,23 @@ class SearchPopper extends React.Component {
                 )}
 
                 {companiesNYSE.map((company, index) => (
-                  <MenuItem dense key={index} className={classes.menuItemHover}>
+                  <MenuItem
+                    dense
+                    key={`NYSE-${index}`}
+                    className={classes.menuItemHover}
+                    onClick={() => this.handleClickResult(company.symbol)}
+                  >
                     {this.showResultTickers(company, classes)}
                   </MenuItem>
                 ))}
 
                 {companiesNASDAQ.map((company, index) => (
-                  <MenuItem dense key={index} className={classes.menuItemHover}>
+                  <MenuItem
+                    dense
+                    key={`NASDAQ-${index}`}
+                    className={classes.menuItemHover}
+                    onClick={() => this.handleClickResult(company.symbol)}
+                  >
                     {this.showResultTickers(company, classes)}
                   </MenuItem>
                 ))}
@@ -183,4 +205,4 @@ class SearchPopper extends React.Component {
   }
 }
 
-export default withStyles(styles)(SearchPopper);
+export default withStyles(styles)(withRouter(SearchPopper));
