@@ -1,14 +1,17 @@
 import React from "react";
-import { withRouter } from "react-router";
-
 import { withStyles } from "@material-ui/core/styles";
+
+import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil.js";
+
 import {
-  TableRow,
-  TableCell,
-  TableContainer,
   Table,
   TableBody,
+  TableCell,
+  TableContainer,
+  TableFooter,
   TableHead,
+  TablePagination,
+  TableRow,
   Typography,
 } from "@material-ui/core";
 
@@ -18,13 +21,14 @@ const styles = (theme) => ({
     border: "hidden",
   },
   tableContainer: {
-    width: "80%",
+    padding: "12px 0px",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
+      padding: "7px 0px",
     },
-    alignSelf: "center",
     borderRadius: "4px",
     boxShadow: theme.customShadow.tableContainer,
+    backgroundColor: theme.palette.paperBackground.onPage,
   },
   tableCell: {
     fontSize: "medium",
@@ -32,140 +36,127 @@ const styles = (theme) => ({
       fontSize: "small",
     },
     color: "white",
-    borderColor: theme.palette.secondary.main,
-    borderWidth: "2px",
-    borderStyle: "solid",
-    borderBottom: "hidden",
-    borderTop: "hidden",
+    borderBottom: "0px",
+    borderRight: "2px solid " + theme.palette.secondary.main,
   },
-  tableCellCenter: {
-    border: "none",
+  headCell: {
+    borderBottom: "0px",
+    borderRight: "2px solid " + theme.palette.secondary.main,
     alignItems: "center",
   },
-  headColor: {
-    backgroundColor: theme.palette.paperBackground.sub,
-  },
   headtitle: {
-    fontSize: "large",
+    fontSize: "20px",
     [theme.breakpoints.down("xs")]: {
       fontSize: "medium",
     },
     fontWeight: "bold",
+    color: theme.palette.secondary.main,
+  },
+  tablePagination: {
     color: "white",
+  },
+  tablePaginationSelectIcon: {
+    color: "white",
+  },
+  tablePaginationActions: {
+    "& .Mui-disabled": {
+      color: theme.palette.disabled.main,
+    },
   },
 });
 
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.paperBackground.onPage,
-    },
-    "&:nth-of-type(even)": {
-      backgroundColor: theme.palette.paperBackground.onPageLight,
-    },
-  },
-}))(TableRow);
-
 class OverallTable extends React.Component {
-  chooseTableRowValue = (type) => {
-    switch (type) {
-      case "":
-        return ``;
+  getTableRow = (user, id) => {
+    const { classes } = this.props;
+    const fullName = user.firstName + " " + user.lastName;
+    const data = [
+      id,
+      fullName,
+      `$${numberWithCommas(user.totalPortfolio)}`,
+      user.region === "null" ? "-" : user.region,
+    ];
 
-      default:
-        return;
-    }
-  };
-
-  chooseTableRow = (type, classes) => {
     return (
-      <StyledTableRow>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        >
-          {type}
-        </TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        ></TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        ></TableCell>
-        <TableCell
-          component="th"
-          scope="row"
-          align="center"
-          className={classes.tableCell}
-        ></TableCell>
-      </StyledTableRow>
+      <TableRow key={fullName + id}>
+        {
+          data.map((datum, id) => (
+            <TableCell
+              key={fullName + id + "-" + id}
+              component="th"
+              scope="row"
+              align="center"
+              className={classes.tableCell}
+            >
+              {datum}
+            </TableCell>
+          ))
+        }
+      </TableRow>
     );
   };
 
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      totalUser,
+      currentPage,
+      handleChangePage,
+    } = this.props;
+    const users = this.props.users || [];
+    const headLabels = [
+      "#",
+      "Username",
+      "Portfolio",
+      "Region",
+    ];
+    const rowsPerPage = 8;
 
     return (
-      <TableContainer className={classes.tableContainer}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow className={classes.headColor}>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>#</Typography>
-              </TableCell>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>Username</Typography>
-              </TableCell>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>Portfolio</Typography>
-              </TableCell>
-              <TableCell
-                component="th"
-                scope="row"
-                align="center"
-                className={classes.tableCellCenter}
-              >
-                <Typography className={classes.headtitle}>Region</Typography>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {this.chooseTableRow("1", classes)}
-            {this.chooseTableRow("2", classes)}
-            {this.chooseTableRow("3", classes)}
-            {this.chooseTableRow("4", classes)}
-            {this.chooseTableRow("5", classes)}
-            {this.chooseTableRow("6", classes)}
-            {this.chooseTableRow("7", classes)}
-            {this.chooseTableRow("8", classes)}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
+      <React.Fragment>
+        <TableContainer className={classes.tableContainer}>
+          <Table className={classes.table} aria-label="ranking table">
+            <TableHead>
+              <TableRow>
+                { headLabels.map((label) => (
+                    <TableCell
+                      key={"head-" + label}
+                      component="th"
+                      scope="row"
+                      align="center"
+                      className={classes.headCell}
+                    >
+                      <Typography className={classes.headtitle}> {label} </Typography>
+                    </TableCell>
+                  ))
+                }
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              { users.map((user, id) => (
+                  this.getTableRow(user, currentPage * rowsPerPage + id + 1)
+                ))
+              }
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <TablePagination
+          classes={{
+            selectIcon: classes.tablePaginationSelectIcon,
+            actions: classes.tablePaginationActions,
+          }}
+          className={classes.tablePagination}
+          component={"div"}
+          count={totalUser}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[]}
+          page={currentPage}
+          onChangePage={handleChangePage}
+        />
+      </React.Fragment>
+    )
   }
 }
 
-export default withStyles(styles)(withRouter(OverallTable));
+export default withStyles(styles)(OverallTable);

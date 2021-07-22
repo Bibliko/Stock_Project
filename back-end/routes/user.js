@@ -1,4 +1,7 @@
-const { listRangeAsync } = require("../redis/redis-client");
+const {
+  listLengthAsync,
+  listRangeAsync,
+} = require("../redis/redis-client");
 
 const { Router } = require("express");
 const router = Router();
@@ -126,6 +129,24 @@ router.get("/getData", (req, res) => {
     .catch((err) => {
       console.log(err);
       res.status(500).send("Failed to get user's data");
+    });
+});
+
+/**
+ * @description Get the length of ranking list.
+ * @query (Optional) {String} region The desired ranking region (default to overall)
+ */
+router.get("/getRankingLength", (req, res) => {
+  const { region } = req.query;
+  const list = region ? `${rankingList}_${region}` : rankingList;
+
+  listLengthAsync(list)
+    .then((listLength) => {
+      res.send(listLength.toString());
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get the length of ranking list");
     });
 });
 

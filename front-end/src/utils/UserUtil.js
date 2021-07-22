@@ -266,6 +266,26 @@ export const getUserData = (dataNeeded, email) => {
   });
 };
 
+export const getUserPendingTransactions = (email) => {
+  const dataNeeded = {
+    transactions: {
+      where: {
+        isFinished: false,
+      },
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    getUserData(dataNeeded, email)
+      .then((userData) => {
+        resolve(userData.transactions);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const getUserTransactionsHistory = (
   email,
   rowsLengthChoices,
@@ -325,6 +345,24 @@ export const getUserAccountSummaryChartTimestamps = (
     })
       .then((accountSummaryChartTimestamps) => {
         resolve(accountSummaryChartTimestamps.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getRankingLength = (region = null) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getRankingLength`, {
+      method: "get",
+      params: {
+        region,
+      },
+      withCredentials: true,
+    })
+      .then((listLength) => {
+        resolve(parseInt(listLength.data));
       })
       .catch((err) => {
         reject(err);
@@ -492,6 +530,7 @@ export default {
   changeUserData,
   changeUserEmail,
   getUserData,
+  getUserPendingTransactions,
   getUserTransactionsHistory,
   getUserAccountSummaryChartTimestamps,
   getOverallRanking,

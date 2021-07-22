@@ -7,6 +7,10 @@
 /db/*
 /build
 
+# secrets
+/config/*
+/prisma/.env
+
 # misc
 .DS_Store
 .env.local
@@ -21,4 +25,3 @@ yarn-error.log*
 
 # Next.js
 /.next
-© 2021 GitHub, Inc.
