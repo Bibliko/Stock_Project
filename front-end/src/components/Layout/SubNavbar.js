@@ -202,7 +202,7 @@ class SubNavbar extends React.Component {
                 gridArea: mediaQuery ? "1 / 1 / 2 / 6" : "1 / 1 / 3 / 6",
                 cursor: mediaQuery && "pointer",
               }}
-              onClick={mediaQuery ? this.toggle : () => {}}
+              onClick={mediaQuery ? this.toggle : undefined}
             >
               {isMarketClosed
                 ? "Market Closed"

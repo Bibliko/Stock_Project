@@ -370,9 +370,7 @@ export const getRankingLength = (region = null) => {
   });
 };
 
-export const getOverallRanking = (
-  page
-) => {
+export const getOverallRanking = (page) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/getOverallRanking`, {
       method: "get",
@@ -390,10 +388,7 @@ export const getOverallRanking = (
   });
 };
 
-export const getRegionalRanking = (
-  page,
-  region,
-) => {
+export const getRegionalRanking = (page, region) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/getRegionalRanking`, {
       method: "get",
@@ -411,7 +406,6 @@ export const getRegionalRanking = (
       });
   });
 };
-
 
 // User Calculations Related:
 

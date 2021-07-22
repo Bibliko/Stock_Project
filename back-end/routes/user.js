@@ -164,7 +164,8 @@ router.get("/getOverallRanking", (req, res) => {
           firstName: data[0],
           lastName: data[1],
           totalPortfolio: parseInt(data[2], 10),
-          region: data[3]
+          region: data[3],
+          email: data[4],
         };
       });
 
@@ -190,7 +191,8 @@ router.get("/getRegionalRanking", (req, res) => {
           firstName: data[0],
           lastName: data[1],
           totalPortfolio: parseInt(data[2], 10),
-          region: data[3]
+          region: data[3],
+          email: data[4],
         };
       });
       res.send(usersListJson);
