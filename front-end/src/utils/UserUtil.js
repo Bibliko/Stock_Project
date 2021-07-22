@@ -352,6 +352,61 @@ export const getUserAccountSummaryChartTimestamps = (
   });
 };
 
+export const getRankingLength = (region = null) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getRankingLength`, {
+      method: "get",
+      params: {
+        region,
+      },
+      withCredentials: true,
+    })
+      .then((listLength) => {
+        resolve(parseInt(listLength.data));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getOverallRanking = (page) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getOverallRanking`, {
+      method: "get",
+      params: {
+        page,
+      },
+      withCredentials: true,
+    })
+      .then((overallRanking) => {
+        resolve(overallRanking.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getRegionalRanking = (page, region) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getRegionalRanking`, {
+      method: "get",
+      params: {
+        page,
+        region,
+      },
+      withCredentials: true,
+    })
+      .then((regionalRanking) => {
+        resolve(regionalRanking.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 // User Calculations Related:
 
 // example of stockQuotesJSON in front-end/src/utils/FinancialModelingPrepUtil.js
@@ -478,6 +533,8 @@ export default {
   getUserPendingTransactions,
   getUserTransactionsHistory,
   getUserAccountSummaryChartTimestamps,
+  getOverallRanking,
+  getRegionalRanking,
 
   calculateTotalSharesValue,
   checkStockQuotesForUser,

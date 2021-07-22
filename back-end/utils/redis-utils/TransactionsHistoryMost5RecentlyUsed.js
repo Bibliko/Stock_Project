@@ -188,7 +188,7 @@ const searchAndUpdateTransactionsHistoryM5RU = (
 
 /**
  * @special_note First element of the list is length of transactions history that fits the description attributes
- * @use Redis key 'email|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' : List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID"
+ * @use Redis key 'email|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' : List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|type|userID"
  * @description create or delete-then-create (if existed) new M5RU item to cache transactions history
  * @param email User email
  * @param numberOfChunksSkipped required
@@ -238,7 +238,7 @@ const createOrOverwriteTransactionsHistoryM5RUItemRedisKey = (
 
 /**
  * @special_note First element of the list is length of transactions history that fits the description attributes
- * @use Redis key 'email|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' : List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID"
+ * @use Redis key 'email|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' : List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|type|userID"
  * @description Add length of transactions history fitting in THIS filters to the beginning of cached M5RU Item
  * @param email User email
  * @param numberOfChunksSkipped required
@@ -262,7 +262,7 @@ const addLengthToFirstOfTransactionsHistoryM5RUItemRedisKey = (
 
 /**
  * @special_note First element of the list is length of transactions history that fits the description attributes
- * @use Redis key 'email|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' : List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|isTypeBuy|userID"
+ * @use Redis key 'email|transactionsHistoryM5RU|numberOfChunksSkipped|filtersString|orderBy|orderQuery' : List -> "id|createdAt|companyCode|quantity|priceAtTransaction|limitPrice|brokerage|finishedTime|type|userID"
  * @param email User email
  * @param numberOfChunksSkipped required
  * @param filters Example of filters object is in ParserUtil createRedisValueFromTransactionsHistoryFilters

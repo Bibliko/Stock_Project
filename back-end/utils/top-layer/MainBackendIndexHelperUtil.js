@@ -1,19 +1,22 @@
 const { isMarketClosedCheck } = require("../redis-utils/RedisUtil");
 
 const checkMarketClosed = (globalBackendVariables) => {
-  if (!globalBackendVariables.isPrismaMarketHolidaysInitialized) {
-    console.log("MainBackendIndexHelperUtil, checkMarketClosed");
-    return;
-  }
+  return new Promise((resolve, reject) => {
+    if (!globalBackendVariables.isPrismaMarketHolidaysInitialized) {
+      console.log("MainBackendIndexHelperUtil, checkMarketClosed");
+      return resolve();
+    }
 
-  isMarketClosedCheck()
-    .then((checkResult) => {
-      // console.log(checkResult);
-      globalBackendVariables.isMarketClosed = checkResult;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    isMarketClosedCheck()
+      .then((checkResult) => {
+        // console.log(checkResult);
+        globalBackendVariables.isMarketClosed = checkResult;
+        resolve();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 };
 
 module.exports = {

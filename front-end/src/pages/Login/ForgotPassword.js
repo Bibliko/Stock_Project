@@ -328,7 +328,7 @@ class ForgotPassword extends React.Component {
             >
               <img
                 className={classes.avatar}
-                src="/bibOfficial.jpg"
+                src="/bibOfficial.png"
                 alt="Bibliko"
               />
               {!this.shouldShowSuccessOnly() && (
@@ -478,7 +478,7 @@ class ForgotPassword extends React.Component {
                     }}
                   >
                     <img
-                      src="/google-logo-png-open-2000.png" //change the logo to fit with the background
+                      src="/google-logo-png-open-480.png" //change the logo to fit with the background
                       alt="google"
                       className={classes.image}
                     />

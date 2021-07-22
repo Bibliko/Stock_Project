@@ -2,6 +2,11 @@ import React from "react";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import {
+  transactionTypeBuy,
+  transactionTypeSell,
+} from "../../../utils/low-dependency/PrismaConstantUtil";
+
 import { withStyles } from "@material-ui/core/styles";
 import { Button, Select, MenuItem } from "@material-ui/core";
 
@@ -106,10 +111,10 @@ class TypeFilter extends React.Component {
           <MenuItem value="none" className={classes.menuItem}>
             <em>None</em>
           </MenuItem>
-          <MenuItem value="buy" className={classes.menuItem}>
+          <MenuItem value={transactionTypeBuy} className={classes.menuItem}>
             Buy_Spend
           </MenuItem>
-          <MenuItem value="sell" className={classes.menuItem}>
+          <MenuItem value={transactionTypeSell} className={classes.menuItem}>
             Sell_Gain
           </MenuItem>
         </Select>

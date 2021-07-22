@@ -241,7 +241,7 @@ class Login extends React.Component {
             >
               <Grid item xs className={classes.center}>
                 <img
-                  src="/bibOfficial.jpg"
+                  src="/bibOfficial.png"
                   alt="Bibliko"
                   className={classes.avatar}
                 />
@@ -334,7 +334,7 @@ class Login extends React.Component {
                     }}
                   >
                     <img
-                      src="/google-logo-png-open-2000.png"
+                      src="/google-logo-png-open-480.png"
                       alt="google"
                       className={classes.image}
                     />
