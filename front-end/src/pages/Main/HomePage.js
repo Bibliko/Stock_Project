@@ -55,7 +55,6 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
-    //maxHeight: '300px'
   },
   paperRedirectingToAccountSetting: {
     height: theme.customHeight.redirectingPaper,

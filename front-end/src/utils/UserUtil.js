@@ -332,9 +332,7 @@ export const getUserAccountSummaryChartTimestamps = (
   });
 };
 
-export const getOverallRanking = (
-  page
-) => {
+export const getOverallRanking = (page) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/getOverallRanking`, {
       method: "get",
@@ -352,10 +350,7 @@ export const getOverallRanking = (
   });
 };
 
-export const getRegionalRanking = (
-  page,
-  region,
-) => {
+export const getRegionalRanking = (page, region) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/userData/getRegionalRanking`, {
       method: "get",

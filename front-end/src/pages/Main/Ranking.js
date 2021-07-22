@@ -145,7 +145,7 @@ class Ranking extends React.Component {
     const {
       overallRank,
       regionRank,
-      portfolioValue, 
+      portfolioValue,
       previousWeek,
       portfolioHigh,
     } = this.props.userSession;
