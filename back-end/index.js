@@ -48,6 +48,11 @@ const {
   updateMostGainersDaily
 } = require("./utils/redis-utils/MostGLA");
 
+const {
+  emptyPendingTransactionsListAllCompanies,
+  deleteAllPendingTransactions,
+} = require("./utils/redis-utils/PendingOrders");
+
 const { startSocketIO } = require("./socketIO");
 
 const { PORT, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = require('./config');
@@ -115,7 +120,7 @@ setupPassport(passport);
  * functions and passing in object as parameter
  */
 var globalBackendVariables = {
-  isMarketClosed: false,
+  isMarketClosed: null, // init as null because we need to check if BE has checked marketCLosed or not
   isPrismaMarketHolidaysInitialized: false,
 
   hasReplacedAllExchangesHistoricalChart: false,
@@ -142,7 +147,23 @@ SequentialPromisesWithResultsArray(tasksList).catch((err) => console.log(err));
 
 const setupBackendIntervals = () => {
   // Check Market Closed
-  setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
+  setInterval(
+    () => {
+      const previousMarketState = globalBackendVariables.isMarketClosed;
+      checkMarketClosed(globalBackendVariables)
+        .then(() => {
+          // Delete all pending transactions when market is closed
+          if (
+            previousMarketState === false &&
+            globalBackendVariables.isMarketClosed === true
+          )
+            return deleteAllPendingTransactions();
+        })
+        .then((res) => res && console.log(res))
+        .catch(err => console.log(err));
+    },
+    oneSecond
+  );
 
   setInterval(deleteExpiredVerification, oneDay);
 
@@ -187,6 +208,20 @@ const setupBackendIntervals = () => {
   // parameter: forceUpdate <Boolean>
   // If forceUpdate is true and system is in developer mode, does not need to call API.
   setInterval(() => updateCompaniesRatingsList(), oneDay);
+
+  // TODO: Uncomment in production
+  // setInterval(
+  //   () => {
+  //   if (
+  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //     !globalBackendVariables.isMarketClosed
+  //   ) {
+  //       emptyPendingTransactionsListAllCompanies()
+  //         .catch((err) => console.log(err));
+  //     }
+  //   },
+  //   5 * oneMinute
+  // );
 };
 
 setupBackendIntervals();
@@ -215,6 +250,7 @@ app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 app.use("/companyRating", require("./routes/companyRating"));
+app.use("/transaction", require("./routes/transaction"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];

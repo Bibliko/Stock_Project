@@ -6,6 +6,7 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
+import RankingPaper from "../../components/Paper/HomePage/RankingPaper";
 import MarketWatchPaper from "../../components/Paper/HomePage/MarketWatch";
 import MostGainersPaper from "../../components/Paper/HomePage/MostGainers";
 import AccountSummaryPaper from "../../components/Paper/HomePage/AccountSummary";
@@ -54,16 +55,6 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
-    //maxHeight: '300px'
-  },
-  title: {
-    fontSize: "large",
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "medium",
-    },
-    fontWeight: "bold",
-    marginBottom: "12px",
-    color: theme.palette.primary.main,
   },
   paperRedirectingToAccountSetting: {
     height: theme.customHeight.redirectingPaper,
@@ -171,15 +162,12 @@ class HomePage extends React.Component {
               <MostGainersPaper title={"Most Gainers"} />
             </Grid>
 
-            <Grid container item xs={12} sm={6} className={classes.itemGrid}>
+            <Grid container item xs={12} sm={6} md={7} className={classes.itemGrid}>
               <AccountSummaryPaper />
             </Grid>
 
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography className={classes.title}>Rankings</Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
+            <Grid item xs={12} sm={6} md={5} className={classes.itemGrid}>
+              <RankingPaper />
             </Grid>
 
             <SpaceDivMainPages />

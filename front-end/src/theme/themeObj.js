@@ -26,7 +26,7 @@ const theme = {
     maxMostGainers: "400px",
     maxMostGainersChip: "95px",
 
-    mainPageWidth: "90%",
+    mainPageWidth: "clamp(150px, 90%, 2000px)",
     mainSkeletonWidth: "100%",
 
     redirectingPaper: "90%",
@@ -83,7 +83,7 @@ const theme = {
     primary: {
       // Purple
       main: "rgba(136, 120, 255, 1)",
-      hover: "rgba(136, 120, 255, 0.3)",
+      hover: "rgba(136, 120, 255, 0.5)",
 
       subLight: "rgba(120, 127, 246, 1)",
 
