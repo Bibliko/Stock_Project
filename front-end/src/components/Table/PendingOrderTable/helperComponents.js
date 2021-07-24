@@ -21,36 +21,36 @@ const StyledTableCell = withStyles((theme) => ({
 
 export const chooseTableCellHeader = (indexColumnName, state) => {
   const { labels } = state;
-  const type = labels[indexColumnName];
+  const label = labels[indexColumnName];
 
   return (
-    <StyledTableCell key={indexColumnName} align={'center'}>{type}</StyledTableCell>
+    <StyledTableCell key={indexColumnName} align={'center'}>{label}</StyledTableCell>
   );
 };
 
-export const chooseTableCell = (type, isLastRow, classes, order) => {
+export const chooseTableCell = (label, isLastRow, classes, order) => {
   return (
     <TableCell
       align="center"
       className={clsx(classes.tableCell, {
         [classes.lastRow]: isLastRow(),
-        [classes.lastLeftCell]: isLastRow() && type === "Type",
+        [classes.lastLeftCell]: isLastRow() && label === "Type",
         [classes.lastRightCell]:
-        isLastRow() && type === "Actions",
+        isLastRow() && label === "Actions",
       })}
     >
       <div>
         <Typography noWrap>
-          {chooseTableCellValue(type, order, classes)}
+          {chooseTableCellValue(label, order, classes)}
         </Typography>
       </div>
     </TableCell>
   );
 };
 
-export const chooseTableCellValue = (type, order, classes) => {
+export const chooseTableCellValue = (label, order, classes) => {
   const {
-    isTypeBuy,
+    type,
     companyCode,
     quantity,
     option,
@@ -60,8 +60,8 @@ export const chooseTableCellValue = (type, order, classes) => {
 
   let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage, 2));
 
-  switch (type) {
-    case "Type": return isTypeBuy ? "BUY" : "SELL";
+  switch (label) {
+    case "Type": return `${type}`;
 
     case "Code": return `${companyCode}`;
 
