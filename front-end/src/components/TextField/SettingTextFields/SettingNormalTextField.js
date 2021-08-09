@@ -63,6 +63,9 @@ const styles = (theme) => ({
         paddingBottom: "6px",
       },
     },
+    "&.Mui-disabled": {
+      color: theme.palette.disabled.whiteColor,
+    },
   },
   title: {
     color: "white",

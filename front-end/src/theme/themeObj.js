@@ -85,6 +85,9 @@ const theme = {
       main: "rgba(136, 120, 255, 1)",
       hover: "rgba(136, 120, 255, 0.5)",
 
+      transparent: "rgba(136, 120, 255, 0.13)",
+      transparentHover: "rgba(136, 120, 255, 0.2)",
+
       subLight: "rgba(120, 127, 246, 1)",
 
       subDark: "rgba(104, 80, 230, 1)",

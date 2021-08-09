@@ -39,19 +39,22 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
-    //maxHeight: '300px'
   },
 });
 
 class PlaceOrder extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "userSession", "userOrder"];
+    const compareKeys = ["classes", "userOrder"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
       !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
+  }
+
+  componentWillUnmount() {
+    this.props.clearOrder();
   }
 
   render() {
@@ -90,12 +93,10 @@ class PlaceOrder extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  userSession: state.userSession,
   userOrder: state.userOrder,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  mutateOrder: (dataToChange) => dispatch(orderAction("change", dataToChange)),
   clearOrder: () => dispatch(orderAction("clear")),
 });
 

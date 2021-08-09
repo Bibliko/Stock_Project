@@ -65,7 +65,7 @@ class App extends React.Component {
       .then((user) => {
         this.reduxStoreInitialState = {
           userSession: user.data,
-          userOrder: { disabled: {} },
+          userOrder: {},
           isMarketClosed: true,
         };
 

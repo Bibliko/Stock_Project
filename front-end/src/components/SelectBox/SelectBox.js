@@ -28,6 +28,9 @@ const styles = (theme) => ({
     "&:hover": {
       backgroundColor: theme.palette.paperBackground.onPageLight,
     },
+    "&.Mui-disabled": {
+      color: theme.palette.disabled.whiteColor,
+    },
     fontSize: "medium",
     height: "45px",
     [theme.breakpoints.down("xs")]: {
@@ -64,7 +67,7 @@ const styles = (theme) => ({
 });
 
 function SelectBox(props) {
-  const { classes, containerClass, items, name, value, onChange } = props;
+  const { classes, containerClass, items, name, value, disabled, onChange } = props;
 
   return (
     <Container className={clsx(classes.selectBoxContainer, containerClass)}>
@@ -73,6 +76,7 @@ function SelectBox(props) {
         <Select
           id={name}
           value={value}
+          disabled={disabled}
           onChange={onChange}
           className={classes.input}
           MenuProps={{ classes: { paper: classes.menuList } }}

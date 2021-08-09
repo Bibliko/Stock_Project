@@ -1,13 +1,18 @@
 import React from "react";
-import PropTypes from "prop-types";
+import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import { isEqual } from "lodash";
+import { connect } from "react-redux";
+
+import { orderAction } from "../../../redux/storeActions/actions";
+import { getFullStockInfo } from "../../../utils/RedisUtil";
+import { placeOrder, amendOrder } from "../../../utils/TransactionUtil";
+import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
 
 import ProgressButton from "../../Button/ProgressButton";
 
 import {
   Button,
-  Divider,
   Paper,
   Typography
 } from "@material-ui/core";
@@ -28,7 +33,7 @@ const styles = (theme) => ({
     color: theme.palette.normalFontColor.primary,
     borderRadius: "4px",
     width: "100%",
-    padding: "1.2rem 1.5rem 1.4rem 1.5rem",
+    padding: "1.2rem 1.5rem 2rem 1.5rem",
   },
   title: {
     flexBasis: "100%",
@@ -59,36 +64,154 @@ const styles = (theme) => ({
       fontSize: "1.15em",
     },
   },
-  divider: {
-    flexBasis: "100%",
-    margin: "2rem 0 1rem 0",
-    background: "white",
-  },
   buttonContainer: {
     flexGrow: "1",
     width: "unset",
     color: theme.palette.normalFontColor.primary,
   },
+  clearButton: {
+    background: theme.palette.primary.transparent,
+    "&:hover": {
+      background: theme.palette.primary.transparentHover,
+    },
+  },
 });
 
 class OrderSummary extends React.Component {
   state = {
+    brokerage: "",
+    fail: false,
+    success: false,
+    loading: false,
+  };
+
+  calculateBrokerage = (lastPrice, quatity) => {
+    let brokerage;
+    /**
+     * Brokerage ( phí giao dịch )
+     * Case 1 : tổng giá trị giao dịch ( sell/buy ) bé hơn bằng 10000 $ thì brokerage = 20 $
+     * Case 2 : tổng giá trị trị giao dịch lớn hơn 10 000$ thì brokerage = 20$ + 0.25% ( tổng giá trị giao dịch - 10000 $ )
+     * ví dụ : buy/sell lượng cổ phiếu giá 15 000 thì brokerage = 20 + 0.25% * 5000
+     */
+
+    if (lastPrice * quatity <= 10000) {
+      brokerage = 20;
+    } else {
+      brokerage = 20 + (0.25 / 100) * (lastPrice * quatity - 10000);
+    }
+
+    return roundNumber(brokerage, 2);
+  };
+
+  updateBrokerage = () => {
+    const { companyCode, quantity, limitPrice } = this.props.userOrder;
+
+    if (limitPrice)
+      return this.setState({ brokerage: this.calculateBrokerage(limitPrice, quantity) });
+
+    getFullStockInfo(companyCode)
+      .then((stockInfo) => {
+        this.setState({ brokerage: this.calculateBrokerage(stockInfo.price, quantity) });
+        console.log(stockInfo.price);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  handleSubmit = () => {
+    const { id: userID } = this.props.userSession;
+    const {
+      id: orderID,
+      type,
+      companyCode,
+      quantity,
+      option,
+      limitPrice,
+      amend,
+    } = this.props.userOrder;
+    const { brokerage } = this.state;
+    const orderData = {
+      type,
+      companyCode,
+      quantity,
+      option,
+      limitPrice,
+      brokerage,
+    };
+    const id = amend ? orderID : userID;
+    const submitOrder = amend ? amendOrder : placeOrder;
+
+    this.setState({
+      loading: true,
+      success: false,
+      fail: false,
+    }, () => {
+      submitOrder(id, orderData)
+        .then(() => {
+          this.setState({
+            loading: false,
+            success: true,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          this.setState({
+            loading: false,
+            fail: true,
+          });
+        });
+    });
   };
 
   componentDidMount() {
+    const {
+      type,
+      companyCode,
+      quantity,
+    } = this.props.userOrder;
+
+    if (type && companyCode && quantity)
+      this.updateBrokerage();
+    else
+      this.setState({ brokerage: "" });
   }
 
-  componentWillUnmount() {}
+  componentDidUpdate() {
+    const {
+      type,
+      companyCode,
+      quantity,
+    } = this.props.userOrder;
+
+    if (type && companyCode && quantity)
+      this.updateBrokerage();
+    else
+      this.setState({ brokerage: "" });
+  }
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
       !isEqual(nextProps.classes, this.props.classes) ||
+      !isEqual(nextProps.userOrder, this.props.userOrder) ||
       !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      clearOrder,
+    } = this.props;
+    const {
+      brokerage,
+      fail,
+      success,
+      loading,
+    } = this.state;
+    const {
+      type,
+      companyCode,
+      quantity,
+    } = this.props.userOrder;
 
     return (
       <div className={classes.root}>
@@ -96,21 +219,16 @@ class OrderSummary extends React.Component {
           <Typography className={classes.title}>{"Order Summary"}</Typography>
 
           <Typography className={classes.label}>{"Type:"}</Typography>
-          <Typography className={classes.content}>{"content"}</Typography>
+          <Typography className={classes.content}>{type}</Typography>
 
           <Typography className={classes.label}>{"Code:"}</Typography>
-          <Typography className={classes.content}>{"content"}</Typography>
+          <Typography className={classes.content}>{companyCode}</Typography>
 
           <Typography className={classes.label}>{"Quantity:"}</Typography>
-          <Typography className={classes.content}>{"content"}</Typography>
+          <Typography className={classes.content}>{quantity}</Typography>
 
           <Typography className={classes.label}>{"Brokerage:"}</Typography>
-          <Typography className={classes.content}>{"content"}</Typography>
-
-          <Divider variant="middle" className={classes.divider} />
-
-          <Typography className={classes.label}>{"Total:"}</Typography>
-          <Typography className={classes.content}>{"content"}</Typography>
+          <Typography className={classes.content}>{brokerage && `$${brokerage}`}</Typography>
         </Paper>
 
         <Button
@@ -118,13 +236,18 @@ class OrderSummary extends React.Component {
           variant="outlined"
           disableElevation
           color="primary"
-          className={classes.buttonContainer}
+          className={clsx(classes.buttonContainer, classes.clearButton)}
+          onClick={() => clearOrder()}
         >
           {"Clear"}
         </Button>
 
         <ProgressButton
           containerClass={classes.buttonContainer}
+          success={success}
+          fail={fail}
+          loading={loading}
+          handleClick={this.handleSubmit}
         >
           {"Submit"}
         </ProgressButton>
@@ -133,8 +256,16 @@ class OrderSummary extends React.Component {
   }
 }
 
-OrderSummary.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
+const mapStateToProps = (state) => ({
+  userSession: state.userSession,
+  userOrder: state.userOrder,
+});
 
-export default withStyles(styles)(OrderSummary);
+const mapDispatchToProps = (dispatch) => ({
+  clearOrder: () => dispatch(orderAction("clear")),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(OrderSummary));
