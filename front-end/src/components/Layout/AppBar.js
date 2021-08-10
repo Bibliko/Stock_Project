@@ -273,6 +273,16 @@ class PersistentAppBar extends React.Component {
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
                           onClick={() => {
+                            redirectToPage("placeOrder", this.props);
+                          }}
+                          className={classes.menuItem}
+                        >
+                          Place an Order
+                        </MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          onClick={() => {
                             redirectToPage("/transactionsHistory", this.props);
                           }}
                           className={classes.menuItem}

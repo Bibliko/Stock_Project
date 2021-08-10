@@ -2,13 +2,8 @@ import React from "react";
 import clsx from "clsx";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
-import { socket } from "../../App";
-
-import { connect } from "react-redux";
-import { userAction } from "../../redux/storeActions/actions";
 
 import { getFullStockInfo } from "../../utils/RedisUtil";
-import { changeUserData } from "../../utils/UserUtil";
 
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
@@ -18,7 +13,7 @@ import CompanyActions from "../../components/CompanyDetail/CompanyActions";
 import SegmentedBar from "../../components/ProgressBar/SegmentedBar";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Container, Typography, Grid, Button } from "@material-ui/core";
+import { Container, Typography, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -59,16 +54,6 @@ const styles = (theme) => ({
   tranactionsCard: {
     width: "100%",
   },
-  watchlistButton: {
-    color: theme.palette.primary.main,
-    border: `1px solid ${theme.palette.primary.main}`,
-    fontWeight: "bold",
-    textTransform: "none",
-  },
-  watchlistButtonRemove: {
-    color: theme.palette.secondary.main,
-    border: `1px solid ${theme.palette.secondary.main}`,
-  },
 });
 
 class CompanyDetail extends React.Component {
@@ -79,43 +64,6 @@ class CompanyDetail extends React.Component {
     errorMessage: "",
 
     finishedSettingUp: false,
-  };
-
-  addToWatchlist = () => {
-    const { companyCode } = this.state;
-    let { email, watchlist: newWatchlist } = this.props.userSession;
-
-    newWatchlist.push(companyCode);
-    const dataNeedChange = {
-      watchlist: {
-        set: newWatchlist,
-      },
-    };
-    changeUserData(dataNeedChange, email, this.props.mutateUser, socket).catch(
-      (err) => {
-        console.log(err);
-      }
-    );
-  };
-
-  removeFromWatchlist = () => {
-    const { companyCode } = this.state;
-    let { email, watchlist: newWatchlist } = this.props.userSession;
-
-    newWatchlist = newWatchlist.filter(
-      (companyCodeString) => companyCodeString !== companyCode
-    );
-
-    const dataNeedChange = {
-      watchlist: {
-        set: newWatchlist,
-      },
-    };
-    changeUserData(dataNeedChange, email, this.props.mutateUser, socket).catch(
-      (err) => {
-        console.log(err);
-      }
-    );
   };
 
   componentDidMount() {
@@ -150,7 +98,7 @@ class CompanyDetail extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "userSession"];
+    const compareKeys = ["classes"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
@@ -160,7 +108,7 @@ class CompanyDetail extends React.Component {
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { classes } = this.props;
     const {
       companyCode,
       companyData,
@@ -210,37 +158,12 @@ class CompanyDetail extends React.Component {
                   item
                   xs={12}
                   md={3}
-                  container
-                  spacing={4}
-                  direction="row"
                   className={clsx(classes.actionsContainer, classes.fullWidth)}
                 >
-                  <Grid item xs={12}>
-                    <CompanyActions
-                      companyCode={companyCode}
-                      className={classes.transactionsCard}
-                    />
-                  </Grid>
-                  <Grid item xs={12} className={classes.fullWidth}>
-                    <Button
-                      variant="outlined"
-                      className={clsx(classes.watchlistButton, {
-                        [classes.watchlistButtonRemove]: userSession.watchlist.includes(
-                          companyCode
-                        ),
-                      })}
-                      onClick={
-                        userSession.watchlist.includes(companyCode)
-                          ? this.removeFromWatchlist
-                          : this.addToWatchlist
-                      }
-                    >
-                      {userSession.watchlist.includes(companyCode) &&
-                        "Remove from watchlist"}
-                      {!userSession.watchlist.includes(companyCode) &&
-                        "Add to watchlist"}
-                    </Button>
-                  </Grid>
+                  <CompanyActions
+                    companyCode={companyCode}
+                    className={classes.transactionsCard}
+                  />
                 </Grid>
               </React.Fragment>
             )}
@@ -252,15 +175,4 @@ class CompanyDetail extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  userSession: state.userSession,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(withRouter(CompanyDetail)));
+export default withStyles(styles)(withRouter(CompanyDetail));
