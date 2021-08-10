@@ -148,7 +148,7 @@ class CompanyDialog extends React.Component {
   }
 
   render() {
-    const { classes, handleClose, open, companyCode } = this.props;
+    const { classes, handleAction, handleClose, open, companyCode } = this.props;
     const { value, errorMessage, companyData } = this.state;
 
     return (
@@ -214,11 +214,8 @@ class CompanyDialog extends React.Component {
           </DialogContent>
 
           <DialogActions className={classes.dialogAction}>
-            <Button onClick={handleClose} color="primary">
-              Buy
-            </Button>
-            <Button onClick={handleClose} color="primary">
-              Sell
+            <Button onClick={handleAction} color="primary">
+              Trade
             </Button>
           </DialogActions>
         </Dialog>

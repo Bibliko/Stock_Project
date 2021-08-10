@@ -25,6 +25,7 @@ import Companies from "./pages/Main/Companies";
 import CompanyDetail from "./pages/Main/CompanyDetail";
 import TransactionsHistory from "./pages/Main/TransactionsHistory";
 import PendingOrder from "./pages/Main/PendingOrder";
+import PlaceOrder from "./pages/Main/PlaceOrder";
 
 import Layout from "./components/Layout/Layout";
 import { createTheme } from "./theme/ThemeUtil";
@@ -64,6 +65,7 @@ class App extends React.Component {
       .then((user) => {
         this.reduxStoreInitialState = {
           userSession: user.data,
+          userOrder: {},
           isMarketClosed: true,
         };
 
@@ -142,6 +144,7 @@ class App extends React.Component {
                     component={TransactionsHistory}
                   />
                   <Route path="/pendingOrder" component={PendingOrder} />
+                  <Route path="/placeOrder" component={PlaceOrder} />
                 </Layout>
               )}
             </Switch>

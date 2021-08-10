@@ -2,10 +2,11 @@ import React from "react";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
-import { userAction } from "../../redux/storeActions/actions";
+import { orderAction } from "../../redux/storeActions/actions";
 import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
 import { getAllCompaniesRating } from "../../utils/CompanyUtil";
 import { ratingValue } from "../../utils/low-dependency/FmpHelper";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { SortDirection } from "react-virtualized";
 
@@ -145,6 +146,11 @@ class Companies extends React.Component {
     this.setState({
       openDialog: false,
     });
+  };
+
+  handleDialogAction = () => {
+    this.props.mutateOrder({companyCode: this.state.companyCode});
+    redirectToPage('/placeOrder', this.props)
   };
 
   // Price scale: y = 10 ^ (0.0055051499 * x)
@@ -311,6 +317,7 @@ class Companies extends React.Component {
         <CompanyDialog
           open={openDialog}
           handleClose={this.handleCloseDialog}
+          handleAction={this.handleDialogAction}
           companyCode={companyCode}
         />
       </Container>
@@ -323,7 +330,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+  mutateOrder: (dataToChange) => dispatch(orderAction("change", dataToChange)),
 });
 
 export default connect(

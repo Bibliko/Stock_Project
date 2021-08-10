@@ -1,6 +1,7 @@
 const actionTypes = {
-    USER: 'USER',
-    MARKET: 'MARKET'
+    USER: "USER",
+    ORDER: "ORDER",
+    MARKET: "MARKET"
 };
 
 export default actionTypes;
