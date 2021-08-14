@@ -64,6 +64,8 @@ class OrderForm extends React.Component {
       if (value && !isNumeric(value)) return;
       return this.props.mutateOrder({ [field]: parseFloat(value) });
     }
+    if (value === transactionOptionDefault)
+      return this.props.mutateOrder({ [field]: value, limitPrice: null });
 
     this.props.mutateOrder({ [field]: value });
   };
@@ -135,6 +137,7 @@ class OrderForm extends React.Component {
           containerClass={classes.field}
           name={"Price"}
           value={limitPrice || ""}
+          disabled={option === transactionOptionDefault}
           onChange={(event) => this.handleDetailChange(
             "limitPrice",
             event.target.value

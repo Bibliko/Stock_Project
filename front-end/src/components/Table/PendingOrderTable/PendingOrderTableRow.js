@@ -55,16 +55,25 @@ class PendingOrderTableRow extends React.Component {
   };
 
   render() {
-    const { classes, labels, order } = this.props;
+    const {
+      classes,
+      labels,
+      order,
+      handleDelete,
+      handleAmend,
+    } = this.props;
 
     return (
       <TableRow className={classes.tableRow}>
-        { labels.map((label) => (
+        { labels.map((label, index) => (
             chooseTableCell(
               label,
+              index,
               this.isLastRow,
               classes,
-              order
+              order,
+              handleDelete,
+              handleAmend,
             )
         ))}
       </TableRow>

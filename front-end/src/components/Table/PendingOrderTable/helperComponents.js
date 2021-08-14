@@ -21,36 +21,45 @@ const StyledTableCell = withStyles((theme) => ({
 
 export const chooseTableCellHeader = (indexColumnName, state) => {
   const { labels } = state;
-  const type = labels[indexColumnName];
+  const label = labels[indexColumnName];
 
   return (
-    <StyledTableCell key={indexColumnName} align={'center'}>{type}</StyledTableCell>
+    <StyledTableCell key={indexColumnName} align={'center'}>{label}</StyledTableCell>
   );
 };
 
-export const chooseTableCell = (type, isLastRow, classes, order) => {
+export const chooseTableCell = (
+  label,
+  index,
+  isLastRow,
+  classes,
+  order,
+  deleteOrder,
+  amendOrder
+) => {
   return (
     <TableCell
+      key={`${label}-${index}`}
       align="center"
       className={clsx(classes.tableCell, {
         [classes.lastRow]: isLastRow(),
-        [classes.lastLeftCell]: isLastRow() && type === "Type",
+        [classes.lastLeftCell]: isLastRow() && label === "Type",
         [classes.lastRightCell]:
-        isLastRow() && type === "Actions",
+        isLastRow() && label === "Actions",
       })}
     >
       <div>
         <Typography noWrap>
-          {chooseTableCellValue(type, order, classes)}
+          {chooseTableCellValue(label, order, classes, deleteOrder, amendOrder)}
         </Typography>
       </div>
     </TableCell>
   );
 };
 
-export const chooseTableCellValue = (type, order, classes) => {
+export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOrder) => {
   const {
-    isTypeBuy,
+    type,
     companyCode,
     quantity,
     option,
@@ -60,8 +69,8 @@ export const chooseTableCellValue = (type, order, classes) => {
 
   let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage, 2));
 
-  switch (type) {
-    case "Type": return isTypeBuy ? "BUY" : "SELL";
+  switch (label) {
+    case "Type": return `${type}`;
 
     case "Code": return `${companyCode}`;
 
@@ -69,11 +78,11 @@ export const chooseTableCellValue = (type, order, classes) => {
 
     case "Option": return `${option}`;
 
-    case "Land price": return `$${numberWithCommas(roundNumber(limitPrice, 2))}`;
+    case "Land price": return limitPrice ? `$${numberWithCommas(roundNumber(limitPrice, 2))}` : "-";
 
     case "Brokerage": return `$${numberWithCommas(roundNumber(brokerage, 2))}`;
 
-    case "Trade value": return `$${tradeValue}`;
+    case "Trade value": return limitPrice ? `$${tradeValue}` : "-";
 
     case "Actions":
       return (
@@ -84,7 +93,7 @@ export const chooseTableCellValue = (type, order, classes) => {
             variant="contained"
             className={classes.amendButton}
             disableElevation
-            onClick={() => alert('Amend')}
+            onClick={amendOrder}
           >
             Amend
           </Button>
@@ -94,7 +103,7 @@ export const chooseTableCellValue = (type, order, classes) => {
             variant="contained"
             className={classes.deleteButton}
             disableElevation
-            onClick={() => alert('Delete')}
+            onClick={deleteOrder}
           >
             Delete
           </Button>

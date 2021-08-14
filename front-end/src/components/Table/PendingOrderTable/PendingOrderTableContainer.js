@@ -1,6 +1,8 @@
 import React from "react";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
+import { orderAction } from "../../../redux/storeActions/actions";
+
 import {
   TableRow,
   TableContainer,
@@ -12,6 +14,8 @@ import { withStyles } from "@material-ui/core/styles";
 
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { getUserPendingTransactions } from "../../../utils/UserUtil";
+import { deleteOrder } from "../../../utils/TransactionUtil";
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 
 import { paperWhenPendingOrderEmpty, chooseTableCellHeader } from "./helperComponents";
 import PendingOrderTableRow from "./PendingOrderTableRow";
@@ -117,9 +121,21 @@ class PendingOrderTableContainer extends React.Component {
     }, 3 * oneSecond);
   };
 
-  componentDidMount() {
-    this.getUserPendingTransactionsData()
-  }
+  handleAmendOrder = (order) => {
+    this.props.mutateOrder({
+      ...order,
+      amend: true,
+    });
+    redirectToPage("/placeOrder", this.props);
+  };
+
+  handleDeleteOrder = (orderID) => {
+    deleteOrder(orderID)
+      .then(() => {
+        return this.getUserPendingTransactionsData();
+      })
+      .catch((err) => console.log(err));
+  };
 
   getUserPendingTransactionsData = () => {
     const { email } = this.props.userSession;
@@ -136,6 +152,10 @@ class PendingOrderTableContainer extends React.Component {
       console.log(err);
     });
   };
+
+  componentDidMount() {
+    this.getUserPendingTransactionsData()
+  }
 
   render() {
     const { classes } = this.props;
@@ -179,6 +199,8 @@ class PendingOrderTableContainer extends React.Component {
                     order={row}
                     rowIndex={index}
                     rowsLength={pendingOrders.length}
+                    handleDelete={() => this.handleDeleteOrder(row.id)}
+                    handleAmend={() => this.handleAmendOrder(row)}
                   />
                 ))}
               </TableBody>
@@ -194,6 +216,11 @@ const mapStateToProps = (state) => ({
   userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(PendingOrderTableContainer))
-);
+const mapDispatchToProps = (dispatch) => ({
+  mutateOrder: (dataToChange) => dispatch(orderAction("change", dataToChange)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(withRouter(PendingOrderTableContainer)));
