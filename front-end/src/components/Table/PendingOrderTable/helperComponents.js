@@ -28,9 +28,18 @@ export const chooseTableCellHeader = (indexColumnName, state) => {
   );
 };
 
-export const chooseTableCell = (label, isLastRow, classes, order) => {
+export const chooseTableCell = (
+  label,
+  index,
+  isLastRow,
+  classes,
+  order,
+  deleteOrder,
+  amendOrder
+) => {
   return (
     <TableCell
+      key={`${label}-${index}`}
       align="center"
       className={clsx(classes.tableCell, {
         [classes.lastRow]: isLastRow(),
@@ -41,14 +50,14 @@ export const chooseTableCell = (label, isLastRow, classes, order) => {
     >
       <div>
         <Typography noWrap>
-          {chooseTableCellValue(label, order, classes)}
+          {chooseTableCellValue(label, order, classes, deleteOrder, amendOrder)}
         </Typography>
       </div>
     </TableCell>
   );
 };
 
-export const chooseTableCellValue = (label, order, classes) => {
+export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOrder) => {
   const {
     type,
     companyCode,
@@ -69,11 +78,11 @@ export const chooseTableCellValue = (label, order, classes) => {
 
     case "Option": return `${option}`;
 
-    case "Land price": return `$${numberWithCommas(roundNumber(limitPrice, 2))}`;
+    case "Land price": return limitPrice ? `$${numberWithCommas(roundNumber(limitPrice, 2))}` : "-";
 
     case "Brokerage": return `$${numberWithCommas(roundNumber(brokerage, 2))}`;
 
-    case "Trade value": return `$${tradeValue}`;
+    case "Trade value": return limitPrice ? `$${tradeValue}` : "-";
 
     case "Actions":
       return (
@@ -84,7 +93,7 @@ export const chooseTableCellValue = (label, order, classes) => {
             variant="contained"
             className={classes.amendButton}
             disableElevation
-            onClick={() => alert('Amend')}
+            onClick={amendOrder}
           >
             Amend
           </Button>
@@ -94,7 +103,7 @@ export const chooseTableCellValue = (label, order, classes) => {
             variant="contained"
             className={classes.deleteButton}
             disableElevation
-            onClick={() => alert('Delete')}
+            onClick={deleteOrder}
           >
             Delete
           </Button>

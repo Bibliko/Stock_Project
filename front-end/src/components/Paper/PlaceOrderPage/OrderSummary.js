@@ -8,6 +8,7 @@ import { orderAction } from "../../../redux/storeActions/actions";
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { placeOrder, amendOrder } from "../../../utils/TransactionUtil";
 import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
+import { transactionOptionDefault } from "../../../utils/low-dependency/PrismaConstantUtil";
 
 import ProgressButton from "../../Button/ProgressButton";
 
@@ -112,12 +113,30 @@ class OrderSummary extends React.Component {
     getFullStockInfo(companyCode)
       .then((stockInfo) => {
         this.setState({ brokerage: this.calculateBrokerage(stockInfo.price, quantity) });
-        console.log(stockInfo.price);
       })
       .catch((err) => console.log(err));
   };
 
+  validateOrder = () => {
+    const {
+      type,
+      companyCode,
+      quantity,
+      option,
+      limitPrice,
+    } = this.props.userOrder;
+
+    return (
+      type && companyCode && quantity && option &&
+      // if option is not default, there must be a limitPrice
+      (option === transactionOptionDefault || limitPrice)
+    );
+  };
+
   handleSubmit = () => {
+    if (!this.validateOrder())
+      return this.setState({ fail: true });
+
     const { id: userID } = this.props.userSession;
     const {
       id: orderID,
@@ -134,7 +153,7 @@ class OrderSummary extends React.Component {
       companyCode,
       quantity,
       option,
-      limitPrice,
+      limitPrice: option === transactionOptionDefault ? null : limitPrice,
       brokerage,
     };
     const id = amend ? orderID : userID;
@@ -163,26 +182,14 @@ class OrderSummary extends React.Component {
   };
 
   componentDidMount() {
-    const {
-      type,
-      companyCode,
-      quantity,
-    } = this.props.userOrder;
-
-    if (type && companyCode && quantity)
+    if (this.validateOrder())
       this.updateBrokerage();
     else
       this.setState({ brokerage: "" });
   }
 
   componentDidUpdate() {
-    const {
-      type,
-      companyCode,
-      quantity,
-    } = this.props.userOrder;
-
-    if (type && companyCode && quantity)
+    if (this.validateOrder())
       this.updateBrokerage();
     else
       this.setState({ brokerage: "" });
