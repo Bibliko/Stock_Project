@@ -51,7 +51,7 @@ const theme = {
     topLayout: "55px",
     topLayoutSmall: "20px",
 
-    topFloatingToolButton: "110px",
+    topFloatingToolButton: "150px",
     smallTopFloatingToolButton: "100px",
 
     dialogItemsTransactionsHistoryFilters: "20px",
@@ -60,8 +60,8 @@ const theme = {
   },
   customZIndex: {
     reminder: 10,
-    floatingToolButton: 5,
-    floatingActionButton: 5,
+    floatingToolButton: 30,
+    floatingActionButton: 30,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     subNavbar: 20,
     subNavbarCard: 18,
