@@ -191,7 +191,7 @@ class Login extends React.Component {
     } else {
       if (isEmpty(this.state.error)) {
         loginUser("local", {
-          email: this.email,
+          email: this.email.toLowerCase(),
           password: this.password,
           // remember: this.remember
         })

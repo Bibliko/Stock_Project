@@ -166,7 +166,7 @@ class Signup extends React.Component {
     } else {
       if (isEmpty(this.state.error)) {
         signupUser({
-          email: this.email,
+          email: this.email.toLowerCase(),
           password: this.password,
         })
           .then((res) => {

@@ -237,9 +237,9 @@ class SensitiveSection extends React.Component {
   };
 
   sendVerificationCodeButton = () => {
-    getUserData("default", this.email)
+    getUserData("default", this.email.toLowerCase())
       .then((user) => {
-        return user ? null : sendVerificationCode(this.email, "email");
+        return user ? null : sendVerificationCode(this.email.toLowerCase(), "email");
       })
       .then((emailSent) => {
         this.setState({
@@ -257,7 +257,7 @@ class SensitiveSection extends React.Component {
   };
 
   confirmVerificationCode = () => {
-    checkVerificationCode(this.email, this.state.verificationCode, "email")
+    checkVerificationCode(this.email.toLowerCase(), this.state.verificationCode, "email")
       .then(() => {
         this.setState(
           {
@@ -270,7 +270,7 @@ class SensitiveSection extends React.Component {
           () => {
             changeUserEmail(
               this.props.email,
-              this.email,
+              this.email.toLowerCase(),
               this.props.mutateUser,
               socket
             ).catch((err) => {

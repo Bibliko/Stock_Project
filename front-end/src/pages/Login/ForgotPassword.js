@@ -207,7 +207,7 @@ class ForgotPassword extends React.Component {
         error: this.errorTypes[1],
       });
     } else {
-      sendVerificationCode(this.email, "password")
+      sendVerificationCode(this.email.toLowerCase(), "password")
         .then(() => {
           this.setState({
             success: "Password Verification Code has been sent",
@@ -228,7 +228,7 @@ class ForgotPassword extends React.Component {
         error: this.errorTypes[1],
       });
     } else {
-      checkVerificationCode(this.email, this.code, "password")
+      checkVerificationCode(this.email.toLowerCase(), this.code, "password")
         .then(() => {
           this.setState({
             allowButtonSendCode: false,
@@ -252,7 +252,7 @@ class ForgotPassword extends React.Component {
     ) {
       this.setState({ error: this.errorTypes[1] });
     } else {
-      changePassword(this.password, this.email)
+      changePassword(this.password, this.email.toLowerCase())
         .then((res) => {
           this.setState({ success: "Successfully changed password" });
         })
