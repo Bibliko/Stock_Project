@@ -175,7 +175,7 @@ class SearchPopper extends React.Component {
                   <Typography className={classes.searchNote}>{note}</Typography>
                 )}
 
-                {companiesNYSE?.map((company, index) => (
+                {companiesNYSE.map?.((company, index) => (
                   <MenuItem
                     dense
                     key={`NYSE-${index}`}
@@ -186,7 +186,7 @@ class SearchPopper extends React.Component {
                   </MenuItem>
                 ))}
 
-                {companiesNASDAQ?.map((company, index) => (
+                {companiesNASDAQ.map?.((company, index) => (
                   <MenuItem
                     dense
                     key={`NASDAQ-${index}`}

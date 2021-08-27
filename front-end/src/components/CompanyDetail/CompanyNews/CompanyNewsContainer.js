@@ -118,7 +118,7 @@ class CompanyNewsContainer extends React.Component {
           spacing={2}
           style={{ alignSelf: "center" }}
         >
-          {news?.map((companyNews, index) => (
+          {news.map?.((companyNews, index) => (
             <CompanyNewsCard key={index} newsObject={companyNews} />
           ))}
         </Grid>
