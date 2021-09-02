@@ -11,9 +11,11 @@ import {
   transactionOptionLess,
   transactionOptionDefault,
 } from "../../../utils/low-dependency/PrismaConstantUtil";
-import{ isNumeric } from "../../../utils/low-dependency/NumberUtil";
+import { isNumeric } from "../../../utils/low-dependency/NumberUtil";
+import { getStockScreener } from "../../../utils/FinancialModelingPrepUtil";
 
 import SelectBox from "../../SelectBox/SelectBox";
+import VirtualizedAutocomplete from "../../SelectBox/VirtualizedAutocomplete";
 import TextField from "../../TextField/SettingTextFields/SettingNormalTextField";
 
 import { Typography } from "@material-ui/core";
@@ -49,13 +51,26 @@ const transactionTypes = [
   transactionTypeBuy,
   transactionTypeSell,
 ];
+
 const transactionOptions = [
   transactionOptionDefault,
   transactionOptionLess,
   transactionOptionGreater,
 ];
 
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
 class OrderForm extends React.Component {
+  state = { options: [] };
+
   handleDetailChange = (field, value) => {
     if (value && (field === "quantity" || field === "limitPrice")) {
       // value must be an integer
@@ -78,7 +93,30 @@ class OrderForm extends React.Component {
     );
   }
 
+  componentDidMount() {
+    getStockScreener({
+      priceFilter: [0, Infinity],
+      marketCapFilter: [0, Infinity],
+      sectorFilter: "All",
+      industryFilter: "All",
+    })
+      .then((stockData) => {
+        this.setState({
+          options: stableSort(
+            stockData.map((stock) => stock.code),
+            (a, b) =>  {
+              if (a > b) return 1;
+              if (a < b) return -1;
+              return 0;
+            }
+          )
+        });
+      })
+      .catch((err) => console.log(err));
+  }
+
   render() {
+    const { options } = this.state;
     const { classes } = this.props;
     const {
       type,
@@ -103,14 +141,16 @@ class OrderForm extends React.Component {
             event.target.value
           )}
         />
-        <TextField
+        <VirtualizedAutocomplete
           containerClass={classes.field}
           name={"Code"}
-          value={companyCode || ""}
+          value={companyCode}
+          options={options}
           disabled={amend}
-          onChange={(event) => this.handleDetailChange(
+          loading={!(companyCode && options)}
+          onChange={(event, value) => this.handleDetailChange(
             "companyCode",
-            event.target.value
+            value
           )}
         />
         <TextField
