@@ -16,7 +16,7 @@ const styles = (theme) => ({
   root: {
     position: "absolute",
     height: "75%",
-    width: theme.customWidth.mainPageWidth,
+    width: theme.customWidth.mainPageWidthSmall,
     marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {
       marginTop: theme.customMargin.topLayoutSmall,
@@ -28,15 +28,14 @@ const styles = (theme) => ({
     flexDirection: "column",
     maxWidth: "none",
   },
-  fullHeightWidth: {
-    height: "100%",
+  fullWidth: {
     width: "100%",
     minHeight: "200px",
   },
   itemGrid: {
     display: "flex",
     justifyContent: "flex-start",
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "column",
     minHeight: "125px",
   },
@@ -66,7 +65,7 @@ class PlaceOrder extends React.Component {
           container
           spacing={5}
           direction="row"
-          className={classes.fullHeightWidth}
+          className={classes.fullWidth}
         >
           <Grid
             item

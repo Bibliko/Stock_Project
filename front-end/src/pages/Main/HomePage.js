@@ -102,6 +102,7 @@ const styles = (theme) => ({
     },
     alignSelf: "flex-start",
     marginBottom: "40px",
+    marginLeft: "32px",
     fontWeight: "bolder",
     background: theme.palette.gradient.main,
     "-webkit-background-clip": "text",
@@ -162,7 +163,12 @@ class HomePage extends React.Component {
               <MostGainersPaper title={"Most Gainers"} />
             </Grid>
 
-            <Grid container item xs={12} sm={6} md={7} className={classes.itemGrid}>
+            <Grid
+              container item
+              xs={12} sm={6} md={7}
+              className={classes.itemGrid}
+              style={{flexDirection: "row"}}
+            >
               <AccountSummaryPaper />
             </Grid>
 

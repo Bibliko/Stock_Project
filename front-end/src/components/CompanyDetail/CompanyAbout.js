@@ -88,7 +88,7 @@ class CompanyAbout extends React.Component {
   state = {
     showFullDescription: false,
     showFullDetails: false,
-    companyDescription: this.props.companyData.description.substring(0, 350),
+    companyDescription: this.props.companyData.description?.substring(0, 350),
   };
 
   extendDescription = () => {
@@ -101,7 +101,7 @@ class CompanyAbout extends React.Component {
   shrinkDescription = () => {
     this.setState({
       showFullDescription: false,
-      companyDescription: this.props.companyData.description.substring(0, 350),
+      companyDescription: this.props.companyData.description?.substring(0, 350),
     });
   };
 
@@ -122,7 +122,7 @@ class CompanyAbout extends React.Component {
 
   componentDidUpdate() {
     if (!this.state.showFullDescription)
-      this.setState({companyDescription: this.props.companyData.description.substring(0, 350)});
+      this.setState({companyDescription: this.props.companyData.description?.substring(0, 350)});
   }
 
   shouldComponentUpdate(nextProps, nextState) {

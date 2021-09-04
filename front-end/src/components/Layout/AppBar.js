@@ -229,11 +229,12 @@ class PersistentAppBar extends React.Component {
               </Typography>
             </Button>
 
+            {/*TODO: Notification
             <Button disableRipple className={classes.menuButton}>
               <Typography className={classes.menuButtonTitle}>
                 Notifications
               </Typography>
-            </Button>
+            </Button>*/}
 
             <Button
               disableRipple
@@ -321,9 +322,10 @@ class PersistentAppBar extends React.Component {
                         </MenuItem>
 
                         <MenuItem disabled>Explore</MenuItem>
+                        {/*TODO: Charts page
                         <MenuItem dense className={classes.menuItem}>
                           Charts
-                        </MenuItem>
+                        </MenuItem>*/}
                         <MenuItem
                           dense
                           onClick={() => {

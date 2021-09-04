@@ -63,7 +63,7 @@ export const loginUser = (typeLogin, credentials) => {
           resolve("Successful");
         })
         .catch((e) => {
-          reject(e.response.data.message);
+          reject(e.response?.data?.message);
         });
     }
   });
@@ -80,7 +80,7 @@ export const signupUser = (credentials) => {
         resolve(res.data.message);
       })
       .catch((e) => {
-        reject(e.response.data.message);
+        reject(e.response?.data?.message);
       });
   });
 };
@@ -107,7 +107,7 @@ export const sendVerificationCode = (email, credentialNeedVerification) => {
         resolve(res.data.message);
       })
       .catch((err) => {
-        reject(err.response.data);
+        reject(err.response?.data);
       });
   });
 };
@@ -138,7 +138,7 @@ export const checkVerificationCode = (
         resolve("Successful");
       })
       .catch((err) => {
-        reject(err.response.data);
+        reject(err.response?.data);
       });
   });
 };
