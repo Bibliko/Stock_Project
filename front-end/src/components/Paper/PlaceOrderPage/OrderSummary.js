@@ -25,6 +25,11 @@ const styles = (theme) => ({
     flexFlow: "row wrap",
     gap: "0.7rem",
     width: "100%",
+    padding: '0px 10px',
+    maxWidth: "400px",
+    [theme.breakpoints.down("sm")]: {
+      paddingTop: "20px",
+    },
   },
   paper: {
     display: "flex",

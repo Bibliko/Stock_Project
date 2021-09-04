@@ -26,7 +26,8 @@ const theme = {
     maxMostGainers: "400px",
     maxMostGainersChip: "95px",
 
-    mainPageWidth: "clamp(150px, 90%, 2000px)",
+    mainPageWidth: "clamp(150px, 90%, 1500px)",
+    mainPageWidthSmall: "clamp(150px, 90%, 1000px)",
     mainSkeletonWidth: "100%",
 
     redirectingPaper: "90%",

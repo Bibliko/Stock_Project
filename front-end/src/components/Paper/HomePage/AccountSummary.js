@@ -24,7 +24,6 @@ import HoldingsTableContainer from "../../Table/AccountSummaryTable/HoldingsTabl
 const styles = (theme) => ({
   container: {
     color: "white",
-    alignSelf: "center",
   },
   avatar: {
     width: "60px",
