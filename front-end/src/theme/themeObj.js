@@ -127,14 +127,14 @@ const theme = {
     },
 
     // App Bar
-    appBarBlue: {
+    appBar: {
       // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
-      main: "rgba(31, 47, 152, 1)",
+      main: "rgba(27, 24, 44, 1)",
     },
 
     // Paper
     paperBackground: {
-      main: "rgba(0, 0, 0, 1)", // Black
+      main: "rgba(22, 22, 24, 1)", // Black
       sub: "rgba(107, 87, 224, 1)", // Dark Purple
 
       // Grey
@@ -186,8 +186,8 @@ const theme = {
 
     // Search Field
     searchFieldBackground: {
-      main: "rgba(60, 60, 60, 1)",
-      onHover: "rgba(70, 70, 70, 1)",
+      main: "rgba(53, 51, 62, 1)",
+      onHover: "rgba(65, 62, 76, 1)",
       rippleSpan: "rgba(100, 100, 100, 0.9)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
     },

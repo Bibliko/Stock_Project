@@ -66,7 +66,7 @@ const styles = (theme) => ({
     },
     border: "4px solid",
     borderColor: theme.palette.primary.subDark,
-    boxShadow: "0px 3px 20px rgba(200, 200, 200, 0.5)",
+    boxShadow: "0px 3px 20px 5px " + theme.palette.primary.transparentHover,
   },
   firstPlace: {
     transform: "scale(1.2)",
