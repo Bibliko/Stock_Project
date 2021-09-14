@@ -389,10 +389,10 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
     // Update user cash
     await prisma.user.update({
       where: {
-        id: user.id,
+        id: user.id
       },
       data: {
-        cash: user.cash + totalCashChange,
+        cash: user.cash + totalCashChange
       }
     });
 
@@ -411,7 +411,7 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
           buyPriceAvg: recentPrice,
           user: {
             connect: {
-              id: user.id,
+              id: user.id
             }
           }
         }
@@ -473,7 +473,7 @@ const sellShareEvent = async (
       return await prisma.share.delete({
         where: {
           id: sellShare.id
-        },
+        }
       });
     }
     // Case 2: sell some shares => update share quantity
@@ -532,7 +532,7 @@ const proceedTransaction = async (transactionID, recentPrice) => {
         isFinished: true,
         finishedTime: new Date(),
         priceAtTransaction: recentPrice,
-        spendOrGain: totalCashChange,
+        spendOrGain: totalCashChange
       }
     });
   } catch (err) {
@@ -554,5 +554,5 @@ module.exports = {
   getChunkUserTransactionsHistoryForRedisM5RU,
   getLengthUserTransactionsHistoryForRedisM5RU,
 
-  proceedTransaction,
+  proceedTransaction
 };

@@ -10,8 +10,9 @@
 
 const {
   oneSecond,
-  oneDay,
-  oneMinute
+  oneMinute,
+  oneHour,
+  oneDay
 } = require("./utils/low-dependency/DayTimeUtil");
 
 const {
@@ -50,7 +51,8 @@ const {
 
 const {
   emptyPendingTransactionsListAllCompanies,
-  deleteAllPendingTransactions,
+  addAllPendingTransactions,
+  deleteAllPendingTransactions
 } = require("./utils/redis-utils/PendingOrders");
 
 const { startSocketIO } = require("./socketIO");
@@ -209,13 +211,27 @@ const setupBackendIntervals = () => {
   // If forceUpdate is true and system is in developer mode, does not need to call API.
   setInterval(() => updateCompaniesRatingsList(), oneDay);
 
+  setInterval(
+    () => {
+      if (
+        globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+        !globalBackendVariables.isMarketClosed
+      ) {
+        addAllPendingTransactions()
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+      }
+    },
+    oneHour * 1.5
+  );
+
   // TODO: Uncomment in production
   // setInterval(
   //   () => {
-  //   if (
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
+  //     if (
+  //       globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //       !globalBackendVariables.isMarketClosed
+  //     ) {
   //       emptyPendingTransactionsListAllCompanies()
   //         .catch((err) => console.log(err));
   //     }

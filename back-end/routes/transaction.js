@@ -7,7 +7,7 @@ const { omit } = require("lodash");
 const {
   addSinglePendingTransaction,
   updateSinglePendingTransaction,
-  deleteSinglePendingTransaction,
+  deleteSinglePendingTransaction
 } = require("../utils/redis-utils/PendingOrders");
 
 router.put("/placeOrder", (req, res) => {
