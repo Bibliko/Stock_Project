@@ -69,6 +69,7 @@ const http = require("http");
 const server = http.createServer(app);
 
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const passport = require("passport");
 const { setupPassport } = require("./passport");
@@ -104,7 +105,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(cookieParser("stock-project"));
 app.use(bodyParser.json());
+app.set("trust proxy", 1);
 app.use(
   session({
     secret: "stock-project",
