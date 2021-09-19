@@ -190,7 +190,7 @@ const main = () => {
     .finally(() => {
       if (localSchema !== firebaseSchema) {
         putFirebaseToLocal().then((done) => {
-          exec('echo "init | npm run update-db-production"', (error, stdout, stderr) => {
+          exec('echo "init" | npm run update-db-production', (error, stdout, stderr) => {
             if (error) {
               console.log(`error: ${error.message}`);
               return;
