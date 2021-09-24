@@ -34,14 +34,15 @@ const styles = (theme) => ({
     justifyContent: "center",
     maxWidth: "none",
     minHeight: "605px",
+    overflow: "hidden",
   },
   paper: {
     height: "fit-content",
     width: "fit-content",
-    minWidth: "450px",
+    minWidth: "400px",
     [theme.breakpoints.down("xs")]: {
-      height: "-webkit-fill-available",
-      width: "-webkit-fill-available",
+      height: "100%",
+      width: "100%",
       minWidth: 0,
     },
     padding: theme.spacing(1),

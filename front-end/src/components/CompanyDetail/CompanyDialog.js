@@ -215,7 +215,7 @@ class CompanyDialog extends React.Component {
 
           <DialogActions className={classes.dialogAction}>
             <Button onClick={handleAction} color="primary">
-              Trade
+              Buy / Sell
             </Button>
           </DialogActions>
         </Dialog>

@@ -46,17 +46,6 @@ const styles = (theme) => ({
 });
 
 class MostGainersCard extends React.Component {
-  /**
-   * @param {string} changesPercentage (+131.00%)
-   * @returns {string} Percentage inside
-   */
-  gainerChangesPercentage = (changesPercentage) => {
-    return changesPercentage.substring(
-      changesPercentage.indexOf("(") + 1,
-      changesPercentage.indexOf(")")
-    );
-  };
-
   render() {
     const { classes, gainer } = this.props;
 
@@ -68,17 +57,11 @@ class MostGainersCard extends React.Component {
         <Grid item xs={4} className={classes.centerGrid}>
           <Chip
             className={clsx(classes.chip, {
-              [classes.increase]:
-                this.gainerChangesPercentage(gainer.changesPercentage).charAt(
-                  0
-                ) === "+",
-              [classes.decrease]:
-                this.gainerChangesPercentage(gainer.changesPercentage).charAt(
-                  0
-                ) === "-",
+              [classes.increase]: gainer.changesPercentage.charAt(0) !== "-",
+              [classes.decrease]: gainer.changesPercentage.charAt(0) === "-",
             })}
             size="medium"
-            label={this.gainerChangesPercentage(gainer.changesPercentage)}
+            label={`${roundNumber(parseFloat(gainer.changesPercentage), 2)}%`}
           />
         </Grid>
         <Grid item xs={4} className={classes.leftGrid}>

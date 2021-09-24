@@ -7,7 +7,10 @@ import { socket } from "../../App";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
-import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
+import {
+  redirectToPage,
+  openInNewTab,
+} from "../../utils/low-dependency/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
 
 import { leaveUserRoom } from "../../utils/SocketUtil";
@@ -223,12 +226,6 @@ class PersistentAppBar extends React.Component {
             <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
-            <Button disableRipple className={classes.menuButton}>
-              <Typography className={classes.menuButtonTitle}>
-                Education
-              </Typography>
-            </Button>
-
             {/*TODO: Notification
             <Button disableRipple className={classes.menuButton}>
               <Typography className={classes.menuButtonTitle}>
@@ -245,7 +242,7 @@ class PersistentAppBar extends React.Component {
               aria-haspopup="true"
               onClick={this.toggleGameMenu}
             >
-              <Typography className={classes.menuButtonTitle}>Game</Typography>
+              <Typography className={classes.menuButtonTitle}>Menu</Typography>
             </Button>
             <Popper
               open={openGameMenu}
@@ -342,6 +339,16 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
+
+            <Button
+              disableRipple
+              className={classes.menuButton}
+              onClick={() => openInNewTab("https://bibliko.org/")}
+            >
+              <Typography className={classes.menuButtonTitle}>
+                Education
+              </Typography>
+            </Button>
 
             <Button
               className={classes.menuButton}
