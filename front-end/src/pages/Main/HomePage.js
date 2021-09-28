@@ -20,7 +20,6 @@ import { SettingsRounded as SettingsRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,

@@ -25,7 +25,6 @@ import { Divider, Button, Container } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     width: theme.customWidth.mainPageWidthSmall,
     marginTop: theme.customMargin.topLayout,
     [theme.breakpoints.down("xs")]: {

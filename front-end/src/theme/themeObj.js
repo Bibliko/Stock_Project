@@ -39,6 +39,9 @@ const theme = {
     subBarHeight: "80px",
     subBarHeightSmall: "25px",
 
+    footerHeight: "60px",
+    footerHeightSmall: "70px",
+
     redirectingPaper: "200px",
 
     settingTextField: "45px",
