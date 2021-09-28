@@ -25,6 +25,8 @@ const {
 
 const { transactionTypeBuy } = require("../low-dependency/PrismaConstantUtil");
 
+const { compareFloat } = require("../low-dependency/NumberUtil");
+
 const deleteExpiredVerification = () => {
   let date = new Date();
   date = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
@@ -45,16 +47,25 @@ const deleteExpiredVerification = () => {
 const createAccountSummaryChartTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.accountSummaryTimestamp
-      .findUnique({
+      .findMany({
         where: {
-          UTCDateKey_userID: {
-            UTCDateKey: getFullDateUTCString(newDate()),
-            userID: user.id
-          }
-        }
+          userID: user.id
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1
       })
       .then((timestamp) => {
-        if (!timestamp) {
+        timestamp = timestamp[0]
+        // Only create new daily timestamp if there is no timestamp
+        // or there is a change in totalPortfolio to reduce database's size
+        if (
+          !timestamp || (
+            timestamp.UTCDateKey !== getFullDateUTCString(newDate()) &&
+            compareFloat(timestamp.portfolioValue, user.totalPortfolio)
+          )
+        ) {
           return prisma.accountSummaryTimestamp.create({
             data: {
               UTCDateString: newDate(),
@@ -83,16 +94,27 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.rankingTimestamp
-      .findUnique({
+      .findMany({
         where: {
-          UTCDateKey_userID: {
-            UTCDateKey: getFullDateUTCString(newDate()),
-            userID: user.id
-          }
-        }
+          userID: user.id
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1
       })
       .then((timestamp) => {
-        if (!timestamp) {
+        timestamp = timestamp[0]
+        // Only create new daily timestamp if there is no timestamp
+        // or there is a change in ranking to reduce database's size
+        if (
+          !timestamp || (
+            timestamp.UTCDateKey !== getFullDateUTCString(newDate()) && (
+              timestamp.ranking !== user.ranking ||
+              timestamp.regionalRanking !== user.regionalRanking
+            )
+          )
+        ) {
           return prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
@@ -154,6 +176,9 @@ const updateRankingList = (globalBackendVariables) => {
         orderBy: [
           {
             totalPortfolio: "desc"
+          },
+          {
+            id: "asc"
           }
         ]
       });
