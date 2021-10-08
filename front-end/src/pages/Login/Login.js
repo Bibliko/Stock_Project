@@ -10,6 +10,7 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
+import { withMediaQuery } from "../../theme/ThemeUtil";
 
 import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
 import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
@@ -26,30 +27,79 @@ import {
 
 const styles = (theme) => ({
   root: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "stretch",
+    justifyContent: "flex-start",
     position: "absolute",
     height: "100vh",
     width: "100vw",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
     maxWidth: "none",
     minHeight: "605px",
     overflow: "hidden",
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column",
+      overflowY: "auto",
+    },
+  },
+  hero: {
+    boxSizing: "border-box",
+    flex: "1 1 50%",
+    padding: "0px 5%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    [theme.breakpoints.down("xs")]: {
+      display: "unset",
+      minHeight: "100vh",
+      padding: "20% 10%",
+    },
+  },
+  logo: {
+    height: "70px",
+    width: "fit-content",
+    marginLeft: "-8px",
+  },
+  title: {
+    color: "white",
+    letterSpacing: "0.02em",
+    margin: "0.5em 0px",
+    fontSize: "xxx-large",
+    fontWeight: "bolder",
+    lineHeight: "1.1",
+  },
+  description: {
+    color: "white",
+    opacity: "0.6",
+    fontSize: "1.38em",
+    lineHeight: "1.4",
+    maxWidth: "50ch",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "larger",
+    },
+  },
+  button: {
+    color: "white",
+    marginTop: "2em",
+    fontSize: "large",
+    letterSpacing: "0.01em",
+    background: theme.palette.primary.transparent,
+    "&:hover": {
+      background: theme.palette.primary.transparentHover,
+    },
   },
   paper: {
-    height: "fit-content",
-    width: "fit-content",
-    minWidth: "400px",
-    [theme.breakpoints.down("xs")]: {
-      height: "100%",
-      width: "100%",
-      minWidth: 0,
-    },
+    boxSizing: "border-box",
+    flex: "1 1 50%",
     padding: theme.spacing(1),
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     background: theme.palette.gradientPaper.main,
+    [theme.breakpoints.down("xs")]: {
+      minHeight: "100vh",
+    },
   },
   div: {
     backgroundColor: theme.palette.loginBackground.main,
@@ -91,11 +141,6 @@ const styles = (theme) => ({
     borderRadius: "50%",
     height: "40px",
     width: "40px",
-  },
-  avatar: {
-    height: "120px",
-    width: "120px",
-    margin: theme.spacing(1),
   },
   alternativeLoginButton: {
     maxHeight: "fit-content",
@@ -149,6 +194,7 @@ const styles = (theme) => ({
   },
   form: {
     flexDirection: "column",
+    gap: "8px",
   },
   dividerLine: {
     backgroundColor: theme.palette.loginLink.main,
@@ -159,6 +205,8 @@ class Login extends React.Component {
   state = {
     error: "",
   };
+
+  formRef = React.createRef()
 
   errorTypes = ["Missing field."];
 
@@ -209,6 +257,10 @@ class Login extends React.Component {
     }
   };
 
+  scrollToForm = () => {
+    this.formRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
+
   componentDidMount() {
     if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
@@ -222,7 +274,7 @@ class Login extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, mediaQuery } = this.props;
     const { error } = this.state;
 
     if (shouldRedirectToHomePage(this.props)) {
@@ -233,20 +285,50 @@ class Login extends React.Component {
       <div>
         <div className={classes.div} />
         <Container className={classes.root} disableGutters>
-          <Paper className={classes.paper} elevation={2}>
+          <div className={classes.hero}>
+            <img
+              src="/bibliko.png"
+              alt="Bibliko logo"
+              className={classes.logo}
+            />
+            <Typography className={classes.title}>
+              {"Bibliko stock game"}
+            </Typography>
+            <Typography className={classes.description}>
+              {`Bibliko stock game is a free stock game for young people.
+               The information of trading stocks is updated daily according
+                to the real market to help users have a hands-on experience
+                 with stock market before investing.`}
+            </Typography>
+            { mediaQuery &&
+              <Button
+                aria-label="Let's get started"
+                variant="outlined"
+                color="primary"
+                className={classes.button}
+                onClick={() => this.scrollToForm()}
+              >
+                {"Let's get started"}
+              </Button>
+            }
+          </div>
+          <Paper className={classes.paper} elevation={2} ref={this.formRef}>
             <Grid
               container
               spacing={2}
               direction="column"
               className={classes.center}
             >
-              <Grid item xs className={classes.center}>
-                <img
-                  src="/bibOfficial.png"
-                  alt="Bibliko"
-                  className={classes.avatar}
-                />
-              </Grid>
+              { mediaQuery ? null :
+                <Grid item xs className={classes.center}>
+                  <Typography
+                    className={classes.title}
+                    style={{textAlign: "center"}}
+                  >
+                    {"Let's get started"}
+                  </Typography>
+                </Grid>
+              }
               <Grid
                 container
                 spacing={1}
@@ -376,4 +458,10 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Login)));
+)(
+  withStyles(styles)(
+    withRouter(
+      withMediaQuery("(max-width:600px)")(Login)
+    )
+  )
+);

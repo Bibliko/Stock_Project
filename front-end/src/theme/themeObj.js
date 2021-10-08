@@ -149,7 +149,7 @@ const theme = {
 
     // Login
     loginBackground: {
-      main: "#0d0d0d",
+      main: "rgba(29, 29, 42, 1)",
     },
 
     gradientPaper: {
