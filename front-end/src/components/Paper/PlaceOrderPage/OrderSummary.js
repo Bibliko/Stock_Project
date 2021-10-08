@@ -9,14 +9,18 @@ import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { placeOrder, amendOrder } from "../../../utils/TransactionUtil";
 import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
 import { transactionOptionDefault } from "../../../utils/low-dependency/PrismaConstantUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import ProgressButton from "../../Button/ProgressButton";
 
 import {
   Button,
   Paper,
-  Typography
+  Typography,
+  Snackbar,
 } from "@material-ui/core";
+
+import { Alert } from "@material-ui/lab";
 
 const styles = (theme) => ({
   root: {
@@ -89,6 +93,8 @@ class OrderSummary extends React.Component {
     fail: false,
     success: false,
     loading: false,
+    openSnackbar: false,
+    alertSeverity: "success",
   };
 
   calculateBrokerage = (lastPrice, quatity) => {
@@ -152,6 +158,7 @@ class OrderSummary extends React.Component {
       limitPrice,
       amend,
     } = this.props.userOrder;
+    const { clearOrder, handleResetAutocomplete } = this.props;
     const { brokerage } = this.state;
     const orderData = {
       type,
@@ -175,6 +182,9 @@ class OrderSummary extends React.Component {
             loading: false,
             success: true,
           });
+          clearOrder();
+          handleResetAutocomplete();
+          this.handleOpenSnackbar("success");
         })
         .catch((err) => {
           console.log(err);
@@ -182,7 +192,24 @@ class OrderSummary extends React.Component {
             loading: false,
             fail: true,
           });
+          this.handleOpenSnackbar("error");
         });
+    });
+  };
+
+  handleOpenSnackbar = (severity) => {
+    this.setState({
+      openSnackbar: true,
+      alertSeverity: severity,
+    });
+  };
+
+  handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    this.setState({
+      openSnackbar: false,
     });
   };
 
@@ -212,12 +239,15 @@ class OrderSummary extends React.Component {
     const {
       classes,
       clearOrder,
+      handleResetAutocomplete,
     } = this.props;
     const {
       brokerage,
       fail,
       success,
       loading,
+      openSnackbar,
+      alertSeverity,
     } = this.state;
     const {
       type,
@@ -249,7 +279,10 @@ class OrderSummary extends React.Component {
           disableElevation
           color="primary"
           className={clsx(classes.buttonContainer, classes.clearButton)}
-          onClick={() => clearOrder()}
+          onClick={() => {
+            clearOrder();
+            handleResetAutocomplete();
+          }}
         >
           {"Clear"}
         </Button>
@@ -263,6 +296,25 @@ class OrderSummary extends React.Component {
         >
           {"Submit"}
         </ProgressButton>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={5 * oneSecond}
+          onClose={this.handleCloseSnackbar}
+        >
+          <Alert
+            elevation={6}
+            variant="filled"
+            onClose={this.handleCloseSnackbar}
+            severity={alertSeverity}
+          >
+            {
+              `${alertSeverity === "success"
+              ? "Successfully placed"
+              : "Failed to place"} your order!`
+            }
+          </Alert>
+        </Snackbar>
       </div>
     );
   }

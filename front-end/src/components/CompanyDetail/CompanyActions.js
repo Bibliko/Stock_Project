@@ -132,7 +132,7 @@ class CompanyActionsPaper extends React.Component {
             aria-label="trade button"
             className={classes.actionButton}
           >
-            Trade
+            {"Buy / Sell"}
           </Button>
 
           <Button

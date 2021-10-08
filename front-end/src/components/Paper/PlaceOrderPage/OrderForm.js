@@ -89,6 +89,7 @@ class OrderForm extends React.Component {
     return (
       !isEqual(nextProps.classes, this.props.classes) ||
       !isEqual(nextProps.userOrder, this.props.userOrder) ||
+      !isEqual(nextProps.autocompleteKey, this.props.autocompleteKey) ||
       !isEqual(nextState, this.state)
     );
   }
@@ -117,7 +118,7 @@ class OrderForm extends React.Component {
 
   render() {
     const { options } = this.state;
-    const { classes } = this.props;
+    const { classes, autocompleteKey } = this.props;
     const {
       type,
       companyCode,
@@ -143,11 +144,12 @@ class OrderForm extends React.Component {
         />
         <VirtualizedAutocomplete
           containerClass={classes.field}
+          autocompleteKey={autocompleteKey}
           name={"Code"}
           value={companyCode}
           options={options}
           disabled={amend}
-          loading={!(companyCode && options)}
+          loading={!options.length}
           onChange={(event, value) => this.handleDetailChange(
             "companyCode",
             value

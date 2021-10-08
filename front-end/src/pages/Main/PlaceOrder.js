@@ -41,6 +41,13 @@ const styles = (theme) => ({
 });
 
 class PlaceOrder extends React.Component {
+  state = { autocompleteKey: "" };
+
+  handleResetAutocomplete = () => {
+    // Whenever the key is changed, Autocomplete will be rerendered
+    this.setState({ autocompleteKey: new Date().toISOString() });
+  };
+
   shouldComponentUpdate(nextProps, nextState) {
     const compareKeys = ["classes", "userOrder"];
     const nextPropsCompare = pick(nextProps, compareKeys);
@@ -57,6 +64,7 @@ class PlaceOrder extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const { autocompleteKey } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
@@ -72,7 +80,7 @@ class PlaceOrder extends React.Component {
             md={8}
             className={classes.itemGrid}
           >
-            <OrderForm />
+            <OrderForm autocompleteKey={autocompleteKey}/>
           </Grid>
 
           <Grid
@@ -81,7 +89,7 @@ class PlaceOrder extends React.Component {
             md={4}
             className={classes.itemGrid}
           >
-            <OrderSummary />
+            <OrderSummary handleResetAutocomplete={this.handleResetAutocomplete}/>
           </Grid>
         </Grid>
         <SpaceDivMainPages />
