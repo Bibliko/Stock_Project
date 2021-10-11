@@ -6,8 +6,7 @@ const {
 const { Router } = require("express");
 const router = Router();
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/low-dependency/PrismaClient");
 
 const {
   searchAndUpdateTransactionsHistoryM5RU,

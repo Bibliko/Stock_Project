@@ -1,8 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
+const { prisma } = require("../../utils/low-dependency/PrismaClient");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 // const { indices } = require('../../algolia');
-
-const prisma = new PrismaClient();
 
 const {
   GOOGLE_CLIENT_ID,

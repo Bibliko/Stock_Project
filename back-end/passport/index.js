@@ -3,8 +3,7 @@ const signupStrategy = require("./strategies/signup");
 const facebookStrategy = require("./strategies/facebook");
 const googleStrategy = require("./strategies/google");
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/low-dependency/PrismaClient");
 
 const setupPassport = (passport) => {
   passport.serializeUser(function (user, done) {

@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../low-dependency/PrismaClient");
 const { keysAsync, delAsync } = require("../../redis/redis-client");
 const { isEqual, isEmpty } = require("lodash");
 
@@ -20,6 +19,7 @@ const {
 
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
 const {
+  SequentialPromises,
   SequentialPromisesWithResultsArray
 } = require("../low-dependency/PromisesUtil");
 
@@ -206,14 +206,14 @@ const updateRankingList = (globalBackendVariables) => {
           }
         });
 
-        return Promise.all([
+        return () => Promise.all([
           updateUserRanking,
           redisUpdateOverallRankingList(user),
           redisUpdateRegionalRankingList(nowRegion, user)
         ]);
       });
 
-      return Promise.all(updateAllUsersRanking);
+      return SequentialPromises(updateAllUsersRanking);
     })
     .then(() => {
       globalBackendVariables.updatedRankingListFlag = !globalBackendVariables.updatedRankingListFlag;

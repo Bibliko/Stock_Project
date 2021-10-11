@@ -1,6 +1,5 @@
 const { isEmpty } = require("lodash");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../low-dependency/PrismaClient");
 
 const { listRangeAsync } = require("../../redis/redis-client");
 
