@@ -194,7 +194,6 @@ class VirtualizedAutocomplete extends React.Component {
           id="stock-selector"
           key={autocompleteKey}
           value={value}
-          inputValue={value}
           onChange={onChange}
           disabled={disabled}
           loading={loading}

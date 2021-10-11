@@ -11,6 +11,7 @@ import {
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
 import { withMediaQuery } from "../../theme/ThemeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
 import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
@@ -23,6 +24,7 @@ import {
   Grid,
   Divider,
   Container,
+  ClickAwayListener,
 } from "@material-ui/core";
 
 const styles = (theme) => ({
@@ -52,13 +54,12 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     [theme.breakpoints.down("xs")]: {
       display: "unset",
-      minHeight: "100vh",
+      minHeight: "max(600px, 100vh)",
       padding: "20% 10%",
     },
   },
   logo: {
     height: "70px",
-    width: "fit-content",
     marginLeft: "-8px",
   },
   title: {
@@ -98,7 +99,7 @@ const styles = (theme) => ({
     alignItems: "center",
     background: theme.palette.gradientPaper.main,
     [theme.breakpoints.down("xs")]: {
-      minHeight: "100vh",
+      minHeight: "max(600px, 100vh)",
     },
   },
   div: {
@@ -206,7 +207,7 @@ class Login extends React.Component {
     error: "",
   };
 
-  formRef = React.createRef()
+  formRef = React.createRef();
 
   errorTypes = ["Missing field."];
 
@@ -258,8 +259,11 @@ class Login extends React.Component {
   };
 
   scrollToForm = () => {
-    this.formRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
+    setTimeout(
+      () => this.formRef.current.scrollIntoView({ behavior: 'smooth' }),
+      oneSecond * 0.2
+    );
+  };
 
   componentDidMount() {
     if (shouldRedirectToHomePage(this.props)) {
@@ -337,23 +341,30 @@ class Login extends React.Component {
                 xs
                 className={classes.center}
               >
-                <form
-                  className={clsx(classes.center, classes.form)}
-                  noValidate
-                  autoComplete="on"
+                <ClickAwayListener
+                  onClickAway={() => {
+                    if (mediaQuery)
+                      this.scrollToForm();
+                  }}
                 >
-                  <NormalTextField
-                    name="Email"
-                    changeData={this.changeEmail}
-                    enterData={this.handleKeyDown}
-                  />
-                  <PasswordTextField
-                    name="Password"
-                    changePassword={this.changePassword}
-                    enterPassword={this.handleKeyDown}
-                    createOrLogin="login"
-                  />
-                </form>
+                  <form
+                    className={clsx(classes.center, classes.form)}
+                    noValidate
+                    autoComplete="on"
+                  >
+                    <NormalTextField
+                      name="Email"
+                      changeData={this.changeEmail}
+                      enterData={this.handleKeyDown}
+                    />
+                    <PasswordTextField
+                      name="Password"
+                      changePassword={this.changePassword}
+                      enterPassword={this.handleKeyDown}
+                      createOrLogin="login"
+                    />
+                  </form>
+                </ClickAwayListener>
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
                     <Typography align="center" className={classes.errorText}>
@@ -362,7 +373,14 @@ class Login extends React.Component {
                   </Grid>
                 )}
                 <Grid item xs className={classes.center}>
-                  <Button className={classes.submit} onClick={this.submit}>
+                  <Button
+                    className={classes.submit}
+                    onClick={() => {
+                      this.submit();
+                      if (mediaQuery)
+                        this.scrollToForm();
+                    }}
+                  >
                     Log in
                   </Button>
                 </Grid>
