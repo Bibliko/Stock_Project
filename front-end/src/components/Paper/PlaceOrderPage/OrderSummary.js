@@ -97,6 +97,9 @@ class OrderSummary extends React.Component {
     alertSeverity: "success",
   };
 
+  // prevent double click
+  submitTimeout;
+
   calculateBrokerage = (lastPrice, quatity) => {
     let brokerage;
     /**
@@ -197,6 +200,16 @@ class OrderSummary extends React.Component {
     });
   };
 
+  handleSubmitClick = () => {
+    if (this.submitTimeout) {
+      clearTimeout(this.submitTimeout);
+    }
+    this.submitTimeout = setTimeout(
+      () => this.handleSubmit(),
+      oneSecond * 0.5
+    );
+  };
+
   handleOpenSnackbar = (severity) => {
     this.setState({
       openSnackbar: true,
@@ -292,7 +305,7 @@ class OrderSummary extends React.Component {
           success={success}
           fail={fail}
           loading={loading}
-          handleClick={this.handleSubmit}
+          handleClick={this.handleSubmitClick}
         >
           {"Submit"}
         </ProgressButton>
