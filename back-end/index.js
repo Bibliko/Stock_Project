@@ -16,6 +16,10 @@ const {
 } = require("./utils/low-dependency/DayTimeUtil");
 
 const {
+  excludeFromCors
+} = require("./utils/low-dependency/NetworkUtil");
+
+const {
   deleteExpiredVerification,
   checkAndUpdateAllUsers,
   updateRankingList
@@ -61,7 +65,6 @@ const {
   PORT,
   NODE_ENV,
   FRONTEND_HOST,
-  PASSPORT_CALLBACK_HOST,
   SENDGRID_API_KEY
 } = require('./config');
 const express = require("express");
@@ -94,7 +97,7 @@ const session = require("express-session");
  * without being regulated by this corsOptions.
  */
 
-const whitelist = [FRONTEND_HOST, PASSPORT_CALLBACK_HOST];
+const whitelist = [FRONTEND_HOST];
 const corsOptions = {
   origin: function (origin, callback) {
     if (NODE_ENV === "development") {
@@ -109,8 +112,13 @@ const corsOptions = {
   },
   credentials: true
 };
+const publicPaths = [
+  "*/auth/google*",
+  "*/auth/facebook*",
+  "*/verificationSession/verification*"
+];
 
-app.use(cors(corsOptions));
+app.use(excludeFromCors(publicPaths, cors(corsOptions)));
 app.use(cookieParser("stock-project"));
 app.use(bodyParser.json());
 app.set("trust proxy", 1);
