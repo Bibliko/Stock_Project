@@ -65,6 +65,7 @@ const {
   PORT,
   NODE_ENV,
   FRONTEND_HOST,
+  REDIS_URL,
   SENDGRID_API_KEY
 } = require('./config');
 const express = require("express");
@@ -83,6 +84,11 @@ const cors = require("cors");
 const passport = require("passport");
 const { setupPassport } = require("./passport");
 const session = require("express-session");
+
+const redis = require("redis");
+let RedisStore = require("connect-redis")(session);
+let redisClient = redis.createClient(REDIS_URL);
+
 
 /* cors: for example, if front-end sends request to back-end,
  * then front-end is cors (cross-origin requests),
@@ -117,18 +123,20 @@ const publicPaths = [
   "*/auth/facebook*",
   "*/verificationSession/verification*"
 ];
+const sessionOptions = {
+  secret: "stock-project",
+  resave: false,
+  saveUninitialized: false
+};
+if (NODE_ENV === "production") {
+  sessionOptions.store = new RedisStore({ client: redisClient });
+};
 
 app.use(excludeFromCors(publicPaths, cors(corsOptions)));
 app.use(cookieParser("stock-project"));
 app.use(bodyParser.json());
 app.set("trust proxy", 1);
-app.use(
-  session({
-    secret: "stock-project",
-    resave: false,
-    saveUninitialized: false
-  })
-);
+app.use(session(sessionOptions));
 app.use(passport.initialize());
 app.use(passport.session());
 
