@@ -34,10 +34,9 @@ const styles = (theme) => ({
     alignItems: "stretch",
     justifyContent: "flex-start",
     position: "absolute",
-    height: "100vh",
     width: "100vw",
     maxWidth: "none",
-    minHeight: "605px",
+    minHeight: "max(605px, 100vh)",
     overflow: "hidden",
     [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
@@ -260,7 +259,7 @@ class Login extends React.Component {
 
   scrollToForm = () => {
     setTimeout(
-      () => this.formRef.current.scrollIntoView({ behavior: 'smooth' }),
+      () => this.formRef.current?.scrollIntoView({ behavior: 'smooth' }),
       oneSecond * 0.2
     );
   };

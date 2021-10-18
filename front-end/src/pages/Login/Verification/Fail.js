@@ -22,14 +22,15 @@ const styles = (theme) => ({
     justifyContent: "center",
     maxWidth: "none",
     minHeight: "410px",
+    overflowX: "hidden",
   },
   paper: {
     height: "fit-content",
     width: "fit-content",
     minWidth: "450px",
     [theme.breakpoints.down("xs")]: {
-      height: "-webkit-fill-available",
-      width: "-webkit-fill-available",
+      height: "100%",
+      width: "100%",
       minWidth: 0,
     },
     padding: theme.spacing(1),
