@@ -4,6 +4,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { isEqual, isEmpty, pick } from "lodash";
 
+import { withTranslation } from "react-i18next";
+
 import { socket } from "../../../App";
 import {
   offSocketListeners,
@@ -175,7 +177,7 @@ class AccountSummary extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "userSession"];
+    const compareKeys = ["t", "classes", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
@@ -185,7 +187,7 @@ class AccountSummary extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const { holdingsRows } = this.state;
     const {
       avatarUrl,
@@ -214,7 +216,7 @@ class AccountSummary extends React.Component {
               {firstName + " " + lastName}
             </Typography>
             <Typography className={classes.rank}>
-              {`Rank: ${ranking}`}
+              {t("ranking.rank") + `: ${ranking}`}
             </Typography>
           </div>
         </Grid>
@@ -235,7 +237,7 @@ class AccountSummary extends React.Component {
               [classes.dailyChangeRed]: dailyChange < 0,
             })}
           >
-            {`Daily Change $${dailyChange}`}
+            {t("account.dailyChange") + ` $${dailyChange}`}
           </Typography>
         </Grid>
 
@@ -250,13 +252,13 @@ class AccountSummary extends React.Component {
 
         <Grid item xs={12} sm={12} md={6} className={classes.tableContainer}>
           <Typography className={classes.tableTitle}>
-            {"Top Holdings"}
+            {t("account.topHoldings")}
           </Typography>
           {isEmpty(holdingsRows) && (
             <Paper className={classes.paperAccountSummary} elevation={2}>
               <StorefrontRoundedIcon className={classes.storeIcon} />
               <Typography className={classes.holdingsText}>
-                Start by buying some stocks!
+                {t("general.startBuying")}
               </Typography>
             </Paper>
           )}
@@ -273,4 +275,8 @@ const mapStateToProps = (state) => ({
   userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(withStyles(styles)(AccountSummary));
+export default connect(mapStateToProps)(
+  withTranslation()(
+    withStyles(styles)(AccountSummary)
+  )
+);

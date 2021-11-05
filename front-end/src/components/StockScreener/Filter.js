@@ -1,6 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import { Slider, Typography, Tooltip, Grid } from "@material-ui/core";
@@ -85,6 +87,7 @@ class Filter extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       price,
       marketCap,
@@ -128,7 +131,9 @@ class Filter extends React.Component {
         className={clsx(classes.fullWidth, classes.container)}
       >
         <Grid item xs={6} sm={12} className={classes.itemGrid}>
-          <Typography className={classes.label}>Price</Typography>
+          <Typography className={classes.label}>
+            {t("general.price")}
+          </Typography>
           <CustomSlider
             value={price}
             min={-250}
@@ -144,7 +149,9 @@ class Filter extends React.Component {
           />
         </Grid>
         <Grid item xs={6} sm={12} className={classes.itemGrid}>
-          <Typography className={classes.label}>Market Cap</Typography>
+          <Typography className={classes.label}>
+            {t("general.marketCap")}
+          </Typography>
           <CustomSlider
             value={marketCap}
             min={250}
@@ -167,7 +174,7 @@ class Filter extends React.Component {
           className={clsx(classes.sectorSelectBox, classes.itemGrid)}
         >
           <SelectBox
-            name={"Sector"}
+            name={t("general.sector")}
             items={sectors}
             value={sector}
             emptyLabel={"All"}
@@ -181,7 +188,7 @@ class Filter extends React.Component {
           className={clsx(classes.industrySelectBox, classes.itemGrid)}
         >
           <SelectBox
-            name={"Industry"}
+            name={t("general.industry")}
             items={industries}
             value={industry}
             emptyLabel={"All"}
@@ -193,4 +200,4 @@ class Filter extends React.Component {
   }
 }
 
-export default withStyles(styles)(Filter);
+export default withTranslation()(withStyles(styles)(Filter));

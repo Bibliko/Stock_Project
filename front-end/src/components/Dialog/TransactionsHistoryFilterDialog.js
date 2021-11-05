@@ -153,7 +153,7 @@ class TransactionsHistoryFilterDialog extends React.Component {
     errorReports: 0,
   };
 
-  keys = ["Quantity", "Price", "Gain/Loss"];
+  keys = ["quantity", "price", "spendOrGain"];
 
   defaultFilters = {
     type: "none", // buy, sell, OR none

@@ -5,6 +5,8 @@ import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 import RankingPaper from "../../components/Paper/HomePage/RankingPaper";
 import MarketWatchPaper from "../../components/Paper/HomePage/MarketWatch";
@@ -111,18 +113,20 @@ const styles = (theme) => ({
 
 class HomePage extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "userSession"];
+    const compareKeys = ["t", "classes", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return !isEqual(nextPropsCompare, propsCompare);
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { t, classes, userSession } = this.props;
 
     return (
       <Container className={classes.root} disableGutters>
-        <Typography className={classes.welcome}>Welcome to Bibliko</Typography>
+        <Typography className={classes.welcome}>
+          {t("homepage.greeting")}
+        </Typography>
         {!userSession.hasFinishedSettingUp && (
           <Paper
             className={classes.paperRedirectingToAccountSetting}
@@ -138,7 +142,7 @@ class HomePage extends React.Component {
               )}
             />
             <Typography className={classes.accountSettingWords}>
-              Setup Your Account Now To Start!
+              {t("homepage.setupAccount")}
             </Typography>
           </Paper>
         )}
@@ -159,7 +163,7 @@ class HomePage extends React.Component {
             </Grid>
 
             <Grid item xs={12} md={5} className={classes.itemGrid}>
-              <MostGainersPaper title={"Most Gainers"} />
+              <MostGainersPaper title={t("homepage.mostGainers")} />
             </Grid>
 
             <Grid
@@ -188,5 +192,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(HomePage))
+  withTranslation()(
+    withStyles(styles)(withRouter(HomePage))
+  )
 );

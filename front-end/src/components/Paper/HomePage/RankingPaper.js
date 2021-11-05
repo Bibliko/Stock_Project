@@ -1,5 +1,8 @@
 import React from "react";
 import { withRouter } from "react-router";
+
+import { withTranslation } from "react-i18next";
+
 import { Typography, Avatar } from "@material-ui/core";
 import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 import { getOverallRanking, getUserData } from "../../../utils/UserUtil";
@@ -145,7 +148,7 @@ class RankingPaper extends React.Component {
 
   render() {
     const { top3Users, top4To8Users } = this.state;
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     return (
       <div className={classes.root}>
@@ -153,7 +156,7 @@ class RankingPaper extends React.Component {
           className={classes.title}
           onClick={() => {redirectToPage("/ranking", this.props);}}
         >
-          {"Ranking"}
+          {t("ranking.ranking")}
         </Typography>
 
         <div className={classes.topUser}>
@@ -177,11 +180,11 @@ class RankingPaper extends React.Component {
           onClick={() => {redirectToPage("/ranking", this.props);}}
           align={"right"}
         >
-          {"View full ranking"}
+          {t("ranking.viewFullRanking")}
         </Typography>
       </div>
     );
   }
 }
 
-export default withStyles(styles)(withRouter(RankingPaper));
+export default withTranslation()(withStyles(styles)(withRouter(RankingPaper)));

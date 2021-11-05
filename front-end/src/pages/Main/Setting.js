@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { withRouter } from "react-router";
 import { socket } from "../../App";
 
+import { withTranslation } from "react-i18next";
+
 import { isEqual, pick, extend } from "lodash";
 
 import { connect } from "react-redux";
@@ -178,6 +180,7 @@ class AccountSetting extends React.Component {
       "occupation",
     ];
     const compareKeys = [
+      "t",
       "classes",
       ...userSessionKeys.map((key) => "userSession." + key),
     ];
@@ -188,7 +191,7 @@ class AccountSetting extends React.Component {
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { t, classes, userSession } = this.props;
 
     return (
       <Container className={classes.root} disableGutters>
@@ -196,7 +199,7 @@ class AccountSetting extends React.Component {
 
         <BasicSection
           id="basic-section"
-          ref={this.basicSectionRef}
+          reference={this.basicSectionRef}
           firstName={userSession.firstName}
           lastName={userSession.lastName}
           dateOfBirth={userSession.dateOfBirth}
@@ -208,7 +211,7 @@ class AccountSetting extends React.Component {
 
         <SensitiveSection
           id="sensitive-section"
-          ref={this.sensitiveSectionRef}
+          reference={this.sensitiveSectionRef}
           oldPassword={userSession.password}
           email={userSession.email}
           recordChanges={this.recordChanges}
@@ -219,7 +222,7 @@ class AccountSetting extends React.Component {
 
         <SelectSection
           id="select-section"
-          ref={this.selectSectionRef}
+          reference={this.selectSectionRef}
           region={userSession.region}
           occupation={userSession.occupation}
           recordChanges={this.recordChanges}
@@ -228,7 +231,7 @@ class AccountSetting extends React.Component {
         <StickyReminder
           ref={this.reminderRef}
           collapsible={false}
-          message="You have unsaved changes"
+          message={t("general.unsavedChanges")}
           stickyPosition="bottom"
           visible={false}
         >
@@ -240,7 +243,7 @@ class AccountSetting extends React.Component {
             className={classes.reminderButton}
             style={{ textDecoration: "underline" }}
           >
-            Reset
+            {t("general.reset")}
           </Button>
           <Button
             aria-label="save changes"
@@ -250,13 +253,13 @@ class AccountSetting extends React.Component {
             className={clsx(classes.reminderButton, classes.saveButton)}
             onClick={this.submit}
           >
-            Save
+            {t("general.save")}
           </Button>
         </StickyReminder>
         <TextDialog
           ref={this.errorDialogRef}
-          title="Failed to save changes"
-          content={"Please check your information and try again"}
+          title={t("general.failedSaveChanges")}
+          content={t("general.checkInfoAgain")}
         />
       </Container>
     );
@@ -274,4 +277,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(AccountSetting)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(AccountSetting))
+  )
+);

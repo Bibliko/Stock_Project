@@ -3,6 +3,8 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { orderAction } from "../../../redux/storeActions/actions";
 
+import { withTranslation } from "react-i18next";
+
 import {
   TableRow,
   TableContainer,
@@ -158,7 +160,7 @@ class PendingOrderTableContainer extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const {
       hoverPaper,
       loading,
@@ -172,6 +174,7 @@ class PendingOrderTableContainer extends React.Component {
         {isFirstInitializationEmpty &&
           !loading &&
           paperWhenPendingOrderEmpty(
+            t,
             classes,
             hoverPaper,
             this.hoverPaper,
@@ -185,6 +188,7 @@ class PendingOrderTableContainer extends React.Component {
                 <TableRow>
                   {labels.map((_, index) => {
                     return chooseTableCellHeader(
+                      t,
                       index,
                       this.state
                     );
@@ -223,4 +227,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(PendingOrderTableContainer)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(PendingOrderTableContainer))
+  )
+);

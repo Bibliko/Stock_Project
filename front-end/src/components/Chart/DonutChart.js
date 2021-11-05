@@ -2,6 +2,9 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
+
 import Tooltip from "@material-ui/core/Tooltip";
 import themeObj from "../../theme/themeObj";
 
@@ -68,6 +71,7 @@ class DonutChart extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       scale,
       progress,
@@ -83,7 +87,7 @@ class DonutChart extends React.Component {
         className={classes.radialChart}
       >
         <CustomTooltip
-          title={`Shares: ${100 - progress}%`}
+          title={t("general.shares") + `: ${100 - progress}%`}
           aria-label="Shares"
           placement="top"
           leaveDelay={200}
@@ -102,7 +106,7 @@ class DonutChart extends React.Component {
           />
         </CustomTooltip>
         <CustomTooltip
-          title={`Cash: ${progress}%`}
+          title={t("general.cash") + `: ${progress}%`}
           aria-label="Cash"
           placement="top"
           leaveDelay={200}
@@ -159,7 +163,7 @@ class DonutChart extends React.Component {
             fill={TEXT_COLOR}
             className={clsx(classes.label, classes.cashLabel)}
           >
-            {"Cash"}
+            {t("general.cash")}
           </text>
           <text
             x={"50%"}
@@ -167,7 +171,7 @@ class DonutChart extends React.Component {
             fill={TEXT_COLOR}
             className={clsx(classes.label, classes.sharesLabel)}
           >
-            {"Shares"}
+            {t("general.shares")}
           </text>
         </g>
       </svg>
@@ -187,4 +191,4 @@ DonutChart.propTypes = {
   totalPortfolio: PropTypes.number,
 };
 
-export default withStyles(styles)(DonutChart);
+export default withTranslation()(withStyles(styles)(DonutChart));

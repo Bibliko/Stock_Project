@@ -3,6 +3,8 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
+import { withTranslation } from "react-i18next";
+
 import {
   shouldRedirectToHomePage,
   redirectToPage,
@@ -94,7 +96,7 @@ class Succeed extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     return (
       <div>
@@ -125,11 +127,13 @@ class Succeed extends React.Component {
                   className={classes.succeedIcon}
                 />
                 <Typography className={classes.title}>
-                  Email Verified Successfully
+                  {t("login.verificationSuccess")}
                 </Typography>
               </Grid>
               <Grid item className={classes.center}>
-                <Typography>Redirecting to Home Page...</Typography>
+                <Typography>
+                  {t("login.redirect")}
+                </Typography>
               </Grid>
             </Grid>
           </Paper>
@@ -150,4 +154,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Succeed)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Succeed))
+  )
+);

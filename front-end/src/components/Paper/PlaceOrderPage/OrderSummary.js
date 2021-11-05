@@ -1,10 +1,12 @@
 import React from "react";
 import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
-
 import { orderAction } from "../../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
+
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { placeOrder, amendOrder } from "../../../utils/TransactionUtil";
 import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
@@ -241,15 +243,18 @@ class OrderSummary extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["t", "classes", "userOrder"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.classes, this.props.classes) ||
-      !isEqual(nextProps.userOrder, this.props.userOrder) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
 
   render() {
     const {
+      t,
       classes,
       clearOrder,
       handleResetAutocomplete,
@@ -271,18 +276,30 @@ class OrderSummary extends React.Component {
     return (
       <div className={classes.root}>
         <Paper className={classes.paper}>
-          <Typography className={classes.title}>{"Order Summary"}</Typography>
+          <Typography className={classes.title}>
+            {t("placeOrder.summary")}
+          </Typography>
 
-          <Typography className={classes.label}>{"Type:"}</Typography>
-          <Typography className={classes.content}>{type}</Typography>
+          <Typography className={classes.label}>
+            {t("general.type") + ":"}
+          </Typography>
+          <Typography className={classes.content}>
+            {type ? t("general." + type) : ""}
+          </Typography>
 
-          <Typography className={classes.label}>{"Code:"}</Typography>
+          <Typography className={classes.label}>
+            {t("general.code") + ":"}
+          </Typography>
           <Typography className={classes.content}>{companyCode}</Typography>
 
-          <Typography className={classes.label}>{"Quantity:"}</Typography>
+          <Typography className={classes.label}>
+            {t("general.quantity") + ":"}
+          </Typography>
           <Typography className={classes.content}>{quantity}</Typography>
 
-          <Typography className={classes.label}>{"Brokerage:"}</Typography>
+          <Typography className={classes.label}>
+            {t("general.brokerage") + ":"}
+          </Typography>
           <Typography className={classes.content}>{brokerage && `$${brokerage}`}</Typography>
         </Paper>
 
@@ -297,7 +314,7 @@ class OrderSummary extends React.Component {
             handleResetAutocomplete();
           }}
         >
-          {"Clear"}
+          {t("general.clear")}
         </Button>
 
         <ProgressButton
@@ -307,7 +324,7 @@ class OrderSummary extends React.Component {
           loading={loading}
           handleClick={this.handleSubmitClick}
         >
-          {"Submit"}
+          {t("general.submit")}
         </ProgressButton>
 
         <Snackbar
@@ -323,8 +340,8 @@ class OrderSummary extends React.Component {
           >
             {
               `${alertSeverity === "success"
-              ? "Successfully placed"
-              : "Failed to place"} your order!`
+              ? t("placeOrder.successfulAlert")
+              : t("placeOrder.failedAlert")} ${t("placeOrder.yourOrder")}`
             }
           </Alert>
         </Snackbar>
@@ -345,4 +362,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(OrderSummary));
+)(
+  withTranslation()(
+    withStyles(styles)(OrderSummary)
+  )
+);

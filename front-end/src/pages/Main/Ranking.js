@@ -5,6 +5,9 @@ import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
+
 import {
   getRankingLength,
   getOverallRanking,
@@ -133,17 +136,6 @@ const regions = [
   "South America",
 ];
 
-const options = [
-  {
-    value: "Overall",
-    label: "Overall Ranking",
-  },
-  ...regions.map((region) => ({
-    value: region,
-    label: region + " Ranking",
-  })),
-];
-
 class Ranking extends React.Component {
   constructor(props) {
     super(props);
@@ -158,6 +150,29 @@ class Ranking extends React.Component {
       portfolioHigh: portfolioValue,
       portfolioLow: portfolioValue,
     };
+
+    const { t, i18n } = this.props;
+    const { language } = i18n;
+    const rankingText = t("ranking.ranking");
+
+    this.options = [
+      {
+        value: "Overall",
+        label: (
+          (language === "vi" ? rankingText + " " : "") +
+          t("table.Overall") +
+          (language !== "vi" ? " " + rankingText : "")
+        ),
+      },
+      ...regions.map((region) => ({
+        value: region,
+        label: (
+          (language === "vi" ? rankingText + " " : "") +
+          t("general." + region) +
+          (language !== "vi" ? " " + rankingText : "")
+        ),
+      })),
+    ];
   }
 
   timeoutToChangePage;
@@ -327,7 +342,7 @@ class Ranking extends React.Component {
               <SelectNoBox
                 containerStyle={classes.titleContainer}
                 fontStyle={classes.titleFont}
-                items={options}
+                items={this.options}
                 value={rankingOption}
                 onChange={this.changeRankingOption}
               />
@@ -372,4 +387,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Ranking)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Ranking))
+  )
+);

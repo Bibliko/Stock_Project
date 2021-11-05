@@ -7,6 +7,8 @@ import { socket } from "../../App";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
+import { withTranslation } from "react-i18next";
+
 import {
   offSocketListeners,
   updatedUserDataFlags,
@@ -207,7 +209,7 @@ class AccountSummary extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "userSession"];
+    const compareKeys = ["t", "classes", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
@@ -217,7 +219,7 @@ class AccountSummary extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     const {
       cash,
@@ -239,7 +241,9 @@ class AccountSummary extends React.Component {
           className={classes.fullHeightWidth}
         >
           <Container className={classes.itemContainer}>
-            <Typography className={classes.gridTitle}>Summary</Typography>
+            <Typography className={classes.gridTitle}>
+              {t("account.summary")}
+            </Typography>
             <SummaryTableContainer
               cash={roundNumber(cash, 2)}
               totalPortfolio={roundNumber(totalPortfolio, 2)}
@@ -248,12 +252,14 @@ class AccountSummary extends React.Component {
             />
           </Container>
           <Container className={classes.itemContainer}>
-            <Typography className={classes.gridTitle}>Holdings</Typography>
+            <Typography className={classes.gridTitle}>
+              {t("account.holdings")}
+            </Typography>
             {isEmpty(this.state.holdingsRows) && (
               <Paper className={classes.paperAccountSummary} elevation={2}>
                 <StorefrontRoundedIcon className={classes.storeIcon} />
                 <Typography className={classes.holdingsText}>
-                  Start by buying some stocks!
+                  {t("general.startBuying")}
                 </Typography>
               </Paper>
             )}
@@ -263,13 +269,13 @@ class AccountSummary extends React.Component {
           </Container>
           <Container className={classes.itemContainer}>
             <Typography className={classes.gridTitle}>
-              Portfolio Chart
+              {t("account.portfolioChart")}
             </Typography>
             <Typography className={classes.titleChart}>
               ${numberWithCommas(roundNumber(totalPortfolio, 2))}
             </Typography>
             <Typography className={classes.subtitleChart}>
-              Portfolio Now
+              {t("account.portfolioNow")}
             </Typography>
             <AccountSummaryChart
               email={email}
@@ -294,4 +300,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(AccountSummary)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(AccountSummary))
+  )
+);

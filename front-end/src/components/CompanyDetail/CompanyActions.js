@@ -8,6 +8,8 @@ import { socket } from "../../App";
 import { connect } from "react-redux";
 import { orderAction, userAction } from "../../redux/storeActions/actions";
 
+import { withTranslation } from "react-i18next";
+
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 import { changeUserData } from "../../utils/UserUtil";
 
@@ -51,7 +53,7 @@ const styles = (theme) => ({
 
 class CompanyActionsPaper extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "userSession"];
+    const compareKeys = ["t", "classes", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return !isEqual(nextPropsCompare, propsCompare);
@@ -101,6 +103,7 @@ class CompanyActionsPaper extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       paperClassName,
       titleClassName,
@@ -111,14 +114,14 @@ class CompanyActionsPaper extends React.Component {
     return (
       <Paper className={clsx(classes.actionsPaper, paperClassName)}>
         <Typography className={clsx(classes.title, titleClassName)}>
-          {`Actions for ${companyCode}`}
+          {t("company.actionsFor") + ` ${companyCode}`}
         </Typography>
 
         <Divider className={classes.divider} />
 
         {(!userSession || isEmpty(userSession)) && (
           <Typography className={classes.body}>
-            Please login to trade stocks
+            {t("company.requireLogin")}
           </Typography>
         )}
 
@@ -132,7 +135,7 @@ class CompanyActionsPaper extends React.Component {
             aria-label="trade button"
             className={classes.actionButton}
           >
-            {"Buy / Sell"}
+            {t("company.buySell")}
           </Button>
 
           <Button
@@ -149,9 +152,9 @@ class CompanyActionsPaper extends React.Component {
             }
           >
             {userSession.watchlist.includes(companyCode) &&
-              "Remove from watchlist"}
+              t("watchlist.remove")}
             {!userSession.watchlist.includes(companyCode) &&
-              "Add to watchlist"}
+              t("watchlist.add")}
           </Button>
         </ButtonGroup>
       </Paper>
@@ -178,4 +181,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(CompanyActionsPaper)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(CompanyActionsPaper))
+  )
+);

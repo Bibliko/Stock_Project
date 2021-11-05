@@ -1,6 +1,8 @@
 import React from "react";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { TableRow } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 
@@ -56,6 +58,7 @@ class PendingOrderTableRow extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       labels,
       order,
@@ -67,6 +70,7 @@ class PendingOrderTableRow extends React.Component {
       <TableRow className={classes.tableRow}>
         { labels.map((label, index) => (
             chooseTableCell(
+              t,
               label,
               index,
               this.isLastRow,
@@ -81,4 +85,6 @@ class PendingOrderTableRow extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(PendingOrderTableRow));
+export default withTranslation()(
+  withStyles(styles)(withRouter(PendingOrderTableRow))
+);

@@ -5,6 +5,8 @@ import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import {
   shouldRedirectToHomePage,
   redirectToPage,
@@ -113,20 +115,26 @@ const styles = (theme) => ({
 });
 
 class Signup extends React.Component {
-  state = {
-    error: "",
-    success: "",
-  };
+  constructor(props) {
+    super(props);
 
-  errorTypes = [
-    "Confirm Password does not match Password.",
-    "Missing some fields",
-    "Invalid email",
-  ];
+    this.state = {
+      error: "",
+      success: "",
+    };
 
-  email = "";
-  password = "";
-  confirmPassword = "";
+    const { t } = this.props;
+
+    this.errorTypes = [
+      t("login.confirmPasswordNotMatch"),
+      t("login.missingFields"),
+      t("login.invalidEmail"),
+    ];
+
+    this.email = "";
+    this.password = "";
+    this.confirmPassword = "";
+  }
 
   setStateError = () => {
     if (!validator.validate(this.email)) {
@@ -199,7 +207,7 @@ class Signup extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     const { error, success } = this.state;
 
@@ -263,20 +271,20 @@ class Signup extends React.Component {
                       align="center"
                       className={classes.announcementText}
                     >
-                      Error: {error}
+                      {`${t("general.error")}: ${error}`}
                     </Typography>
                   </Grid>
                 )}
                 {!isEmpty(success) && (
                   <Grid item xs className={classes.announcement}>
                     <Typography align="center" className={classes.successText}>
-                      Success: {success}
+                      {`${t("general.success")}: ${success}`}
                     </Typography>
                   </Grid>
                 )}
                 <Grid item xs className={classes.center}>
                   <Button className={classes.submit} onClick={this.submit}>
-                    Sign Up
+                    {t("login.signUp")}
                   </Button>
                   <Button
                     color="primary"
@@ -286,7 +294,7 @@ class Signup extends React.Component {
                     className={classes.link}
                     disableRipple
                   >
-                    Back to Login
+                    {t("login.backToLogin")}
                   </Button>
                 </Grid>
               </Grid>
@@ -302,4 +310,8 @@ const mapStateToProps = (state) => ({
   userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(withStyles(styles)(withRouter(Signup)));
+export default connect(mapStateToProps)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Signup))
+  )
+);

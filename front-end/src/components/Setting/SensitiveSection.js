@@ -3,6 +3,8 @@ import validator from "email-validator";
 import clsx from "clsx";
 import { socket } from "../../App";
 
+import { withTranslation } from "react-i18next";
+
 import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
 import SettingPasswordTextField from "../TextField/SettingTextFields/SettingPasswordTextField";
 
@@ -244,11 +246,11 @@ class SensitiveSection extends React.Component {
       .then((emailSent) => {
         this.setState({
           emailSuccess: emailSent
-            ? "Email Verification Code has been sent"
+            ? this.props.t("settings.emailSuccess")
             : "",
           emailError: emailSent
             ? ""
-            : "This email already exists. Can't change to this email.",
+            : this.props.t("settings.emailError"),
         });
       })
       .catch((err) => {
@@ -361,8 +363,16 @@ class SensitiveSection extends React.Component {
     this.props.recordChanges(this.createChangeLog());
   };
 
+  componentDidMount() {
+    this.props.reference.current = this;
+  }
+
+  componentWillUnmount() {
+    this.props.reference.current = null;
+  }
+
   render() {
-    const { classes, email } = this.props;
+    const { t, classes, email } = this.props;
     const {
       show,
       wrongPassword,
@@ -409,7 +419,7 @@ class SensitiveSection extends React.Component {
                 className={classes.emailSendCodeButton}
                 onClick={this.sendVerificationCodeButton}
               >
-                Send Verification Code
+                {t("settings.sendVerification")}
               </Button>
             </Container>
             {emailSuccess !== "" && (
@@ -430,20 +440,22 @@ class SensitiveSection extends React.Component {
                 className={classes.emailSendCodeButton}
                 onClick={this.confirmVerificationCode}
               >
-                Confirm
+                {t("general.confirm")}
               </Button>
             </Container>
           </Grid>
 
           <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={classes.passwordTitle}>Password</Typography>
+            <Typography className={classes.passwordTitle}>
+              {t("general.Password")}
+            </Typography>
             <PasswordAccordion expanded={show} onChange={this.toggle}>
               <PasswordAccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 id="password-section"
               >
                 <Typography className={classes.text}>
-                  Change Password
+                  {t("settings.changePassword")}
                 </Typography>
               </PasswordAccordionSummary>
               <AccordionDetails className={classes.fullWidth}>
@@ -459,27 +471,27 @@ class SensitiveSection extends React.Component {
                   <Grid item xs={12} className={classes.itemGrid}>
                     <SettingPasswordTextField
                       value={input.oldPassword}
-                      name="Current Password"
+                      name={t("settings.currentPassword")}
                       isInvalid={wrongPassword}
-                      helper="Incorrect password"
+                      helper={t("settings.incorrectPassword")}
                       onChange={this.checkOldPassword}
                     />
                   </Grid>
                   <Grid item xs={12} className={classes.itemGrid}>
                     <SettingPasswordTextField
                       value={input.newPassword}
-                      name="New Password"
+                      name={t("settings.newPassword")}
                       isInvalid={invalidPassword}
-                      helper="Password must contain at least 8 characters"
+                      helper={t("settings.invalidPassword")}
                       onChange={this.recordNewPassword}
                     />
                   </Grid>
                   <Grid item xs={12} className={classes.itemGrid}>
                     <SettingPasswordTextField
                       value={input.confirmedPassword}
-                      name="Confirm New Password"
+                      name={t("settings.confirmPassword")}
                       isInvalid={unmatchedPassword}
-                      helper="Password doesn't match"
+                      helper={t("settings.unmatchPassword")}
                       onChange={this.recordConfirmedPassword}
                     />
                   </Grid>
@@ -493,4 +505,6 @@ class SensitiveSection extends React.Component {
   }
 }
 
-export default withStyles(styles)(SensitiveSection);
+export default withTranslation()(
+  withStyles(styles)(SensitiveSection)
+);

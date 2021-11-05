@@ -27,6 +27,7 @@ const StyledTableCell = withStyles((theme) => ({
 }))(TableCell);
 
 export const chooseTableCellHeader = (
+  t,
   indexInNamesState,
   createSortHandler,
   classes,
@@ -54,7 +55,7 @@ export const chooseTableCellHeader = (
         className={classes.cellDiv}
         disabled={label === "Type"}
       >
-        {label}
+        {t("table." + label)}
         {orderBy === prismaType ? (
           <span className={classes.visuallyHidden}>
             {orderQuery === "desc" ? "sorted descending" : "sorted ascending"}
@@ -144,6 +145,7 @@ export const chooseTableCellValue = (label, classes, transactionInfo) => {
 };
 
 export const paperWhenHistoryEmpty = (
+  t,
   classes,
   hoverPaperState,
   hoverPaperFn,
@@ -161,7 +163,7 @@ export const paperWhenHistoryEmpty = (
         })}
       />
       <Typography className={classes.assignmentWord}>
-        Start by making some transactions by selling or buying stocks!
+        {t("table.startMakingTransactions")}
       </Typography>
     </Paper>
   );

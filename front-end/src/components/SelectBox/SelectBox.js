@@ -1,6 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 
+import { useTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 import {
   Typography,
@@ -68,6 +70,7 @@ const styles = (theme) => ({
 
 function SelectBox(props) {
   const { classes, containerClass, items, name, value, disabled, onChange } = props;
+  const { t } = useTranslation();
 
   return (
     <Container className={clsx(classes.selectBoxContainer, containerClass)}>
@@ -88,7 +91,7 @@ function SelectBox(props) {
           )}
           {items.map((item) => (
             <MenuItem key={item} value={item} className={classes.menuItem}>
-              {item}
+              {t(`general.${item}`, item)}
             </MenuItem>
           ))}
         </Select>

@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import {
@@ -202,17 +204,20 @@ const styles = (theme) => ({
 });
 
 class Login extends React.Component {
-  state = {
-    error: "",
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: "",
+    };
 
-  formRef = React.createRef();
+    this.formRef = React.createRef();
 
-  errorTypes = ["Missing field."];
+    this.errorTypes = [this.props.t("login.missingField")];
 
-  email = "";
-  password = "";
-  // remember=false
+    this.email = "";
+    this.password = "";
+    // remember=false
+  }
 
   changeEmail = (event) => {
     this.email = event.target.value;
@@ -277,7 +282,7 @@ class Login extends React.Component {
   }
 
   render() {
-    const { classes, mediaQuery } = this.props;
+    const { t, classes, mediaQuery } = this.props;
     const { error } = this.state;
 
     if (shouldRedirectToHomePage(this.props)) {
@@ -295,13 +300,10 @@ class Login extends React.Component {
               className={classes.logo}
             />
             <Typography className={classes.title}>
-              {"Bibliko stock game"}
+              {t("login.title")}
             </Typography>
             <Typography className={classes.description}>
-              {`Bibliko stock game is a free stock game for young people.
-               The information of trading stocks is updated daily according
-                to the real market to help users have a hands-on experience
-                 with stock market before investing.`}
+              {t("login.description")}
             </Typography>
             { mediaQuery &&
               <Button
@@ -311,7 +313,7 @@ class Login extends React.Component {
                 className={classes.button}
                 onClick={() => this.scrollToForm()}
               >
-                {"Let's get started"}
+                {t("login.getStarted")}
               </Button>
             }
           </div>
@@ -328,7 +330,7 @@ class Login extends React.Component {
                     className={classes.title}
                     style={{textAlign: "center"}}
                   >
-                    {"Let's get started"}
+                    {t("login.getStarted")}
                   </Typography>
                 </Grid>
               }
@@ -367,7 +369,7 @@ class Login extends React.Component {
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
                     <Typography align="center" className={classes.errorText}>
-                      Error: {error}
+                      {`${t("general.error")}: ${error}`}
                     </Typography>
                   </Grid>
                 )}
@@ -380,7 +382,7 @@ class Login extends React.Component {
                         this.scrollToForm();
                     }}
                   >
-                    Log in
+                    {t("login.logIn")}
                   </Button>
                 </Grid>
               </Grid>
@@ -393,7 +395,7 @@ class Login extends React.Component {
                   className={classes.link}
                   disableRipple
                 >
-                  Create an account
+                  {t("login.createAccount")}
                 </Button>
                 <Divider
                   orientation="vertical"
@@ -408,7 +410,7 @@ class Login extends React.Component {
                   className={classes.link}
                   disableRipple
                 >
-                  Forgot password
+                  {t("login.forgotPassword")}
                 </Button>
               </Grid>
               <Grid
@@ -421,7 +423,7 @@ class Login extends React.Component {
               >
                 <Grid item xs className={classes.center}>
                   <Typography className={classes.orLogInWith}>
-                    OR login with
+                    {t("login.loginWith")}
                   </Typography>
                 </Grid>
                 <Grid item xs className={classes.center}>
@@ -476,9 +478,11 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(
-  withStyles(styles)(
-    withRouter(
-      withMediaQuery("(max-width:600px)")(Login)
+  withTranslation()(
+    withStyles(styles)(
+      withRouter(
+        withMediaQuery("(max-width:600px)")(Login)
+      )
     )
   )
 );

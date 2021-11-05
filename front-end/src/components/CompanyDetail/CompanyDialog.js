@@ -3,6 +3,8 @@ import { withRouter } from "react-router";
 import { isEqual } from "lodash";
 import PropTypes from "prop-types";
 
+import { withTranslation } from "react-i18next";
+
 import { getFullStockInfo } from "../../utils/RedisUtil";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -148,7 +150,14 @@ class CompanyDialog extends React.Component {
   }
 
   render() {
-    const { classes, handleAction, handleClose, open, companyCode } = this.props;
+    const {
+      t,
+      classes,
+      handleAction,
+      handleClose,
+      open,
+      companyCode,
+    } = this.props;
     const { value, errorMessage, companyData } = this.state;
 
     return (
@@ -181,12 +190,12 @@ class CompanyDialog extends React.Component {
                       aria-label="full width tabs"
                     >
                       <Tab
-                        label="About"
+                        label={t("company.about")}
                         className={classes.dialogTab}
                         {...a11yProps(0)}
                       />
                       <Tab
-                        label="Graph"
+                        label={t("company.graph")}
                         className={classes.dialogTab}
                         {...a11yProps(1)}
                       />
@@ -215,7 +224,7 @@ class CompanyDialog extends React.Component {
 
           <DialogActions className={classes.dialogAction}>
             <Button onClick={handleAction} color="primary">
-              Buy / Sell
+              {t("company.buySell")}
             </Button>
           </DialogActions>
         </Dialog>
@@ -224,4 +233,4 @@ class CompanyDialog extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(CompanyDialog));
+export default withTranslation()(withStyles(styles)(withRouter(CompanyDialog)));

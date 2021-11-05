@@ -2,6 +2,8 @@ import React from "react";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
@@ -124,6 +126,7 @@ class SearchPopper extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       openSearchMenu,
       handleClose,
@@ -167,7 +170,7 @@ class SearchPopper extends React.Component {
                 autoFocusItem={focusItem}
               >
                 <MenuItem dense disabled>
-                  Stocks
+                  {t("general.stocks")}
                 </MenuItem>
 
                 {this.showLinearProgressBar() && <LinearProgress />}
@@ -205,4 +208,6 @@ class SearchPopper extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(SearchPopper));
+export default withTranslation()(
+  withStyles(styles)(withRouter(SearchPopper))
+);

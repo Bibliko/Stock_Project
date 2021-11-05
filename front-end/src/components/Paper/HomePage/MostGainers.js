@@ -74,7 +74,7 @@ class MostGainers extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
-      !isEqual(nextProps.classes, this.props.classes) ||
+      !isEqual(nextProps, this.props) ||
       !isEqual(nextState, this.state)
     );
   }

@@ -1,6 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 
+import { useTranslation } from "react-i18next";
+
 import { openInNewTab } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -60,12 +62,13 @@ const styles = (theme) => ({
 
 function Footer(props) {
   const { classes } = props;
+  const { t } = useTranslation();
 
   return (
     <div className={classes.root}>
       <Container className={classes.container}>
         <Typography className={clsx(classes.text, classes.social)}>
-          Follow us
+          {t("footer.social")}
           <IconButton
             aria-label="facebook"
             className={classes.facebook}
@@ -76,7 +79,7 @@ function Footer(props) {
         </Typography>
 
         <Typography className={classes.text}>
-          Bibliko © 2021 All Rights Reserved
+          {t("footer.trademark")}
         </Typography>
       </Container>
     </div>

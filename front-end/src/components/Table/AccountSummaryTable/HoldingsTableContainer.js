@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import HoldingsTableRow from "./HoldingsTableRow";
@@ -89,16 +91,17 @@ class HoldingsTableContainer extends React.Component {
               type === "Buy Price (Avg)" || type === "Last Price",
           })}
         >
-          {type}
+          {this.props.t(`table.${type}`)}
         </div>
       </StyledTableCell>
     );
   };
 
   handleOpenSnackbar = (companyCode, AddedOrRemoved) => {
+    const { t } = this.props;
     this.setState({
       openSnackbar: true,
-      companyCodeOnAction: `${AddedOrRemoved} ${companyCode} ${AddedOrRemoved === "Added" ? "to" : "from"}`,
+      companyCodeOnAction: `${t("table." + AddedOrRemoved)} ${companyCode} ${AddedOrRemoved === "Added" ? t("table.to") : t("table.from")}`,
     });
   };
 
@@ -117,7 +120,7 @@ class HoldingsTableContainer extends React.Component {
   }
 
   render() {
-    const { classes, rows, minimal } = this.props;
+    const { t, classes, rows, minimal } = this.props;
     const { openSnackbar, companyCodeOnAction } = this.state;
 
     return (
@@ -153,7 +156,7 @@ class HoldingsTableContainer extends React.Component {
           onClose={this.handleCloseSnackbar}
         >
           <Alert onClose={this.handleCloseSnackbar} severity="success">
-            {`${companyCodeOnAction} watchlist successfully!`}
+            {`${companyCodeOnAction} ${t("table.watchlistSuccessfully")}!`}
           </Alert>
         </Snackbar>
       </TableContainer>
@@ -161,4 +164,6 @@ class HoldingsTableContainer extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(HoldingsTableContainer));
+export default withTranslation()(
+  withStyles(styles)(withRouter(HoldingsTableContainer))
+);

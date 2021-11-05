@@ -120,35 +120,36 @@ class App extends React.Component {
       <ThemeProvider theme={createTheme()}>
         <LocalizationProvider dateAdapter={DateFnsUtils}>
           <Provider store={this.getReduxStore()}>
-            <Switch>
-              <Route path="/login" component={Login} />
-              <Route path="/signup" component={Signup} />
-              <Route path="/forgotpassword" component={ForgotPassword} />
-              <Route path="/verificationSucceed" component={Succeed} />
-              <Route path="/verificationFail" component={Fail} />
+            <React.Suspense fallback={<LinearProgress />}>
+              <Switch>
+                <Route path="/login" component={Login} />
+                <Route path="/signup" component={Signup} />
+                <Route path="/forgotpassword" component={ForgotPassword} />
+                <Route path="/verificationSucceed" component={Succeed} />
+                <Route path="/verificationFail" component={Fail} />
 
-              {!this.specialLinks.includes(this.state.path) && (
-                <Layout toggleTheme={this.toggleTheme}>
-                  <Route exact path="/" component={HomePage} />
-                  <Route path="/companies" component={Companies} />
-                  <Route
-                    path="/company/:companyCode"
-                    component={CompanyDetail}
-                  />
-                  <Route path="/accountSummary" component={AccountSummary} />
-                  <Route path="/watchlist" component={Watchlist} />
-                  <Route path="/setting" component={Setting} />
-                  <Route path="/ranking" component={Ranking} />
-                  <Route
-                    path="/transactionsHistory"
-                    component={TransactionsHistory}
-                  />
-                  <Route path="/pendingOrder" component={PendingOrder} />
-                  <Route path="/placeOrder" component={PlaceOrder} />
-                </Layout>
-              )}
-            </Switch>
-            )}
+                {!this.specialLinks.includes(this.state.path) && (
+                  <Layout toggleTheme={this.toggleTheme}>
+                    <Route exact path="/" component={HomePage} />
+                    <Route path="/companies" component={Companies} />
+                    <Route
+                      path="/company/:companyCode"
+                      component={CompanyDetail}
+                    />
+                    <Route path="/accountSummary" component={AccountSummary} />
+                    <Route path="/watchlist" component={Watchlist} />
+                    <Route path="/setting" component={Setting} />
+                    <Route path="/ranking" component={Ranking} />
+                    <Route
+                      path="/transactionsHistory"
+                      component={TransactionsHistory}
+                    />
+                    <Route path="/pendingOrder" component={PendingOrder} />
+                    <Route path="/placeOrder" component={PlaceOrder} />
+                  </Layout>
+                )}
+              </Switch>
+            </React.Suspense>
           </Provider>
         </LocalizationProvider>
       </ThemeProvider>

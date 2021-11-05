@@ -4,6 +4,8 @@ import { isEmpty, isEqual } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import {
   shouldRedirectToHomePage,
   redirectToPage,
@@ -145,23 +147,28 @@ const styles = (theme) => ({
 });
 
 class ForgotPassword extends React.Component {
-  state = {
-    error: "",
-    success: "",
-    allowButtonSendCode: true,
-    allowCode: false,
-    allowPassword: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: "",
+      success: "",
+      allowButtonSendCode: true,
+      allowCode: false,
+      allowPassword: false,
+    };
 
-  errorTypes = [
-    "Confirm Password does not match Password.",
-    "Missing some fields",
-  ];
+    const { t } = this.props;
 
-  email = "";
-  code = "";
-  password = "";
-  confirmPassword = "";
+    this.errorTypes = [
+      t("login.confirmPasswordNotMatch"),
+      t("login.missingFields"),
+    ];
+
+    this.email = "";
+    this.code = "";
+    this.password = "";
+    this.confirmPassword = "";
+  }
 
   clearSuccessAndError = () => {
     if (!isEmpty(this.state.error)) {
@@ -212,7 +219,7 @@ class ForgotPassword extends React.Component {
       sendVerificationCode(this.email.toLowerCase(), "password")
         .then(() => {
           this.setState({
-            success: "Password Verification Code has been sent",
+            success: this.props.t("login.verificationSent"),
             error: "",
             allowCode: true,
           });
@@ -256,7 +263,7 @@ class ForgotPassword extends React.Component {
     } else {
       changePassword(this.password, this.email.toLowerCase())
         .then((res) => {
-          this.setState({ success: "Successfully changed password" });
+          this.setState({ success: this.props.t("login.successfullyChanged") });
         })
         .catch((err) => {
           this.setState({ error: err });
@@ -286,7 +293,7 @@ class ForgotPassword extends React.Component {
     const { success, error } = this.state;
     return (
       !isEmpty(success) &&
-      isEqual(success, "Successfully changed password") &&
+      isEqual(success, this.props.t("login.successfullyChanged")) &&
       isEmpty(error)
     );
   };
@@ -304,7 +311,7 @@ class ForgotPassword extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const {
       allowButtonSendCode,
       allowCode,
@@ -336,7 +343,7 @@ class ForgotPassword extends React.Component {
               {!this.shouldShowSuccessOnly() && (
                 <React.Fragment>
                   <Typography className={classes.instruction}>
-                    Please enter your email and we’ll send you a code.
+                    {t("login.pleaseEnterInfo")}
                   </Typography>
                   <Grid
                     item
@@ -363,7 +370,7 @@ class ForgotPassword extends React.Component {
                           onClick={this.sendCode}
                           className={classes.buttonStyles}
                         >
-                          Send
+                          {t("login.send")}
                         </Button>
                       )}
                     </Grid>
@@ -384,7 +391,7 @@ class ForgotPassword extends React.Component {
                           onClick={this.verifyCode}
                           className={classes.buttonStyles}
                         >
-                          Confirm
+                          {t("general.confirm")}
                         </Button>
                       </Grid>
                     )}
@@ -419,7 +426,7 @@ class ForgotPassword extends React.Component {
                           onClick={this.submit}
                           className={classes.buttonStyles}
                         >
-                          Submit
+                          {t("general.submit")}
                         </Button>
                       </Grid>
                     )}
@@ -432,14 +439,14 @@ class ForgotPassword extends React.Component {
                     align="center"
                     className={classes.announcementText}
                   >
-                    Error: {error}
+                    {`${t("general.error")}: ${error}`}
                   </Typography>
                 </Grid>
               )}
               {!isEmpty(success) && isEmpty(error) && (
                 <Grid item xs className={classes.center}>
                   <Typography align="center" className={classes.successText}>
-                    Success: {success}
+                    {`${t("general.success")}: ${success}`}
                   </Typography>
                 </Grid>
               )}
@@ -462,12 +469,12 @@ class ForgotPassword extends React.Component {
                     }}
                     disableRipple
                   >
-                    Login
+                    {t("login.login")}
                   </Button>
                 </Grid>
                 <Grid item xs className={classes.center}>
                   <Typography className={classes.orLogInWith}>
-                    or login with
+                    {t("login.loginWith")}
                   </Typography>
                 </Grid>
                 <Grid item xs className={classes.center}>
@@ -514,5 +521,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(ForgotPassword))
+  withTranslation()(
+    withStyles(styles)(withRouter(ForgotPassword))
+  )
 );
