@@ -194,7 +194,7 @@
     "Brokerage": "Phí môi giới",
     "Trade value": "Giá trị giao dịch",
     "Actions": "Tác vụ",
-    "Code": "Mã công ty",
+    "Code": "Mã",
     "Name": "Tên",
     "Holding": "Các cổ phiếu đang nắm giữ",
     "Buy Price (Avg)": "Giá mua (TB)",
@@ -242,6 +242,8 @@
     "missingFields": "Thiếu thông tin",
     "missingField": "Thiếu thông tin.",
     "invalidEmail": "Email không hợp lệ",
+    "Incorrect email.": "Email không hợp lệ.",
+    "Incorrect password.": "Mật khẩu không hợp lệ.",
     "verificationSent": "Mã xác thực đã được gửi",
     "successfullyChanged": "Đổi mật khẩu thành công",
     "pleaseEnterInfo": "Vui lòng nhập email để nhận mã xác thực.",
@@ -252,7 +254,7 @@
     "signUp": "Đăng ký",
     "title": "Game chứng khoán Bibliko",
     "description": "Game chứng khoán Bibliko là game chứng khoán miễn phí dành cho giới trẻ. Thông tin của các cổ phiếu được cập nhật theo thị trường thật để người dùng có trải nghiệm thực tế nhất với thị trường chứng khoán trước khi bắt đầu đầu tư.",
-    "getStarted": "Hãy bắt đầu nào",
+    "getStarted": "Hãy bắt đầu ngay",
     "createAccount": "Tạo tài khoản",
     "forgotPassword": "Quên mật khẩu"
   }

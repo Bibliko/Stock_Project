@@ -242,6 +242,8 @@
     "missingFields": "Missing some fields",
     "missingField": "Missing field.",
     "invalidEmail": "Invalid email",
+    "Incorrect email.": "Incorrect email.",
+    "Incorrect password.": "Incorrect password.",
     "verificationSent": "Password Verification Code has been sent",
     "successfullyChanged": "Successfully changed password",
     "pleaseEnterInfo": "Please enter your email and we’ll send you a code.",

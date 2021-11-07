@@ -256,7 +256,7 @@ class Login extends React.Component {
             this.props.mutateUser(user.data);
           })
           .catch((err) => {
-            this.setState({ error: err });
+            this.setState({ error: this.props.t("login." + err) });
           });
       }
     }
@@ -330,7 +330,7 @@ class Login extends React.Component {
                     className={classes.title}
                     style={{textAlign: "center"}}
                   >
-                    {t("login.getStarted")}
+                    {t("login.getStarted") + "!"}
                   </Typography>
                 </Grid>
               }

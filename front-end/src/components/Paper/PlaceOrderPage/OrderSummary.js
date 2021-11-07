@@ -59,6 +59,7 @@ const styles = (theme) => ({
   },
   label: {
     flexBasis: "50%",
+    minWidth: "7.15em",
     marginTop: "0.6rem",
     fontWeight: "bold",
     fontSize: "1.25em",
@@ -69,7 +70,6 @@ const styles = (theme) => ({
     },
   },
   content: {
-    flexBasis: "50%",
     marginTop: "0.6rem",
     fontSize: "1.25em",
     [theme.breakpoints.down("sm")]: {
@@ -80,6 +80,7 @@ const styles = (theme) => ({
     flexGrow: "1",
     width: "unset",
     color: theme.palette.normalFontColor.primary,
+    flexBasis: "40%",
   },
   clearButton: {
     background: theme.palette.primary.transparent,
