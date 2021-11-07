@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEqual, isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import WatchlistTableRow from "./WatchlistTableRow";
@@ -176,7 +178,7 @@ class WatchlistTableContainer extends React.Component {
             [classes.cellDivName]: type === "Name",
           })}
         >
-          {type}
+          {this.props.t("table." + type, type)}
         </div>
       </StyledTableCell>
     );
@@ -187,7 +189,7 @@ class WatchlistTableContainer extends React.Component {
   }
 
   render() {
-    const { classes, rows } = this.props;
+    const { t, classes, rows } = this.props;
     const {
       openSnackbar,
       companyCodeRemoved,
@@ -209,7 +211,7 @@ class WatchlistTableContainer extends React.Component {
               })}
             />
             <Typography className={classes.companiesWord}>
-              Start by adding more companies to your list!
+              {t("table.startAddingCompanies")}
             </Typography>
           </Paper>
         )}
@@ -250,7 +252,7 @@ class WatchlistTableContainer extends React.Component {
           onClose={this.handleCloseSnackbar}
         >
           <Alert onClose={this.handleCloseSnackbar} severity="success">
-            {`Removed ${companyCodeRemoved} from watchlist successfully!`}
+            {`${t("table.Removed")} ${companyCodeRemoved} ${t("table.fromWatchlist")}`}
           </Alert>
         </Snackbar>
       </div>
@@ -258,4 +260,6 @@ class WatchlistTableContainer extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(WatchlistTableContainer));
+export default withTranslation()(
+  withStyles(styles)(withRouter(WatchlistTableContainer))
+);

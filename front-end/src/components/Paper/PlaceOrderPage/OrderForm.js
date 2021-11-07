@@ -1,9 +1,12 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 
 import { orderAction } from "../../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
+
 import {
   transactionTypeBuy,
   transactionTypeSell,
@@ -86,9 +89,11 @@ class OrderForm extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["t", "classes", "userOrder", "autocompleteKey"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.classes, this.props.classes) ||
-      !isEqual(nextProps.userOrder, this.props.userOrder) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
@@ -117,7 +122,7 @@ class OrderForm extends React.Component {
 
   render() {
     const { options } = this.state;
-    const { classes } = this.props;
+    const { t, classes, autocompleteKey } = this.props;
     const {
       type,
       companyCode,
@@ -129,10 +134,12 @@ class OrderForm extends React.Component {
 
     return (
       <div className={classes.root}>
-        <Typography className={classes.title}>{"Order's details"}</Typography>
+        <Typography className={classes.title}>
+          {t("placeOrder.details")}
+        </Typography>
         <SelectBox
           style={{flexBasis: "100%"}}
-          name={"Type"}
+          name={t("general.type")}
           items={transactionTypes}
           value={type || ""}
           disabled={amend}
@@ -143,11 +150,12 @@ class OrderForm extends React.Component {
         />
         <VirtualizedAutocomplete
           containerClass={classes.field}
-          name={"Code"}
+          autocompleteKey={autocompleteKey}
+          name={t("general.code")}
           value={companyCode}
           options={options}
           disabled={amend}
-          loading={!(companyCode && options)}
+          loading={!options.length}
           onChange={(event, value) => this.handleDetailChange(
             "companyCode",
             value
@@ -155,7 +163,7 @@ class OrderForm extends React.Component {
         />
         <TextField
           containerClass={classes.field}
-          name={"Quantity"}
+          name={t("general.quantity")}
           value={quantity || ""}
           onChange={(event) => this.handleDetailChange(
             "quantity",
@@ -164,7 +172,7 @@ class OrderForm extends React.Component {
         />
         <SelectBox
           containerClass={classes.field}
-          name={"Option"}
+          name={t("general.option")}
           items={transactionOptions}
           value={option || ""}
           disabled={amend}
@@ -175,7 +183,7 @@ class OrderForm extends React.Component {
         />
         <TextField
           containerClass={classes.field}
-          name={"Price"}
+          name={t("general.price")}
           value={limitPrice || ""}
           disabled={option === transactionOptionDefault}
           onChange={(event) => this.handleDetailChange(
@@ -200,4 +208,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(OrderForm));
+)(
+  withTranslation()(
+    withStyles(styles)(OrderForm)
+  )
+);

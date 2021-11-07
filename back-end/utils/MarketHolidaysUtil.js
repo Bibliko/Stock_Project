@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("./low-dependency/PrismaClient");
 
 const { newDate, getYearUTCString } = require("./low-dependency/DayTimeUtil");
 

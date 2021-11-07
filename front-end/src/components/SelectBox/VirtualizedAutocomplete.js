@@ -169,6 +169,7 @@ class VirtualizedAutocomplete extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     return (
       !isEqual(nextProps.classes, this.props.classes) ||
+      !isEqual(nextProps.autocompleteKey, this.props.autocompleteKey) ||
       !isEqual(nextProps.options, this.props.options)
     );
   }
@@ -177,6 +178,7 @@ class VirtualizedAutocomplete extends React.Component {
     const {
       classes,
       containerClass,
+      autocompleteKey,
       name,
       disabled,
       loading,
@@ -190,6 +192,7 @@ class VirtualizedAutocomplete extends React.Component {
         <Typography className={classes.title} >{name}</Typography>
         <Autocomplete
           id="stock-selector"
+          key={autocompleteKey}
           value={value}
           onChange={onChange}
           disabled={disabled}

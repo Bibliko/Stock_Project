@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../low-dependency/PrismaClient");
 const { keysAsync, delAsync } = require("../../redis/redis-client");
 const { isEqual, isEmpty } = require("lodash");
 
@@ -20,10 +19,13 @@ const {
 
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
 const {
+  SequentialPromises,
   SequentialPromisesWithResultsArray
 } = require("../low-dependency/PromisesUtil");
 
 const { transactionTypeBuy } = require("../low-dependency/PrismaConstantUtil");
+
+const { compareFloat } = require("../low-dependency/NumberUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -45,16 +47,25 @@ const deleteExpiredVerification = () => {
 const createAccountSummaryChartTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.accountSummaryTimestamp
-      .findUnique({
+      .findMany({
         where: {
-          UTCDateKey_userID: {
-            UTCDateKey: getFullDateUTCString(newDate()),
-            userID: user.id
-          }
-        }
+          userID: user.id
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1
       })
       .then((timestamp) => {
-        if (!timestamp) {
+        timestamp = timestamp[0]
+        // Only create new daily timestamp if there is no timestamp
+        // or there is a change in totalPortfolio to reduce database's size
+        if (
+          !timestamp || (
+            timestamp.UTCDateKey !== getFullDateUTCString(newDate()) &&
+            compareFloat(timestamp.portfolioValue, user.totalPortfolio)
+          )
+        ) {
           return prisma.accountSummaryTimestamp.create({
             data: {
               UTCDateString: newDate(),
@@ -83,16 +94,27 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.rankingTimestamp
-      .findUnique({
+      .findMany({
         where: {
-          UTCDateKey_userID: {
-            UTCDateKey: getFullDateUTCString(newDate()),
-            userID: user.id
-          }
-        }
+          userID: user.id
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1
       })
       .then((timestamp) => {
-        if (!timestamp) {
+        timestamp = timestamp[0]
+        // Only create new daily timestamp if there is no timestamp
+        // or there is a change in ranking to reduce database's size
+        if (
+          !timestamp || (
+            timestamp.UTCDateKey !== getFullDateUTCString(newDate()) && (
+              timestamp.ranking !== user.ranking ||
+              timestamp.regionalRanking !== user.regionalRanking
+            )
+          )
+        ) {
           return prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
@@ -154,6 +176,9 @@ const updateRankingList = (globalBackendVariables) => {
         orderBy: [
           {
             totalPortfolio: "desc"
+          },
+          {
+            id: "asc"
           }
         ]
       });
@@ -181,14 +206,14 @@ const updateRankingList = (globalBackendVariables) => {
           }
         });
 
-        return Promise.all([
+        return () => Promise.all([
           updateUserRanking,
           redisUpdateOverallRankingList(user),
           redisUpdateRegionalRankingList(nowRegion, user)
         ]);
       });
 
-      return Promise.all(updateAllUsersRanking);
+      return SequentialPromises(updateAllUsersRanking);
     })
     .then(() => {
       globalBackendVariables.updatedRankingListFlag = !globalBackendVariables.updatedRankingListFlag;
@@ -389,10 +414,10 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
     // Update user cash
     await prisma.user.update({
       where: {
-        id: user.id,
+        id: user.id
       },
       data: {
-        cash: user.cash + totalCashChange,
+        cash: user.cash + totalCashChange
       }
     });
 
@@ -411,7 +436,7 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
           buyPriceAvg: recentPrice,
           user: {
             connect: {
-              id: user.id,
+              id: user.id
             }
           }
         }
@@ -473,7 +498,7 @@ const sellShareEvent = async (
       return await prisma.share.delete({
         where: {
           id: sellShare.id
-        },
+        }
       });
     }
     // Case 2: sell some shares => update share quantity
@@ -532,7 +557,7 @@ const proceedTransaction = async (transactionID, recentPrice) => {
         isFinished: true,
         finishedTime: new Date(),
         priceAtTransaction: recentPrice,
-        spendOrGain: totalCashChange,
+        spendOrGain: totalCashChange
       }
     });
   } catch (err) {
@@ -554,5 +579,5 @@ module.exports = {
   getChunkUserTransactionsHistoryForRedisM5RU,
   getLengthUserTransactionsHistoryForRedisM5RU,
 
-  proceedTransaction,
+  proceedTransaction
 };

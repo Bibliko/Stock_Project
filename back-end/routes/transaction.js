@@ -1,13 +1,12 @@
 const { Router } = require("express");
-const { PrismaClient } = require("@prisma/client");
+const { prisma } = require("../utils/low-dependency/PrismaClient");
 const router = Router();
-const prisma = new PrismaClient();
 const { omit } = require("lodash");
 
 const {
   addSinglePendingTransaction,
   updateSinglePendingTransaction,
-  deleteSinglePendingTransaction,
+  deleteSinglePendingTransaction
 } = require("../utils/redis-utils/PendingOrders");
 
 router.put("/placeOrder", (req, res) => {

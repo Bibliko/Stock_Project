@@ -2,6 +2,8 @@ import React from "react";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import {
   shouldRedirectToHomePage,
   redirectToPage,
@@ -22,14 +24,15 @@ const styles = (theme) => ({
     justifyContent: "center",
     maxWidth: "none",
     minHeight: "410px",
+    overflowX: "hidden",
   },
   paper: {
     height: "fit-content",
     width: "fit-content",
     minWidth: "450px",
     [theme.breakpoints.down("xs")]: {
-      height: "-webkit-fill-available",
-      width: "-webkit-fill-available",
+      height: "100%",
+      width: "100%",
       minWidth: 0,
     },
     padding: theme.spacing(1),
@@ -97,7 +100,7 @@ class Fail extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     if (shouldRedirectToHomePage(this.props)) {
       return null;
@@ -130,7 +133,7 @@ class Fail extends React.Component {
               >
                 <HighlightOffRoundedIcon className={classes.failIcon} />
                 <Typography color="error" className={classes.title}>
-                  Email Verified Failed
+                  {t("login.verificationFailed")}
                 </Typography>
               </Grid>
               <Grid item xs className={classes.center}>
@@ -142,7 +145,7 @@ class Fail extends React.Component {
                     redirectToPage("/login", this.props);
                   }}
                 >
-                  Back To Login
+                  {t("login.backToLogin")}
                 </Button>
               </Grid>
             </Grid>
@@ -157,4 +160,8 @@ const mapStateToProps = (state) => ({
   userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(withStyles(styles)(withRouter(Fail)));
+export default connect(mapStateToProps)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Fail))
+  )
+);

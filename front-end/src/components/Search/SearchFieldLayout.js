@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { withMediaQuery } from "../../theme/ThemeUtil";
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 import { searchCompanyTickers } from "../../utils/FinancialModelingPrepUtil";
@@ -143,7 +145,7 @@ class SearchFieldLayout extends React.Component {
             companiesNASDAQ: resultTickers[1] || [],
             note:
               isEmpty(resultTickers[0]) && isEmpty(resultTickers[1])
-                ? "No Stocks Found..."
+                ? this.props.t("general.noStocks")
                 : "",
           });
         })
@@ -227,7 +229,7 @@ class SearchFieldLayout extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "mediaQuery"];
+    const compareKeys = ["t", "classes", "mediaQuery"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
@@ -306,5 +308,9 @@ class SearchFieldLayout extends React.Component {
 }
 
 export default withStyles(styles)(
-  withTheme(withRouter(withMediaQuery("(max-width:599px)")(SearchFieldLayout)))
+  withTranslation()(
+    withTheme(
+      withRouter(withMediaQuery("(max-width:599px)")(SearchFieldLayout))
+    )
+  )
 );

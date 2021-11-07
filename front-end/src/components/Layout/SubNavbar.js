@@ -2,6 +2,8 @@ import React from "react";
 import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import {
@@ -168,7 +170,7 @@ class SubNavbar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "isMarketClosed", "mediaQuery", "userSession"];
+    const compareKeys = ["t", "classes", "isMarketClosed", "mediaQuery", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
@@ -178,7 +180,7 @@ class SubNavbar extends React.Component {
   }
 
   render() {
-    const { classes, mediaQuery, isMarketClosed } = this.props;
+    const { t, classes, mediaQuery, isMarketClosed } = this.props;
 
     const { collapse, countdown, data } = this.state;
 
@@ -205,8 +207,8 @@ class SubNavbar extends React.Component {
               onClick={mediaQuery ? this.toggle : undefined}
             >
               {isMarketClosed
-                ? "Market Closed"
-                : "Market closed in " + countdown}
+                ? t("subNavbar.marketClosed")
+                : t("subNavbar.marketClosedIn") + countdown}
 
               {mediaQuery && (
                 <IconButton
@@ -255,4 +257,8 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   null
-)(withStyles(styles)(withMediaQuery("(min-width:800px)")(SubNavbar)));
+)(
+  withTranslation()(
+    withStyles(styles)(withMediaQuery("(min-width:800px)")(SubNavbar))
+  )
+);

@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../low-dependency/PrismaClient");
 const {
   delAsync,
   keysAsync,
@@ -9,7 +8,7 @@ const {
   sortedSetGetRangeByScoreAsync,
   setAddAsync,
   setRemoveAsync,
-  setGetAllItemsAsync,
+  setGetAllItemsAsync
 } = require("../../redis/redis-client");
 const {
   SequentialPromisesWithResultsArray
@@ -17,7 +16,7 @@ const {
 const { proceedTransaction } = require("../top-layer/UserUtil");
 const {
   pendingCompaniesSet,
-  pendingOrdersSet,
+  pendingOrdersSet
 } = require("./RedisUtil");
 const {
   getSingleCachedShareInfo
@@ -25,7 +24,7 @@ const {
 const {
   transactionOptionGreater,
   transactionOptionLess,
-  transactionOptionDefault,
+  transactionOptionDefault
 } = require("../low-dependency/PrismaConstantUtil");
 
 /**
@@ -39,7 +38,7 @@ const {
  *    option,
  *  }
  */
- const addSinglePendingTransaction = (transaction) => {
+const addSinglePendingTransaction = (transaction) => {
   return new Promise((resolve, reject) => {
     const { id, companyCode, limitPrice, option } = transaction;
 
@@ -52,11 +51,28 @@ const {
         sortedSetAddAsync(
           redisKey,
           weight,
-          valueString,
+          valueString
         )
       ))
       .then(() => resolve("Successfully added a pending order"))
       .catch((err) => reject(err));
+  });
+};
+
+/**
+ * @description Add all pending orders from database to redis cache
+ */
+const addAllPendingTransactions = () => {
+  return new Promise((resolve, reject) => {
+    prisma.userTransaction.findMany({
+      where: { isFinished: false }
+    })
+    .then((transactions) => {
+      console.dir(transactions)
+      return Promise.all(transactions.map((transaction) => addSinglePendingTransaction(transaction)))
+    })
+    .then(() => resolve("Successfully added all pending orders to redis cache"))
+    .catch((err) => reject(err));
   });
 };
 
@@ -71,7 +87,7 @@ const {
  *    option,
  *  }
  */
- const updateSinglePendingTransaction = (transaction) => {
+const updateSinglePendingTransaction = (transaction) => {
   return new Promise((resolve, reject) => {
     const { id, companyCode, limitPrice, option } = transaction;
 
@@ -82,7 +98,7 @@ const {
     sortedSetAddAsync(
       redisKey,
       weight,
-      valueString,
+      valueString
     )
       .then(() => resolve("Successfully updated a pending order"))
       .catch((err) => reject(err));
@@ -99,7 +115,7 @@ const {
  *    option,
  *  }
  */
- const deleteSinglePendingTransaction = (transaction) => {
+const deleteSinglePendingTransaction = (transaction) => {
   return new Promise((resolve, reject) => {
     const { id, companyCode, option } = transaction;
 
@@ -115,7 +131,7 @@ const {
 };
 
 /**
- * @description Delete all pending transactions in the whole server without proceeding them
+ * @description Delete all pending orders in the whole server without proceeding them
  */
 const deleteAllPendingTransactions = () => {
   return new Promise((resolve, reject) => {
@@ -141,7 +157,7 @@ const deleteAllPendingTransactions = () => {
  * @param companyCodes The company to clear pending queue
  * @param recentPrice The current price of that company's stock
  */
- const emptyPendingTransactionsListOneCompany = (companyCode, recentPrice) => {
+const emptyPendingTransactionsListOneCompany = (companyCode, recentPrice) => {
   return new Promise((resolve, reject) => {
     let transactionsID;
     const options = [transactionOptionLess, transactionOptionGreater, transactionOptionDefault];
@@ -213,7 +229,7 @@ const deleteAllPendingTransactions = () => {
 /**
  * @description Clear all possible pending transactions in the whole server
  */
- const emptyPendingTransactionsListAllCompanies = () => {
+const emptyPendingTransactionsListAllCompanies = () => {
   return new Promise((resolve, reject) => {
     setGetAllItemsAsync(pendingCompaniesSet)
       .then((companyCodes) => (
@@ -245,10 +261,11 @@ const deleteAllPendingTransactions = () => {
 
 module.exports = {
   addSinglePendingTransaction,
+  addAllPendingTransactions,
   updateSinglePendingTransaction,
   deleteSinglePendingTransaction,
   deleteAllPendingTransactions,
 
   emptyPendingTransactionsListOneCompany,
-  emptyPendingTransactionsListAllCompanies,
+  emptyPendingTransactionsListAllCompanies
 };

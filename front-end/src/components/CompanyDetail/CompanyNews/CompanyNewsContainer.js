@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 // TODO: Uncomment this in production
 // import { getStockNews } from "../../../utils/FinancialModelingPrepUtil";
 // import { oneMinute } from "../../../utils/low-dependency/DayTimeUtil";
@@ -85,7 +87,7 @@ class CompanyNewsContainer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "companyData"];
+    const compareKeys = ["t", "classes", "companyData"];
     const compareProps = pick(this.props, compareKeys);
     const compareNextProps = pick(nextProps, compareKeys);
 
@@ -96,7 +98,7 @@ class CompanyNewsContainer extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const { news } = this.state;
 
     return (
@@ -108,7 +110,9 @@ class CompanyNewsContainer extends React.Component {
         item
         xs={12}
       >
-        <Typography className={classes.title2}>News</Typography>
+        <Typography className={classes.title2}>
+          {t("company.news")}
+        </Typography>
         <Divider className={classes.divider} />
         <Grid
           item
@@ -132,4 +136,6 @@ CompanyNewsContainer.propTypes = {
   companyData: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(withRouter(CompanyNewsContainer));
+export default withTranslation()(
+  withStyles(styles)(withRouter(CompanyNewsContainer))
+);

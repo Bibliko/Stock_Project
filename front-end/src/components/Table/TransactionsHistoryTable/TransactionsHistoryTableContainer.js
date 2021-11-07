@@ -4,6 +4,8 @@ import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import TransactionsHistoryTableRow from "./TransactionsHistoryTableRow";
 import TransactionsHistoryFilterDialog from "../../Dialog/TransactionsHistoryFilterDialog";
 import {
@@ -432,6 +434,7 @@ class TransactionsHistoryTableContainer extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     const userSessionKeys = ["email"];
     const compareKeys = [
+      "t",
       "classes",
       ...userSessionKeys.map((key) => "userSession." + key),
     ];
@@ -445,7 +448,7 @@ class TransactionsHistoryTableContainer extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const {
       hoverPaper,
       loading,
@@ -469,6 +472,7 @@ class TransactionsHistoryTableContainer extends React.Component {
         {isFirstInitializationEmpty &&
           !loading &&
           paperWhenHistoryEmpty(
+            t,
             classes,
             hoverPaper,
             this.hoverPaper,
@@ -493,7 +497,7 @@ class TransactionsHistoryTableContainer extends React.Component {
                     [classes.filterWordHidden]: !isScrollingUp,
                   })}
                 >
-                  Filter
+                  {t("table.filter")}
                 </Typography>
               </Fab>
               <TransactionsHistoryFilterDialog
@@ -504,13 +508,16 @@ class TransactionsHistoryTableContainer extends React.Component {
                 handleClose={this.closeFilterDialog}
               />
             </Container>
-            <Typography className={classes.title}>Trading History</Typography>
+            <Typography className={classes.title}>
+              {t("appbar.menu.tradingHistory")}
+            </Typography>
             <TableContainer className={classes.tableContainer}>
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                   <TableRow>
                     {names.map((typeName, index) => {
                       return chooseTableCellHeader(
+                        t,
                         index,
                         this.createSortHandler,
                         classes,
@@ -552,5 +559,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(TransactionsHistoryTableContainer))
+  withTranslation()(
+    withStyles(styles)(withRouter(TransactionsHistoryTableContainer))
+  )
 );

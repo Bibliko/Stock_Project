@@ -1,6 +1,9 @@
 import React from "react";
 import { isEmpty } from "lodash";
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
+
 import { ComponentWithForwardedRef } from "../../../utils/low-dependency/ComponentUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -78,13 +81,13 @@ class InputTextFieldWithDeleteButton extends React.Component {
   };
 
   render() {
-    const { classes, name, forwardedRef, changeData, clearData } = this.props;
+    const { t, classes, name, forwardedRef, changeData, clearData } = this.props;
 
     return (
       <TextField
         id={name}
         ref={forwardedRef}
-        name={name}
+        name={t(`general.${name}`, name)}
         value={this.state.value}
         label={name}
         autoComplete="off"
@@ -120,5 +123,7 @@ class InputTextFieldWithDeleteButton extends React.Component {
 }
 
 export default ComponentWithForwardedRef(
-  withStyles(styles)(InputTextFieldWithDeleteButton)
+  withTranslation()(
+    withStyles(styles)(InputTextFieldWithDeleteButton)
+  )
 );

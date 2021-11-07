@@ -1,6 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
+const { prisma } = require("../../utils/low-dependency/PrismaClient");
 const LocalStrategy = require("passport-local").Strategy;
-const prisma = new PrismaClient();
+const bcrypt = require('bcrypt');
 
 const loginStrategy = new LocalStrategy(
   {
@@ -17,10 +17,14 @@ const loginStrategy = new LocalStrategy(
         if (!user) {
           return done(null, false, { message: "Incorrect email." });
         }
-        if (user.password !== password) {
-          return done(null, false, { message: "Incorrect password." });
-        }
-        return done(null, user);
+
+        return bcrypt.compare(password, user.password)
+          .then((res) => {
+            if (!res) {
+              return done(null, false, { message: "Incorrect password." });
+            }
+            return done(null, user);
+          });
       })
       .catch((err) => {
         return done(err);

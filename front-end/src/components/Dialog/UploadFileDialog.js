@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import {
@@ -61,6 +63,7 @@ function UploadFileDialog(props) {
     fail,
     fileName,
   } = props;
+  const { t } = useTranslation();
 
   return (
     <Dialog
@@ -73,7 +76,7 @@ function UploadFileDialog(props) {
       classes={{ paper: classes.paper }}
     >
       <DialogTitle id="upload-dialog-title" className={classes.dialogTitle}>
-        Upload your avatar
+        {t("uploadDialog.instruction")}
       </DialogTitle>
       <DialogContent id="upload-content" className={classes.dialogContent}>
         <Grid
@@ -111,7 +114,7 @@ function UploadFileDialog(props) {
           <Grid item xs={6} className={classes.itemGrid}>
             <div className={classes.fileNameWrapper}>
               <Typography noWrap component="span">
-                {fileName || "No file chosen"}
+                {fileName || t("uploadDialog.noFile")}
               </Typography>
             </div>
           </Grid>
@@ -123,7 +126,7 @@ function UploadFileDialog(props) {
               fail={fail}
               handleClick={handleUpload}
             >
-              Save
+              {t("general.save")}
             </ProgressButton>
           </Grid>
         </Grid>

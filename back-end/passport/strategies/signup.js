@@ -1,6 +1,8 @@
-const { PrismaClient } = require("@prisma/client");
+const { prisma } = require("../../utils/low-dependency/PrismaClient");
 const LocalStrategy = require("passport-local").Strategy;
-const prisma = new PrismaClient();
+const bcrypt = require('bcrypt');
+
+const saltRounds = 8;
 
 // const mailgun = require("mailgun-js");
 // const DOMAIN = 'minecommand.us';
@@ -26,11 +28,13 @@ const signupStrategy = new LocalStrategy(
         }
       })
       .then((user) => {
-        if (user) {
-          done(null, user, { message: "User with this email already exists." });
-        } else {
-          done(null, false, { email, password });
-        }
+        if (user)
+          return done(null, user, { message: "User with this email already exists." });
+
+        return bcrypt.hash(password, saltRounds)
+          .then((hashedPassword) => {
+            return done(null, false, { email, hashedPassword });
+          });
       })
       .catch((err) => {
         console.log(err);

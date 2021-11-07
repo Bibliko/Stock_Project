@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/low-dependency/PrismaClient");
 // const { indices } = require('../algolia');
 
 router.get("/getData", (req, res) => {

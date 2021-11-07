@@ -1,5 +1,7 @@
 import React from "react";
 
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 import { TextField, InputAdornment, IconButton } from "@material-ui/core";
 
@@ -54,14 +56,14 @@ const styles = (theme) => ({
 
 class NormalTextField extends React.Component {
   render() {
-    const { classes, name, disabled, changeData, enterData } = this.props;
+    const { t, classes, name, disabled, changeData, enterData } = this.props;
 
     return (
       <TextField
         id={name}
         disabled={disabled}
         name={name}
-        label={name}
+        label={t(`general.${name}`, name)}
         variant="filled"
         margin="normal"
         required
@@ -92,4 +94,4 @@ class NormalTextField extends React.Component {
   }
 }
 
-export default withStyles(styles)(NormalTextField);
+export default withTranslation()(withStyles(styles)(NormalTextField));

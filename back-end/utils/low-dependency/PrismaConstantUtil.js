@@ -9,5 +9,5 @@ module.exports = {
   transactionTypeSell,
   transactionOptionGreater,
   transactionOptionLess,
-  transactionOptionDefault,
+  transactionOptionDefault
 }

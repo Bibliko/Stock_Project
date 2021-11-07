@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 import {
@@ -10,6 +12,8 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 import { getUser, loginUser } from "../../utils/UserUtil";
+import { withMediaQuery } from "../../theme/ThemeUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
 
 import NormalTextField from "../../components/TextField/AuthenticationTextFields/NormalTextField";
 import PasswordTextField from "../../components/TextField/AuthenticationTextFields/PasswordTextField";
@@ -22,33 +26,82 @@ import {
   Grid,
   Divider,
   Container,
+  ClickAwayListener,
 } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
-    height: "100vh",
-    width: "100vw",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "stretch",
+    justifyContent: "flex-start",
+    position: "absolute",
+    width: "100vw",
     maxWidth: "none",
-    minHeight: "605px",
+    minHeight: "max(605px, 100vh)",
+    overflow: "hidden",
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column",
+      overflowY: "auto",
+    },
+  },
+  hero: {
+    boxSizing: "border-box",
+    flex: "1 1 50%",
+    padding: "0px 5%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    [theme.breakpoints.down("xs")]: {
+      display: "unset",
+      minHeight: "max(600px, 100vh)",
+      padding: "20% 10%",
+    },
+  },
+  logo: {
+    height: "70px",
+    marginLeft: "-8px",
+  },
+  title: {
+    color: "white",
+    letterSpacing: "0.02em",
+    margin: "0.5em 0px",
+    fontSize: "xxx-large",
+    fontWeight: "bolder",
+    lineHeight: "1.1",
+  },
+  description: {
+    color: "white",
+    opacity: "0.6",
+    fontSize: "1.38em",
+    lineHeight: "1.4",
+    maxWidth: "50ch",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "larger",
+    },
+  },
+  button: {
+    color: "white",
+    marginTop: "2em",
+    fontSize: "large",
+    letterSpacing: "0.01em",
+    background: theme.palette.primary.transparent,
+    "&:hover": {
+      background: theme.palette.primary.transparentHover,
+    },
   },
   paper: {
-    height: "fit-content",
-    width: "fit-content",
-    minWidth: "450px",
-    [theme.breakpoints.down("xs")]: {
-      height: "-webkit-fill-available",
-      width: "-webkit-fill-available",
-      minWidth: 0,
-    },
+    boxSizing: "border-box",
+    flex: "1 1 50%",
     padding: theme.spacing(1),
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     background: theme.palette.gradientPaper.main,
+    [theme.breakpoints.down("xs")]: {
+      minHeight: "max(600px, 100vh)",
+    },
   },
   div: {
     backgroundColor: theme.palette.loginBackground.main,
@@ -90,11 +143,6 @@ const styles = (theme) => ({
     borderRadius: "50%",
     height: "40px",
     width: "40px",
-  },
-  avatar: {
-    height: "120px",
-    width: "120px",
-    margin: theme.spacing(1),
   },
   alternativeLoginButton: {
     maxHeight: "fit-content",
@@ -148,6 +196,7 @@ const styles = (theme) => ({
   },
   form: {
     flexDirection: "column",
+    gap: "8px",
   },
   dividerLine: {
     backgroundColor: theme.palette.loginLink.main,
@@ -155,15 +204,20 @@ const styles = (theme) => ({
 });
 
 class Login extends React.Component {
-  state = {
-    error: "",
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: "",
+    };
 
-  errorTypes = ["Missing field."];
+    this.formRef = React.createRef();
 
-  email = "";
-  password = "";
-  // remember=false
+    this.errorTypes = [this.props.t("login.missingField")];
+
+    this.email = "";
+    this.password = "";
+    // remember=false
+  }
 
   changeEmail = (event) => {
     this.email = event.target.value;
@@ -208,6 +262,13 @@ class Login extends React.Component {
     }
   };
 
+  scrollToForm = () => {
+    setTimeout(
+      () => this.formRef.current?.scrollIntoView({ behavior: 'smooth' }),
+      oneSecond * 0.2
+    );
+  };
+
   componentDidMount() {
     if (shouldRedirectToHomePage(this.props)) {
       redirectToPage("/", this.props);
@@ -221,7 +282,7 @@ class Login extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes, mediaQuery } = this.props;
     const { error } = this.state;
 
     if (shouldRedirectToHomePage(this.props)) {
@@ -232,20 +293,47 @@ class Login extends React.Component {
       <div>
         <div className={classes.div} />
         <Container className={classes.root} disableGutters>
-          <Paper className={classes.paper} elevation={2}>
+          <div className={classes.hero}>
+            <img
+              src="/bibliko.png"
+              alt="Bibliko logo"
+              className={classes.logo}
+            />
+            <Typography className={classes.title}>
+              {t("login.title")}
+            </Typography>
+            <Typography className={classes.description}>
+              {t("login.description")}
+            </Typography>
+            { mediaQuery &&
+              <Button
+                aria-label="Let's get started"
+                variant="outlined"
+                color="primary"
+                className={classes.button}
+                onClick={() => this.scrollToForm()}
+              >
+                {t("login.getStarted")}
+              </Button>
+            }
+          </div>
+          <Paper className={classes.paper} elevation={2} ref={this.formRef}>
             <Grid
               container
               spacing={2}
               direction="column"
               className={classes.center}
             >
-              <Grid item xs className={classes.center}>
-                <img
-                  src="/bibOfficial.png"
-                  alt="Bibliko"
-                  className={classes.avatar}
-                />
-              </Grid>
+              { mediaQuery ? null :
+                <Grid item xs className={classes.center}>
+                  <Typography
+                    className={classes.title}
+                    style={{textAlign: "center"}}
+                  >
+                    {t("login.getStarted")}
+                  </Typography>
+                </Grid>
+              }
               <Grid
                 container
                 spacing={1}
@@ -254,33 +342,47 @@ class Login extends React.Component {
                 xs
                 className={classes.center}
               >
-                <form
-                  className={clsx(classes.center, classes.form)}
-                  noValidate
-                  autoComplete="on"
+                <ClickAwayListener
+                  onClickAway={() => {
+                    if (mediaQuery)
+                      this.scrollToForm();
+                  }}
                 >
-                  <NormalTextField
-                    name="Email"
-                    changeData={this.changeEmail}
-                    enterData={this.handleKeyDown}
-                  />
-                  <PasswordTextField
-                    name="Password"
-                    changePassword={this.changePassword}
-                    enterPassword={this.handleKeyDown}
-                    createOrLogin="login"
-                  />
-                </form>
+                  <form
+                    className={clsx(classes.center, classes.form)}
+                    noValidate
+                    autoComplete="on"
+                  >
+                    <NormalTextField
+                      name="Email"
+                      changeData={this.changeEmail}
+                      enterData={this.handleKeyDown}
+                    />
+                    <PasswordTextField
+                      name="Password"
+                      changePassword={this.changePassword}
+                      enterPassword={this.handleKeyDown}
+                      createOrLogin="login"
+                    />
+                  </form>
+                </ClickAwayListener>
                 {!isEmpty(error) && (
                   <Grid item xs className={classes.error}>
                     <Typography align="center" className={classes.errorText}>
-                      Error: {error}
+                      {`${t("general.error")}: ${error}`}
                     </Typography>
                   </Grid>
                 )}
                 <Grid item xs className={classes.center}>
-                  <Button className={classes.submit} onClick={this.submit}>
-                    Log in
+                  <Button
+                    className={classes.submit}
+                    onClick={() => {
+                      this.submit();
+                      if (mediaQuery)
+                        this.scrollToForm();
+                    }}
+                  >
+                    {t("login.logIn")}
                   </Button>
                 </Grid>
               </Grid>
@@ -293,7 +395,7 @@ class Login extends React.Component {
                   className={classes.link}
                   disableRipple
                 >
-                  Create an account
+                  {t("login.createAccount")}
                 </Button>
                 <Divider
                   orientation="vertical"
@@ -308,7 +410,7 @@ class Login extends React.Component {
                   className={classes.link}
                   disableRipple
                 >
-                  Forgot password
+                  {t("login.forgotPassword")}
                 </Button>
               </Grid>
               <Grid
@@ -321,7 +423,7 @@ class Login extends React.Component {
               >
                 <Grid item xs className={classes.center}>
                   <Typography className={classes.orLogInWith}>
-                    OR login with
+                    {t("login.loginWith")}
                   </Typography>
                 </Grid>
                 <Grid item xs className={classes.center}>
@@ -375,4 +477,12 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Login)));
+)(
+  withTranslation()(
+    withStyles(styles)(
+      withRouter(
+        withMediaQuery("(max-width:600px)")(Login)
+      )
+    )
+  )
+);

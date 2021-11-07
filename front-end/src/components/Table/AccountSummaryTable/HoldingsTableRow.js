@@ -22,7 +22,8 @@ import {
   TableCell,
   IconButton,
   Typography,
-  Tooltip,
+  // TODO: code tooltip
+  // Tooltip,
 } from "@material-ui/core";
 
 import {
@@ -30,7 +31,8 @@ import {
   ArrowDropUpRounded as ArrowDropUpRoundedIcon,
   ArrowDropDownRounded as ArrowDropDownRoundedIcon,
   DeleteForeverRounded as DeleteForeverRoundedIcon,
-  InfoRounded as InfoRoundedIcon,
+  // TODO: code tooltip
+  // InfoRounded as InfoRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -95,31 +97,34 @@ const styles = (theme) => ({
   lastRow: {
     borderBottomWidth: "1px",
   },
-  codeInfoButton: {
-    color: "white",
-    padding: 0,
-    marginLeft: "8px",
-  },
+  // TODO: code tooltip
+  // codeInfoButton: {
+  //   color: "white",
+  //   padding: 0,
+  //   marginLeft: "8px",
+  // },
 });
 
-const HtmlTooltip = withStyles((theme) => ({
-  tooltip: {
-    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
-    boxShadow: theme.customShadow.popup,
-    color: "white",
-    maxWidth: 220,
-  },
-  arrow: {
-    color: theme.palette.paperBackground.onPageSuperLight,
-  },
-}))(Tooltip);
+// TODO: code tooltip
+// const HtmlTooltip = withStyles((theme) => ({
+//   tooltip: {
+//     backgroundColor: theme.palette.paperBackground.onPageSuperLight,
+//     boxShadow: theme.customShadow.popup,
+//     color: "white",
+//     maxWidth: 220,
+//   },
+//   arrow: {
+//     color: theme.palette.paperBackground.onPageSuperLight,
+//   },
+// }))(Tooltip);
 
 class HoldingsTableRow extends React.Component {
   state = {
     lastPrice: "Updating",
     profitOrLoss: "Updating",
     isInWatchlist: false,
-    openInfo: false,
+    // TODO: code tooltip
+    // openInfo: false,
   };
 
   checkStockPriceInterval;
@@ -186,7 +191,8 @@ class HoldingsTableRow extends React.Component {
           <Typography className={classes.holdingsTableItem}>
             {this.chooseTableCellValue(type)}
           </Typography>
-          {type === "Code" && (
+          {/*TODO: code tooltip*/}
+          {/*{type === "Code" && (
             <HtmlTooltip
               title={
                 <React.Fragment>
@@ -206,7 +212,7 @@ class HoldingsTableRow extends React.Component {
                 <InfoRoundedIcon onBlur={this.closeInfoTooltip} />
               </IconButton>
             </HtmlTooltip>
-          )}
+          )}*/}
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -218,23 +224,24 @@ class HoldingsTableRow extends React.Component {
     );
   };
 
-  switchInfoTooltip = () => {
-    this.setState({
-      openInfo: !this.state.openInfo,
-    });
-  };
+  // TODO: code tooltip
+  // switchInfoTooltip = () => {
+  //   this.setState({
+  //     openInfo: !this.state.openInfo,
+  //   });
+  // };
 
-  openInfoTooltip = () => {
-    this.setState({
-      openInfo: true,
-    });
-  };
+  // openInfoTooltip = () => {
+  //   this.setState({
+  //     openInfo: true,
+  //   });
+  // };
 
-  closeInfoTooltip = () => {
-    this.setState({
-      openInfo: false,
-    });
-  };
+  // closeInfoTooltip = () => {
+  //   this.setState({
+  //     openInfo: false,
+  //   });
+  // };
 
   addToWatchlist = () => {
     const { code } = this.props.rowData;

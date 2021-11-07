@@ -1,4 +1,7 @@
 import React from "react";
+
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import { numberWithCommas } from "../../../utils/low-dependency/NumberUtil.js";
@@ -96,6 +99,7 @@ class OverallTable extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       totalUser,
       currentPage,
@@ -103,10 +107,10 @@ class OverallTable extends React.Component {
     } = this.props;
     const users = this.props.users || [];
     const headLabels = [
-      "#",
-      "Username",
-      "Portfolio",
-      "Region",
+      t("ranking.#"),
+      t("general.username"),
+      t("general.portfolioValue"),
+      t("settings.region"),
     ];
     const rowsPerPage = 8;
 
@@ -158,4 +162,4 @@ class OverallTable extends React.Component {
   }
 }
 
-export default withStyles(styles)(OverallTable);
+export default withTranslation()(withStyles(styles)(OverallTable));

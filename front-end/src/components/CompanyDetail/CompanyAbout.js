@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import {
   simplifyNumber,
   numberWithCommas,
@@ -126,7 +128,7 @@ class CompanyAbout extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "companyData"];
+    const compareKeys = ["t", "classes", "companyData"];
     const compareProps = pick(this.props, compareKeys);
     const compareNextProps = pick(nextProps, compareKeys);
 
@@ -137,7 +139,7 @@ class CompanyAbout extends React.Component {
   }
 
   render() {
-    const { classes, companyData } = this.props;
+    const { t, classes, companyData } = this.props;
     const { companyDescription, showFullDescription, showFullDetails } = this.state;
 
     return (
@@ -149,9 +151,11 @@ class CompanyAbout extends React.Component {
         item
         xs={12}
       >
-        <Typography className={classes.title2}>About</Typography>
+        <Typography className={classes.title2}>
+          {t("company.about")}
+        </Typography>
         <Typography className={classes.websiteLink}>
-          {"Website: "}
+          {t("company.website") + ": "}
           <a
             href={companyData.website}
             target="_blank"
@@ -170,7 +174,7 @@ class CompanyAbout extends React.Component {
               disableRipple
               onClick={this.shrinkDescription}
             >
-              See Less
+              {t("company.less")}
             </Button>
           )}
           {!showFullDescription && (
@@ -179,7 +183,7 @@ class CompanyAbout extends React.Component {
               disableRipple
               onClick={this.extendDescription}
             >
-              See More
+              {t("company.more")}
             </Button>
           )}
         </Typography>
@@ -192,83 +196,83 @@ class CompanyAbout extends React.Component {
           style={{ alignSelf: "center" }}
         >
           {this.gridElement(
-            "IPO Date",
+            t("company.IPODate"),
             new Date(companyData.ipoDate).toDateString(),
             classes
           )}
 
-          {this.gridElement("CEO", companyData.ceo, classes)}
+          {this.gridElement(t("company.CEO"), companyData.ceo, classes)}
 
           {this.gridElement(
-            "Employees",
+            t("company.employees"),
             numberWithCommas(companyData.fullTimeEmployees),
             classes
           )}
 
           {this.gridElement(
-            "Head Quarter",
+            t("company.headQuarter"),
             `${companyData.city}, ${capitalizeString(companyData.state)}`,
             classes
           )}
 
-          {this.gridElement("Industry", companyData.industry, classes)}
+          {this.gridElement(t("general.industry"), companyData.industry, classes)}
 
-          {this.gridElement("Sector", companyData.sector, classes)}
+          {this.gridElement(t("general.sector"), companyData.sector, classes)}
 
-          {this.gridElement("Exchange", companyData.exchangeShortName, classes)}
+          {this.gridElement(t("general.exchange"), companyData.exchangeShortName, classes)}
 
           {showFullDetails &&
             this.gridElement(
-              "Market Cap",
+              t("general.marketCap"),
               simplifyNumber(companyData.marketCap),
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Average Volume",
+              t("general.averageVolume"),
               simplifyNumber(companyData.volAvg),
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Volume",
+              t("general.volume"),
               simplifyNumber(companyData.volume),
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Day High",
+              t("general.dayHigh"),
               `$${roundNumber(companyData.dayHigh, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Day Low",
+              t("general.dayLow"),
               `$${roundNumber(companyData.dayLow, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Year High",
+              t("general.yearHigh"),
               `$${roundNumber(companyData.yearHigh, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Year Low",
+              t("general.yearLow"),
               `$${roundNumber(companyData.yearLow, 2)}`,
               classes
             )}
 
           {showFullDetails &&
             this.gridElement(
-              "Open Price",
+              t("general.openPrice"),
               `$${roundNumber(companyData.open, 2)}`,
               classes
             )}
@@ -278,8 +282,8 @@ class CompanyAbout extends React.Component {
             className={classes.showDetailButton}
             onClick={this.switchShowingDetails}
           >
-            {showFullDetails && "Show Less"}
-            {!showFullDetails && "Show More"}
+            {showFullDetails && t("company.less")}
+            {!showFullDetails && t("company.more")}
           </Button>
         </Grid>
       </Grid>
@@ -292,4 +296,4 @@ CompanyAbout.propTypes = {
   companyData: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(withRouter(CompanyAbout));
+export default withTranslation()(withStyles(styles)(withRouter(CompanyAbout)));

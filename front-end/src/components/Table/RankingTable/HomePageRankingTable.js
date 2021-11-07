@@ -1,6 +1,8 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
+import { withTranslation } from "react-i18next";
+
 import {
   TableContainer,
   Table,
@@ -47,16 +49,22 @@ const StyledTableCell = withStyles((theme) => ({
 
 class HomePageRankingTable extends React.Component {
   render() {
-    const { classes, users } = this.props;
+    const { t, classes, users } = this.props;
 
     return (
       <TableContainer className={classes.container} component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <StyledTableCell style={{maxWidth: "50px" }} align="center"> Rank </StyledTableCell>
-              <StyledTableCell align="left"> Name </StyledTableCell>
-              <StyledTableCell align="right"> Net Worth </StyledTableCell>
+              <StyledTableCell style={{maxWidth: "50px" }} align="center">
+                {t("ranking.rank")}
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {t("general.name")}
+              </StyledTableCell>
+              <StyledTableCell align="right">
+                {t("general.netWorth")}
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -76,4 +84,4 @@ class HomePageRankingTable extends React.Component {
   }
 }
 
-export default withStyles(styles)(HomePageRankingTable);
+export default withTranslation()(withStyles(styles)(HomePageRankingTable));

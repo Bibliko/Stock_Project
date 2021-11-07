@@ -19,16 +19,19 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-export const chooseTableCellHeader = (indexColumnName, state) => {
+export const chooseTableCellHeader = (t, indexColumnName, state) => {
   const { labels } = state;
   const label = labels[indexColumnName];
 
   return (
-    <StyledTableCell key={indexColumnName} align={'center'}>{label}</StyledTableCell>
+    <StyledTableCell key={indexColumnName} align={'center'}>
+      {t("table." + label)}
+    </StyledTableCell>
   );
 };
 
 export const chooseTableCell = (
+  t,
   label,
   index,
   isLastRow,
@@ -50,14 +53,21 @@ export const chooseTableCell = (
     >
       <div>
         <Typography noWrap>
-          {chooseTableCellValue(label, order, classes, deleteOrder, amendOrder)}
+          {chooseTableCellValue(t, label, order, classes, deleteOrder, amendOrder)}
         </Typography>
       </div>
     </TableCell>
   );
 };
 
-export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOrder) => {
+export const chooseTableCellValue = (
+  t,
+  label,
+  order,
+  classes,
+  deleteOrder,
+  amendOrder
+) => {
   const {
     type,
     companyCode,
@@ -70,13 +80,13 @@ export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOr
   let tradeValue = numberWithCommas(roundNumber((limitPrice * quantity) + brokerage, 2));
 
   switch (label) {
-    case "Type": return `${type}`;
+    case "Type": return `${t("general." + type)}`;
 
     case "Code": return `${companyCode}`;
 
     case "Quantity": return `${numberWithCommas(quantity)}`;
 
-    case "Option": return `${option}`;
+    case "Option": return `${t("general." + option)}`;
 
     case "Land price": return limitPrice ? `$${numberWithCommas(roundNumber(limitPrice, 2))}` : "-";
 
@@ -95,7 +105,7 @@ export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOr
             disableElevation
             onClick={amendOrder}
           >
-            Amend
+            {t("general.amend")}
           </Button>
           <Button
             aria-label="delete"
@@ -105,7 +115,7 @@ export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOr
             disableElevation
             onClick={deleteOrder}
           >
-            Delete
+            {t("general.delete")}
           </Button>
         </span>
       );
@@ -115,6 +125,7 @@ export const chooseTableCellValue = (label, order, classes, deleteOrder, amendOr
 };
 
 export const paperWhenPendingOrderEmpty = (
+  t,
   classes,
   hoverPaperState,
   hoverPaperFn,
@@ -132,7 +143,7 @@ export const paperWhenPendingOrderEmpty = (
         })}
       />
       <Typography className={classes.assignmentWord}>
-        No pending orders!
+        {t("table.noPendingOrders")}
       </Typography>
     </Paper>
   );

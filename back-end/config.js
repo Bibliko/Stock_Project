@@ -6,6 +6,7 @@ module.exports = {
     PASSPORT_CALLBACK_HOST: process.env.PASSPORT_CALLBACK_HOST,
 
     DATABASE_URL: process.env.DATABASE_URL,
+    REDISCLOUD_URL: process.env.REDISCLOUD_URL,
     REDIS_URL: process.env.REDIS_URL,
 
     FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,

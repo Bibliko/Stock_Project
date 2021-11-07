@@ -17,7 +17,6 @@ import { Container, Typography, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,

@@ -1,22 +1,28 @@
 import React from "react";
 import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
-
 import { orderAction } from "../../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
+
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { placeOrder, amendOrder } from "../../../utils/TransactionUtil";
 import { roundNumber } from "../../../utils/low-dependency/NumberUtil";
 import { transactionOptionDefault } from "../../../utils/low-dependency/PrismaConstantUtil";
+import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import ProgressButton from "../../Button/ProgressButton";
 
 import {
   Button,
   Paper,
-  Typography
+  Typography,
+  Snackbar,
 } from "@material-ui/core";
+
+import { Alert } from "@material-ui/lab";
 
 const styles = (theme) => ({
   root: {
@@ -89,7 +95,12 @@ class OrderSummary extends React.Component {
     fail: false,
     success: false,
     loading: false,
+    openSnackbar: false,
+    alertSeverity: "success",
   };
+
+  // prevent double click
+  submitTimeout;
 
   calculateBrokerage = (lastPrice, quatity) => {
     let brokerage;
@@ -152,6 +163,7 @@ class OrderSummary extends React.Component {
       limitPrice,
       amend,
     } = this.props.userOrder;
+    const { clearOrder, handleResetAutocomplete } = this.props;
     const { brokerage } = this.state;
     const orderData = {
       type,
@@ -175,6 +187,9 @@ class OrderSummary extends React.Component {
             loading: false,
             success: true,
           });
+          clearOrder();
+          handleResetAutocomplete();
+          this.handleOpenSnackbar("success");
         })
         .catch((err) => {
           console.log(err);
@@ -182,7 +197,34 @@ class OrderSummary extends React.Component {
             loading: false,
             fail: true,
           });
+          this.handleOpenSnackbar("error");
         });
+    });
+  };
+
+  handleSubmitClick = () => {
+    if (this.submitTimeout) {
+      clearTimeout(this.submitTimeout);
+    }
+    this.submitTimeout = setTimeout(
+      () => this.handleSubmit(),
+      oneSecond * 0.5
+    );
+  };
+
+  handleOpenSnackbar = (severity) => {
+    this.setState({
+      openSnackbar: true,
+      alertSeverity: severity,
+    });
+  };
+
+  handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    this.setState({
+      openSnackbar: false,
     });
   };
 
@@ -201,23 +243,29 @@ class OrderSummary extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["t", "classes", "userOrder"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.classes, this.props.classes) ||
-      !isEqual(nextProps.userOrder, this.props.userOrder) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
 
   render() {
     const {
+      t,
       classes,
       clearOrder,
+      handleResetAutocomplete,
     } = this.props;
     const {
       brokerage,
       fail,
       success,
       loading,
+      openSnackbar,
+      alertSeverity,
     } = this.state;
     const {
       type,
@@ -228,18 +276,30 @@ class OrderSummary extends React.Component {
     return (
       <div className={classes.root}>
         <Paper className={classes.paper}>
-          <Typography className={classes.title}>{"Order Summary"}</Typography>
+          <Typography className={classes.title}>
+            {t("placeOrder.summary")}
+          </Typography>
 
-          <Typography className={classes.label}>{"Type:"}</Typography>
-          <Typography className={classes.content}>{type}</Typography>
+          <Typography className={classes.label}>
+            {t("general.type") + ":"}
+          </Typography>
+          <Typography className={classes.content}>
+            {type ? t("general." + type) : ""}
+          </Typography>
 
-          <Typography className={classes.label}>{"Code:"}</Typography>
+          <Typography className={classes.label}>
+            {t("general.code") + ":"}
+          </Typography>
           <Typography className={classes.content}>{companyCode}</Typography>
 
-          <Typography className={classes.label}>{"Quantity:"}</Typography>
+          <Typography className={classes.label}>
+            {t("general.quantity") + ":"}
+          </Typography>
           <Typography className={classes.content}>{quantity}</Typography>
 
-          <Typography className={classes.label}>{"Brokerage:"}</Typography>
+          <Typography className={classes.label}>
+            {t("general.brokerage") + ":"}
+          </Typography>
           <Typography className={classes.content}>{brokerage && `$${brokerage}`}</Typography>
         </Paper>
 
@@ -249,9 +309,12 @@ class OrderSummary extends React.Component {
           disableElevation
           color="primary"
           className={clsx(classes.buttonContainer, classes.clearButton)}
-          onClick={() => clearOrder()}
+          onClick={() => {
+            clearOrder();
+            handleResetAutocomplete();
+          }}
         >
-          {"Clear"}
+          {t("general.clear")}
         </Button>
 
         <ProgressButton
@@ -259,10 +322,29 @@ class OrderSummary extends React.Component {
           success={success}
           fail={fail}
           loading={loading}
-          handleClick={this.handleSubmit}
+          handleClick={this.handleSubmitClick}
         >
-          {"Submit"}
+          {t("general.submit")}
         </ProgressButton>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={5 * oneSecond}
+          onClose={this.handleCloseSnackbar}
+        >
+          <Alert
+            elevation={6}
+            variant="filled"
+            onClose={this.handleCloseSnackbar}
+            severity={alertSeverity}
+          >
+            {
+              `${alertSeverity === "success"
+              ? t("placeOrder.successfulAlert")
+              : t("placeOrder.failedAlert")} ${t("placeOrder.yourOrder")}`
+            }
+          </Alert>
+        </Snackbar>
       </div>
     );
   }
@@ -280,4 +362,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(OrderSummary));
+)(
+  withTranslation()(
+    withStyles(styles)(OrderSummary)
+  )
+);

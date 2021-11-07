@@ -1,6 +1,7 @@
 import React from "react";
-
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
 
 import SelectBox from "../SelectBox/SelectBox";
 import SpaceDivMainPages from "../Space/SpaceDivMainPages";
@@ -81,8 +82,16 @@ class SelectSection extends React.Component {
     );
   };
 
+  componentDidMount() {
+    this.props.reference.current = this;
+  }
+
+  componentWillUnmount() {
+    this.props.reference.current = null;
+  }
+
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const { input } = this.state;
     const occupations = ["Student", "Teacher", "Other"];
     const regions = [
@@ -106,7 +115,7 @@ class SelectSection extends React.Component {
         >
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SelectBox
-              name="Region"
+              name={t("settings.region")}
               value={input.region ? input.region : ""}
               items={regions}
               onChange={this.recordRegion}
@@ -114,7 +123,7 @@ class SelectSection extends React.Component {
           </Grid>
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SelectBox
-              name="Occupation"
+              name={t("settings.occupation")}
               value={input.occupation ? input.occupation : ""}
               items={occupations}
               onChange={this.recordOccupation}
@@ -127,4 +136,6 @@ class SelectSection extends React.Component {
   }
 }
 
-export default withStyles(styles)(SelectSection);
+export default withTranslation()(
+  withStyles(styles)(SelectSection)
+);

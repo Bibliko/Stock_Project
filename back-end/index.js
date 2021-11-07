@@ -10,9 +10,14 @@
 
 const {
   oneSecond,
-  oneDay,
-  oneMinute
+  oneMinute,
+  oneHour,
+  oneDay
 } = require("./utils/low-dependency/DayTimeUtil");
+
+const {
+  excludeFromCors
+} = require("./utils/low-dependency/NetworkUtil");
 
 const {
   deleteExpiredVerification,
@@ -50,12 +55,19 @@ const {
 
 const {
   emptyPendingTransactionsListAllCompanies,
-  deleteAllPendingTransactions,
+  addAllPendingTransactions,
+  deleteAllPendingTransactions
 } = require("./utils/redis-utils/PendingOrders");
 
 const { startSocketIO } = require("./socketIO");
 
-const { PORT, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = require('./config');
+const {
+  PORT,
+  NODE_ENV,
+  FRONTEND_HOST,
+  REDIS_URL,
+  SENDGRID_API_KEY
+} = require('./config');
 const express = require("express");
 const app = express();
 const { pick } = require("lodash");
@@ -67,10 +79,16 @@ const http = require("http");
 const server = http.createServer(app);
 
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const passport = require("passport");
 const { setupPassport } = require("./passport");
 const session = require("express-session");
+
+const redis = require("redis");
+let RedisStore = require("connect-redis")(session);
+let redisClient = redis.createClient(REDIS_URL);
+
 
 /* cors: for example, if front-end sends request to back-end,
  * then front-end is cors (cross-origin requests),
@@ -100,16 +118,25 @@ const corsOptions = {
   },
   credentials: true
 };
+const publicPaths = [
+  "*/auth/google*",
+  "*/auth/facebook*",
+  "*/verificationSession/verification*"
+];
+const sessionOptions = {
+  secret: "stock-project",
+  resave: false,
+  saveUninitialized: false
+};
+if (NODE_ENV === "production") {
+  sessionOptions.store = new RedisStore({ client: redisClient });
+};
 
-app.use(cors(corsOptions));
+app.use(excludeFromCors(publicPaths, cors(corsOptions)));
+app.use(cookieParser("stock-project"));
 app.use(bodyParser.json());
-app.use(
-  session({
-    secret: "stock-project",
-    resave: false,
-    saveUninitialized: false
-  })
-);
+app.set("trust proxy", 1);
+app.use(session(sessionOptions));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -209,13 +236,27 @@ const setupBackendIntervals = () => {
   // If forceUpdate is true and system is in developer mode, does not need to call API.
   setInterval(() => updateCompaniesRatingsList(), oneDay);
 
+  setInterval(
+    () => {
+      if (
+        globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+        !globalBackendVariables.isMarketClosed
+      ) {
+        addAllPendingTransactions()
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+      }
+    },
+    oneHour * 1.5
+  );
+
   // TODO: Uncomment in production
   // setInterval(
   //   () => {
-  //   if (
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
+  //     if (
+  //       globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+  //       !globalBackendVariables.isMarketClosed
+  //     ) {
   //       emptyPendingTransactionsListAllCompanies()
   //         .catch((err) => console.log(err));
   //     }

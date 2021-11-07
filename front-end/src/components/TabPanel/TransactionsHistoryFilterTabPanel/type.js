@@ -2,6 +2,8 @@ import React from "react";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import {
   transactionTypeBuy,
   transactionTypeSell,
@@ -48,7 +50,7 @@ const styles = (theme) => ({
 });
 
 /**
-  Props: 
+  Props:
   filters={filters}
   handleChangeFilters={handleChangeFilters}
  */
@@ -77,7 +79,7 @@ class TypeFilter extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["classes", "filters"];
+    const compareKeys = ["t", "classes", "filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
@@ -88,14 +90,14 @@ class TypeFilter extends React.Component {
   }
 
   render() {
-    const { classes, filters } = this.props;
+    const { t, classes, filters } = this.props;
 
     const { open } = this.state;
 
     return (
       <React.Fragment>
         <Button className={classes.disableButton} disableRipple>
-          Type
+          {t("general.type")}
         </Button>
         <Select
           open={open}
@@ -112,10 +114,10 @@ class TypeFilter extends React.Component {
             <em>None</em>
           </MenuItem>
           <MenuItem value={transactionTypeBuy} className={classes.menuItem}>
-            Buy_Spend
+            {t("general." + transactionTypeBuy)}
           </MenuItem>
           <MenuItem value={transactionTypeSell} className={classes.menuItem}>
-            Sell_Gain
+            {t("general." + transactionTypeSell)}
           </MenuItem>
         </Select>
       </React.Fragment>
@@ -123,4 +125,4 @@ class TypeFilter extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(TypeFilter));
+export default withTranslation()(withStyles(styles)(withRouter(TypeFilter)));

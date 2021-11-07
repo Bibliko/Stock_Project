@@ -1,6 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 
+import { withTranslation } from "react-i18next";
+
 import {
   numberWithCommas,
   roundNumber,
@@ -81,7 +83,7 @@ const StyledTableRow = withStyles((theme) => ({
 
 class MyStatsTable extends React.Component {
   getChangeTrend = (type) => {
-    if (type === "Change from previous week:")
+    if (type === "Change from previous week")
       return this.props.changeFromPreviousWeek >= 0 ? "Up" : "Down";
   };
 
@@ -96,25 +98,25 @@ class MyStatsTable extends React.Component {
     } = this.props;
 
     switch (type) {
-      case "Overall ranking:":
+      case "Overall ranking":
         return `${numberWithCommas(overallRank)}`;
 
-      case "Region ranking:":
+      case "Region ranking":
         return `${numberWithCommas(regionRank)}`;
 
-      case "Portfolio value:":
+      case "Portfolio value":
         return `$${numberWithCommas(portfolioValue)}`;
 
-      case "Change from previous week:":
+      case "Change from previous week":
         if (changeFromPreviousWeek < 0) {
           return `-$${numberWithCommas(roundNumber(Math.abs(changeFromPreviousWeek), 2))}`;
         }
         return `$${numberWithCommas(changeFromPreviousWeek)}`;
 
-      case "Portfolio high:":
+      case "Portfolio high":
         return `$${numberWithCommas(portfolioHigh)}`;
 
-      case "Portfolio low:":
+      case "Portfolio low":
         return `$${numberWithCommas(portfolioLow)}`;
 
       default:
@@ -123,7 +125,7 @@ class MyStatsTable extends React.Component {
   };
 
   getTableRow = (label) => {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const changeTrend = this.getChangeTrend(label);
 
     return (
@@ -132,7 +134,7 @@ class MyStatsTable extends React.Component {
           align="left"
           className={clsx(classes.tableCell, classes.content)}
         >
-          {label}
+          {t("table." + label) + ":"}
         </TableCell>
 
         <TableCell
@@ -157,7 +159,7 @@ class MyStatsTable extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     return (
       <TableContainer className={classes.tableContainer}>
@@ -166,19 +168,19 @@ class MyStatsTable extends React.Component {
             <TableRow className={classes.head}>
               <TableCell align="left" className={classes.tableCell}>
                 <Typography className={classes.headtitle}>
-                  {"My Stats"}
+                  {t("table.myStats")}
                 </Typography>
               </TableCell>
               {<TableCell align="left" className={classes.tableCell} />}
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.getTableRow("Overall ranking:")}
-            {this.getTableRow("Region ranking:")}
-            {this.getTableRow("Portfolio value:")}
-            {this.getTableRow("Change from previous week:")}
-            {this.getTableRow("Portfolio high:")}
-            {this.getTableRow("Portfolio low:")}
+            {this.getTableRow("Overall ranking")}
+            {this.getTableRow("Region ranking")}
+            {this.getTableRow("Portfolio value")}
+            {this.getTableRow("Change from previous week")}
+            {this.getTableRow("Portfolio high")}
+            {this.getTableRow("Portfolio low")}
           </TableBody>
         </Table>
       </TableContainer>
@@ -186,4 +188,4 @@ class MyStatsTable extends React.Component {
   }
 }
 
-export default withStyles(styles)(MyStatsTable);
+export default withTranslation()(withStyles(styles)(MyStatsTable));

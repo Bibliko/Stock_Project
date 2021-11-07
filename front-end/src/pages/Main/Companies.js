@@ -3,6 +3,9 @@ import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { orderAction } from "../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
+
 import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
 import { getAllCompaniesRating } from "../../utils/CompanyUtil";
 import { ratingValue } from "../../utils/low-dependency/FmpHelper";
@@ -20,7 +23,6 @@ import ProgressButton from "../../components/Button/ProgressButton";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
@@ -248,7 +250,7 @@ class Companies extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const {
       openDialog,
       companyCode,
@@ -281,7 +283,7 @@ class Companies extends React.Component {
               loading={loading}
               handleClick={this.handleReload}
             >
-              Reload
+              {t("general.reload")}
             </ProgressButton>
             <Filter
               price={price}
@@ -295,7 +297,7 @@ class Companies extends React.Component {
           </Grid>
           <Grid item xs={12} sm={8}>
             <Typography className={classes.gridTitle} component="div">
-              Companies
+              {t("general.companies")}
             </Typography>
 
             <CompaniesListTable
@@ -308,8 +310,7 @@ class Companies extends React.Component {
             />
 
             <Typography className={classes.caption}>
-              {`Showing ${stockData.length} result` +
-                (stockData.length > 1 ? "s" : "")}
+              {`${t("table.showing")} ${stockData.length} ${t("table.result")}`}
             </Typography>
           </Grid>
         </Grid>
@@ -336,4 +337,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Companies)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Companies))
+  )
+);

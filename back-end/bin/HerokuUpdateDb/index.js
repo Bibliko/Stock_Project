@@ -37,10 +37,10 @@ const addMigrations = () =>
     fs.readdir("./prisma/migrations")
       .then((entries) => {
         const entryPromiseList = entries.map((entry) => {
-          // entry can be migrate.lock or name of directory
-          if (entry === "migrate.lock") {
-            const file = fs.readFileSync("./prisma/migrations/migrate.lock");
-            return migrationsFolder.child("migrate.lock").put(file);
+          // entry can be migration_lock.toml or name of directory
+          if (entry === "migration_lock.toml") {
+            const file = fs.readFileSync("./prisma/migrations/migration_lock.toml");
+            return migrationsFolder.child("migration_lock.toml").put(file);
           } else {
             fs.readdir(`./prisma/migrations/${entry}`, (err, files) => {
               if (err) {
@@ -125,7 +125,7 @@ const putFirebaseToLocal = () =>
     migrationsFolder
       .list()
       .then((entryList) => {
-        takeFirebaseFile(migrationsFolder, "migrate.lock")
+        takeFirebaseFile(migrationsFolder, "migration_lock.toml")
           .then((file) => {
             if (!file) {
               console.log("No migrations yet");
@@ -134,40 +134,21 @@ const putFirebaseToLocal = () =>
 
             const migrateLockPromise = fsWriteFilePrismaMigrations(
               file,
-              "migrate.lock"
+              "migration_lock.toml"
             );
 
             const prefixPromiseList = entryList.prefixes.map((entry) => {
-              const READMEPromise = takeFirebaseFile(entry, "README.md");
-              const schemaPromise = takeFirebaseFile(entry, "schema.prisma");
-              const stepsPromise = takeFirebaseFile(entry, "steps.json");
-
               // path_ in firebase: system/migrations/...
               const migrationName = entry.location.path_.substring(18);
 
-              return Promise.all([
-                READMEPromise,
-                schemaPromise,
-                stepsPromise
-              ]).then(([README, schema, steps]) => {
-                return Promise.all([
-                  fsWriteFilePrismaMigrations(
-                    README,
-                    "README.md",
+              return takeFirebaseFile(entry, "migration.sql")
+                .then((migrationSQL) => {
+                  return fsWriteFilePrismaMigrations(
+                    migrationSQL,
+                    "migration.sql",
                     migrationName
-                  ),
-                  fsWriteFilePrismaMigrations(
-                    schema,
-                    "schema.prisma",
-                    migrationName
-                  ),
-                  fsWriteFilePrismaMigrations(
-                    steps,
-                    "steps.json",
-                    migrationName
-                  )
-                ]);
-              });
+                  );
+                });
             });
 
             Promise.all([migrateLockPromise, Promise.all(prefixPromiseList)])
@@ -209,7 +190,7 @@ const main = () => {
     .finally(() => {
       if (localSchema !== firebaseSchema) {
         putFirebaseToLocal().then((done) => {
-          exec('echo "init" | npm run update-db', (error, stdout, stderr) => {
+          exec('echo "init" | npm run update-db-production', (error, stdout, stderr) => {
             if (error) {
               console.log(`error: ${error.message}`);
               return;

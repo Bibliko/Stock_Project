@@ -1,3 +1,4 @@
+const pathToRegexp = require("path-to-regexp");
 const ip = require("ip");
 const myIPAddress = ip.address();
 
@@ -22,7 +23,20 @@ const getPassportCallbackHost = () => {
   }
 };
 
+const excludeFromCors = (paths, fn) => {
+  return (req, res, next) => {
+    for (let i = 0; i < paths.length; i++) {
+      const regexp = pathToRegexp(paths[i]);
+      if (regexp.test(req.path)) {
+        return next();
+      }
+    }
+    return fn(req, res, next);
+  };
+};
+
 module.exports = {
   getFrontendHost,
-  getPassportCallbackHost
+  getPassportCallbackHost,
+  excludeFromCors
 };
