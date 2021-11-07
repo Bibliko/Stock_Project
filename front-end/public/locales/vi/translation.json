@@ -157,7 +157,8 @@
     "holdings": "Các cổ phiếu đang nắm giữ",
     "summary": "Tóm tắt",
     "portfolioChart": "Biểu đồ danh mục đầu tư",
-    "portfolioNow": "Tổng giá trị các danh mục đầu tư hiện tại"
+    "portfolioNow": "Tổng giá trị các danh mục đầu tư hiện tại",
+    "sharesSmall": "Cổ phiếu"
   },
   "placeOrder": {
     "details": "Chi tiết giao dịch",

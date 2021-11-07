@@ -157,7 +157,8 @@
     "holdings": "Holdings",
     "summary": "Summary",
     "portfolioChart": "Portfolio Chart",
-    "portfolioNow": "Current Portfolio"
+    "portfolioNow": "Current Portfolio",
+    "sharesSmall": "Shares"
   },
   "placeOrder": {
     "details": "Order's details",

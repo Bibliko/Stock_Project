@@ -48,6 +48,9 @@ const styles = (theme) => ({
   cashLabel: {
     transform: "translateY(19px)",
   },
+  cashLabelVi: {
+    transform: "translateX(6px) translateY(19px)",
+  },
   sharesLabel: {
     transform: "translateX(7px) translateY(43px)",
   },
@@ -72,6 +75,7 @@ class DonutChart extends React.Component {
   render() {
     const {
       t,
+      i18n,
       classes,
       scale,
       progress,
@@ -87,7 +91,7 @@ class DonutChart extends React.Component {
         className={classes.radialChart}
       >
         <CustomTooltip
-          title={t("general.shares") + `: ${100 - progress}%`}
+          title={t("account.sharesSmall") + `: ${100 - progress}%`}
           aria-label="Shares"
           placement="top"
           leaveDelay={200}
@@ -161,7 +165,10 @@ class DonutChart extends React.Component {
             x={"50%"}
             y={"43%"}
             fill={TEXT_COLOR}
-            className={clsx(classes.label, classes.cashLabel)}
+            className={clsx(
+              classes.label,
+              i18n.language === "vi" ? classes.cashLabelVi : classes.cashLabel
+            )}
           >
             {t("general.cash")}
           </text>
@@ -171,7 +178,7 @@ class DonutChart extends React.Component {
             fill={TEXT_COLOR}
             className={clsx(classes.label, classes.sharesLabel)}
           >
-            {t("general.shares")}
+            {t("account.sharesSmall")}
           </text>
         </g>
       </svg>
