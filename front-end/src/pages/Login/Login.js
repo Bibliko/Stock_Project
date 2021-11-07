@@ -256,7 +256,7 @@ class Login extends React.Component {
             this.props.mutateUser(user.data);
           })
           .catch((err) => {
-            this.setState({ error: this.props.t("login." + err) });
+            this.setState({ error: this.props.t("login." + err, err) });
           });
       }
     }

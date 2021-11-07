@@ -247,7 +247,7 @@ class ForgotPassword extends React.Component {
         })
         .catch((err) => {
           this.setState({
-            error: err,
+            error: this.props.t("login." + err, err),
           });
         });
     }
@@ -266,7 +266,7 @@ class ForgotPassword extends React.Component {
           this.setState({ success: this.props.t("login.successfullyChanged") });
         })
         .catch((err) => {
-          this.setState({ error: err });
+          this.setState({ error: this.props.t("login." + err, err) });
         });
     }
   };
