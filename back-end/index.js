@@ -292,6 +292,7 @@ app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 app.use("/companyRating", require("./routes/companyRating"));
 app.use("/transaction", require("./routes/transaction"));
+app.use("/fmp", require("./routes/financialModelingPrep"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];

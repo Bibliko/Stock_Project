@@ -333,6 +333,94 @@ const getMostGainersFromFMP = () => {
   });
 };
 
+/**
+ * @description Search stocks from FMP
+ * @param {String} searchQuery phrase to search for
+ * @param {Number} limit results limit
+ * @param {String} exchange the exchange to search in
+ */
+const searchTickers = (searchQuery, limit, exchange) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/search?query=${searchQuery.toUpperCase()}&limit=${limit}&exchange=${exchange}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((tickers) => {
+        return tickers.json();
+      })
+      .then((tickersJSON) => resolve(tickersJSON))
+      .catch((err) => reject(err));
+  });
+};
+
+/**
+ * @description Get stock news from FMP
+ * @param {String} companyCode company code needed
+ * @param {Number} limit how many news do you need?
+ */
+const getStockNews = (companyCode, limit) => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/stock_news?tickers=${companyCode}&limit=${limit}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((news) => {
+        return news.json();
+      })
+      .then((newsJSON) => resolve(newsJSON))
+      .catch((err) => reject(err));
+  });
+};
+
+/**
+ * @description Get most active stocks from FMP
+ */
+const getMostActiveStocks = () => {
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/actives?apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stocks) => {
+        return stocks.json();
+      })
+      .then((stocksJSON) => resolve(stocksJSON))
+      .catch((err) => reject(err));
+  });
+};
+
+/**
+ * @description Get stock screener from FMP
+ * @important Huge response (few MBs) => Cache for later requests
+ */
+const getFullStockScreener = () => {
+  // MarketCap < 1000 => Dead stocks
+  const minimumMarketCap = 1000;
+
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${minimumMarketCap}&exchange=${"NYSE,NASDAQ"}&apikey=${FINANCIAL_MODELING_PREP_API_KEY}`
+    )
+      .then((stockScreener) => {
+        return stockScreener.json();
+      })
+      .then((stockScreenerJSON) => {
+        resolve(
+          stockScreenerJSON.map(({
+            companyName, symbol, price, marketCap, industry, sector
+          }) => {
+            return {
+              name: companyName,
+              code: symbol,
+              price,
+              marketCap,
+              industry,
+              sector
+            };
+          })
+        );
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 module.exports = {
   updateMarketHolidaysFromFMP,
 
@@ -345,5 +433,10 @@ module.exports = {
 
   getHistoricalChartFromFMP,
 
-  getMostGainersFromFMP
+  getMostGainersFromFMP,
+
+  searchTickers,
+  getStockNews,
+  getMostActiveStocks,
+  getFullStockScreener
 };

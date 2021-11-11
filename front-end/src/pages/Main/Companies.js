@@ -6,7 +6,10 @@ import { orderAction } from "../../redux/storeActions/actions";
 
 import { withTranslation } from "react-i18next";
 
-import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
+import {
+  getStockScreener,
+  filterStockScreener,
+} from "../../utils/FinancialModelingPrepUtil";
 import { getAllCompaniesRating } from "../../utils/CompanyUtil";
 import { ratingValue } from "../../utils/low-dependency/FmpHelper";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
@@ -204,12 +207,15 @@ class Companies extends React.Component {
     const { price, marketCap, sector, industry } = this.state;
     let { stockRatings } = this.state;
 
-    getStockScreener({
-      priceFilter: price,
-      marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
-      sectorFilter: sector,
-      industryFilter: industry,
-    })
+    getStockScreener()
+      .then((stockData) => {
+        return filterStockScreener(stockData, {
+          priceFilter: price,
+          marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
+          sectorFilter: sector,
+          industryFilter: industry,
+        });
+      })
       .then((stockData) => {
         // fetch ratingData on mount
         if (!stockRatings)
