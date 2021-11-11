@@ -143,7 +143,8 @@
   },
   "watchlist": {
     "remove": "Xoá khỏi danh sách theo dõi",
-    "add": "Thêm vào danh sách theo dõi"
+    "add": "Thêm vào danh sách theo dõi",
+    "goto": "Đến"
   },
   "ranking": {
     "rank": "Hạng",

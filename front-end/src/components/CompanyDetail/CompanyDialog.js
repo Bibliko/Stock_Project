@@ -2,11 +2,16 @@ import React from "react";
 import { withRouter } from "react-router";
 import { isEqual } from "lodash";
 import PropTypes from "prop-types";
+import { socket } from "../../App";
+
+import { connect } from "react-redux";
+import { userAction } from "../../redux/storeActions/actions";
 
 import { withTranslation } from "react-i18next";
 
 import { getFullStockInfo } from "../../utils/RedisUtil";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
+import { changeUserData } from "../../utils/UserUtil";
 
 import SwipeableViews from "react-swipeable-views";
 import { withStyles } from "@material-ui/core/styles";
@@ -57,6 +62,11 @@ const styles = (theme) => ({
     fontSize: "x-large",
     fontWeight: "bold",
     color: "white",
+  },
+  tradeButton: {
+    marginRight: "7px",
+    color: theme.palette.secondary.mainHover,
+    textDecoration: "underline",
   },
 });
 
@@ -130,6 +140,40 @@ class CompanyDialog extends React.Component {
       });
   };
 
+  mutateWatchlist = (newWatchlist) => {
+    const { email } = this.props.userSession;
+
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket)
+      .catch(
+        (err) => {
+          console.log(err);
+        }
+      );
+  };
+
+  addToWatchlist = () => {
+    const { companyCode } = this.props;
+    let { watchlist: newWatchlist } = this.props.userSession;
+
+    newWatchlist.push(companyCode);
+    this.mutateWatchlist(newWatchlist);
+  };
+
+  removeFromWatchlist = () => {
+    const { companyCode } = this.props;
+    let { watchlist: newWatchlist } = this.props.userSession;
+
+    newWatchlist = newWatchlist.filter(
+      (companyCodeString) => companyCodeString !== companyCode
+    );
+    this.mutateWatchlist(newWatchlist);
+  };
+
   componentDidMount() {
     this.updateCompanyData();
   }
@@ -153,6 +197,7 @@ class CompanyDialog extends React.Component {
     const {
       t,
       classes,
+      userSession,
       handleAction,
       handleClose,
       open,
@@ -223,8 +268,26 @@ class CompanyDialog extends React.Component {
           </DialogContent>
 
           <DialogActions className={classes.dialogAction}>
-            <Button onClick={handleAction} color="primary">
+            <Button
+              onClick={handleAction}
+              className={classes.tradeButton}
+            >
               {t("company.buySell")}
+            </Button>
+
+            <Button
+              aria-label="add/remove watchlist button"
+              color="primary"
+              onClick={
+                userSession.watchlist.includes(companyCode)
+                  ? this.removeFromWatchlist
+                  : this.addToWatchlist
+              }
+            >
+              {userSession.watchlist.includes(companyCode) &&
+                t("watchlist.remove")}
+              {!userSession.watchlist.includes(companyCode) &&
+                t("watchlist.add")}
             </Button>
           </DialogActions>
         </Dialog>
@@ -233,4 +296,19 @@ class CompanyDialog extends React.Component {
   }
 }
 
-export default withTranslation()(withStyles(styles)(withRouter(CompanyDialog)));
+const mapStateToProps = (state) => ({
+  userSession: state.userSession,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(CompanyDialog))
+  )
+);

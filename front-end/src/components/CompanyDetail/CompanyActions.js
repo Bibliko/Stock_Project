@@ -64,41 +64,38 @@ class CompanyActionsPaper extends React.Component {
     redirectToPage('/placeOrder', this.props)
   };
 
-  addToWatchlist = () => {
-    const { companyCode } = this.props;
-    let { email, watchlist: newWatchlist } = this.props.userSession;
+  mutateWatchlist = (newWatchlist) => {
+    const { email } = this.props.userSession;
 
-    newWatchlist.push(companyCode);
     const dataNeedChange = {
       watchlist: {
         set: newWatchlist,
       },
     };
-    changeUserData(dataNeedChange, email, this.props.mutateUser, socket).catch(
-      (err) => {
-        console.log(err);
-      }
-    );
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket)
+      .catch(
+        (err) => {
+          console.log(err);
+        }
+      );
+  };
+
+  addToWatchlist = () => {
+    const { companyCode } = this.props;
+    let { watchlist: newWatchlist } = this.props.userSession;
+
+    newWatchlist.push(companyCode);
+    this.mutateWatchlist(newWatchlist);
   };
 
   removeFromWatchlist = () => {
     const { companyCode } = this.props;
-    let { email, watchlist: newWatchlist } = this.props.userSession;
+    let { watchlist: newWatchlist } = this.props.userSession;
 
     newWatchlist = newWatchlist.filter(
       (companyCodeString) => companyCodeString !== companyCode
     );
-
-    const dataNeedChange = {
-      watchlist: {
-        set: newWatchlist,
-      },
-    };
-    changeUserData(dataNeedChange, email, this.props.mutateUser, socket).catch(
-      (err) => {
-        console.log(err);
-      }
-    );
+    this.mutateWatchlist(newWatchlist);
   };
 
   render() {
