@@ -143,7 +143,8 @@
   },
   "watchlist": {
     "remove": "Remove from watchlist",
-    "add": "Add to watchlist"
+    "add": "Add to watchlist",
+    "goto": "Go to"
   },
   "ranking": {
     "rank": "Rank",
@@ -242,8 +243,14 @@
     "missingFields": "Missing some fields",
     "missingField": "Missing field.",
     "invalidEmail": "Invalid email",
+    "Incorrect email.": "Incorrect email.",
+    "Incorrect password.": "Incorrect password.",
+    "User with this email already exists.": "User with this email already exists.",
+    "Processing (Can take a while). Check your inboxes... and spams.": "Processing (Can take a while). Check your inboxes... and spams.",
+    "Your verification code does not match.": "Your verification code does not match.",
     "verificationSent": "Password Verification Code has been sent",
     "successfullyChanged": "Successfully changed password",
+    "Your email or credentials may be wrong": "Your email or credentials may be wrong",
     "pleaseEnterInfo": "Please enter your email and we’ll send you a code.",
     "send": "Send",
     "login": "Login",

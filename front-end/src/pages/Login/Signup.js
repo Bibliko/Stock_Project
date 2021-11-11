@@ -179,10 +179,10 @@ class Signup extends React.Component {
           password: this.password,
         })
           .then((res) => {
-            this.setState({ success: res });
+            this.setState({ success: this.props.t("login." + res) });
           })
           .catch((err) => {
-            this.setState({ error: err });
+            this.setState({ error: this.props.t("login." + err, err) });
           });
       }
     }

@@ -108,7 +108,7 @@ class SubNavbar extends React.Component {
           getCachedHistoricalChart("NYSE", "5min"),
           getFullStockInfo(topShare),
           mostActiveStocks,
-          getFullStockInfo("AAPL"),
+          getFullStockInfo("MSFT"),
         ]);
       })
       .then(

@@ -94,7 +94,7 @@ class CompaniesListTable extends React.Component {
             {
               width: 60,
               minWidth: 40,
-              label: t("general.code"),
+              label: t("table.Code"),
               dataKey: "code",
             },
             {

@@ -5,6 +5,7 @@ import { withRouter } from "react-router";
 
 import { withTranslation } from "react-i18next";
 
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import WatchlistTableRow from "./WatchlistTableRow";
@@ -22,7 +23,10 @@ import {
   Paper,
 } from "@material-ui/core";
 
-import { BusinessRounded as BusinessRoundedIcon } from "@material-ui/icons";
+import {
+  BusinessRounded as BusinessRoundedIcon,
+  LaunchRounded as LaunchRoundedIcon
+} from "@material-ui/icons";
 
 import { Alert as MuiAlert } from "@material-ui/lab";
 
@@ -93,6 +97,19 @@ const styles = (theme) => ({
       fontSize: "medium",
     },
     textAlign: "center",
+  },
+  link: {
+    marginTop: "0.5em",
+    cursor: "pointer",
+    color: theme.palette.primary.main,
+    "&:hover": {
+      color: theme.palette.primary.hover,
+      textDecoration: "underline",
+    },
+  },
+  linkIcon: {
+    position: "relative",
+    bottom: "-2px",
   },
   watchlistContainerDiv: {
     width: "100%",
@@ -212,6 +229,15 @@ class WatchlistTableContainer extends React.Component {
             />
             <Typography className={classes.companiesWord}>
               {t("table.startAddingCompanies")}
+            </Typography>
+            <Typography
+              onClick={() => {
+                redirectToPage("companies", this.props);
+              }}
+              className={clsx(classes.companiesWord, classes.link)}
+            >
+              {`${t("watchlist.goto")} ${t("appbar.menu.companies")}`}
+              <LaunchRoundedIcon fontSize="small" className={classes.linkIcon}/>
             </Typography>
           </Paper>
         )}

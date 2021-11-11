@@ -143,7 +143,8 @@
   },
   "watchlist": {
     "remove": "Xoá khỏi danh sách theo dõi",
-    "add": "Thêm vào danh sách theo dõi"
+    "add": "Thêm vào danh sách theo dõi",
+    "goto": "Đến"
   },
   "ranking": {
     "rank": "Hạng",
@@ -194,7 +195,7 @@
     "Brokerage": "Phí môi giới",
     "Trade value": "Giá trị giao dịch",
     "Actions": "Tác vụ",
-    "Code": "Mã công ty",
+    "Code": "Mã",
     "Name": "Tên",
     "Holding": "Các cổ phiếu đang nắm giữ",
     "Buy Price (Avg)": "Giá mua (TB)",
@@ -242,8 +243,14 @@
     "missingFields": "Thiếu thông tin",
     "missingField": "Thiếu thông tin.",
     "invalidEmail": "Email không hợp lệ",
+    "Incorrect email.": "Email không hợp lệ.",
+    "Incorrect password.": "Mật khẩu không hợp lệ.",
+    "User with this email already exists.": "Email này đã được đăng kí.",
+    "Processing (Can take a while). Check your inboxes... and spams.": "Đang xử lí (Có thể phải chờ lâu). Vui lòng kiểm tra hộp thư và spam.",
+    "Your verification code does not match.": "Mã xác thực không hợp lệ.",
     "verificationSent": "Mã xác thực đã được gửi",
     "successfullyChanged": "Đổi mật khẩu thành công",
+    "Your email or credentials may be wrong": "Email hoặc thông tin không đúng",
     "pleaseEnterInfo": "Vui lòng nhập email để nhận mã xác thực.",
     "send": "Gửi",
     "login": "Đăng nhập",
@@ -252,7 +259,7 @@
     "signUp": "Đăng ký",
     "title": "Game chứng khoán Bibliko",
     "description": "Game chứng khoán Bibliko là game chứng khoán miễn phí dành cho giới trẻ. Thông tin của các cổ phiếu được cập nhật theo thị trường thật để người dùng có trải nghiệm thực tế nhất với thị trường chứng khoán trước khi bắt đầu đầu tư.",
-    "getStarted": "Hãy bắt đầu nào",
+    "getStarted": "Hãy bắt đầu ngay",
     "createAccount": "Tạo tài khoản",
     "forgotPassword": "Quên mật khẩu"
   }
