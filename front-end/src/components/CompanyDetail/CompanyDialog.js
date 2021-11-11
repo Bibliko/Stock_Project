@@ -29,6 +29,8 @@ import {
   Typography,
 } from "@material-ui/core";
 
+import { LaunchRounded as LaunchRoundedIcon } from "@material-ui/icons";
+
 import CompanyAbout from "../CompanyDetail/CompanyAbout";
 import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
 
@@ -44,6 +46,9 @@ const styles = (theme) => ({
     cursor: "pointer",
     color: "white",
     backgroundColor: "#000033",
+    "&:hover h2": {
+      opacity: "0.7",
+    },
   },
   dialogContent: {
     color: "white",
@@ -219,6 +224,7 @@ class CompanyDialog extends React.Component {
             onClick={() => {redirectToPage(`/company/${companyCode}`, this.props)}}
           >
             {`${companyData.companyName} (${companyCode.toUpperCase()})`}
+            <LaunchRoundedIcon fontSize="small"/>
           </DialogTitle>
 
           <DialogContent className={classes.dialogContent}>
