@@ -126,10 +126,12 @@ const publicPaths = [
 const sessionOptions = {
   secret: "stock-project",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { maxAge: 86400000 } // 24 hours
 };
 if (NODE_ENV === "production") {
   sessionOptions.store = new RedisStore({ client: redisClient });
+  sessionOptions.cookie.secure = true; // serve secure cookies over https
 };
 
 app.use(excludeFromCors(publicPaths, cors(corsOptions)));
