@@ -11,9 +11,8 @@ import {
 } from "../../utils/low-dependency/PageRedirectUtil";
 
 // TODO: Uncomment this in production
-// import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
-
-// import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
+import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
 import {
   joinUserRoom,
@@ -105,12 +104,12 @@ class Layout extends React.Component {
 
   setupIntervals = () => {
     // TODO: Uncomment this in production
-    // if (this.props.userSession.hasFinishedSettingUp) {
-    //   this.checkStockQuotesInterval = setInterval(
-    //     () => checkStockQuotesToCalculateSharesValue(this),
-    //     30 * oneSecond
-    //   );
-    // }
+    if (this.props.userSession.hasFinishedSettingUp) {
+      this.checkStockQuotesInterval = setInterval(
+        () => checkStockQuotesToCalculateSharesValue(this),
+        30 * oneSecond
+      );
+    }
   };
 
   setupSocketListeners = () => {

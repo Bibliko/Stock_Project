@@ -39,10 +39,11 @@ const {
   SequentialPromisesWithResultsArray
 } = require("./utils/low-dependency/PromisesUtil");
 
-// const {
-//   updateCachedShareQuotesUsingCache,
-//   updateCachedShareProfilesUsingCache
-// } = require("./utils/redis-utils/SharesInfoBank");
+// TODO: Uncomment this in production
+const {
+  updateCachedShareQuotesUsingCache,
+  updateCachedShareProfilesUsingCache
+} = require("./utils/redis-utils/SharesInfoBank");
 
 const {
   updateCompaniesRatingsList
@@ -203,27 +204,28 @@ const setupBackendIntervals = () => {
   );
   setInterval(deletePrismaMarketHolidays, oneDay);
 
-  // // Update Cached Shares
+  // TODO: Uncomment this in production
+  // Update Cached Shares
 
-  // setInterval(() => {
-  //   if(
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
-  //     updateCachedShareQuotesUsingCache()
-  //     .catch(err => console.log(err));
-  //   }
-  // }, 2 * oneSecond);
+  setInterval(() => {
+    if(
+      globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+      !globalBackendVariables.isMarketClosed
+    ) {
+      updateCachedShareQuotesUsingCache()
+      .catch(err => console.log(err));
+    }
+  }, 10 * oneSecond);
 
-  // setInterval(() => {
-  //   if(
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
-  //     updateCachedShareProfilesUsingCache()
-  //     .catch(err => console.log(err));
-  //   }
-  // }, oneMinute);
+  setInterval(() => {
+    if(
+      globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+      !globalBackendVariables.isMarketClosed
+    ) {
+      updateCachedShareProfilesUsingCache()
+      .catch(err => console.log(err));
+    }
+  }, oneMinute);
 
   setInterval(() => updateMostGainersDaily(globalBackendVariables), oneSecond);
 
@@ -252,19 +254,19 @@ const setupBackendIntervals = () => {
     oneHour * 1.5
   );
 
-  // TODO: Uncomment in production
-  // setInterval(
-  //   () => {
-  //     if (
-  //       globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //       !globalBackendVariables.isMarketClosed
-  //     ) {
-  //       emptyPendingTransactionsListAllCompanies()
-  //         .catch((err) => console.log(err));
-  //     }
-  //   },
-  //   5 * oneMinute
-  // );
+  // TODO: Uncomment this in production
+  setInterval(
+    () => {
+      if (
+        globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+        !globalBackendVariables.isMarketClosed
+      ) {
+        emptyPendingTransactionsListAllCompanies()
+          .catch((err) => console.log(err));
+      }
+    },
+    5 * oneMinute
+  );
 };
 
 setupBackendIntervals();
