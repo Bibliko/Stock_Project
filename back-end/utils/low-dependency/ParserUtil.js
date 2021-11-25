@@ -298,8 +298,8 @@ const parseRedisTransactionsHistoryFilters = (redisValue) => {
  */
 const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
   return {
-    ...stockQuoteJSON,
-    ...stockProfileJSON
+    ...stockProfileJSON,
+    ...stockQuoteJSON
   };
 };
 

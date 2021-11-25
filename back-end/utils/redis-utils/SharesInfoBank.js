@@ -244,7 +244,7 @@ const updateCachedShareProfiles = (shareSymbols) => {
     const chunks50Symbols = chunk(shareSymbols, 50);
     const tasksList = [];
 
-    const getStockProfilesFromFMPPromises = chunks50Symbols.map(
+    chunks50Symbols.forEach(
       (chunkSymbols) => {
         const symbolsString = createSymbolsStringFromCachedSharesList(
           chunkSymbols
@@ -253,7 +253,7 @@ const updateCachedShareProfiles = (shareSymbols) => {
       }
     );
 
-    SequentialPromisesWithResultsArray(getStockProfilesFromFMPPromises)
+    SequentialPromisesWithResultsArray(tasksList)
       .then((stockProfilesJSONArray) => {
         if (stockProfilesJSONArray) {
           // stockQuotesJSONArray: [ [first 50 chunk], [second 50 chunk], ... ]
