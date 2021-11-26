@@ -111,7 +111,7 @@ class MyStatsTable extends React.Component {
         if (changeFromPreviousWeek < 0) {
           return `- $${numberWithCommas(roundNumber(Math.abs(changeFromPreviousWeek), 2))}`;
         }
-        return `$${numberWithCommas(roundNumber(roundchangeFromPreviousWeek, 2))}`;
+        return `$${numberWithCommas(roundNumber(changeFromPreviousWeek, 2))}`;
 
       case "Portfolio high":
         return `$${numberWithCommas(roundNumber(portfolioHigh, 2))}`;

@@ -15,6 +15,7 @@ import {
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -79,6 +80,13 @@ const styles = (theme) => ({
   stickyCell: {
     position: "sticky",
     left: 0,
+  },
+  codeCell: {
+    cursor: "pointer",
+    "&:hover": {
+      textDecoration: "underline",
+      color: theme.palette.secondary.main,
+    },
   },
   holdingsTableItem: {
     fontSize: "medium",
@@ -180,7 +188,13 @@ class HoldingsTableRow extends React.Component {
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
           [classes.stickyCell]: type === "Code" && !this.props.minimal,
+          [classes.codeCell]: type === "Code",
         })}
+        onClick={
+          type === "Code"
+          ? () => redirectToPage(`company/${this.props.rowData.code}`, this.props)
+          : undefined
+        }
       >
         <div
           className={clsx(classes.cellDiv, {
