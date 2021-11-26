@@ -2,8 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { isEqual } from "lodash";
+import { withRouter } from "react-router";
 
 import { getCachedMostGainers } from "../../../utils/RedisUtil";
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 
 import MostGainersCard from "../../Card/MostGainers";
 
@@ -89,7 +91,13 @@ class MostGainers extends React.Component {
         <Paper className={classes.paper}>
           <MenuList className={classes.menuList}>
             {gainers.slice(0, 10).map((gainer, index) => (
-              <MenuItem key={index} className={classes.menuItem}>
+              <MenuItem
+                key={index}
+                className={classes.menuItem}
+                onClick={() => {
+                  redirectToPage(`/company/${gainer.ticker}`, this.props);
+                }}
+              >
                 <MostGainersCard gainer={gainer} />
               </MenuItem>
             ))}
@@ -105,4 +113,4 @@ MostGainers.propTypes = {
   title: PropTypes.string,
 };
 
-export default withStyles(styles)(MostGainers);
+export default withStyles(styles)(withRouter(MostGainers));
