@@ -105,19 +105,19 @@ class MyStatsTable extends React.Component {
         return `${numberWithCommas(regionRank)}`;
 
       case "Portfolio value":
-        return `$${numberWithCommas(portfolioValue)}`;
+        return `$${numberWithCommas(roundNumber(portfolioValue, 2))}`;
 
       case "Change from previous week":
         if (changeFromPreviousWeek < 0) {
-          return `-$${numberWithCommas(roundNumber(Math.abs(changeFromPreviousWeek), 2))}`;
+          return `- $${numberWithCommas(roundNumber(Math.abs(changeFromPreviousWeek), 2))}`;
         }
-        return `$${numberWithCommas(changeFromPreviousWeek)}`;
+        return `$${numberWithCommas(roundNumber(roundchangeFromPreviousWeek, 2))}`;
 
       case "Portfolio high":
-        return `$${numberWithCommas(portfolioHigh)}`;
+        return `$${numberWithCommas(roundNumber(portfolioHigh, 2))}`;
 
       case "Portfolio low":
-        return `$${numberWithCommas(portfolioLow)}`;
+        return `$${numberWithCommas(roundNumber(portfolioLow, 2))}`;
 
       default:
         return;

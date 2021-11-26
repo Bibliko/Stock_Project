@@ -155,8 +155,8 @@ class HoldingsTableRow extends React.Component {
         return `$${numberWithCommas(this.state.lastPrice)}`;
 
       case "Profit/Loss":
-        if ((this.state.profitOrLoss, 10 < 0)) {
-          return `-$${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
+        if (this.state.profitOrLoss < 0) {
+          return `- $${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
         }
         return `$${numberWithCommas(this.state.profitOrLoss)}`;
 

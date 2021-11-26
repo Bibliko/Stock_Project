@@ -5,6 +5,8 @@ import clsx from "clsx";
 
 import { withTranslation } from "react-i18next";
 
+import { roundNumber } from "../../utils/low-dependency/NumberUtil";
+
 import Tooltip from "@material-ui/core/Tooltip";
 import themeObj from "../../theme/themeObj";
 
@@ -91,7 +93,7 @@ class DonutChart extends React.Component {
         className={classes.radialChart}
       >
         <CustomTooltip
-          title={t("account.sharesSmall") + `: ${100 - progress}%`}
+          title={t("account.sharesSmall") + `: ${roundNumber(100 - progress, 2)}%`}
           aria-label="Shares"
           placement="top"
           leaveDelay={200}
