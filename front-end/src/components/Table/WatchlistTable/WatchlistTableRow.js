@@ -270,6 +270,11 @@ class WatchlistTableRow extends React.Component {
     }
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.companyCode !== prevProps.companyCode)
+      this.setStateShareInfo();
+  }
+
   componentDidMount() {
     this.setupAndUpdateWatchlistComponent();
   }
