@@ -93,7 +93,7 @@ class SummaryTableContainer extends React.Component {
 
       case "Daily Change":
         if (this.props.userDailyChange < 0) {
-          return `-$${numberWithCommas(Math.abs(this.props.userDailyChange))}`;
+          return `- $${numberWithCommas(Math.abs(this.props.userDailyChange))}`;
         }
         return `$${numberWithCommas(this.props.userDailyChange)}`;
 

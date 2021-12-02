@@ -94,7 +94,6 @@ export const marketCountdownUpdate = (thisComponent) => {
   }
 
   var timeNow = newDate();
-  //console.log(timeNow);
 
   var UTCHours = getHoursUTCString(timeNow);
   var UTCMinutes = getMinutesUTCString(timeNow);

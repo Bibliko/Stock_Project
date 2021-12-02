@@ -8,13 +8,14 @@ import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
 // TODO: Uncomment this in production
-// import { getFullStockInfo } from "../../../utils/RedisUtil";
+import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import {
   numberWithCommas,
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -79,6 +80,13 @@ const styles = (theme) => ({
   stickyCell: {
     position: "sticky",
     left: 0,
+  },
+  codeCell: {
+    cursor: "pointer",
+    "&:hover": {
+      textDecoration: "underline",
+      color: theme.palette.secondary.main,
+    },
   },
   holdingsTableItem: {
     fontSize: "medium",
@@ -155,8 +163,8 @@ class HoldingsTableRow extends React.Component {
         return `$${numberWithCommas(this.state.lastPrice)}`;
 
       case "Profit/Loss":
-        if ((this.state.profitOrLoss, 10 < 0)) {
-          return `-$${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
+        if (this.state.profitOrLoss < 0) {
+          return `- $${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
         }
         return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
@@ -180,7 +188,13 @@ class HoldingsTableRow extends React.Component {
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
           [classes.stickyCell]: type === "Code" && !this.props.minimal,
+          [classes.codeCell]: type === "Code",
         })}
+        onClick={
+          type === "Code"
+          ? () => redirectToPage(`company/${this.props.rowData.code}`, this.props)
+          : undefined
+        }
       >
         <div
           className={clsx(classes.cellDiv, {
@@ -331,16 +345,15 @@ class HoldingsTableRow extends React.Component {
 
   updateHoldingInformation = () => {
     // TODO: Uncomment this in production
-    // const { code, holding, buyPriceAvg } = this.props.rowData;
-    // getFullStockInfo(code)
-    //   .then((fullStockInfo) => {
-    //     console.log(fullStockInfo);
-    //     const { price } = fullStockInfo;
-    //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    const { code, holding, buyPriceAvg } = this.props.rowData;
+    getFullStockInfo(code)
+      .then((fullStockInfo) => {
+        const { price } = fullStockInfo;
+        this.setStateHoldingInformation(price, buyPriceAvg, holding);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   componentDidMount() {

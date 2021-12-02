@@ -198,7 +198,7 @@ class AccountSummary extends React.Component {
       totalPortfolio,
       totalPortfolioLastClosure,
     } = this.props.userSession;
-    const dailyChange = totalPortfolio - totalPortfolioLastClosure;
+    const dailyChange = roundNumber(totalPortfolio - totalPortfolioLastClosure, 2);
 
     return (
       <Grid
@@ -237,7 +237,10 @@ class AccountSummary extends React.Component {
               [classes.dailyChangeRed]: dailyChange < 0,
             })}
           >
-            {t("account.dailyChange") + ` $${dailyChange}`}
+            {
+              t("account.dailyChange") +
+              ` ${dailyChange < 0 ? "- $" : "$"}${Math.abs(dailyChange)}`
+            }
           </Typography>
         </Grid>
 

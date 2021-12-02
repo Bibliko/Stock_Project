@@ -15,7 +15,12 @@ const googleStrategy = new GoogleStrategy(
     callbackURL: `${PASSPORT_CALLBACK_HOST}/auth/google/callback`
   },
   function (token, tokenSecret, profile, done) {
-    const { name, picture, email } = profile._json;
+    const {
+      given_name: firstName,
+      family_name: lastName,
+      picture,
+      email
+    } = profile._json;
 
     prisma.user
       .findUnique({
@@ -30,7 +35,8 @@ const googleStrategy = new GoogleStrategy(
         } else {
           return prisma.user.create({
             data: {
-              name,
+              firstName,
+              lastName,
               email,
               password: "",
               avatarUrl: picture

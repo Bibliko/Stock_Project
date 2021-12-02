@@ -12,10 +12,10 @@ import {
   simplifyNumber,
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
-// TODO: Uncomment this in production
-// import { getFullStockInfo } from "../../../utils/RedisUtil";
+import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import { changeUserData } from "../../../utils/UserUtil";
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import { TableRow, TableCell, Typography } from "@material-ui/core";
@@ -74,6 +74,11 @@ const styles = (theme) => ({
   stickyCell: {
     position: "sticky",
     left: 0,
+    cursor: "pointer",
+    "&:hover": {
+      textDecoration: "underline",
+      color: theme.palette.secondary.main,
+    },
   },
   watchlistRowItem: {
     fontSize: "medium",
@@ -127,6 +132,11 @@ class WatchlistTableRow extends React.Component {
           [classes.lastRow]: this.isTableRowTheLast(),
           [classes.stickyCell]: type === "Code",
         })}
+        onClick={
+          type === "Code"
+          ? () => redirectToPage(`company/${this.props.companyCode}`, this.props)
+          : undefined
+        }
       >
         <div
           className={clsx(classes.cellDiv, {
@@ -232,15 +242,15 @@ class WatchlistTableRow extends React.Component {
 
   setStateShareInfo = () => {
     // TODO: Uncomment this in production
-    // const { companyCode } = this.props;
-    // getFullStockInfo(companyCode)
-    //   .then((fullStockInfo) => {
-    //     console.log(fullStockInfo);
-    //     this.setStateStockQuote(fullStockInfo);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    const { companyCode } = this.props;
+    getFullStockInfo(companyCode)
+      .then((fullStockInfo) => {
+        console.log(fullStockInfo);
+        this.setStateStockQuote(fullStockInfo);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   setupAndUpdateWatchlistComponent = () => {
@@ -259,6 +269,11 @@ class WatchlistTableRow extends React.Component {
       clearInterval(this.intervalForUpdateShareInfo);
     }
   };
+
+  componentDidUpdate(prevProps) {
+    if (this.props.companyCode !== prevProps.companyCode)
+      this.setStateShareInfo();
+  }
 
   componentDidMount() {
     this.setupAndUpdateWatchlistComponent();

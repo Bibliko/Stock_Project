@@ -39,10 +39,11 @@ const {
   SequentialPromisesWithResultsArray
 } = require("./utils/low-dependency/PromisesUtil");
 
-// const {
-//   updateCachedShareQuotesUsingCache,
-//   updateCachedShareProfilesUsingCache
-// } = require("./utils/redis-utils/SharesInfoBank");
+// TODO: Uncomment this in production
+const {
+  updateCachedShareQuotesUsingCache,
+  updateCachedShareProfilesUsingCache
+} = require("./utils/redis-utils/SharesInfoBank");
 
 const {
   updateCompaniesRatingsList
@@ -126,10 +127,12 @@ const publicPaths = [
 const sessionOptions = {
   secret: "stock-project",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { maxAge: 86400000 } // 24 hours
 };
 if (NODE_ENV === "production") {
   sessionOptions.store = new RedisStore({ client: redisClient });
+  sessionOptions.cookie.secure = true; // serve secure cookies over https
 };
 
 app.use(excludeFromCors(publicPaths, cors(corsOptions)));
@@ -201,27 +204,28 @@ const setupBackendIntervals = () => {
   );
   setInterval(deletePrismaMarketHolidays, oneDay);
 
-  // // Update Cached Shares
+  // TODO: Uncomment this in production
+  // Update Cached Shares
 
-  // setInterval(() => {
-  //   if(
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
-  //     updateCachedShareQuotesUsingCache()
-  //     .catch(err => console.log(err));
-  //   }
-  // }, 2 * oneSecond);
+  setInterval(() => {
+    if(
+      globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+      !globalBackendVariables.isMarketClosed
+    ) {
+      updateCachedShareQuotesUsingCache()
+      .catch(err => console.log(err));
+    }
+  }, 10 * oneSecond);
 
-  // setInterval(() => {
-  //   if(
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
-  //     updateCachedShareProfilesUsingCache()
-  //     .catch(err => console.log(err));
-  //   }
-  // }, oneMinute);
+  setInterval(() => {
+    if(
+      globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+      !globalBackendVariables.isMarketClosed
+    ) {
+      updateCachedShareProfilesUsingCache()
+      .catch(err => console.log(err));
+    }
+  }, oneMinute);
 
   setInterval(() => updateMostGainersDaily(globalBackendVariables), oneSecond);
 
@@ -247,22 +251,22 @@ const setupBackendIntervals = () => {
           .catch((err) => console.log(err));
       }
     },
-    oneHour * 1.5
+    oneHour
   );
 
-  // TODO: Uncomment in production
-  // setInterval(
-  //   () => {
-  //     if (
-  //       globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //       !globalBackendVariables.isMarketClosed
-  //     ) {
-  //       emptyPendingTransactionsListAllCompanies()
-  //         .catch((err) => console.log(err));
-  //     }
-  //   },
-  //   5 * oneMinute
-  // );
+  // TODO: Uncomment this in production
+  setInterval(
+    () => {
+      if (
+        globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+        !globalBackendVariables.isMarketClosed
+      ) {
+        emptyPendingTransactionsListAllCompanies()
+          .catch((err) => console.log(err));
+      }
+    },
+    5 * oneMinute
+  );
 };
 
 setupBackendIntervals();

@@ -490,8 +490,6 @@ export const checkStockQuotesToCalculateSharesValue = (
         cachedShares
       );
 
-      console.log(totalSharesValue);
-
       const newTotalPortfolioValue = cash + totalSharesValue;
 
       /**

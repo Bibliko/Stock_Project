@@ -6,8 +6,8 @@ import { withRouter } from "react-router";
 import { withTranslation } from "react-i18next";
 
 // TODO: Uncomment this in production
-// import { getStockNews } from "../../../utils/FinancialModelingPrepUtil";
-// import { oneMinute } from "../../../utils/low-dependency/DayTimeUtil";
+import { getStockNews } from "../../../utils/FinancialModelingPrepUtil";
+import { oneMinute } from "../../../utils/low-dependency/DayTimeUtil";
 
 import CompanyNewsCard from "./CompanyNewsCard";
 
@@ -63,23 +63,23 @@ class CompanyNewsContainer extends React.Component {
 
   checkAndSetStateNews = () => {
     // TODO: Uncomment this in production
-    // getStockNews(this.props.companyData.symbol, 10)
-    //   .then((newsArray) => {
-    //     if (!isEqual(newsArray, this.state.news)) {
-    //       this.setState({
-    //         news: newsArray ?? [],
-    //       });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    getStockNews(this.props.companyData.symbol, 10)
+      .then((newsArray) => {
+        if (!isEqual(newsArray, this.state.news)) {
+          this.setState({
+            news: newsArray ?? [],
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   componentDidMount() {
     // TODO: Uncomment this in production
-    // this.checkAndSetStateNews();
-    // this.intervalCheckNews = setInterval(this.checkAndSetStateNews, oneMinute)
+    this.checkAndSetStateNews();
+    this.intervalCheckNews = setInterval(this.checkAndSetStateNews, oneMinute)
   }
 
   componentWillUnmount() {
