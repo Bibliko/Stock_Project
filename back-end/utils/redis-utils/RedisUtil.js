@@ -1,6 +1,5 @@
 const { isEqual } = require("lodash");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../low-dependency/PrismaClient");
 
 const {
   getAsync,
@@ -44,6 +43,10 @@ const {
  *
  * - 'RANKING_LIST': list
  * - 'RANKING_LIST_${region}': list
+ *
+ * - 'PENDING_COMPANIES': set -> set of companies that have pending orders
+ * - `PENDING_ORDERS_${option}_${companyCode}`: sorted set
+ *   -> set of orderIDs for each options (>=, <=, at market open) of a companyCode
  */
 
 const transactionsHistoryList = "transactionsHistoryList";
@@ -59,6 +62,9 @@ const cachedHistoricalChartFull = "cachedHistoricalChartFull";
 const cachedMostGainers = "cachedMostGainers";
 const cachedShares = "cachedShares";
 const rankingList = "RANKING_LIST";
+
+const pendingCompaniesSet = "PENDING_COMPANIES";
+const pendingOrdersSet = "PENDING_ORDERS";
 
 /**
  * @returns true if market is closed, false if market is opened
@@ -171,7 +177,7 @@ const removeCachedVerificationCode = (email, cacheKey) => {
  * @param user User object containing attributes as in Prisma User Model
  */
 const redisUpdateOverallRankingList = (user) => {
-  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}|${user.email}`;
   return listPushAsync(rankingList, value);
 };
 
@@ -181,7 +187,7 @@ const redisUpdateOverallRankingList = (user) => {
  * @param user User object containing attributes as in Prisma User Model
  */
 const redisUpdateRegionalRankingList = (region, user) => {
-  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}`;
+  const value = `${user.firstName}|${user.lastName}|${user.totalPortfolio}|${user.region}|${user.email}`;
   return listPushAsync(`${rankingList}_${region}`, value);
 };
 
@@ -237,6 +243,9 @@ module.exports = {
   cachedMostGainers,
   cachedShares,
   rankingList,
+
+  pendingCompaniesSet,
+  pendingOrdersSet,
 
   // Market Time
   isMarketClosedCheck,

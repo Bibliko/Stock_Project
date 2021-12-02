@@ -12,7 +12,6 @@ import { Container, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
@@ -50,9 +49,13 @@ const styles = (theme) => ({
 
 class WatchlistPage extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email", "watchlist"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
+    const userSessionKeys = ["email", "watchlist"];
+    const compareKeys = [
+      "classes",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return !isEqual(nextPropsCompare, propsCompare);
   }

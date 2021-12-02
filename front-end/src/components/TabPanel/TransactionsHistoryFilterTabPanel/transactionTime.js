@@ -4,6 +4,8 @@ import { DateTime } from "luxon";
 import { isEqual, isEmpty, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -133,7 +135,7 @@ class TransactionTimeFilter extends React.Component {
     }
 
     if (new Date(from) > new Date(to)) {
-      return "From must < To";
+      return this.props.t("filter.from<To");
     }
 
     return "";
@@ -210,32 +212,32 @@ class TransactionTimeFilter extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["filters"];
+    const compareKeys = ["t", "classes", "filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     const { from, to, errorText } = this.state;
 
     return (
       <React.Fragment>
         <Button className={classes.disableButton} disableRipple>
-          Transaction Time
+          {t("table.Transaction Time")}
         </Button>
         <div className={classes.form}>
           <TextField
             error={!isEmpty(errorText)}
             helperText={!isEmpty(errorText) ? errorText : ""}
             type="text"
-            placeholder="From"
+            placeholder={t("filter.from")}
             onChange={(event) => this.handleChangeValue(event, "from")}
             value={from === "none" ? "" : from}
             className={classes.mainTextField}
@@ -261,7 +263,7 @@ class TransactionTimeFilter extends React.Component {
             error={!isEmpty(errorText)}
             helperText="M/d/yyyy"
             type="text"
-            placeholder="To"
+            placeholder={t("filter.to")}
             onChange={(event) => this.handleChangeValue(event, "to")}
             value={to === "none" ? "" : to}
             className={classes.mainTextField}
@@ -289,4 +291,6 @@ class TransactionTimeFilter extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(TransactionTimeFilter));
+export default withTranslation()(
+  withStyles(styles)(withRouter(TransactionTimeFilter))
+);

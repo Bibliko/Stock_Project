@@ -6,6 +6,7 @@ import {
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
 import { convertToLocalTimeString } from "../../../utils/low-dependency/DayTimeUtil";
+import { transactionTypeBuy } from "../../../utils/low-dependency/PrismaConstantUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -26,23 +27,24 @@ const StyledTableCell = withStyles((theme) => ({
 }))(TableCell);
 
 export const chooseTableCellHeader = (
+  t,
   indexInNamesState,
   createSortHandler,
   classes,
   state
 ) => {
   const { orderBy, orderQuery, names, prismaNames } = state;
-  const type = names[indexInNamesState];
+  const label = names[indexInNamesState];
   const prismaType = prismaNames[indexInNamesState];
 
   return (
     <StyledTableCell
       key={indexInNamesState}
-      align={type === "Type" ? "left" : "right"}
+      align={label === "Type" ? "left" : "right"}
       className={clsx(classes.tableCell, {
-        [classes.firstElementTopLeftRounded]: type === "Type",
-        [classes.lastElementTopRightRounded]: type === "Transaction Time",
-        [classes.tableCellTransactionTime]: type === "Transaction Time",
+        [classes.firstElementTopLeftRounded]: label === "Type",
+        [classes.lastElementTopRightRounded]: label === "Transaction Time",
+        [classes.tableCellTransactionTime]: label === "Transaction Time",
       })}
       sortDirection={orderBy === prismaType ? orderQuery : false}
     >
@@ -51,9 +53,9 @@ export const chooseTableCellHeader = (
         direction={orderBy === prismaType ? orderQuery : "asc"}
         onClick={createSortHandler(prismaType)}
         className={classes.cellDiv}
-        disabled={type === "Type"}
+        disabled={label === "Type"}
       >
-        {type}
+        {t("table." + label)}
         {orderBy === prismaType ? (
           <span className={classes.visuallyHidden}>
             {orderQuery === "desc" ? "sorted descending" : "sorted ascending"}
@@ -65,50 +67,50 @@ export const chooseTableCellHeader = (
 };
 
 export const chooseTableCell = (
-  type,
+  label,
   isTableRowTheLast,
   classes,
   transactionInfo
 ) => {
-  const { isTypeBuy, spendOrGain } = transactionInfo;
+  const { type, spendOrGain } = transactionInfo;
 
   return (
     <TableCell
       align="center"
       className={clsx(classes.tableCell, {
         [classes.lastRow]: isTableRowTheLast(),
-        [classes.lastLeftCell]: isTableRowTheLast() && type === "Type",
+        [classes.lastLeftCell]: isTableRowTheLast() && label === "Type",
         [classes.lastRightCell]:
-          isTableRowTheLast() && type === "Transaction Time",
+          isTableRowTheLast() && label === "Transaction Time",
       })}
     >
       <div
         className={clsx(classes.cellDiv, {
-          [classes.cellDivSpecialForType]: type === "Type",
+          [classes.cellDivSpecialForType]: label === "Type",
         })}
       >
         <Typography
           className={clsx(classes.watchlistRowItem, {
             [classes.greenIcon]:
-              (type === "Type" && isTypeBuy) ||
-              (type === "Gain/Loss" && spendOrGain > 0),
+              (label === "Type" && type === transactionTypeBuy) ||
+              (label === "Gain/Loss" && spendOrGain > 0),
 
             [classes.redIcon]:
-              (type === "Type" && !isTypeBuy) ||
-              (type === "Gain/Loss" && spendOrGain < 0),
+              (label === "Type" && type !== transactionTypeBuy) ||
+              (label === "Gain/Loss" && spendOrGain < 0),
           })}
           noWrap
         >
-          {chooseTableCellValue(type, classes, transactionInfo)}
+          {chooseTableCellValue(label, classes, transactionInfo)}
         </Typography>
       </div>
     </TableCell>
   );
 };
 
-export const chooseTableCellValue = (type, classes, transactionInfo) => {
+export const chooseTableCellValue = (label, classes, transactionInfo) => {
   const {
-    isTypeBuy,
+    type,
     companyCode,
     quantity,
     priceAtTransaction,
@@ -116,9 +118,9 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
     finishedTime,
   } = transactionInfo;
 
-  switch (type) {
+  switch (label) {
     case "Type":
-      return isTypeBuy ? "Buy" : "Sell";
+      return `${type}`;
 
     case "Code":
       return `${companyCode}`;
@@ -130,7 +132,7 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
       return `$${numberWithCommas(roundNumber(priceAtTransaction, 2))}`;
 
     case "Gain/Loss":
-      return isTypeBuy
+      return type === transactionTypeBuy
         ? `- $${numberWithCommas(roundNumber(Math.abs(spendOrGain), 2))}`
         : `$${numberWithCommas(roundNumber(spendOrGain, 2))}`;
 
@@ -143,6 +145,7 @@ export const chooseTableCellValue = (type, classes, transactionInfo) => {
 };
 
 export const paperWhenHistoryEmpty = (
+  t,
   classes,
   hoverPaperState,
   hoverPaperFn,
@@ -160,7 +163,7 @@ export const paperWhenHistoryEmpty = (
         })}
       />
       <Typography className={classes.assignmentWord}>
-        Start by making some transactions by selling or buying stocks!
+        {t("table.startMakingTransactions")}
       </Typography>
     </Paper>
   );

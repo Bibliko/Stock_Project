@@ -8,17 +8,16 @@
  * - 6th part: socket
  */
 
-try {
-  require("./config/config");
-} catch (err) {
-  console.log("No config found. Using default ENV.");
-}
-
 const {
   oneSecond,
-  oneDay,
-  oneMinute
+  oneMinute,
+  oneHour,
+  oneDay
 } = require("./utils/low-dependency/DayTimeUtil");
+
+const {
+  excludeFromCors
+} = require("./utils/low-dependency/NetworkUtil");
 
 const {
   deleteExpiredVerification,
@@ -40,10 +39,11 @@ const {
   SequentialPromisesWithResultsArray
 } = require("./utils/low-dependency/PromisesUtil");
 
-// const {
-//   updateCachedShareQuotesUsingCache,
-//   updateCachedShareProfilesUsingCache
-// } = require("./utils/redis-utils/SharesInfoBank");
+// TODO: Uncomment this in production
+const {
+  updateCachedShareQuotesUsingCache,
+  updateCachedShareProfilesUsingCache
+} = require("./utils/redis-utils/SharesInfoBank");
 
 const {
   updateCompaniesRatingsList
@@ -54,9 +54,21 @@ const {
   updateMostGainersDaily
 } = require("./utils/redis-utils/MostGLA");
 
+const {
+  emptyPendingTransactionsListAllCompanies,
+  addAllPendingTransactions,
+  deleteAllPendingTransactions
+} = require("./utils/redis-utils/PendingOrders");
+
 const { startSocketIO } = require("./socketIO");
 
-const { PORT: port, NODE_ENV, FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const {
+  PORT,
+  NODE_ENV,
+  FRONTEND_HOST,
+  REDIS_URL,
+  SENDGRID_API_KEY
+} = require('./config');
 const express = require("express");
 const app = express();
 const { pick } = require("lodash");
@@ -68,10 +80,16 @@ const http = require("http");
 const server = http.createServer(app);
 
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const passport = require("passport");
 const { setupPassport } = require("./passport");
 const session = require("express-session");
+
+const redis = require("redis");
+let RedisStore = require("connect-redis")(session);
+let redisClient = redis.createClient(REDIS_URL);
+
 
 /* cors: for example, if front-end sends request to back-end,
  * then front-end is cors (cross-origin requests),
@@ -92,7 +110,7 @@ const corsOptions = {
     if (NODE_ENV === "development") {
       callback(null, true);
     } else {
-      if (whitelist.indexOf(origin) !== -1) {
+      if (whitelist.indexOf(origin) !== -1 || (NODE_ENV === 'qa' && origin === undefined)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -101,16 +119,27 @@ const corsOptions = {
   },
   credentials: true
 };
+const publicPaths = [
+  "*/auth/google*",
+  "*/auth/facebook*",
+  "*/verificationSession/verification*"
+];
+const sessionOptions = {
+  secret: "stock-project",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 86400000 } // 24 hours
+};
+if (NODE_ENV === "production") {
+  sessionOptions.store = new RedisStore({ client: redisClient });
+  sessionOptions.cookie.secure = true; // serve secure cookies over https
+};
 
-app.use(cors(corsOptions));
+app.use(excludeFromCors(publicPaths, cors(corsOptions)));
+app.use(cookieParser("stock-project"));
 app.use(bodyParser.json());
-app.use(
-  session({
-    secret: "stock-project",
-    resave: false,
-    saveUninitialized: false
-  })
-);
+app.set("trust proxy", 1);
+app.use(session(sessionOptions));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -121,7 +150,7 @@ setupPassport(passport);
  * functions and passing in object as parameter
  */
 var globalBackendVariables = {
-  isMarketClosed: false,
+  isMarketClosed: null, // init as null because we need to check if BE has checked marketCLosed or not
   isPrismaMarketHolidaysInitialized: false,
 
   hasReplacedAllExchangesHistoricalChart: false,
@@ -148,7 +177,23 @@ SequentialPromisesWithResultsArray(tasksList).catch((err) => console.log(err));
 
 const setupBackendIntervals = () => {
   // Check Market Closed
-  setInterval(() => checkMarketClosed(globalBackendVariables), oneSecond);
+  setInterval(
+    () => {
+      const previousMarketState = globalBackendVariables.isMarketClosed;
+      checkMarketClosed(globalBackendVariables)
+        .then(() => {
+          // Delete all pending transactions when market is closed
+          if (
+            previousMarketState === false &&
+            globalBackendVariables.isMarketClosed === true
+          )
+            return deleteAllPendingTransactions();
+        })
+        .then((res) => res && console.log(res))
+        .catch(err => console.log(err));
+    },
+    oneSecond
+  );
 
   setInterval(deleteExpiredVerification, oneDay);
 
@@ -159,27 +204,28 @@ const setupBackendIntervals = () => {
   );
   setInterval(deletePrismaMarketHolidays, oneDay);
 
-  // // Update Cached Shares
+  // TODO: Uncomment this in production
+  // Update Cached Shares
 
-  // setInterval(() => {
-  //   if(
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
-  //     updateCachedShareQuotesUsingCache()
-  //     .catch(err => console.log(err));
-  //   }
-  // }, 2 * oneSecond);
+  setInterval(() => {
+    if(
+      globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+      !globalBackendVariables.isMarketClosed
+    ) {
+      updateCachedShareQuotesUsingCache()
+      .catch(err => console.log(err));
+    }
+  }, 10 * oneSecond);
 
-  // setInterval(() => {
-  //   if(
-  //     globalBackendVariables.isPrismaMarketHolidaysInitialized &&
-  //     !globalBackendVariables.isMarketClosed
-  //   ) {
-  //     updateCachedShareProfilesUsingCache()
-  //     .catch(err => console.log(err));
-  //   }
-  // }, oneMinute);
+  setInterval(() => {
+    if(
+      globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+      !globalBackendVariables.isMarketClosed
+    ) {
+      updateCachedShareProfilesUsingCache()
+      .catch(err => console.log(err));
+    }
+  }, oneMinute);
 
   setInterval(() => updateMostGainersDaily(globalBackendVariables), oneSecond);
 
@@ -193,6 +239,34 @@ const setupBackendIntervals = () => {
   // parameter: forceUpdate <Boolean>
   // If forceUpdate is true and system is in developer mode, does not need to call API.
   setInterval(() => updateCompaniesRatingsList(), oneDay);
+
+  setInterval(
+    () => {
+      if (
+        globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+        !globalBackendVariables.isMarketClosed
+      ) {
+        addAllPendingTransactions()
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+      }
+    },
+    oneHour
+  );
+
+  // TODO: Uncomment this in production
+  setInterval(
+    () => {
+      if (
+        globalBackendVariables.isPrismaMarketHolidaysInitialized &&
+        !globalBackendVariables.isMarketClosed
+      ) {
+        emptyPendingTransactionsListAllCompanies()
+          .catch((err) => console.log(err));
+      }
+    },
+    5 * oneMinute
+  );
 };
 
 setupBackendIntervals();
@@ -221,6 +295,8 @@ app.use("/shareData", require("./routes/share"));
 app.use("/redis", require("./routes/redis"));
 app.use("/verificationSession", require("./routes/verification"));
 app.use("/companyRating", require("./routes/companyRating"));
+app.use("/transaction", require("./routes/transaction"));
+app.use("/fmp", require("./routes/financialModelingPrep"));
 
 app.use("/getGlobalBackendVariablesFlags", (_, res) => {
   const flags = ["updatedAllUsersFlag", "updatedRankingListFlag"];
@@ -234,6 +310,6 @@ app.use("/getGlobalBackendVariablesFlags", (_, res) => {
 startSocketIO(server, globalBackendVariables);
 
 // back-end server listen
-server.listen(port, () => {
-  console.log(`server is listening on port ${port}\n`);
+server.listen(PORT, () => {
+  console.log(`server is listening on port ${PORT}\n`);
 });

@@ -94,7 +94,7 @@ class CompanyNewsCard extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["newsObject"];
+    const compareKeys = ["classes", "newsObject"];
     const compareProps = pick(this.props, compareKeys);
     const compareNextProps = pick(nextProps, compareKeys);
 

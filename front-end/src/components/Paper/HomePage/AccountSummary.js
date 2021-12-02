@@ -2,7 +2,9 @@ import React from "react";
 import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import { isEqual, isEmpty } from "lodash";
+import { isEqual, isEmpty, pick } from "lodash";
+
+import { withTranslation } from "react-i18next";
 
 import { socket } from "../../../App";
 import {
@@ -24,7 +26,6 @@ import HoldingsTableContainer from "../../Table/AccountSummaryTable/HoldingsTabl
 const styles = (theme) => ({
   container: {
     color: "white",
-    alignSelf: "center",
   },
   avatar: {
     width: "60px",
@@ -176,14 +177,17 @@ class AccountSummary extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["t", "classes", "userSession"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const { holdingsRows } = this.state;
     const {
       avatarUrl,
@@ -194,7 +198,7 @@ class AccountSummary extends React.Component {
       totalPortfolio,
       totalPortfolioLastClosure,
     } = this.props.userSession;
-    const dailyChange = totalPortfolio - totalPortfolioLastClosure;
+    const dailyChange = roundNumber(totalPortfolio - totalPortfolioLastClosure, 2);
 
     return (
       <Grid
@@ -212,7 +216,7 @@ class AccountSummary extends React.Component {
               {firstName + " " + lastName}
             </Typography>
             <Typography className={classes.rank}>
-              {`Rank: ${ranking}`}
+              {t("ranking.rank") + `: ${ranking}`}
             </Typography>
           </div>
         </Grid>
@@ -233,7 +237,10 @@ class AccountSummary extends React.Component {
               [classes.dailyChangeRed]: dailyChange < 0,
             })}
           >
-            {`Daily Change $${dailyChange}`}
+            {
+              t("account.dailyChange") +
+              ` ${dailyChange < 0 ? "- $" : "$"}${Math.abs(dailyChange)}`
+            }
           </Typography>
         </Grid>
 
@@ -248,13 +255,13 @@ class AccountSummary extends React.Component {
 
         <Grid item xs={12} sm={12} md={6} className={classes.tableContainer}>
           <Typography className={classes.tableTitle}>
-            {"Top Holdings"}
+            {t("account.topHoldings")}
           </Typography>
           {isEmpty(holdingsRows) && (
             <Paper className={classes.paperAccountSummary} elevation={2}>
               <StorefrontRoundedIcon className={classes.storeIcon} />
               <Typography className={classes.holdingsText}>
-                Start by buying some stocks!
+                {t("general.startBuying")}
               </Typography>
             </Paper>
           )}
@@ -271,4 +278,8 @@ const mapStateToProps = (state) => ({
   userSession: state.userSession,
 });
 
-export default connect(mapStateToProps)(withStyles(styles)(AccountSummary));
+export default connect(mapStateToProps)(
+  withTranslation()(
+    withStyles(styles)(AccountSummary)
+  )
+);

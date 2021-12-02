@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("./PrismaClient");
 
 /**
  * @param email User email
@@ -8,19 +7,22 @@ const prisma = new PrismaClient();
 const getUserData = (email, dataNeeded) => {
   return new Promise((resolve, reject) => {
     var dataJSON = dataNeeded === "default" ? {} : { ...dataNeeded };
-
-    if (dataJSON.shares) {
+    const addSort = (field, orderKey, orderType) => {
       dataJSON = {
         ...dataJSON,
-        shares: {
-          orderBy: [
-            {
-              companyCode: "asc"
-            }
-          ]
-        }
+        [field]: {
+          ...dataJSON[field],
+          orderBy: {
+            [orderKey]: orderType
+          },
+        },
       };
-    }
+    };
+
+    if (dataJSON.shares)
+      addSort("shares", "companyCode", "asc");
+    if (dataJSON.transactions)
+      addSort("transactions", "companyCode", "asc");
 
     prisma.user
       .findUnique({

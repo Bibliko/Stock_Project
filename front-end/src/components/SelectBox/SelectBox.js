@@ -1,4 +1,7 @@
 import React from "react";
+import clsx from "clsx";
+
+import { useTranslation } from "react-i18next";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -26,6 +29,9 @@ const styles = (theme) => ({
     backgroundColor: theme.palette.paperBackground.onPageSuperLight,
     "&:hover": {
       backgroundColor: theme.palette.paperBackground.onPageLight,
+    },
+    "&.Mui-disabled": {
+      color: theme.palette.disabled.whiteColor,
     },
     fontSize: "medium",
     height: "45px",
@@ -63,15 +69,17 @@ const styles = (theme) => ({
 });
 
 function SelectBox(props) {
-  const { classes, items, name, value, onChange } = props;
+  const { classes, containerClass, items, name, value, disabled, onChange } = props;
+  const { t } = useTranslation();
 
   return (
-    <Container className={classes.selectBoxContainer}>
+    <Container className={clsx(classes.selectBoxContainer, containerClass)}>
       <Typography className={classes.title}>{name}</Typography>
       <FormControl variant="outlined" className={classes.selectBox}>
         <Select
           id={name}
           value={value}
+          disabled={disabled}
           onChange={onChange}
           className={classes.input}
           MenuProps={{ classes: { paper: classes.menuList } }}
@@ -83,7 +91,7 @@ function SelectBox(props) {
           )}
           {items.map((item) => (
             <MenuItem key={item} value={item} className={classes.menuItem}>
-              {item}
+              {t(`general.${item}`, item)}
             </MenuItem>
           ))}
         </Select>

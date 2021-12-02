@@ -185,7 +185,7 @@ const createRedisValueFromStockProfileJSON = (stockProfileJSON) => {
 /**
  * @param filters
  * {
- *    type: buy, sell, OR none
+ *    type: Buy, Sell OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
@@ -197,7 +197,7 @@ const createPrismaFiltersObject = (filters) => {
   const { type, code, price, transactionTime } = filters;
   const filtering = {
     isFinished: true
-    // isTypeBuy
+    // type
     // companyCode
     // priceAtTransaction
     // finishedTime
@@ -207,7 +207,7 @@ const createPrismaFiltersObject = (filters) => {
 
   // type
   if (!isEqual(type, "none")) {
-    filtering.isTypeBuy = isEqual(type, "buy");
+    filtering.type = { equals: type };
   }
 
   // code
@@ -261,7 +261,7 @@ const createPrismaFiltersObject = (filters) => {
 /**
  * @param filters
  * {
- *    type: buy, sell, OR none
+ *    type: Buy, Sell, OR none
  *    code: none OR random string with NO String ";" -> this is special character used when these attributes in a string
  *    quantity: (int/none)_to_(int/none)
  *    price: (int/none)_to_(int/none)
@@ -298,8 +298,8 @@ const parseRedisTransactionsHistoryFilters = (redisValue) => {
  */
 const combineFMPStockQuoteAndProfile = (stockQuoteJSON, stockProfileJSON) => {
   return {
-    ...stockQuoteJSON,
-    ...stockProfileJSON
+    ...stockProfileJSON,
+    ...stockQuoteJSON
   };
 };
 
@@ -325,10 +325,10 @@ const createRedisValueFromFinishedTransaction = (finishedTransaction) => {
     brokerage,
     spendOrGain,
     finishedTime,
-    isTypeBuy,
+    type,
     userID
   } = finishedTransaction;
-  return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${isTypeBuy}|${userID}`;
+  return `${id}|${createdAt}|${companyCode}|${quantity}|${priceAtTransaction}|${brokerage}|${spendOrGain}|${finishedTime}|${type}|${userID}`;
 };
 
 /**
@@ -429,7 +429,7 @@ const parseCachedMostGainer = (redisString) => {
 /**
  * @param {object} share Prisma object Share of User
  */
-export const createRedisValueFromSharesList = (share) => {
+const createRedisValueFromSharesList = (share) => {
   const { id, companyCode, quantity, buyPriceAvg, userID } = share;
   return `${id}|${companyCode}|${quantity}|${buyPriceAvg}|${userID}`;
 };
@@ -437,7 +437,7 @@ export const createRedisValueFromSharesList = (share) => {
 /**
  * redisString: "id|companyCode|quantity|buyPriceAvg|userID"
  */
-export const parseRedisSharesListItem = (redisString) => {
+const parseRedisSharesListItem = (redisString) => {
   const valuesArray = redisString.split("|");
 
   return {
@@ -450,9 +450,9 @@ export const parseRedisSharesListItem = (redisString) => {
 };
 
 /**
- * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|isTypeBuy|userID"
+ * redisString: "id|createdAt|companyCode|quantity|priceAtTransaction|brokerage|spendOrGain|finishedTime|type|userID"
  */
-export const parseRedisTransactionsHistoryListItem = (redisString) => {
+ const parseRedisTransactionsHistoryListItem = (redisString) => {
   const valuesArray = redisString.split("|");
 
   return {
@@ -464,7 +464,7 @@ export const parseRedisTransactionsHistoryListItem = (redisString) => {
     brokerage: parseFloat(valuesArray[5]),
     spendOrGain: parseFloat(valuesArray[6]),
     finishedTime: valuesArray[7],
-    isTypeBuy: valuesArray[8] === "true",
+    type: valuesArray[8],
     userID: valuesArray[9]
   };
 };

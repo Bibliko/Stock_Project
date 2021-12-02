@@ -1,6 +1,7 @@
 import React from "react";
-
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
 
 import SettingNormalTextField from "../TextField/SettingTextFields/SettingNormalTextField";
 import DatePickerTextField from "../TextField/DatePickerTextFields/SettingDatePickerTextField";
@@ -157,9 +158,17 @@ class BasicSection extends React.Component {
     this.checkForError(this.state.input.firstName, this.state.input.lastName);
   };
 
+  componentDidMount() {
+    this.props.reference.current = this;
+  }
+
+  componentWillUnmount() {
+    this.props.reference.current = null;
+  }
+
   render() {
     const { input } = this.state;
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const genders = ["Female", "Male", "Other", "Prefer not to say"];
 
     return (
@@ -172,25 +181,27 @@ class BasicSection extends React.Component {
         >
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SettingNormalTextField
-              name="First name"
+              name={t("settings.firstName")}
               value={input.firstName}
               isInvalid={!input.firstName}
-              helper="Cannot be empty"
+              helper={t("settings.noEmpty")}
               onChange={this.recordFirstName}
             />
           </Grid>
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SettingNormalTextField
-              name="Last name"
+              name={t("settings.lastName")}
               value={input.lastName}
               isInvalid={!input.lastName}
-              helper="Cannot be empty"
+              helper={t("settings.noEmpty")}
               onChange={this.recordLastName}
             />
           </Grid>
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <Container className={classes.textFieldContainer}>
-              <Typography className={classes.title}>Date of birth</Typography>
+              <Typography className={classes.title}>
+                {t("settings.DOB")}
+              </Typography>
               <MobileDatePicker
                 disableFuture
                 allowKeyboardControl={true}
@@ -208,7 +219,7 @@ class BasicSection extends React.Component {
           </Grid>
           <Grid item xs={12} sm={6} className={classes.itemGrid}>
             <SelectBox
-              name="Gender"
+              name={t("settings.gender")}
               value={input.gender}
               items={genders}
               onChange={this.recordGender}
@@ -220,4 +231,6 @@ class BasicSection extends React.Component {
   }
 }
 
-export default withStyles(styles)(BasicSection);
+export default withTranslation()(
+  withStyles(styles)(BasicSection)
+);

@@ -1,12 +1,11 @@
-const { PrismaClient } = require("@prisma/client");
+const { prisma } = require("../../utils/low-dependency/PrismaClient");
 
 const FacebookStrategy = require("passport-facebook").Strategy;
-const prisma = new PrismaClient();
 const {
   FACEBOOK_APP_ID,
   FACEBOOK_APP_SECRET,
   PASSPORT_CALLBACK_HOST
-} = process.env;
+} = require('../../config');
 // const { indices } = require('../../algolia');
 
 const facebookStrategy = new FacebookStrategy(

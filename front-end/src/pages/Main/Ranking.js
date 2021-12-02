@@ -1,26 +1,31 @@
 import React from "react";
-import { isEqual } from "lodash";
+import clsx from "clsx";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
+import { withTranslation } from "react-i18next";
+
+import {
+  getRankingLength,
+  getOverallRanking,
+  getRegionalRanking,
+} from "../../utils/UserUtil";
+import { getCachedAccountSummaryChartInfo } from "../../utils/RedisUtil";
+import { endOfLastWeek, oneSecond } from "../../utils/low-dependency/DayTimeUtil";
+
+import SelectNoBox from "../../components/SelectBox/SelectNoBox";
 import MyStatsTable from "../../components/Table/RankingTable/MyStatsTable";
 import OverallTable from "../../components/Table/RankingTable/OverallTable";
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
 
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Container,
-  Grid,
-  Typography,
-  TextField,
-  MenuItem,
-} from "@material-ui/core";
+import { Container, Grid } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
@@ -34,6 +39,14 @@ const styles = (theme) => ({
     flexDirection: "column",
     maxWidth: "none",
   },
+  container: {
+    "& > div + div": {
+      marginTop: "60px",
+      [theme.breakpoints.down("xs")]: {
+        marginTop: "40px",
+      },
+    },
+  },
   center: {
     display: "flex",
     justifyContent: "center",
@@ -42,22 +55,31 @@ const styles = (theme) => ({
   fullHeightWidth: {
     height: "100%",
     width: "100%",
-    padding: "24px",
   },
   itemGrid: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "column",
   },
-  gridTitle: {
+  itemGridWrapper: {
+    width: "100%",
+    maxWidth: "1000px",
+  },
+  titleFont: {
     fontSize: "x-large",
     color: theme.palette.primary.main,
     [theme.breakpoints.down("xs")]: {
       fontSize: "large",
     },
     fontWeight: "bold",
-    marginBottom: "1px",
+    textAlign: "left",
+  },
+  titleContainer: {
+    marginBottom: "20px",
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: "10px",
+    },
   },
   textField: {
     width: "100%",
@@ -103,49 +125,209 @@ const styles = (theme) => ({
   },
 });
 
-const levels = [
-  {
-    value: "Overall",
-    label: "Overall Ranking",
-  },
-  {
-    value: "Regional",
-    label: "Regional Ranking",
-  },
+const regions = [
+  "Africa",
+  "Asia",
+  "The Caribbean",
+  "Central America",
+  "Europe",
+  "North America",
+  "Oceania",
+  "South America",
 ];
 
 class Ranking extends React.Component {
-  state = {
-    rankingLevel: "Overall",
-  };
+  constructor(props) {
+    super(props);
+    const { portfolioValue } = this.props;
 
-  changeRankingLevel = (event) => {
-    if (!isEqual(this.state.rankingLevel, event.target.value)) {
+    this.state = {
+      rankingOption: "Overall",
+      rankingUsersData: {},
+      totalUser: {},
+      rankingPage: 0,
+      lastWeekPortfolio: portfolioValue,
+      portfolioHigh: portfolioValue,
+      portfolioLow: portfolioValue,
+    };
+
+    const { t, i18n } = this.props;
+    const { language } = i18n;
+    const rankingText = t("ranking.ranking");
+
+    this.options = [
+      {
+        value: "Overall",
+        label: (
+          (language === "vi" ? rankingText + " " : "") +
+          t("table.Overall") +
+          (language !== "vi" ? " " + rankingText : "")
+        ),
+      },
+      ...regions.map((region) => ({
+        value: region,
+        label: (
+          (language === "vi" ? rankingText + " " : "") +
+          t("general." + region) +
+          (language !== "vi" ? " " + rankingText : "")
+        ),
+      })),
+    ];
+  }
+
+  timeoutToChangePage;
+
+  changeRankingOption = (event) => {
+    if (!isEqual(this.state.rankingOption, event.target.value)) {
       this.setState({
-        rankingLevel: event.target.value,
+        rankingOption: event.target.value,
+        rankingPage: 0,
       });
     }
   };
 
+  getRankingData = () => {
+    const {
+      rankingUsersData,
+      rankingOption,
+      rankingPage,
+    } = this.state;
+
+    if (rankingOption === "Overall") {
+      // difference in index
+      return getOverallRanking(rankingPage + 1)
+        .then((overallUsers) => {
+          this.setState({
+            rankingUsersData: {
+              ...rankingUsersData,
+              Overall: overallUsers,
+            }
+          });
+        })
+        .catch((error) => console.log(error));
+    }
+
+    // Get regional ranking
+    getRegionalRanking(rankingPage + 1, rankingOption)
+      .then((regionalUsers) => {
+        this.setState({
+          rankingUsersData: {
+            ...rankingUsersData,
+            [rankingOption]: regionalUsers,
+          }
+        });
+      })
+      .catch((error) => console.log(error));
+  };
+
+  changeRankingPage = (event, newPage) => {
+    if (this.timeoutToChangePage) {
+      clearTimeout(this.timeoutToChangePage);
+    }
+
+    this.setState({ rankingPage: newPage }, () => {
+      this.timeoutToChangePage = setTimeout(
+        () => this.getRankingData(newPage),
+        oneSecond / 10
+      );
+    });
+  };
+
+  componentDidMount () {
+    const { email, portfolioValue } = this.props.userSession;
+
+    // (k, Promise a) -> Promise (k, a)
+    const addRegion = ([region, regionPromise]) => (
+      regionPromise.then((data) => [region, data])
+    );
+
+    // Fetch ranking length
+    Promise.all([
+      getRankingLength(),
+      ...regions
+        .map((region) => [region, getRankingLength(region)])
+        .map(addRegion)
+    ])
+      .then(([overallLength, ...regionalLength]) => {
+        this.setState({
+          totalUser: {
+            Overall: overallLength,
+            ...Object.fromEntries(regionalLength),
+          }
+        });
+      })
+      .catch((error) => console.log(error));
+
+    // Fetch other data
+    Promise.all([
+      getOverallRanking(1),
+      getCachedAccountSummaryChartInfo(email),
+      ...regions
+        .map((region) => [region, getRegionalRanking(1, region)])
+        .map(addRegion)
+    ])
+      .then(([overallUsers, cachedTimestamp, ...regionalUsers]) => {
+        const rankingUsersData = {
+          Overall: overallUsers,
+          ...Object.fromEntries(regionalUsers),
+        };
+        const lastWeek = endOfLastWeek();
+        const { data } = cachedTimestamp;
+        let lastWeekPortfolio = 0;
+        let portfolioHigh = parseFloat(data[0][1]);
+        let portfolioLow = parseFloat(data[0][1]);
+
+        if (data) {
+          for (let id = data.length - 1; id >= 0; --id) {
+            const timestamp = data[id];
+            const value = parseFloat(timestamp[1]);
+
+            // eliminate cases that value of timestamp is null
+            if (timestamp[0] && (new Date(timestamp[0])) <= lastWeek && !lastWeekPortfolio) {
+              lastWeekPortfolio = value;
+            }
+            portfolioHigh = value > portfolioHigh ? value : portfolioHigh;
+            portfolioLow = value < portfolioLow ? value : portfolioLow;
+          }
+        }
+        lastWeekPortfolio = lastWeekPortfolio || portfolioValue; // default to portfolioValue
+
+        this.setState({
+          rankingUsersData,
+          lastWeekPortfolio,
+          portfolioHigh,
+          portfolioLow,
+        });
+      })
+      .catch((error) => console.log(error));
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["classes", "userSession"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
 
   render() {
     const { classes } = this.props;
-
-    const { rankingLevel } = this.state;
-
     const {
-      overallRank,
-      regionRank,
-      portfolioValue,
-      previousWeek,
-      portfolioHigh,
+      ranking,
+      regionalRanking,
+      totalPortfolio,
     } = this.props.userSession;
+    const {
+      rankingOption,
+      rankingUsersData,
+      totalUser,
+      rankingPage,
+      lastWeekPortfolio,
+      portfolioHigh,
+      portfolioLow,
+    } = this.state;
 
     return (
       <Container className={classes.root} disableGutters>
@@ -153,60 +335,40 @@ class Ranking extends React.Component {
           container
           spacing={4}
           direction="row"
-          className={classes.fullHeightWidth}
+          className={clsx(classes.fullHeightWidth, classes.container)}
         >
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={classes.gridTitle}>
-              Choose a ranking level
-            </Typography>
-          </Grid>
-          <Grid item xs={12} className={classes.center} align="left">
-            <TextField
-              className={classes.textField}
-              id="Ranking"
-              select
-              label="Ranking level"
-              value={rankingLevel}
-              onChange={this.changeRankingLevel}
-              variant="filled"
-              SelectProps={{
-                className: classes.select,
-                classes: {
-                  icon: classes.selectIcon,
-                },
-              }}
-            >
-              {levels.map((option) => (
-                <MenuItem
-                  key={option.value}
-                  value={option.value}
-                  className={classes.menuItem}
-                >
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={classes.gridTitle}>
-              Overall Ranking
-            </Typography>
-          </Grid>
           <Grid item xs={12} className={classes.itemGrid} align="center">
-            <OverallTable />
+            <div className={classes.itemGridWrapper}>
+              <SelectNoBox
+                containerStyle={classes.titleContainer}
+                fontStyle={classes.titleFont}
+                items={this.options}
+                value={rankingOption}
+                onChange={this.changeRankingOption}
+              />
+              <OverallTable
+                style={{marginTop: "10px"}}
+                users={rankingUsersData[rankingOption]}
+                totalUser={totalUser[rankingOption] || 0}
+                currentPage={rankingPage}
+                handleChangePage={this.changeRankingPage}
+              />
+            </div>
           </Grid>
-          <Grid item xs={12} className={classes.itemGrid}>
-            <Typography className={classes.gridTitle}>My Stats</Typography>
-          </Grid>
+
           <Grid item xs={12} className={classes.itemGrid} align="center">
-            <MyStatsTable
-              overallRank={overallRank}
-              regionRank={regionRank}
-              portfolioValue={portfolioValue}
-              previousWeek={previousWeek}
-              portfolioHigh={portfolioHigh}
-            />
+            <div className={classes.itemGridWrapper}>
+              <MyStatsTable
+                overallRank={ranking}
+                regionRank={regionalRanking}
+                portfolioValue={totalPortfolio}
+                changeFromPreviousWeek={totalPortfolio - lastWeekPortfolio}
+                portfolioHigh={portfolioHigh}
+                portfolioLow={portfolioLow}
+              />
+            </div>
           </Grid>
+
           <SpaceDivMainPages />
         </Grid>
       </Container>
@@ -225,4 +387,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Ranking)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Ranking))
+  )
+);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import {
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogContentText,
 } from "@material-ui/core";
 
-/* 
+/*
   props: {
     title: string,
     content: string
@@ -29,7 +29,7 @@ class TextDialog extends React.Component {
 
   render() {
     const { title, content } = this.props;
-    
+
     return (
       <Dialog
         open={this.state.open}

@@ -1,5 +1,5 @@
 import React from "react";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
@@ -11,7 +11,6 @@ import { Container } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
@@ -29,8 +28,11 @@ const styles = (theme) => ({
 
 class ComponentName extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["classes", "userSession"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }

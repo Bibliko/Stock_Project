@@ -1,6 +1,9 @@
 import React from "react";
 import { isEmpty } from "lodash";
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
+
 import { ComponentWithForwardedRef } from "../../utils/low-dependency/ComponentUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -107,6 +110,7 @@ class SearchField extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       forwardedRef,
       searchCompany,
@@ -114,14 +118,16 @@ class SearchField extends React.Component {
       turnOnSearchMenu,
       clearSearchCompany,
       focused,
+      handleKeyDown,
     } = this.props;
 
     return (
       <TextField
+        onKeyDown={handleKeyDown}
         id="Search"
         ref={forwardedRef}
         value={searchCompany}
-        placeholder="Search..."
+        placeholder={t("general.search")}
         inputRef={this.inputRef}
         autoComplete="off"
         variant="outlined"
@@ -163,4 +169,8 @@ class SearchField extends React.Component {
   }
 }
 
-export default ComponentWithForwardedRef(withStyles(styles)(SearchField));
+export default ComponentWithForwardedRef(
+  withTranslation()(
+    withStyles(styles)(SearchField)
+  )
+);

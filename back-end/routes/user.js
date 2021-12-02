@@ -1,10 +1,12 @@
-const { listRangeAsync } = require("../redis/redis-client");
+const {
+  listLengthAsync,
+  listRangeAsync,
+} = require("../redis/redis-client");
 
 const { Router } = require("express");
 const router = Router();
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/low-dependency/PrismaClient");
 
 const {
   searchAndUpdateTransactionsHistoryM5RU,
@@ -130,6 +132,24 @@ router.get("/getData", (req, res) => {
 });
 
 /**
+ * @description Get the length of ranking list.
+ * @query (Optional) {String} region The desired ranking region (default to overall)
+ */
+router.get("/getRankingLength", (req, res) => {
+  const { region } = req.query;
+  const list = region ? `${rankingList}_${region}` : rankingList;
+
+  listLengthAsync(list)
+    .then((listLength) => {
+      res.send(listLength.toString());
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Failed to get the length of ranking list");
+    });
+});
+
+/**
  * @description Get top 8 users (overall ranking) on the given page in request.
  */
 router.get("/getOverallRanking", (req, res) => {
@@ -143,7 +163,8 @@ router.get("/getOverallRanking", (req, res) => {
           firstName: data[0],
           lastName: data[1],
           totalPortfolio: parseInt(data[2], 10),
-          region: data[3]
+          region: data[3],
+          email: data[4],
         };
       });
 
@@ -169,7 +190,8 @@ router.get("/getRegionalRanking", (req, res) => {
           firstName: data[0],
           lastName: data[1],
           totalPortfolio: parseInt(data[2], 10),
-          region: data[3]
+          region: data[3],
+          email: data[4],
         };
       });
       res.send(usersListJson);

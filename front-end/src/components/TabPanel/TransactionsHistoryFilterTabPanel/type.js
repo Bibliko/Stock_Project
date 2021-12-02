@@ -2,6 +2,13 @@ import React from "react";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
+import {
+  transactionTypeBuy,
+  transactionTypeSell,
+} from "../../../utils/low-dependency/PrismaConstantUtil";
+
 import { withStyles } from "@material-ui/core/styles";
 import { Button, Select, MenuItem } from "@material-ui/core";
 
@@ -43,7 +50,7 @@ const styles = (theme) => ({
 });
 
 /**
-  Props: 
+  Props:
   filters={filters}
   handleChangeFilters={handleChangeFilters}
  */
@@ -72,25 +79,25 @@ class TypeFilter extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["filters"];
+    const compareKeys = ["t", "classes", "filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes, filters } = this.props;
+    const { t, classes, filters } = this.props;
 
     const { open } = this.state;
 
     return (
       <React.Fragment>
         <Button className={classes.disableButton} disableRipple>
-          Type
+          {t("general.type")}
         </Button>
         <Select
           open={open}
@@ -106,11 +113,11 @@ class TypeFilter extends React.Component {
           <MenuItem value="none" className={classes.menuItem}>
             <em>None</em>
           </MenuItem>
-          <MenuItem value="buy" className={classes.menuItem}>
-            Buy_Spend
+          <MenuItem value={transactionTypeBuy} className={classes.menuItem}>
+            {t("general." + transactionTypeBuy)}
           </MenuItem>
-          <MenuItem value="sell" className={classes.menuItem}>
-            Sell_Gain
+          <MenuItem value={transactionTypeSell} className={classes.menuItem}>
+            {t("general." + transactionTypeSell)}
           </MenuItem>
         </Select>
       </React.Fragment>
@@ -118,4 +125,4 @@ class TypeFilter extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(TypeFilter));
+export default withTranslation()(withStyles(styles)(withRouter(TypeFilter)));

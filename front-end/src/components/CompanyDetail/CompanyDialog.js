@@ -2,9 +2,16 @@ import React from "react";
 import { withRouter } from "react-router";
 import { isEqual } from "lodash";
 import PropTypes from "prop-types";
+import { socket } from "../../App";
+
+import { connect } from "react-redux";
+import { userAction } from "../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
 
 import { getFullStockInfo } from "../../utils/RedisUtil";
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
+import { changeUserData } from "../../utils/UserUtil";
 
 import SwipeableViews from "react-swipeable-views";
 import { withStyles } from "@material-ui/core/styles";
@@ -22,6 +29,8 @@ import {
   Typography,
 } from "@material-ui/core";
 
+import { LaunchRounded as LaunchRoundedIcon } from "@material-ui/icons";
+
 import CompanyAbout from "../CompanyDetail/CompanyAbout";
 import NamePriceGraph from "../../components/CompanyDetail/NamePriceGraph";
 
@@ -37,6 +46,9 @@ const styles = (theme) => ({
     cursor: "pointer",
     color: "white",
     backgroundColor: "#000033",
+    "&:hover h2": {
+      opacity: "0.7",
+    },
   },
   dialogContent: {
     color: "white",
@@ -55,6 +67,11 @@ const styles = (theme) => ({
     fontSize: "x-large",
     fontWeight: "bold",
     color: "white",
+  },
+  tradeButton: {
+    marginRight: "7px",
+    color: theme.palette.secondary.mainHover,
+    textDecoration: "underline",
   },
 });
 
@@ -128,6 +145,40 @@ class CompanyDialog extends React.Component {
       });
   };
 
+  mutateWatchlist = (newWatchlist) => {
+    const { email } = this.props.userSession;
+
+    const dataNeedChange = {
+      watchlist: {
+        set: newWatchlist,
+      },
+    };
+    changeUserData(dataNeedChange, email, this.props.mutateUser, socket)
+      .catch(
+        (err) => {
+          console.log(err);
+        }
+      );
+  };
+
+  addToWatchlist = () => {
+    const { companyCode } = this.props;
+    let { watchlist: newWatchlist } = this.props.userSession;
+
+    newWatchlist.push(companyCode);
+    this.mutateWatchlist(newWatchlist);
+  };
+
+  removeFromWatchlist = () => {
+    const { companyCode } = this.props;
+    let { watchlist: newWatchlist } = this.props.userSession;
+
+    newWatchlist = newWatchlist.filter(
+      (companyCodeString) => companyCodeString !== companyCode
+    );
+    this.mutateWatchlist(newWatchlist);
+  };
+
   componentDidMount() {
     this.updateCompanyData();
   }
@@ -148,7 +199,15 @@ class CompanyDialog extends React.Component {
   }
 
   render() {
-    const { classes, handleClose, open, companyCode } = this.props;
+    const {
+      t,
+      classes,
+      userSession,
+      handleAction,
+      handleClose,
+      open,
+      companyCode,
+    } = this.props;
     const { value, errorMessage, companyData } = this.state;
 
     return (
@@ -165,6 +224,7 @@ class CompanyDialog extends React.Component {
             onClick={() => {redirectToPage(`/company/${companyCode}`, this.props)}}
           >
             {`${companyData.companyName} (${companyCode.toUpperCase()})`}
+            <LaunchRoundedIcon fontSize="small"/>
           </DialogTitle>
 
           <DialogContent className={classes.dialogContent}>
@@ -181,12 +241,12 @@ class CompanyDialog extends React.Component {
                       aria-label="full width tabs"
                     >
                       <Tab
-                        label="About"
+                        label={t("company.about")}
                         className={classes.dialogTab}
                         {...a11yProps(0)}
                       />
                       <Tab
-                        label="Graph"
+                        label={t("company.graph")}
                         className={classes.dialogTab}
                         {...a11yProps(1)}
                       />
@@ -214,11 +274,26 @@ class CompanyDialog extends React.Component {
           </DialogContent>
 
           <DialogActions className={classes.dialogAction}>
-            <Button onClick={handleClose} color="primary">
-              Buy
+            <Button
+              onClick={handleAction}
+              className={classes.tradeButton}
+            >
+              {t("company.buySell")}
             </Button>
-            <Button onClick={handleClose} color="primary">
-              Sell
+
+            <Button
+              aria-label="add/remove watchlist button"
+              color="primary"
+              onClick={
+                userSession.watchlist.includes(companyCode)
+                  ? this.removeFromWatchlist
+                  : this.addToWatchlist
+              }
+            >
+              {userSession.watchlist.includes(companyCode) &&
+                t("watchlist.remove")}
+              {!userSession.watchlist.includes(companyCode) &&
+                t("watchlist.add")}
             </Button>
           </DialogActions>
         </Dialog>
@@ -227,4 +302,19 @@ class CompanyDialog extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(CompanyDialog));
+const mapStateToProps = (state) => ({
+  userSession: state.userSession,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(CompanyDialog))
+  )
+);

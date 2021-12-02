@@ -3,6 +3,8 @@ import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
+import { withTranslation } from "react-i18next";
+
 import {
   shouldRedirectToHomePage,
   redirectToPage,
@@ -23,14 +25,15 @@ const styles = (theme) => ({
     justifyContent: "center",
     maxWidth: "none",
     minHeight: "410px",
+    overflowX: "hidden",
   },
   paper: {
     height: "fit-content",
     width: "fit-content",
     minWidth: "450px",
     [theme.breakpoints.down("xs")]: {
-      height: "-webkit-fill-available",
-      width: "-webkit-fill-available",
+      height: "100%",
+      width: "100%",
       minWidth: 0,
     },
     padding: theme.spacing(1),
@@ -93,7 +96,7 @@ class Succeed extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     return (
       <div>
@@ -108,7 +111,7 @@ class Succeed extends React.Component {
             >
               <Grid item xs className={classes.center}>
                 <img
-                  src="/bibOfficial.jpg"
+                  src="/bibOfficial.png"
                   alt="Bibliko"
                   className={classes.avatar}
                 />
@@ -124,11 +127,13 @@ class Succeed extends React.Component {
                   className={classes.succeedIcon}
                 />
                 <Typography className={classes.title}>
-                  Email Verified Successfully
+                  {t("login.verificationSuccess")}
                 </Typography>
               </Grid>
               <Grid item className={classes.center}>
-                <Typography>Redirecting to Home Page...</Typography>
+                <Typography>
+                  {t("login.redirect")}
+                </Typography>
               </Grid>
             </Grid>
           </Paper>
@@ -149,4 +154,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Succeed)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Succeed))
+  )
+);

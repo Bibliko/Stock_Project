@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
+// TODO: Uncomment this in production
 import { getStockNews } from "../../../utils/FinancialModelingPrepUtil";
 import { oneMinute } from "../../../utils/low-dependency/DayTimeUtil";
 
@@ -59,22 +62,24 @@ class CompanyNewsContainer extends React.Component {
   intervalCheckNews;
 
   checkAndSetStateNews = () => {
-    // getStockNews(this.props.companyData.symbol, 10)
-    //   .then((newsArray) => {
-    //     if (!isEqual(newsArray, this.state.news)) {
-    //       this.setState({
-    //         news: newsArray,
-    //       });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    // TODO: Uncomment this in production
+    getStockNews(this.props.companyData.symbol, 10)
+      .then((newsArray) => {
+        if (!isEqual(newsArray, this.state.news)) {
+          this.setState({
+            news: newsArray ?? [],
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   componentDidMount() {
-    // this.checkAndSetStateNews();
-    // this.intervalCheckNews = setInterval(this.checkAndSetStateNews, oneMinute)
+    // TODO: Uncomment this in production
+    this.checkAndSetStateNews();
+    this.intervalCheckNews = setInterval(this.checkAndSetStateNews, oneMinute)
   }
 
   componentWillUnmount() {
@@ -82,7 +87,7 @@ class CompanyNewsContainer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["companyData"];
+    const compareKeys = ["t", "classes", "companyData"];
     const compareProps = pick(this.props, compareKeys);
     const compareNextProps = pick(nextProps, compareKeys);
 
@@ -93,7 +98,7 @@ class CompanyNewsContainer extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const { news } = this.state;
 
     return (
@@ -105,7 +110,9 @@ class CompanyNewsContainer extends React.Component {
         item
         xs={12}
       >
-        <Typography className={classes.title2}>News</Typography>
+        <Typography className={classes.title2}>
+          {t("company.news")}
+        </Typography>
         <Divider className={classes.divider} />
         <Grid
           item
@@ -115,7 +122,7 @@ class CompanyNewsContainer extends React.Component {
           spacing={2}
           style={{ alignSelf: "center" }}
         >
-          {news.map((companyNews, index) => (
+          {news.map?.((companyNews, index) => (
             <CompanyNewsCard key={index} newsObject={companyNews} />
           ))}
         </Grid>
@@ -129,4 +136,6 @@ CompanyNewsContainer.propTypes = {
   companyData: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(withRouter(CompanyNewsContainer));
+export default withTranslation()(
+  withStyles(styles)(withRouter(CompanyNewsContainer))
+);

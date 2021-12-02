@@ -2,6 +2,8 @@ import React from "react";
 import { isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import {
@@ -106,7 +108,7 @@ class SubNavbar extends React.Component {
           getCachedHistoricalChart("NYSE", "5min"),
           getFullStockInfo(topShare),
           mostActiveStocks,
-          getFullStockInfo("AAPL"),
+          getFullStockInfo("MSFT"),
         ]);
       })
       .then(
@@ -153,14 +155,14 @@ class SubNavbar extends React.Component {
     this.updateData();
   }
 
-  componentDidUpdate() {
-    if (this.props.isMarketClosed) {
-      this.setState({
-        countdown: "",
-      });
-      clearInterval(this.marketCountdownInterval);
-    }
-  }
+  // componentDidUpdate() {
+  //   if (this.props.isMarketClosed) {
+  //     this.setState({
+  //       countdown: "",
+  //     });
+  //     clearInterval(this.marketCountdownInterval);
+  //   }
+  // }
 
   componentWillUnmount() {
     clearInterval(this.marketCountdownInterval);
@@ -168,17 +170,17 @@ class SubNavbar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["isMarketClosed", "mediaQuery", "userSession"];
+    const compareKeys = ["t", "classes", "isMarketClosed", "mediaQuery", "userSession"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes, mediaQuery, isMarketClosed } = this.props;
+    const { t, classes, mediaQuery, isMarketClosed } = this.props;
 
     const { collapse, countdown, data } = this.state;
 
@@ -202,11 +204,11 @@ class SubNavbar extends React.Component {
                 gridArea: mediaQuery ? "1 / 1 / 2 / 6" : "1 / 1 / 3 / 6",
                 cursor: mediaQuery && "pointer",
               }}
-              onClick={mediaQuery ? this.toggle : () => {}}
+              onClick={mediaQuery ? this.toggle : undefined}
             >
               {isMarketClosed
-                ? "Market Closed"
-                : "Market closed in " + countdown}
+                ? t("subNavbar.marketClosed")
+                : t("subNavbar.marketClosedIn") + countdown}
 
               {mediaQuery && (
                 <IconButton
@@ -255,4 +257,8 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   null
-)(withStyles(styles)(withMediaQuery("(min-width:800px)")(SubNavbar)));
+)(
+  withTranslation()(
+    withStyles(styles)(withMediaQuery("(min-width:800px)")(SubNavbar))
+  )
+);

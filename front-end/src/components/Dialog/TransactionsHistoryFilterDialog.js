@@ -153,7 +153,7 @@ class TransactionsHistoryFilterDialog extends React.Component {
     errorReports: 0,
   };
 
-  keys = ["Quantity", "Price", "Gain/Loss"];
+  keys = ["quantity", "price", "spendOrGain"];
 
   defaultFilters = {
     type: "none", // buy, sell, OR none
@@ -218,13 +218,13 @@ class TransactionsHistoryFilterDialog extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["openFilterDialog", "filters"];
+    const compareKeys = ["classes", "openFilterDialog", "filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 

@@ -1,11 +1,14 @@
 import React from "react";
 import clsx from "clsx";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import SpaceDivMainPages from "../../components/Space/SpaceDivMainPages";
+import RankingPaper from "../../components/Paper/HomePage/RankingPaper";
 import MarketWatchPaper from "../../components/Paper/HomePage/MarketWatch";
 import MostGainersPaper from "../../components/Paper/HomePage/MostGainers";
 import AccountSummaryPaper from "../../components/Paper/HomePage/AccountSummary";
@@ -19,7 +22,6 @@ import { SettingsRounded as SettingsRoundedIcon } from "@material-ui/icons";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
@@ -54,16 +56,6 @@ const styles = (theme) => ({
     alignItems: "flex-start",
     flexDirection: "column",
     minHeight: "125px",
-    //maxHeight: '300px'
-  },
-  title: {
-    fontSize: "large",
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "medium",
-    },
-    fontWeight: "bold",
-    marginBottom: "12px",
-    color: theme.palette.primary.main,
   },
   paperRedirectingToAccountSetting: {
     height: theme.customHeight.redirectingPaper,
@@ -111,6 +103,7 @@ const styles = (theme) => ({
     },
     alignSelf: "flex-start",
     marginBottom: "40px",
+    marginLeft: "32px",
     fontWeight: "bolder",
     background: theme.palette.gradient.main,
     "-webkit-background-clip": "text",
@@ -120,18 +113,20 @@ const styles = (theme) => ({
 
 class HomePage extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      !isEqual(nextProps.userSession, this.props.userSession) ||
-      !isEqual(nextState, this.state)
-    );
+    const compareKeys = ["t", "classes", "userSession"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   render() {
-    const { classes, userSession } = this.props;
+    const { t, classes, userSession } = this.props;
 
     return (
       <Container className={classes.root} disableGutters>
-        <Typography className={classes.welcome}>Welcome to Bibliko</Typography>
+        <Typography className={classes.welcome}>
+          {t("homepage.greeting")}
+        </Typography>
         {!userSession.hasFinishedSettingUp && (
           <Paper
             className={classes.paperRedirectingToAccountSetting}
@@ -147,7 +142,7 @@ class HomePage extends React.Component {
               )}
             />
             <Typography className={classes.accountSettingWords}>
-              Setup Your Account Now To Start!
+              {t("homepage.setupAccount")}
             </Typography>
           </Paper>
         )}
@@ -168,18 +163,20 @@ class HomePage extends React.Component {
             </Grid>
 
             <Grid item xs={12} md={5} className={classes.itemGrid}>
-              <MostGainersPaper title={"Most Gainers"} />
+              <MostGainersPaper title={t("homepage.mostGainers")} />
             </Grid>
 
-            <Grid container item xs={12} sm={6} className={classes.itemGrid}>
+            <Grid
+              container item
+              xs={12} sm={6} md={7}
+              className={classes.itemGrid}
+              style={{flexDirection: "row"}}
+            >
               <AccountSummaryPaper />
             </Grid>
 
-            <Grid item xs={12} sm={6} className={classes.itemGrid}>
-              <Typography className={classes.title}>Rankings</Typography>
-              <Paper
-                className={clsx(classes.fullHeightWidth, classes.paperColor)}
-              />
+            <Grid item xs={12} sm={6} md={5} className={classes.itemGrid}>
+              <RankingPaper />
             </Grid>
 
             <SpaceDivMainPages />
@@ -195,5 +192,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(withRouter(HomePage))
+  withTranslation()(
+    withStyles(styles)(withRouter(HomePage))
+  )
 );

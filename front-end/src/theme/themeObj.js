@@ -26,7 +26,8 @@ const theme = {
     maxMostGainers: "400px",
     maxMostGainersChip: "95px",
 
-    mainPageWidth: "90%",
+    mainPageWidth: "clamp(150px, 90%, 1500px)",
+    mainPageWidthSmall: "clamp(150px, 90%, 1000px)",
     mainSkeletonWidth: "100%",
 
     redirectingPaper: "90%",
@@ -37,6 +38,9 @@ const theme = {
 
     subBarHeight: "80px",
     subBarHeightSmall: "25px",
+
+    footerHeight: "60px",
+    footerHeightSmall: "70px",
 
     redirectingPaper: "200px",
 
@@ -51,7 +55,7 @@ const theme = {
     topLayout: "55px",
     topLayoutSmall: "20px",
 
-    topFloatingToolButton: "110px",
+    topFloatingToolButton: "150px",
     smallTopFloatingToolButton: "100px",
 
     dialogItemsTransactionsHistoryFilters: "20px",
@@ -60,8 +64,8 @@ const theme = {
   },
   customZIndex: {
     reminder: 10,
-    floatingToolButton: 5,
-    floatingActionButton: 5,
+    floatingToolButton: 30,
+    floatingActionButton: 30,
     appBar: 1100, // This is already embedded in .MuiAppBar-root
     subNavbar: 20,
     subNavbarCard: 18,
@@ -83,7 +87,10 @@ const theme = {
     primary: {
       // Purple
       main: "rgba(136, 120, 255, 1)",
-      hover: "rgba(136, 120, 255, 0.3)",
+      hover: "rgba(136, 120, 255, 0.5)",
+
+      transparent: "rgba(136, 120, 255, 0.13)",
+      transparentHover: "rgba(136, 120, 255, 0.2)",
 
       subLight: "rgba(120, 127, 246, 1)",
 
@@ -123,14 +130,14 @@ const theme = {
     },
 
     // App Bar
-    appBarBlue: {
+    appBar: {
       // main: "linear-gradient(45deg, #141466 20%, #2929CC 100%)",
-      main: "rgba(31, 47, 152, 1)",
+      main: "rgba(27, 24, 44, 1)",
     },
 
     // Paper
     paperBackground: {
-      main: "rgba(0, 0, 0, 1)", // Black
+      main: "rgba(22, 22, 24, 1)", // Black
       sub: "rgba(107, 87, 224, 1)", // Dark Purple
 
       // Grey
@@ -142,7 +149,7 @@ const theme = {
 
     // Login
     loginBackground: {
-      main: "#0d0d0d",
+      main: "rgba(29, 29, 42, 1)",
     },
 
     gradientPaper: {
@@ -182,8 +189,8 @@ const theme = {
 
     // Search Field
     searchFieldBackground: {
-      main: "rgba(60, 60, 60, 1)",
-      onHover: "rgba(70, 70, 70, 1)",
+      main: "rgba(53, 51, 62, 1)",
+      onHover: "rgba(65, 62, 76, 1)",
       rippleSpan: "rgba(100, 100, 100, 0.9)",
       searchIcon: "rgba(255, 255, 255, 0.7)",
     },

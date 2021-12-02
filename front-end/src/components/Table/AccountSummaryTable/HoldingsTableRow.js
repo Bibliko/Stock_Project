@@ -7,6 +7,7 @@ import { socket } from "../../../App";
 import { connect } from "react-redux";
 import { userAction } from "../../../redux/storeActions/actions";
 
+// TODO: Uncomment this in production
 import { getFullStockInfo } from "../../../utils/RedisUtil";
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 import {
@@ -14,6 +15,7 @@ import {
   roundNumber,
 } from "../../../utils/low-dependency/NumberUtil";
 import { changeUserData } from "../../../utils/UserUtil";
+import { redirectToPage } from "../../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -21,7 +23,8 @@ import {
   TableCell,
   IconButton,
   Typography,
-  Tooltip,
+  // TODO: code tooltip
+  // Tooltip,
 } from "@material-ui/core";
 
 import {
@@ -29,7 +32,8 @@ import {
   ArrowDropUpRounded as ArrowDropUpRoundedIcon,
   ArrowDropDownRounded as ArrowDropDownRoundedIcon,
   DeleteForeverRounded as DeleteForeverRoundedIcon,
-  InfoRounded as InfoRoundedIcon,
+  // TODO: code tooltip
+  // InfoRounded as InfoRoundedIcon,
 } from "@material-ui/icons";
 
 const styles = (theme) => ({
@@ -77,6 +81,13 @@ const styles = (theme) => ({
     position: "sticky",
     left: 0,
   },
+  codeCell: {
+    cursor: "pointer",
+    "&:hover": {
+      textDecoration: "underline",
+      color: theme.palette.secondary.main,
+    },
+  },
   holdingsTableItem: {
     fontSize: "medium",
     [theme.breakpoints.down("xs")]: {
@@ -94,31 +105,34 @@ const styles = (theme) => ({
   lastRow: {
     borderBottomWidth: "1px",
   },
-  codeInfoButton: {
-    color: "white",
-    padding: 0,
-    marginLeft: "8px",
-  },
+  // TODO: code tooltip
+  // codeInfoButton: {
+  //   color: "white",
+  //   padding: 0,
+  //   marginLeft: "8px",
+  // },
 });
 
-const HtmlTooltip = withStyles((theme) => ({
-  tooltip: {
-    backgroundColor: theme.palette.paperBackground.onPageSuperLight,
-    boxShadow: theme.customShadow.popup,
-    color: "white",
-    maxWidth: 220,
-  },
-  arrow: {
-    color: theme.palette.paperBackground.onPageSuperLight,
-  },
-}))(Tooltip);
+// TODO: code tooltip
+// const HtmlTooltip = withStyles((theme) => ({
+//   tooltip: {
+//     backgroundColor: theme.palette.paperBackground.onPageSuperLight,
+//     boxShadow: theme.customShadow.popup,
+//     color: "white",
+//     maxWidth: 220,
+//   },
+//   arrow: {
+//     color: theme.palette.paperBackground.onPageSuperLight,
+//   },
+// }))(Tooltip);
 
 class HoldingsTableRow extends React.Component {
   state = {
     lastPrice: "Updating",
     profitOrLoss: "Updating",
     isInWatchlist: false,
-    openInfo: false,
+    // TODO: code tooltip
+    // openInfo: false,
   };
 
   checkStockPriceInterval;
@@ -149,8 +163,8 @@ class HoldingsTableRow extends React.Component {
         return `$${numberWithCommas(this.state.lastPrice)}`;
 
       case "Profit/Loss":
-        if ((this.state.profitOrLoss, 10 < 0)) {
-          return `-$${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
+        if (this.state.profitOrLoss < 0) {
+          return `- $${numberWithCommas(Math.abs(this.state.profitOrLoss))}`;
         }
         return `$${numberWithCommas(this.state.profitOrLoss)}`;
 
@@ -174,7 +188,13 @@ class HoldingsTableRow extends React.Component {
           [classes.lastLeftCell]: this.isTableRowTheLast() && type === "Code",
           [classes.lastRow]: this.isTableRowTheLast(),
           [classes.stickyCell]: type === "Code" && !this.props.minimal,
+          [classes.codeCell]: type === "Code",
         })}
+        onClick={
+          type === "Code"
+          ? () => redirectToPage(`company/${this.props.rowData.code}`, this.props)
+          : undefined
+        }
       >
         <div
           className={clsx(classes.cellDiv, {
@@ -185,7 +205,8 @@ class HoldingsTableRow extends React.Component {
           <Typography className={classes.holdingsTableItem}>
             {this.chooseTableCellValue(type)}
           </Typography>
-          {type === "Code" && (
+          {/*TODO: code tooltip*/}
+          {/*{type === "Code" && (
             <HtmlTooltip
               title={
                 <React.Fragment>
@@ -205,7 +226,7 @@ class HoldingsTableRow extends React.Component {
                 <InfoRoundedIcon onBlur={this.closeInfoTooltip} />
               </IconButton>
             </HtmlTooltip>
-          )}
+          )}*/}
           {this.checkIfProfitOrLoss(type) === "Profit" && (
             <ArrowDropUpRoundedIcon className={classes.arrowUp} />
           )}
@@ -217,23 +238,24 @@ class HoldingsTableRow extends React.Component {
     );
   };
 
-  switchInfoTooltip = () => {
-    this.setState({
-      openInfo: !this.state.openInfo,
-    });
-  };
+  // TODO: code tooltip
+  // switchInfoTooltip = () => {
+  //   this.setState({
+  //     openInfo: !this.state.openInfo,
+  //   });
+  // };
 
-  openInfoTooltip = () => {
-    this.setState({
-      openInfo: true,
-    });
-  };
+  // openInfoTooltip = () => {
+  //   this.setState({
+  //     openInfo: true,
+  //   });
+  // };
 
-  closeInfoTooltip = () => {
-    this.setState({
-      openInfo: false,
-    });
-  };
+  // closeInfoTooltip = () => {
+  //   this.setState({
+  //     openInfo: false,
+  //   });
+  // };
 
   addToWatchlist = () => {
     const { code } = this.props.rowData;
@@ -322,16 +344,16 @@ class HoldingsTableRow extends React.Component {
   };
 
   updateHoldingInformation = () => {
-    // const { code, holding, buyPriceAvg } = this.props.rowData;
-    // getFullStockInfo(code)
-    //   .then((fullStockInfo) => {
-    //     console.log(fullStockInfo);
-    //     const { price } = fullStockInfo;
-    //     this.setStateHoldingInformation(price, buyPriceAvg, holding);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    // TODO: Uncomment this in production
+    const { code, holding, buyPriceAvg } = this.props.rowData;
+    getFullStockInfo(code)
+      .then((fullStockInfo) => {
+        const { price } = fullStockInfo;
+        this.setStateHoldingInformation(price, buyPriceAvg, holding);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   componentDidMount() {
@@ -350,17 +372,18 @@ class HoldingsTableRow extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["watchlist"];
-    const nextPropsCompareUserSession = pick(
-      nextProps.userSession,
-      compareKeys
-    );
-    const propsCompareUserSession = pick(this.props.userSession, compareKeys);
+    const userSessionKeys = ["watchlist"];
+    const compareKeys = [
+      "classes",
+      "isMarketClosed",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextProps.isMarketClosed, this.props.isMarketClosed) ||
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompareUserSession, propsCompareUserSession)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 

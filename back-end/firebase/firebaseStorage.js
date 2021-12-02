@@ -1,9 +1,3 @@
-try {
-  require("../config/config");
-} catch (error) {
-  console.log("No config found. Using default ENV.");
-}
-
 global.XMLHttpRequest = require("xhr2");
 var firebase = require("firebase");
 
@@ -11,13 +5,13 @@ var firebase = require("firebase");
 require("firebase/auth");
 require("firebase/storage");
 
-const {
-  FIREBASE_API_KEY: apiKey,
-  FIREBASE_STORAGE_BUCKET: storageBucket,
-  FIREBASE_PROJECT_ID: projectID,
-  FIREBASE_AUTH_DOMAIN: authDomain,
-  FIREBASE_DATABASE_URL: databaseURL
-} = process.env;
+const config = require('../config');
+
+const apiKey = config.FIREBASE_API_KEY;
+const storageBucket = config.FIREBASE_STORAGE_BUCKET;
+const projectID = config.FIREBASE_PROJECT_ID;
+const authDomain = config.FIREBASE_AUTH_DOMAIN;
+const databaseURL = config.FIREBASE_DATABASE_URL;
 
 var firebaseConfig = {
   apiKey,

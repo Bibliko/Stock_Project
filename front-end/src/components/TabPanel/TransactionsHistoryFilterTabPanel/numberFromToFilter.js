@@ -2,6 +2,8 @@ import React from "react";
 import { isEqual, isEmpty, pick } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -59,17 +61,11 @@ class NumberFromToFilter extends React.Component {
     errorText: "",
   };
 
-  keys = {
-    Quantity: "quantity",
-    Price: "price",
-    "Gain/Loss": "spendOrGain",
-  };
-
   timeoutUpdateFrom;
   timeoutUpdateTo;
 
   getFromOrTo = (fromOrTo) => {
-    const rightKey = this.keys[this.props.filterName];
+    const rightKey = this.props.filterName;
     const filtersFromTo = this.props.filters[rightKey].split("_to_");
     return fromOrTo === "from" ? filtersFromTo[0] : filtersFromTo[1];
   };
@@ -77,7 +73,7 @@ class NumberFromToFilter extends React.Component {
   checkErrorFromTo = (from, to) => {
     if (from !== "none" && to !== "none") {
       if (parseFloat(from) > parseFloat(to)) {
-        return "From must < To.";
+        return this.props.t("filter.from<To");
       }
     }
     return "";
@@ -94,7 +90,7 @@ class NumberFromToFilter extends React.Component {
     const { from, to, errorText } = this.state;
     const value = event.target.value === "" ? "none" : event.target.value;
 
-    const rightKey = this.keys[this.props.filterName];
+    const rightKey = this.props.filterName;
 
     // create and add new value to newFilters object
     const newFilters = { ...this.props.filters };
@@ -166,30 +162,30 @@ class NumberFromToFilter extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["filters", "filterName", "clearFlag"];
+    const compareKeys = ["t", "classes", "filters", "filterName", "clearFlag"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes, filterName } = this.props;
+    const { t, classes, filterName } = this.props;
     const { from, to, errorText } = this.state;
 
     return (
       <React.Fragment>
         <Button className={classes.disableButton} disableRipple>
-          {filterName}
+          {t("general." + filterName)}
         </Button>
         <div className={classes.form}>
           <TextField
             error={!isEmpty(errorText)}
             helperText={!isEmpty(errorText) ? errorText : ""}
-            placeholder="From"
+            placeholder={t("filter.from")}
             onChange={this.handleChangeValue("from")}
             value={from === "none" ? "" : from}
             type="number"
@@ -200,7 +196,7 @@ class NumberFromToFilter extends React.Component {
           />
           <TextField
             error={!isEmpty(errorText)}
-            placeholder="To"
+            placeholder={t("filter.to")}
             onChange={this.handleChangeValue("to")}
             value={to === "none" ? "" : to}
             type="number"
@@ -215,4 +211,6 @@ class NumberFromToFilter extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(NumberFromToFilter));
+export default withTranslation()(
+  withStyles(styles)(withRouter(NumberFromToFilter))
+);

@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { isEqual, pick, isEmpty } from "lodash";
 import { withRouter } from "react-router";
 
+import { withTranslation } from "react-i18next";
+
 import { oneSecond } from "../../../utils/low-dependency/DayTimeUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -48,7 +50,7 @@ const styles = (theme) => ({
 });
 
 /**
-  Props: 
+  Props:
   reportError={this.reportError}
   clearFlag={clearTemporaryValuesFlag}
   handleChangeFilters={handleChangeFilters}
@@ -65,18 +67,18 @@ class CodeFilter extends React.Component {
   /**
     Ticker Symbol Basics
     Stock or equity symbols are the most known type of ticker symbol. 
-    Stocks listed and traded on U.S. exchanges such as 
+    Stocks listed and traded on U.S. exchanges such as
     ...the New York Stock Exchange (NYSE) have ticker symbols with up to three letters. 
-    Nasdaq-listed stocks have four-letter ticker symbols. 
+    Nasdaq-listed stocks have four-letter ticker symbols.
 
     stock ticker symbol maximum length: 5 characters (search Google)
    */
   checkErrorCode = (codeValue) => {
     if (codeValue.indexOf(";") >= 0) {
-      return "No ';' in Code is allowed";
+      return this.props.t("filter.no;");
     }
     if (codeValue.length >= 6) {
-      return "No more than 6 characters";
+      return this.props.t("filter.noMore6");
     }
     return "";
   };
@@ -150,25 +152,25 @@ class CodeFilter extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["clearFlag", "filters"];
+    const compareKeys = ["t", "classes", "clearFlag", "filters"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
     return (
-      !isEqual(nextState, this.state) ||
-      !isEqual(nextPropsCompare, propsCompare)
+      !isEqual(nextPropsCompare, propsCompare) ||
+      !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     const { codeValue, errorCodeText } = this.state;
 
     return (
       <React.Fragment>
         <Button className={classes.disableButton} disableRipple>
-          Code
+          {t("general.code")}
         </Button>
         <TextField
           error={!isEmpty(errorCodeText)}
@@ -199,4 +201,4 @@ class CodeFilter extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(CodeFilter));
+export default withTranslation()(withStyles(styles)(withRouter(CodeFilter)));

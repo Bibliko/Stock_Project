@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
+
+import { withTranslation } from "react-i18next";
 
 import Highcharts from "highcharts";
 import Boost from "highcharts/modules/boost";
@@ -66,21 +68,24 @@ const styles = (theme) => ({
 Boost(Highcharts);
 
 class AccountSummaryChart extends React.Component {
-  state = {
-    highChartOptions: {
-      ...highChartDecorations,
+  constructor(props) {
+    super(props);
+    this.state = {
+      highChartOptions: {
+        ...highChartDecorations,
 
-      series: [
-        {
-          ...highChartDecorations.series[0],
-          name: "Portfolio Value",
-          data: [],
-        },
-      ],
-    },
+        series: [
+          {
+            ...highChartDecorations.series[0],
+            name: props.t("general.portfolioValue"),
+            data: [],
+          },
+        ],
+      },
 
-    isChartReady: false,
-  };
+      isChartReady: false,
+    };
+  }
 
   intervalUpdateChartSeries;
 
@@ -142,14 +147,17 @@ class AccountSummaryChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["t", "classes", "email"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.email, this.props.email) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
 
   render() {
-    const { classes, hasFinishedSettingUp } = this.props;
+    const { t, classes, hasFinishedSettingUp } = this.props;
 
     const { highChartOptions, isChartReady } = this.state;
 
@@ -171,13 +179,15 @@ class AccountSummaryChart extends React.Component {
         {isChartReady && isEmpty(highChartOptions.series[0].data) && (
           <Typography className={classes.note}>
             {hasFinishedSettingUp
-              ? "The chart will be updated every minute"
-              : "Finish setting up your account first!"}
+              ? t("summaryChart.updatePeriod")
+              : t("summaryChart.needSetting")}
           </Typography>
         )}
-        <Typography className={classes.noteChart}>2-year records</Typography>
+        <Typography className={classes.noteChart}>
+          {t("summaryChart.recordsPeriod")}
+        </Typography>
         <Typography className={classes.noteChartSmaller}>
-          (If you need longer-than-2-year records, contact us...)
+          {t("summaryChart.contactForMore")}
         </Typography>
       </div>
     );
@@ -190,8 +200,10 @@ AccountSummaryChart.propTypes = {
   hasFinishedSettingUp: PropTypes.bool.isRequired,
 };
 
-export default withStyles(styles)(
-  withTheme(
-    withRouter(withMediaQuery("(max-width:600px)")(AccountSummaryChart))
+export default withTranslation()(
+  withStyles(styles)(
+    withTheme(
+      withRouter(withMediaQuery("(max-width:600px)")(AccountSummaryChart))
+    )
   )
 );

@@ -2,6 +2,11 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
+
+import { roundNumber } from "../../utils/low-dependency/NumberUtil";
+
 import Tooltip from "@material-ui/core/Tooltip";
 import themeObj from "../../theme/themeObj";
 
@@ -45,6 +50,9 @@ const styles = (theme) => ({
   cashLabel: {
     transform: "translateY(19px)",
   },
+  cashLabelVi: {
+    transform: "translateX(6px) translateY(19px)",
+  },
   sharesLabel: {
     transform: "translateX(7px) translateY(43px)",
   },
@@ -68,6 +76,8 @@ class DonutChart extends React.Component {
 
   render() {
     const {
+      t,
+      i18n,
       classes,
       scale,
       progress,
@@ -83,7 +93,7 @@ class DonutChart extends React.Component {
         className={classes.radialChart}
       >
         <CustomTooltip
-          title={`Shares: ${100 - progress}%`}
+          title={t("account.sharesSmall") + `: ${roundNumber(100 - progress, 2)}%`}
           aria-label="Shares"
           placement="top"
           leaveDelay={200}
@@ -102,7 +112,7 @@ class DonutChart extends React.Component {
           />
         </CustomTooltip>
         <CustomTooltip
-          title={`Cash: ${progress}%`}
+          title={t("general.cash") + `: ${progress}%`}
           aria-label="Cash"
           placement="top"
           leaveDelay={200}
@@ -157,9 +167,12 @@ class DonutChart extends React.Component {
             x={"50%"}
             y={"43%"}
             fill={TEXT_COLOR}
-            className={clsx(classes.label, classes.cashLabel)}
+            className={clsx(
+              classes.label,
+              i18n.language === "vi" ? classes.cashLabelVi : classes.cashLabel
+            )}
           >
-            {"Cash"}
+            {t("general.cash")}
           </text>
           <text
             x={"50%"}
@@ -167,7 +180,7 @@ class DonutChart extends React.Component {
             fill={TEXT_COLOR}
             className={clsx(classes.label, classes.sharesLabel)}
           >
-            {"Shares"}
+            {t("account.sharesSmall")}
           </text>
         </g>
       </svg>
@@ -187,4 +200,4 @@ DonutChart.propTypes = {
   totalPortfolio: PropTypes.number,
 };
 
-export default withStyles(styles)(DonutChart);
+export default withTranslation()(withStyles(styles)(DonutChart));

@@ -1,5 +1,12 @@
 import React from "react";
-import { withRouter } from "react-router";
+import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
+
+import {
+  numberWithCommas,
+  roundNumber,
+} from "../../../utils/low-dependency/NumberUtil";
 
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -12,12 +19,18 @@ import {
   Typography,
 } from "@material-ui/core";
 
+import {
+  ArrowDropUpRounded as ArrowDropUpRoundedIcon,
+  ArrowDropDownRounded as ArrowDropDownRoundedIcon,
+} from "@material-ui/icons";
+
 const styles = (theme) => ({
   table: {
     width: "100%",
     border: "hidden",
   },
   tableContainer: {
+    maxWidth: "650px",
     width: "80%",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
@@ -27,10 +40,6 @@ const styles = (theme) => ({
     boxShadow: theme.customShadow.tableContainer,
   },
   tableCell: {
-    fontSize: "medium",
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "small",
-    },
     border: "hidden",
     color: "white",
   },
@@ -43,7 +52,21 @@ const styles = (theme) => ({
       fontSize: "medium",
     },
     fontWeight: "bold",
-    color: "white",
+  },
+  content: {
+    fontSize: "medium",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "small",
+    },
+    letterSpacing: "0.03em",
+  },
+  arrowUp: {
+    display: "flex",
+    color: theme.palette.secondary.main,
+  },
+  arrowDown: {
+    display: "flex",
+    color: theme.palette.fail.main,
   },
 });
 
@@ -59,65 +82,105 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 class MyStatsTable extends React.Component {
-  chooseTableRowValue = (type) => {
+  getChangeTrend = (type) => {
+    if (type === "Change from previous week")
+      return this.props.changeFromPreviousWeek >= 0 ? "Up" : "Down";
+  };
+
+  getTableRowValue = (type) => {
+    const {
+      overallRank,
+      regionRank,
+      portfolioValue,
+      changeFromPreviousWeek,
+      portfolioHigh,
+      portfolioLow,
+    } = this.props;
+
     switch (type) {
       case "Overall ranking":
-        return ``;
+        return `${numberWithCommas(overallRank)}`;
 
       case "Region ranking":
-        return ``;
+        return `${numberWithCommas(regionRank)}`;
 
       case "Portfolio value":
-        return ``;
+        return `$${numberWithCommas(roundNumber(portfolioValue, 2))}`;
 
       case "Change from previous week":
-        return ``;
+        if (changeFromPreviousWeek < 0) {
+          return `- $${numberWithCommas(roundNumber(Math.abs(changeFromPreviousWeek), 2))}`;
+        }
+        return `$${numberWithCommas(roundNumber(changeFromPreviousWeek, 2))}`;
 
       case "Portfolio high":
-        //return `${this.props.portfolioHigh}`;
-        return ``;
+        return `$${numberWithCommas(roundNumber(portfolioHigh, 2))}`;
+
+      case "Portfolio low":
+        return `$${numberWithCommas(roundNumber(portfolioLow, 2))}`;
 
       default:
         return;
     }
   };
 
-  chooseTableRow = (type, classes) => {
+  getTableRow = (label) => {
+    const { t, classes } = this.props;
+    const changeTrend = this.getChangeTrend(label);
+
     return (
-      <StyledTableRow>
-        <TableCell align="left" className={classes.tableCell}>
-          {type}
+      <StyledTableRow key={"stat-" + label}>
+        <TableCell
+          align="left"
+          className={clsx(classes.tableCell, classes.content)}
+        >
+          {t("table." + label) + ":"}
         </TableCell>
-        <TableCell align="left" className={classes.tableCell}>
-          {this.chooseTableRowValue(type)}
+
+        <TableCell
+          align="left"
+          className={clsx(classes.tableCell, {
+            [classes.arrowUp]: changeTrend === "Up",
+            [classes.arrowDown]: changeTrend === "Down",
+          })}
+        >
+          <Typography className={classes.content}>
+            {this.getTableRowValue(label)}
+          </Typography>
+          {changeTrend === "Up" && (
+            <ArrowDropUpRoundedIcon className={classes.arrowUp} />
+          )}
+          {changeTrend === "Down" && (
+            <ArrowDropDownRoundedIcon className={classes.arrowDown} />
+          )}
         </TableCell>
       </StyledTableRow>
     );
   };
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     return (
       <TableContainer className={classes.tableContainer}>
-        <Table className={classes.table} aria-label="simple table">
+        <Table className={classes.table} aria-label="my stats table">
           <TableHead>
             <TableRow className={classes.head}>
               <TableCell align="left" className={classes.tableCell}>
                 <Typography className={classes.headtitle}>
-                  Performance Summary
+                  {t("table.myStats")}
                 </Typography>
               </TableCell>
-              <TableCell align="left" className={classes.tableCell} />
+              {<TableCell align="left" className={classes.tableCell} />}
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.chooseTableRow("Overall ranking:", classes)}
-            {this.chooseTableRow("Region ranking:", classes)}
-            {this.chooseTableRow("Portfolio value:", classes)}
-            {this.chooseTableRow("Change from previous week:", classes)}
-            {this.chooseTableRow("Portfolio high:", classes)}
-            {this.chooseTableRow("Portfolio low:", classes)}
+            {this.getTableRow("Overall ranking")}
+            {this.getTableRow("Region ranking")}
+            {this.getTableRow("Portfolio value")}
+            {this.getTableRow("Change from previous week")}
+            {this.getTableRow("Portfolio high")}
+            {this.getTableRow("Portfolio low")}
           </TableBody>
         </Table>
       </TableContainer>
@@ -125,4 +188,4 @@ class MyStatsTable extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(MyStatsTable));
+export default withTranslation()(withStyles(styles)(MyStatsTable));

@@ -7,7 +7,12 @@ import { socket } from "../../App";
 import { connect } from "react-redux";
 import { userAction } from "../../redux/storeActions/actions";
 
-import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
+import { withTranslation } from "react-i18next";
+
+import {
+  redirectToPage,
+  openInNewTab,
+} from "../../utils/low-dependency/PageRedirectUtil";
 import { logoutUser } from "../../utils/UserUtil";
 
 import { leaveUserRoom } from "../../utils/SocketUtil";
@@ -18,6 +23,7 @@ import { withStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Toolbar,
+  IconButton,
   Button,
   Grid,
   ClickAwayListener,
@@ -35,10 +41,25 @@ const styles = (theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    background: theme.palette.paperBackground.main,
+    background: theme.palette.appBar.main,
     height: theme.customHeight.appBarHeight,
     [theme.breakpoints.down("xs")]: {
       height: theme.customHeight.appBarHeightSmall,
+    },
+  },
+  languageButton: {
+    "&:hover": {
+      backgroundColor: theme.palette.menuItemHover.main,
+      boxShadow: theme.customShadow.popup,
+    },
+    borderRadius: "3px",
+    padding: "0px 5px",
+    fontSize: "small",
+    fontWeight: "bold",
+    marginRight: "8px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "xx-small",
+      marginRight: "4px",
     },
   },
   menuButton: {
@@ -186,6 +207,14 @@ class PersistentAppBar extends React.Component {
     this.prevOpenGameMenu = this.state.openGameMenu;
   };
 
+  handleChangeLanguage = () => {
+    const { language, languages } = this.props.i18n;
+    const id = (languages.indexOf(language) + 1) % languages.length;
+    console.log(languages[id]);
+    this.props.i18n.changeLanguage(languages[id])
+      .catch((err) => console.log(err));
+  };
+
   componentDidMount() {
     // console.log("mountAppBar");
     this.reFocusWhenTransitionMenu();
@@ -197,9 +226,14 @@ class PersistentAppBar extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email", "avatarUrl", "hasFinishedSettingUp"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
+    const userSessionKeys = ["email", "avatarUrl", "hasFinishedSettingUp"];
+    const compareKeys = [
+      "t",
+      "classes",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return (
       !isEqual(nextPropsCompare, propsCompare) ||
@@ -208,7 +242,7 @@ class PersistentAppBar extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, i18n, classes } = this.props;
 
     const { openAccountMenu, openGameMenu } = this.state;
 
@@ -219,17 +253,20 @@ class PersistentAppBar extends React.Component {
             <SearchFieldLayout />
           </Grid>
           <Grid className={classes.rightNavbarGrid}>
-            <Button disableRipple className={classes.menuButton}>
-              <Typography className={classes.menuButtonTitle}>
-                Education
-              </Typography>
-            </Button>
+            <IconButton
+              aria-label="change language"
+              onClick={this.handleChangeLanguage}
+              className={classes.languageButton}
+            >
+              <img alt={i18n.language} src={t("appbar.flagURL")}/>
+            </IconButton>
 
+            {/*TODO: Notification
             <Button disableRipple className={classes.menuButton}>
               <Typography className={classes.menuButtonTitle}>
-                Notifications
+                {t("appbar.notifications")}
               </Typography>
-            </Button>
+            </Button>*/}
 
             <Button
               disableRipple
@@ -240,7 +277,9 @@ class PersistentAppBar extends React.Component {
               aria-haspopup="true"
               onClick={this.toggleGameMenu}
             >
-              <Typography className={classes.menuButtonTitle}>Game</Typography>
+              <Typography className={classes.menuButtonTitle}>
+                {t("appbar.menu.title")}
+              </Typography>
             </Button>
             <Popper
               open={openGameMenu}
@@ -264,7 +303,19 @@ class PersistentAppBar extends React.Component {
                         id="menu-list-grow"
                         onKeyDown={this.handleListKeyDown}
                       >
-                        <MenuItem disabled>Transactions</MenuItem>
+                        <MenuItem disabled>
+                          {t("appbar.menu.transactions")}
+                        </MenuItem>
+                        <MenuItem
+                          dense
+                          disabled={this.disableIfHasNotFinishedSettingUpAccount()}
+                          onClick={() => {
+                            redirectToPage("placeOrder", this.props);
+                          }}
+                          className={classes.menuItem}
+                        >
+                          {t("appbar.menu.placeOrder")}
+                        </MenuItem>
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
@@ -273,17 +324,22 @@ class PersistentAppBar extends React.Component {
                           }}
                           className={classes.menuItem}
                         >
-                          Trading History
+                          {t("appbar.menu.tradingHistory")}
                         </MenuItem>
                         <MenuItem
                           dense
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
                           className={classes.menuItem}
+                          onClick={() => {
+                            redirectToPage("/pendingOrder", this.props);
+                          }}
                         >
-                          Pending Orders
+                          {t("appbar.menu.pendingOrders")}
                         </MenuItem>
 
-                        <MenuItem disabled>List</MenuItem>
+                        <MenuItem disabled>
+                          {t("appbar.menu.list")}
+                        </MenuItem>
                         <MenuItem
                           dense
                           onClick={() => {
@@ -291,7 +347,7 @@ class PersistentAppBar extends React.Component {
                           }}
                           className={classes.menuItem}
                         >
-                          Watchlist
+                          {t("appbar.menu.watchlist")}
                         </MenuItem>
                         <MenuItem
                           dense
@@ -300,13 +356,16 @@ class PersistentAppBar extends React.Component {
                           }}
                           className={classes.menuItem}
                         >
-                          Companies
+                          {t("appbar.menu.companies")}
                         </MenuItem>
 
-                        <MenuItem disabled>Explore</MenuItem>
-                        <MenuItem dense className={classes.menuItem}>
-                          Charts
+                        <MenuItem disabled>
+                          {t("appbar.menu.explore")}
                         </MenuItem>
+                        {/*TODO: Charts page
+                        <MenuItem dense className={classes.menuItem}>
+                          {t("appbar.menu.charts")}
+                        </MenuItem>*/}
                         <MenuItem
                           dense
                           onClick={() => {
@@ -315,7 +374,7 @@ class PersistentAppBar extends React.Component {
                           disabled={this.disableIfHasNotFinishedSettingUpAccount()}
                           className={classes.menuItem}
                         >
-                          Ranking
+                          {t("appbar.menu.ranking")}
                         </MenuItem>
                       </MenuList>
                     </ClickAwayListener>
@@ -323,6 +382,16 @@ class PersistentAppBar extends React.Component {
                 </Grow>
               )}
             </Popper>
+
+            <Button
+              disableRipple
+              className={classes.menuButton}
+              onClick={() => openInNewTab("https://bibliko.org/")}
+            >
+              <Typography className={classes.menuButtonTitle}>
+                {t("appbar.education")}
+              </Typography>
+            </Button>
 
             <Button
               className={classes.menuButton}
@@ -335,7 +404,7 @@ class PersistentAppBar extends React.Component {
               disableRipple
             >
               <Typography className={classes.menuButtonTitle}>
-                Account
+                {t("appbar.account.title")}
               </Typography>
             </Button>
             <Popper
@@ -366,7 +435,7 @@ class PersistentAppBar extends React.Component {
                             redirectToPage("/accountSummary", this.props);
                           }}
                         >
-                          Account Summary
+                          {t("appbar.account.summary")}
                         </MenuItem>
                         <MenuItem
                           className={classes.menuItem}
@@ -374,13 +443,13 @@ class PersistentAppBar extends React.Component {
                             redirectToPage("/setting", this.props);
                           }}
                         >
-                          Account Settings
+                          {t("appbar.account.settings")}
                         </MenuItem>
                         <MenuItem
                           className={classes.menuItem}
                           onClick={this.logout}
                         >
-                          Log Out
+                          {t("appbar.account.logOut")}
                         </MenuItem>
                       </MenuList>
                     </ClickAwayListener>
@@ -406,4 +475,8 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(PersistentAppBar)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(PersistentAppBar))
+  )
+);

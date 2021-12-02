@@ -1,5 +1,7 @@
 import React from "react";
-import { isEqual } from "lodash";
+import { isEqual, pick } from "lodash";
+
+import { withTranslation } from "react-i18next";
 
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -37,11 +39,10 @@ class CompaniesListTable extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      !isEqual(nextProps.rows, this.props.rows) ||
-      nextProps.sortBy !== this.props.sortBy ||
-      nextProps.sortDirection !== this.props.sortDirection
-    );
+    const compareKeys = ["t", "classes", "rows", "sortBy", "sortDirection"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
+    return !isEqual(nextPropsCompare, propsCompare);
   }
 
   componentDidUpdate() {
@@ -50,6 +51,7 @@ class CompaniesListTable extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       sortBy,
       sortDirection,
@@ -80,37 +82,37 @@ class CompaniesListTable extends React.Component {
               width: 50,
               minWidth: 50,
               maxWidth: 50,
-              label: "No.",
+              label: t("general.no"),
               dataKey: "index",
             },
             {
               width: 100,
               minWidth: 60,
-              label: "Name",
+              label: t("general.name"),
               dataKey: "name",
             },
             {
               width: 60,
               minWidth: 40,
-              label: "Code",
+              label: t("table.Code"),
               dataKey: "code",
             },
             {
               width: 60,
               minWidth: 40,
-              label: "Price",
+              label: t("general.price"),
               dataKey: "price",
             },
             {
               width: 120,
               minWidth: 60,
-              label: "Market Cap",
+              label: t("general.marketCap"),
               dataKey: "marketCap",
             },
             {
               width: 80,
               minWidth: 60,
-              label: "Rating",
+              label: t("general.rating"),
               dataKey: "rating",
             },
           ]}
@@ -120,4 +122,4 @@ class CompaniesListTable extends React.Component {
   }
 }
 
-export default withStyles(styles)(CompaniesListTable);
+export default withTranslation()(withStyles(styles)(CompaniesListTable));

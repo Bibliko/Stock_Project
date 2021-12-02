@@ -1,5 +1,8 @@
 import React from "react";
 import clsx from "clsx";
+
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import {
@@ -63,6 +66,9 @@ const styles = (theme) => ({
         paddingBottom: "6px",
       },
     },
+    "&.Mui-disabled": {
+      color: theme.palette.disabled.whiteColor,
+    },
   },
   title: {
     color: "white",
@@ -121,7 +127,9 @@ class SettingNormalTextField extends React.Component {
 
   render() {
     const {
+      t,
       classes,
+      containerClass,
       name,
       value,
       isInvalid,
@@ -132,9 +140,9 @@ class SettingNormalTextField extends React.Component {
     const { onHover } = this.state;
 
     return (
-      <Container className={classes.textFieldContainer}>
+      <Container className={clsx(classes.textFieldContainer, containerClass)}>
         <Typography className={classes.title}>
-          {name}
+          {t(`general.${name}`, name)}
           <IconButton
             onClick={this.resetValue}
             className={clsx(classes.iconButton, {
@@ -178,4 +186,4 @@ class SettingNormalTextField extends React.Component {
   }
 }
 
-export default withStyles(styles)(SettingNormalTextField);
+export default withTranslation()(withStyles(styles)(SettingNormalTextField));

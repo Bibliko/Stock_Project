@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import { withTranslation } from "react-i18next";
+
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 
@@ -70,32 +72,35 @@ Boost(Highcharts);
 BrokenAxis(Highcharts);
 
 class ExchangeOrCompanyPriceChart extends React.Component {
-  state = {
-    highChartOptions: {
-      ...highChartDecorations,
+  constructor(props) {
+    super(props);
+    this.state = {
+      highChartOptions: {
+        ...highChartDecorations,
 
-      yAxis: {
-        ...highChartDecorations.yAxis,
-        title: {
-          ...highChartDecorations.yAxis.title,
+        yAxis: {
+          ...highChartDecorations.yAxis,
+          title: {
+            ...highChartDecorations.yAxis.title,
+          },
         },
+
+        series: [
+          {
+            ...highChartDecorations.series[0],
+            name: props.t("general.closePrice"),
+            data: [],
+          },
+        ],
       },
 
-      series: [
-        {
-          ...highChartDecorations.series[0],
-          name: "Close Price",
-          data: [],
-        },
-      ],
-    },
-
-    historicalChart5min: [],
-    historicalChartFull: [],
-    chartTimeLimitChoices: ["1D", "1W", "1M", "6M", "Full"],
-    chartTimeLimit: "1D",
-    isChartReady: false,
-  };
+      historicalChart5min: [],
+      historicalChartFull: [],
+      chartTimeLimitChoices: ["1D", "1W", "1M", "6M", "Full"],
+      chartTimeLimit: "1D",
+      isChartReady: false,
+    };
+  }
 
   intervalUpdateChart;
 
@@ -328,7 +333,7 @@ class ExchangeOrCompanyPriceChart extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["exchangeOrCompany"];
+    const compareKeys = ["t", "classes", "exchangeOrCompany"];
     const nextPropsCompare = pick(nextProps, compareKeys);
     const propsCompare = pick(this.props, compareKeys);
 
@@ -339,7 +344,7 @@ class ExchangeOrCompanyPriceChart extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
 
     const {
       isChartReady,
@@ -363,7 +368,9 @@ class ExchangeOrCompanyPriceChart extends React.Component {
         )}
 
         {isChartReady && isEmpty(highChartOptions.series[0].data) && (
-          <Typography className={classes.note}>No Data</Typography>
+          <Typography className={classes.note}>
+            {t("general.noData")}
+          </Typography>
         )}
 
         {isChartReady && !isEmpty(highChartOptions.series[0].data) && (
@@ -398,8 +405,10 @@ ExchangeOrCompanyPriceChart.propTypes = {
   exchangeOrCompany: PropTypes.string.isRequired,
 };
 
-export default withStyles(styles)(
-  withTheme(
-    withRouter(withMediaQuery("(max-width:600px)")(ExchangeOrCompanyPriceChart))
+export default withTranslation()(
+  withStyles(styles)(
+    withTheme(
+      withRouter(withMediaQuery("(max-width:600px)")(ExchangeOrCompanyPriceChart))
+    )
   )
 );

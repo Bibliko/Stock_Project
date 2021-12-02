@@ -10,8 +10,8 @@ import {
   redirectToPage,
 } from "../../utils/low-dependency/PageRedirectUtil";
 
+// TODO: Uncomment this in production
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
-
 import { checkStockQuotesToCalculateSharesValue } from "../../utils/UserUtil";
 
 import {
@@ -30,6 +30,7 @@ import AppBar from "./AppBar";
 import SubNavbar from "./SubNavbar";
 import Reminder from "../Reminder/Reminder";
 import LayoutSpeedDial from "../SpeedDial/LayoutSpeedDial";
+import Footer from "./Footer";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -40,18 +41,18 @@ import { Skeleton } from "@material-ui/lab";
 const styles = (theme) => ({
   root: {
     display: "flex",
+    flexDirection: "column",
+    minHeight: "100vh",
   },
   //content. Write new CSS above this comment
   main: {
     position: "static",
-    width: "100vw",
   },
   mainContent: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
     flexDirection: "column",
-    height: "100vh",
     width: "100%",
   },
   contentHeader: {
@@ -77,6 +78,7 @@ const styles = (theme) => ({
     height: "100vh",
     width: "100%",
     position: "fixed",
+    zIndex: "-1",
   },
   bottomSpace: {
     width: "100%",
@@ -101,12 +103,13 @@ class Layout extends React.Component {
   checkStockQuotesInterval;
 
   setupIntervals = () => {
-    // if (this.props.userSession.hasFinishedSettingUp) {
-    //   this.checkStockQuotesInterval = setInterval(
-    //     () => checkStockQuotesToCalculateSharesValue(this),
-    //     30 * oneSecond
-    //   );
-    // }
+    // TODO: Uncomment this in production
+    if (this.props.userSession.hasFinishedSettingUp) {
+      this.checkStockQuotesInterval = setInterval(
+        () => checkStockQuotesToCalculateSharesValue(this),
+        30 * oneSecond
+      );
+    }
   };
 
   setupSocketListeners = () => {
@@ -202,6 +205,7 @@ class Layout extends React.Component {
             <div className={classes.bottomSpace} />
           </div>
         </main>
+        <Footer />
       </div>
     );
   }

@@ -131,7 +131,7 @@ export const getManyStockInfosUsingPrismaShares = (prismaShares) => {
 export const getCachedHistoricalChart = (
   exchangeOrCompany,
   typeChart,
-  getFromCacheDirectly = process.env.NODE_ENV === "development" ? true : false
+  getFromCacheDirectly = process.env.REACT_APP_NODE_ENV === "development"
 ) => {
   return new Promise((resolve, reject) => {
     axios(`${BACKEND_HOST}/redis/${getHistoricalChart}`, {

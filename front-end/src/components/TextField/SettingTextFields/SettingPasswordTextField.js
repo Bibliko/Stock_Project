@@ -1,5 +1,7 @@
 import React from "react";
 
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 
 import {
@@ -102,12 +104,14 @@ class SettingPasswordTextField extends React.Component {
   };
 
   render() {
-    const { classes, name, value, isInvalid, helper, onChange } = this.props;
+    const { t, classes, name, value, isInvalid, helper, onChange } = this.props;
     const { onHover, visibility } = this.state;
 
     return (
       <Container className={classes.textFieldContainer}>
-        <Typography className={classes.title}>{name}</Typography>
+        <Typography className={classes.title}>
+          {t(`general.${name}`, name)}
+        </Typography>
         <TextField
           fullWidth
           value={value}
@@ -149,4 +153,4 @@ class SettingPasswordTextField extends React.Component {
   }
 }
 
-export default withStyles(styles)(SettingPasswordTextField);
+export default withTranslation()(withStyles(styles)(SettingPasswordTextField));

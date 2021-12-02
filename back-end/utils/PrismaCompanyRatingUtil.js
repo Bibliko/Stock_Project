@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("./low-dependency/PrismaClient");
 
 const {
   SequentialPromisesWithResultsArray
@@ -8,6 +7,8 @@ const {
 const {
   getFullStockRatingsFromFMP
 } = require("./FinancialModelingPrepUtil.js");
+
+const { NODE_ENV } = require('../config');
 
 const executeUpdateCompaniesRatingsList = () => {
   return new Promise((resolve, reject) => {
@@ -69,7 +70,7 @@ const executeUpdateCompaniesRatingsList = () => {
  */
 const updateCompaniesRatingsList = (forceUpdate = false) => {
   return new Promise((resolve, reject) => {
-    if (!forceUpdate && process.env.NODE_ENV === "development") {
+    if (!forceUpdate && NODE_ENV === "development") {
       prisma.companyRating
         .count()
         .then((countModels) => {

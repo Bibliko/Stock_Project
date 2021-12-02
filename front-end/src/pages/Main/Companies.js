@@ -2,10 +2,17 @@ import React from "react";
 import { withRouter } from "react-router";
 
 import { connect } from "react-redux";
-import { userAction } from "../../redux/storeActions/actions";
-import { getStockScreener } from "../../utils/FinancialModelingPrepUtil";
+import { orderAction } from "../../redux/storeActions/actions";
+
+import { withTranslation } from "react-i18next";
+
+import {
+  getStockScreener,
+  filterStockScreener,
+} from "../../utils/FinancialModelingPrepUtil";
 import { getAllCompaniesRating } from "../../utils/CompanyUtil";
 import { ratingValue } from "../../utils/low-dependency/FmpHelper";
+import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { SortDirection } from "react-virtualized";
 
@@ -19,7 +26,6 @@ import ProgressButton from "../../components/Button/ProgressButton";
 
 const styles = (theme) => ({
   root: {
-    position: "absolute",
     height: "75%",
     width: theme.customWidth.mainPageWidth,
     marginTop: theme.customMargin.topLayout,
@@ -147,6 +153,11 @@ class Companies extends React.Component {
     });
   };
 
+  handleDialogAction = () => {
+    this.props.mutateOrder({companyCode: this.state.companyCode});
+    redirectToPage('/placeOrder', this.props)
+  };
+
   // Price scale: y = 10 ^ (0.0055051499 * x)
   getPrice = (value) => {
     return 10 ** (0.0055051499 * value);
@@ -196,12 +207,15 @@ class Companies extends React.Component {
     const { price, marketCap, sector, industry } = this.state;
     let { stockRatings } = this.state;
 
-    getStockScreener({
-      priceFilter: price,
-      marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
-      sectorFilter: sector,
-      industryFilter: industry,
-    })
+    getStockScreener()
+      .then((stockData) => {
+        return filterStockScreener(stockData, {
+          priceFilter: price,
+          marketCapFilter: marketCap.map((value) => this.getMarketCap(value)),
+          sectorFilter: sector,
+          industryFilter: industry,
+        });
+      })
       .then((stockData) => {
         // fetch ratingData on mount
         if (!stockRatings)
@@ -242,7 +256,7 @@ class Companies extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { t, classes } = this.props;
     const {
       openDialog,
       companyCode,
@@ -275,7 +289,7 @@ class Companies extends React.Component {
               loading={loading}
               handleClick={this.handleReload}
             >
-              Reload
+              {t("general.reload")}
             </ProgressButton>
             <Filter
               price={price}
@@ -289,7 +303,7 @@ class Companies extends React.Component {
           </Grid>
           <Grid item xs={12} sm={8}>
             <Typography className={classes.gridTitle} component="div">
-              Companies
+              {t("general.companies")}
             </Typography>
 
             <CompaniesListTable
@@ -302,8 +316,7 @@ class Companies extends React.Component {
             />
 
             <Typography className={classes.caption}>
-              {`Showing ${stockData.length} result` +
-                (stockData.length > 1 ? "s" : "")}
+              {`${t("table.showing")} ${stockData.length} ${t("table.result")}`}
             </Typography>
           </Grid>
         </Grid>
@@ -311,6 +324,7 @@ class Companies extends React.Component {
         <CompanyDialog
           open={openDialog}
           handleClose={this.handleCloseDialog}
+          handleAction={this.handleDialogAction}
           companyCode={companyCode}
         />
       </Container>
@@ -323,10 +337,14 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  mutateUser: (userProps) => dispatch(userAction("default", userProps)),
+  mutateOrder: (dataToChange) => dispatch(orderAction("change", dataToChange)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(withRouter(Companies)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Companies))
+  )
+);

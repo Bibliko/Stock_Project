@@ -1,7 +1,9 @@
 import React from "react";
 import clsx from "clsx";
-import { isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual, pick } from "lodash";
 import { withRouter } from "react-router";
+
+import { withTranslation } from "react-i18next";
 
 import { withMediaQuery } from "../../theme/ThemeUtil";
 import { oneSecond } from "../../utils/low-dependency/DayTimeUtil";
@@ -97,49 +99,6 @@ const styles = (theme) => ({
   },
 });
 
-const NYSE = [
-  {
-    symbol: "asdf",
-    name: "asdf",
-    currency: "USD",
-    exchangeShortName: "asdf",
-  },
-  {
-    symbol: "asdf",
-    name: "asdf",
-    currency: "USD",
-    exchangeShortName: "asdf",
-  },
-  {
-    symbol: "asdf",
-    name: "asdf",
-    currency: "USD",
-    exchangeShortName: "asdf",
-  },
-];
-
-const NASDAQ = [
-  {
-    symbol: "asdf",
-    name: "asdf",
-    currency: "USD",
-    exchangeShortName: "asdf",
-  },
-  {
-    symbol: "asdf",
-    name: "asdf",
-    currency: "USD",
-    exchangeShortName: "asdf",
-  },
-  {
-    symbol: "asdf",
-    name:
-      "LightInTheBox Holding Co. Ltd. American Depositary Shares each representing 2",
-    currency: "USD",
-    exchangeShortName: "asdf",
-  },
-];
-
 class SearchFieldLayout extends React.Component {
   state = {
     openSearchMenu: false,
@@ -147,13 +106,14 @@ class SearchFieldLayout extends React.Component {
     companiesNYSE: [],
     companiesNASDAQ: [],
     note: "",
-
+    focusItem: false,
     isScreenSmall: false,
   };
 
   prevOpenSearchMenu = false;
 
-  timeoutForSearch; // half a second timeout -> delay searching
+  timeoutForSearch; // 1/3 second timeout -> delay searching
+  timeoutForClosing; // delay closing on empty
 
   setTimeoutForSearch = () => {
     this.timeoutForSearch = setTimeout(
@@ -162,35 +122,36 @@ class SearchFieldLayout extends React.Component {
     );
   };
 
+  setTimeoutForClosing = (duration = oneSecond) => {
+    this.timeoutForClosing = setTimeout(
+      () => this.turnOffSearchMenu(),
+      duration
+    );
+  };
+
   searchCompanyFn = () => {
     if (isEmpty(this.state.searchCompany) && this.state.openSearchMenu) {
-      this.turnOffSearchMenu();
+      this.setTimeoutForClosing();
     }
 
     if (!isEmpty(this.state.searchCompany)) {
       if (!this.state.openSearchMenu) {
         this.turnOnSearchMenu();
       }
-      this.setState({
-        companiesNYSE: NYSE,
-        companiesNASDAQ: NASDAQ,
-        note: "",
-      });
-      // searchCompanyTickers(this.state.searchCompany)
-      //   .then((resultTickers) => {
-      //     console.log(resultTickers);
-      //     this.setState({
-      //       companiesNYSE: resultTickers[0],
-      //       companiesNASDAQ: resultTickers[1],
-      //       note:
-      //         isEmpty(resultTickers[0]) && isEmpty(resultTickers[1])
-      //           ? "No Stocks Found..."
-      //           : "",
-      //     });
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
+      searchCompanyTickers(this.state.searchCompany)
+        .then((resultTickers) => {
+          this.setState({
+            companiesNYSE: resultTickers[0] || [],
+            companiesNASDAQ: resultTickers[1] || [],
+            note:
+              isEmpty(resultTickers[0]) && isEmpty(resultTickers[1])
+                ? this.props.t("general.noStocks")
+                : "",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 
@@ -198,27 +159,39 @@ class SearchFieldLayout extends React.Component {
     if (this.timeoutForSearch) {
       clearTimeout(this.timeoutForSearch);
     }
+    if (this.timeoutForClosing) {
+      clearTimeout(this.timeoutForClosing);
+    }
 
     this.setState(
       {
         searchCompany: event.target.value,
         companiesNASDAQ: [],
         companiesNYSE: [],
+        focusItem: false,
       },
       () => this.setTimeoutForSearch()
     );
   };
 
   clearSearchCompany = () => {
-    this.setState({
-      searchCompany: "",
-    });
+    this.setState(
+      { searchCompany: "" },
+      () => this.setTimeoutForClosing(oneSecond * 1.5)
+    );
   };
 
   handleListKeyDown = (event) => {
     if (event.key === "Tab") {
       event.preventDefault();
       this.turnOffSearchMenu();
+    }
+  };
+
+  handleSearchFieldKeyDown = (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      this.setState({ focusItem: true });
     }
   };
 
@@ -234,6 +207,8 @@ class SearchFieldLayout extends React.Component {
       searchCompany: "",
       companiesNASDAQ: [],
       companiesNYSE: [],
+      note: "",
+      focusItem: false,
     });
   };
 
@@ -254,8 +229,11 @@ class SearchFieldLayout extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    const compareKeys = ["t", "classes", "mediaQuery"];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
     return (
-      !isEqual(nextProps.mediaQuery, this.props.mediaQuery) ||
+      !isEqual(nextPropsCompare, propsCompare) ||
       !isEqual(nextState, this.state)
     );
   }
@@ -269,6 +247,7 @@ class SearchFieldLayout extends React.Component {
       note,
       isScreenSmall,
       searchCompany,
+      focusItem,
     } = this.state;
 
     return (
@@ -309,6 +288,7 @@ class SearchFieldLayout extends React.Component {
               changeSearchCompany={this.changeSearchCompany}
               clearSearchCompany={this.clearSearchCompany}
               turnOnSearchMenu={this.turnOnSearchMenu}
+              handleKeyDown={this.handleSearchFieldKeyDown}
             />
             <SearchPopper
               openSearchMenu={openSearchMenu}
@@ -318,6 +298,7 @@ class SearchFieldLayout extends React.Component {
               companiesNYSE={companiesNYSE}
               companiesNASDAQ={companiesNASDAQ}
               searchCompanyKey={searchCompany}
+              focusItem={focusItem}
             />
           </div>
         </ClickAwayListener>
@@ -327,5 +308,9 @@ class SearchFieldLayout extends React.Component {
 }
 
 export default withStyles(styles)(
-  withTheme(withRouter(withMediaQuery("(max-width:599px)")(SearchFieldLayout)))
+  withTranslation()(
+    withTheme(
+      withRouter(withMediaQuery("(max-width:599px)")(SearchFieldLayout))
+    )
+  )
 );

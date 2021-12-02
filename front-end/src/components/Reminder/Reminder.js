@@ -3,6 +3,8 @@ import { withRouter } from "react-router";
 import { isUndefined, isEqual, pick } from "lodash";
 import { connect } from "react-redux";
 
+import { withTranslation } from "react-i18next";
+
 import { redirectToPage } from "../../utils/low-dependency/PageRedirectUtil";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -74,27 +76,33 @@ class Reminder extends React.Component {
   };
 
   settingAccountComponent = (classes, preventDefault) => {
+    const { t } = this.props;
     return (
       <Typography className={classes.reminderText}>
-        You haven't finished setting up your account. Get started now!
+        {t("reminder.needSetting")}
         <Link
           onClick={this.clickAccountSettings}
           className={classes.reminderLink}
         >
-          Account Settings
+          {t("appbar.account.settings")}
         </Link>
       </Typography>
     );
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const compareKeys = ["email", "hasFinishedSettingUp"];
-    const nextPropsCompare = pick(nextProps.userSession, compareKeys);
-    const propsCompare = pick(this.props.userSession, compareKeys);
+    const userSessionKeys = ["email", "hasFinishedSettingUp"];
+    const compareKeys = [
+      "t",
+      "classes",
+      ...userSessionKeys.map((key) => "userSession." + key),
+    ];
+    const nextPropsCompare = pick(nextProps, compareKeys);
+    const propsCompare = pick(this.props, compareKeys);
 
     return (
       !isEqual(nextPropsCompare, propsCompare) ||
-      !isEqual(nextState.hide, this.state.hide)
+      !isEqual(nextState, this.state)
     );
   }
 
@@ -122,4 +130,8 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   null
-)(withStyles(styles)(withRouter(Reminder)));
+)(
+  withTranslation()(
+    withStyles(styles)(withRouter(Reminder))
+  )
+);

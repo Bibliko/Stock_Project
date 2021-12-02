@@ -3,6 +3,8 @@ import { isEqual } from "lodash";
 import { withRouter } from "react-router";
 import clsx from "clsx";
 
+import { withTranslation } from "react-i18next";
+
 import {
   numberWithCommas,
   roundNumber,
@@ -91,7 +93,7 @@ class SummaryTableContainer extends React.Component {
 
       case "Daily Change":
         if (this.props.userDailyChange < 0) {
-          return `-$${numberWithCommas(Math.abs(this.props.userDailyChange))}`;
+          return `- $${numberWithCommas(Math.abs(this.props.userDailyChange))}`;
         }
         return `$${numberWithCommas(this.props.userDailyChange)}`;
 
@@ -114,7 +116,9 @@ class SummaryTableContainer extends React.Component {
           align="left"
           className={classes.tableCell}
         >
-          <Typography className={classes.summaryTableItem}>{type}</Typography>
+          <Typography className={classes.summaryTableItem}>
+            {this.props.t("table." + type)}
+          </Typography>
         </TableCell>
         <TableCell
           align="left"
@@ -160,4 +164,6 @@ class SummaryTableContainer extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(SummaryTableContainer));
+export default withTranslation()(
+  withStyles(styles)(withRouter(SummaryTableContainer))
+);

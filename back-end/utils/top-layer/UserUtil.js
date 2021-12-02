@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../low-dependency/PrismaClient");
 const { keysAsync, delAsync } = require("../../redis/redis-client");
 const { isEqual, isEmpty } = require("lodash");
 
@@ -20,8 +19,13 @@ const {
 
 const { createPrismaFiltersObject } = require("../low-dependency/ParserUtil");
 const {
+  SequentialPromises,
   SequentialPromisesWithResultsArray
 } = require("../low-dependency/PromisesUtil");
+
+const { transactionTypeBuy } = require("../low-dependency/PrismaConstantUtil");
+
+const { compareFloat } = require("../low-dependency/NumberUtil");
 
 const deleteExpiredVerification = () => {
   let date = new Date();
@@ -43,16 +47,25 @@ const deleteExpiredVerification = () => {
 const createAccountSummaryChartTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.accountSummaryTimestamp
-      .findUnique({
+      .findMany({
         where: {
-          UTCDateKey_userID: {
-            UTCDateKey: getFullDateUTCString(newDate()),
-            userID: user.id
-          }
-        }
+          userID: user.id
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1
       })
       .then((timestamp) => {
-        if (!timestamp) {
+        timestamp = timestamp[0]
+        // Only create new daily timestamp if there is no timestamp
+        // or there is a change in totalPortfolio to reduce database's size
+        if (
+          !timestamp || (
+            timestamp.UTCDateKey !== getFullDateUTCString(newDate()) &&
+            compareFloat(timestamp.portfolioValue, user.totalPortfolio)
+          )
+        ) {
           return prisma.accountSummaryTimestamp.create({
             data: {
               UTCDateString: newDate(),
@@ -81,16 +94,27 @@ const createAccountSummaryChartTimestampIfNecessary = (user) => {
 const createRankingTimestampIfNecessary = (user) => {
   return new Promise((resolve, reject) => {
     prisma.rankingTimestamp
-      .findUnique({
+      .findMany({
         where: {
-          UTCDateKey_userID: {
-            UTCDateKey: getFullDateUTCString(newDate()),
-            userID: user.id
-          }
-        }
+          userID: user.id
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1
       })
       .then((timestamp) => {
-        if (!timestamp) {
+        timestamp = timestamp[0]
+        // Only create new daily timestamp if there is no timestamp
+        // or there is a change in ranking to reduce database's size
+        if (
+          !timestamp || (
+            timestamp.UTCDateKey !== getFullDateUTCString(newDate()) && (
+              timestamp.ranking !== user.ranking ||
+              timestamp.regionalRanking !== user.regionalRanking
+            )
+          )
+        ) {
           return prisma.rankingTimestamp.create({
             data: {
               UTCDateString: newDate(),
@@ -143,6 +167,7 @@ const updateRankingList = (globalBackendVariables) => {
         },
         select: {
           id: true,
+          email: true,
           firstName: true,
           lastName: true,
           totalPortfolio: true,
@@ -151,6 +176,9 @@ const updateRankingList = (globalBackendVariables) => {
         orderBy: [
           {
             totalPortfolio: "desc"
+          },
+          {
+            id: "asc"
           }
         ]
       });
@@ -178,14 +206,14 @@ const updateRankingList = (globalBackendVariables) => {
           }
         });
 
-        return Promise.all([
+        return () => Promise.all([
           updateUserRanking,
           redisUpdateOverallRankingList(user),
           redisUpdateRegionalRankingList(nowRegion, user)
         ]);
       });
 
-      return Promise.all(updateAllUsersRanking);
+      return SequentialPromises(updateAllUsersRanking);
     })
     .then(() => {
       globalBackendVariables.updatedRankingListFlag = !globalBackendVariables.updatedRankingListFlag;
@@ -362,6 +390,181 @@ const getLengthUserTransactionsHistoryForRedisM5RU = (email, filters) => {
   });
 };
 
+/**
+ * Perform buy action for the function proceedTransaction
+ * @param {import(".prisma/client").User} user
+ * @param {number} totalCashChange
+ * @param {string} companyCode
+ * @param {number} quantity
+ * @param {number} recentPrice
+ * @returns
+ */
+ const buyShareEvent = async (
+  user,
+  totalCashChange,
+  companyCode,
+  quantity,
+  recentPrice
+) => {
+  try {
+    // Check conditions
+    if (user.cash + totalCashChange < 0) {
+      throw new Error("Condition failed:  Not enough cash");
+    }
+    // Update user cash
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        cash: user.cash + totalCashChange
+      }
+    });
+
+    // Find out whether user has owned this share already or not
+    const buyShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+
+    // Update share
+    // Case 1: user does not own this share => create new share
+    if (!buyShare) {
+      return await prisma.share.create({
+        data: {
+          companyCode: companyCode,
+          quantity: quantity,
+          buyPriceAvg: recentPrice,
+          user: {
+            connect: {
+              id: user.id
+            }
+          }
+        }
+      });
+    }
+    // Case 2: user owns this share => update share quantity, buyPriceAvg
+    buyShare.buyPriceAvg = ((buyShare.buyPriceAvg * buyShare.quantity) + (recentPrice * quantity)) / (quantity + buyShare.quantity);
+    buyShare.quantity += quantity;
+    await prisma.share.update({
+      where: {
+        id: buyShare.id
+      },
+      data: {
+        buyPriceAvg: buyShare.buyPriceAvg,
+        quantity: buyShare.quantity
+      }
+    });
+  } catch (err) {
+    if (!err.message || err.message.search("Condition") === -1)
+      console.log(err);
+    throw err;
+  }
+};
+
+const sellShareEvent = async (
+  user,
+  totalCashChange,
+  companyCode,
+  quantity
+) => {
+  try {
+    // Find the stock user want to sell and update its properties (quantity and average price)
+    const sellShare = user.shares.find(
+      (share) => share.companyCode === companyCode
+    );
+
+    // Check conditions
+    if (!sellShare) {
+      throw new Error("Condition failed: Couldn't find share");
+    } else if (quantity > sellShare.quantity) {
+      throw new Error("Condition failed: Not enough available shares");
+    } else if (user.cash + totalCashChange < 0) {
+      throw new Error("Condition failed: Not enough cash")
+    }
+
+    // Update user cash
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        cash: user.cash + totalCashChange,
+      }
+    });
+
+    // Update share
+    // Case 1: sell all shares => delete the share in prisma
+    if (quantity === sellShare.quantity) {
+      return await prisma.share.delete({
+        where: {
+          id: sellShare.id
+        }
+      });
+    }
+    // Case 2: sell some shares => update share quantity
+    await prisma.share.update({
+      where: {
+        id: sellShare.id
+      },
+      data: {
+        quantity: sellShare.quantity - quantity
+      }
+    });
+  } catch (err) {
+    if (!err.message || err.message.search("Condition") === -1)
+      console.log(err);
+    throw err;
+  }
+};
+
+/**
+ * Buy or sell if the transaction can be procceeded
+ * @param {string} transactionID
+ * @param {number} recentPrice
+ */
+const proceedTransaction = async (transactionID, recentPrice) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const userTransaction = await prisma.userTransaction.findUnique({
+      where: {
+        id: transactionID
+      },
+      include: {
+        user: {
+          include: {
+            shares: true
+          }
+        }
+      }
+    });
+    if (!userTransaction) return;
+
+    const { user, type, quantity, companyCode } = userTransaction;
+    const totalCashChange = (type === transactionTypeBuy ? -1 : 1) * (recentPrice * quantity) - userTransaction.brokerage;
+
+    if (type === transactionTypeBuy) {
+      await buyShareEvent(user, totalCashChange, companyCode, quantity, recentPrice);
+    } else {
+      await sellShareEvent(user, totalCashChange, companyCode, quantity);
+    }
+
+    // Update transaction after buying/selling
+    await prisma.userTransaction.update({
+      where: {
+        id: transactionID
+      },
+      data: {
+        isFinished: true,
+        finishedTime: new Date(),
+        priceAtTransaction: recentPrice,
+        spendOrGain: totalCashChange
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   deleteExpiredVerification,
 
@@ -374,5 +577,7 @@ module.exports = {
   updateRankingList,
 
   getChunkUserTransactionsHistoryForRedisM5RU,
-  getLengthUserTransactionsHistoryForRedisM5RU
+  getLengthUserTransactionsHistoryForRedisM5RU,
+
+  proceedTransaction
 };

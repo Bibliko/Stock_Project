@@ -1,5 +1,7 @@
 import React from "react";
 
+import { withTranslation } from "react-i18next";
+
 import { withStyles } from "@material-ui/core/styles";
 import { TextField, InputAdornment, IconButton } from "@material-ui/core";
 
@@ -59,6 +61,7 @@ class PasswordTextField extends React.Component {
 
   render() {
     const {
+      t,
       classes,
       name,
       changePassword,
@@ -72,7 +75,7 @@ class PasswordTextField extends React.Component {
       <TextField
         id={name}
         name={name}
-        label={name}
+        label={t(`general.${name}`, name)}
         type={!visibility ? "password" : "text"}
         variant="filled"
         margin="normal"
@@ -103,4 +106,4 @@ class PasswordTextField extends React.Component {
   }
 }
 
-export default withStyles(styles)(PasswordTextField);
+export default withTranslation()(withStyles(styles)(PasswordTextField));

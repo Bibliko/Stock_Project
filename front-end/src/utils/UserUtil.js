@@ -63,7 +63,7 @@ export const loginUser = (typeLogin, credentials) => {
           resolve("Successful");
         })
         .catch((e) => {
-          reject(e.response.data.message);
+          reject(e.response?.data?.message);
         });
     }
   });
@@ -80,7 +80,7 @@ export const signupUser = (credentials) => {
         resolve(res.data.message);
       })
       .catch((e) => {
-        reject(e.response.data.message);
+        reject(e.response?.data?.message);
       });
   });
 };
@@ -107,7 +107,7 @@ export const sendVerificationCode = (email, credentialNeedVerification) => {
         resolve(res.data.message);
       })
       .catch((err) => {
-        reject(err.response.data);
+        reject(err.response?.data);
       });
   });
 };
@@ -138,7 +138,7 @@ export const checkVerificationCode = (
         resolve("Successful");
       })
       .catch((err) => {
-        reject(err.response.data);
+        reject(err.response?.data);
       });
   });
 };
@@ -266,6 +266,26 @@ export const getUserData = (dataNeeded, email) => {
   });
 };
 
+export const getUserPendingTransactions = (email) => {
+  const dataNeeded = {
+    transactions: {
+      where: {
+        isFinished: false,
+      },
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    getUserData(dataNeeded, email)
+      .then((userData) => {
+        resolve(userData.transactions);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const getUserTransactionsHistory = (
   email,
   rowsLengthChoices,
@@ -325,6 +345,61 @@ export const getUserAccountSummaryChartTimestamps = (
     })
       .then((accountSummaryChartTimestamps) => {
         resolve(accountSummaryChartTimestamps.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getRankingLength = (region = null) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getRankingLength`, {
+      method: "get",
+      params: {
+        region,
+      },
+      withCredentials: true,
+    })
+      .then((listLength) => {
+        resolve(parseInt(listLength.data));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getOverallRanking = (page) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getOverallRanking`, {
+      method: "get",
+      params: {
+        page,
+      },
+      withCredentials: true,
+    })
+      .then((overallRanking) => {
+        resolve(overallRanking.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const getRegionalRanking = (page, region) => {
+  return new Promise((resolve, reject) => {
+    axios(`${BACKEND_HOST}/userData/getRegionalRanking`, {
+      method: "get",
+      params: {
+        page,
+        region,
+      },
+      withCredentials: true,
+    })
+      .then((regionalRanking) => {
+        resolve(regionalRanking.data);
       })
       .catch((err) => {
         reject(err);
@@ -415,8 +490,6 @@ export const checkStockQuotesToCalculateSharesValue = (
         cachedShares
       );
 
-      console.log(totalSharesValue);
-
       const newTotalPortfolioValue = cash + totalSharesValue;
 
       /**
@@ -455,8 +528,11 @@ export default {
   changeUserData,
   changeUserEmail,
   getUserData,
+  getUserPendingTransactions,
   getUserTransactionsHistory,
   getUserAccountSummaryChartTimestamps,
+  getOverallRanking,
+  getRegionalRanking,
 
   calculateTotalSharesValue,
   checkStockQuotesForUser,

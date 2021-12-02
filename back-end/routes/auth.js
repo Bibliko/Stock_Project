@@ -2,12 +2,11 @@ const {
   getPassportCallbackHost
 } = require("../utils/low-dependency/NetworkUtil");
 
-const { FRONTEND_HOST, SENDGRID_API_KEY } = process.env;
+const { FRONTEND_HOST, SENDGRID_API_KEY } = require('../config');
 
 const { Router } = require("express");
 const router = Router();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/low-dependency/PrismaClient");
 const passport = require("passport");
 const fs = require("fs-extra");
 

@@ -27,7 +27,7 @@ const takeFirebaseFile = (ref, fileName) =>
 const areConfigFilesDifferent = () => {
   return new Promise((resolve, reject) => {
     const firebaseConfigFile = takeFirebaseFile(storageRef, "config.js");
-    const localConfigFile = fs.readFile("./config/config.js", "utf8");
+    const localConfigFile = fs.readFile("./config.js", "utf8");
 
     Promise.all([firebaseConfigFile, localConfigFile])
       .then(([configBlobFirebase, configBlobLocal]) => {
@@ -70,7 +70,7 @@ const checkConfigFolderLocallyAndPullFromFirebaseIfNecessary = () => {
     .then(([configFolderNeedsUpdate, firebaseConfigBlob]) => {
       // if config folder need update
       if (configFolderNeedsUpdate) {
-        return writeFile("./config/config.js", firebaseConfigBlob);
+        return writeFile("./config.js", firebaseConfigBlob);
       } else {
         console.log("Config Folder does not need updates.");
       }
