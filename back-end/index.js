@@ -251,7 +251,7 @@ const setupBackendIntervals = () => {
           .catch((err) => console.log(err));
       }
     },
-    oneHour * 1.5
+    oneHour
   );
 
   // TODO: Uncomment this in production

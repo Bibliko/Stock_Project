@@ -155,14 +155,14 @@ class SubNavbar extends React.Component {
     this.updateData();
   }
 
-  componentDidUpdate() {
-    if (this.props.isMarketClosed) {
-      this.setState({
-        countdown: "",
-      });
-      clearInterval(this.marketCountdownInterval);
-    }
-  }
+  // componentDidUpdate() {
+  //   if (this.props.isMarketClosed) {
+  //     this.setState({
+  //       countdown: "",
+  //     });
+  //     clearInterval(this.marketCountdownInterval);
+  //   }
+  // }
 
   componentWillUnmount() {
     clearInterval(this.marketCountdownInterval);
