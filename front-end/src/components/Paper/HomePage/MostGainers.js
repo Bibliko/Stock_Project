@@ -62,7 +62,6 @@ class MostGainers extends React.Component {
   componentDidMount() {
     getCachedMostGainers()
       .then((gainers) => {
-        console.log(gainers);
         this.setState({
           gainers,
         });

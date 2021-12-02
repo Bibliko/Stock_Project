@@ -348,7 +348,6 @@ class HoldingsTableRow extends React.Component {
     const { code, holding, buyPriceAvg } = this.props.rowData;
     getFullStockInfo(code)
       .then((fullStockInfo) => {
-        console.log(fullStockInfo);
         const { price } = fullStockInfo;
         this.setStateHoldingInformation(price, buyPriceAvg, holding);
       })
